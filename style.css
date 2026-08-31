@@ -493,3 +493,12 @@
     overflow-y: auto !important; /* Scroll vertically */
     padding-right: 5px; /* Prevent scrollbar overlapping content */
 }
+
+.master-card, .equation-grid-wrapper, .workspace-grid {
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+/* Ensure the left sidebar is slightly wider if text gets cramped */
+.left-sidebar:not(.collapsed) {
+    min-width: 240px !important; 
+}
