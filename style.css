@@ -524,3 +524,32 @@
     margin-bottom: 25px !important; /* huge gap below equation */
     margin-top: 0 !important;
 }
+
+/* Collapsed state styling */
+.collapsed .sidebar-title {
+    padding: 0 !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important; /* Make it a circular button when collapsed */
+}
+
+
+.collapsed .sidebar-title .title-svg {
+    margin-right: 0 !important;
+}
+
+
+
+.master-card, .equation-grid-wrapper, .workspace-grid {
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+/* Ensure the left sidebar is slightly wider if text gets cramped */
+.left-sidebar:not(.collapsed) {
+    min-width: 240px !important; 
+}
