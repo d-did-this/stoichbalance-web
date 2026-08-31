@@ -120,10 +120,14 @@
                     <div class="drop-area" id="area-right" ondragover="allowDrop(event)" ondrop="drop(event, 'right')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
                     <div class="panel-tally" id="tally-right"></div>
                 </div>
+            
+                </div>
+                <div class="workspace-controls" style="display:flex; justify-content:center; gap: 15px; padding: 15px; background: #f8fafc; border-top: 2px dashed #cbd5e1;">
+                    <button onclick="undo()" style="background:#f97316; color:white; border-color:#c2410c; box-shadow:0 4px 0 #c2410c; padding: 8px 24px; font-size:16px;">↩️ Undo Last</button>
+                    <button onclick="resetEquation()" style="background:#ef4444; color:white; border-color:#b91c1c; box-shadow:0 4px 0 #b91c1c; padding: 8px 24px; font-size:16px;">🔄 Start Over</button>
+                </div>
             </div>
-        </div>
-
-        <!-- Right Sidebar: Teacher Guide -->
+            <!-- Right Sidebar: Teacher Guide -->
         <div class="right-sidebar" id="teacher-guide">
             <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; width:100%; display:flex; justify-content:center; white-space:nowrap; padding-bottom:4px;" onclick="document.getElementById('teacher-guide').classList.toggle('collapsed')">
                 <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;">👨‍🔬 <span class="full-text" style="margin-left:5px;">PROF. BEAKER</span></div>
@@ -135,12 +139,9 @@
             <div class="guide-btns">
                 <div style="display: flex; gap: 5px; width: 100%;">
                     <button class="btn-hint" style="flex: 9; padding: 6px 10px;" onclick="revealHeuristicHint()">💡 Give me a Hint!</button>
-                    <button style="flex: 1; padding: 6px; display: flex; justify-content: center; align-items: center;" onclick="clearChat()" data-tooltip="Clear Chat">🧹</button>
+                    <button onclick="clearChat()" style="flex: 1; padding: 6px; display: flex; justify-content: center; align-items: center; background:#64748b; color:white; border-color:#475569; box-shadow:0 4px 0 #475569;" data-tooltip="Clear Chat">🧹</button>
                 </div>
-                <div style="display: flex; gap: 5px; width: 100%;">
-                    <button onclick="undo()" style="flex: 1;" data-tooltip="Undo Last Move">↩️ Undo</button>
-                    <button onclick="resetEquation()" style="flex: 1;">🔄 Start Over</button>
-                </div>
+                
             </div>
         </div>
 
