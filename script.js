@@ -4,10 +4,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if(localStorage.getItem('stoich_student_name')) {
         document.getElementById('student-name').value = localStorage.getItem('stoich_student_name');
     }
-    if(localStorage.getItem('stoich_student_form')) {
-        document.getElementById('student-form').value = localStorage.getItem('stoich_student_form');
-    }
-});
+    });
 let currentStreak = parseInt(localStorage.getItem('stoich_streak') || '0');
 let puzzlesSolvedCount = parseInt(localStorage.getItem('stoich_solved') || '0');
 let totalHintsUsed = parseInt(localStorage.getItem('stoich_hints') || '0');
@@ -67,18 +64,25 @@ function toggleMute() {
             }
         });
 
-        const REACTIONS = [
+        let currentForm = 'Form 4';
+
+const FORM_4_REACTIONS = [
     { name: "[Easy] Making Water 💧", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] },
     { name: "[Easy] Salt Formation 🧂", left: ["Na(s)", "Cl2(g)"], right: ["NaCl(s)"] },
     { name: "[Easy] Making Ammonia 💨", left: ["N2(g)", "H2(g)"], right: ["NH3(g)"] },
     { name: "[Med] Burning Methane 🔥", left: ["CH4(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Rusting Iron 🧲", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] }
+];
+
+const FORM_5_REACTIONS = [
     { name: "[Med] Burning Methanol 🔥", left: ["CH3OH(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Med] Rusting Iron 🧲", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] },
     { name: "[Hard] Baking Soda 🧁", left: ["NaHCO3(s)"], right: ["Na2CO3(s)", "H2O(l)", "CO2(g)"] },
     { name: "[Hard] Aluminum Thermite 💥", left: ["Al(s)", "Fe2O3(s)"], right: ["Al2O3(s)", "Fe(s)"] },
     { name: "[Hard] Glucose Combustion 🌿", left: ["C6H12O6(s)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
     { name: "[Hard] Copper Nitric Acid 🧪", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] }
 ];
+
+let REACTIONS = FORM_4_REACTIONS;
 
         const MOLECULE_NAMES = { "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor", "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron", "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium", "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas", "NaCl(s)": "Sodium Chloride", "CH4(g)": "Methane", "Fe2O3(s)": "Iron(III) Oxide", "NaHCO3(s)": "Sodium Bicarbonate", "Na2CO3(s)": "Sodium Carbonate", "Al(s)": "Solid Aluminum", "Al2O3(s)": "Aluminum Oxide", "C6H12O6(s)": "Glucose", "Cu(s)": "Copper", "HNO3(aq)": "Nitric Acid", "Cu(NO3)2(aq)": "Copper(II) Nitrate", "NO2(g)": "Nitrogen Dioxide" };
 
@@ -388,26 +392,44 @@ function toggleMute() {
             localStorage.setItem('STOICHBALANCE_tutorial_seen', 'true');
         }
 
-        function init() {
+        
+function init() {
     updateCountersDOM();
-            populateDropdown();
-            const sel = document.getElementById('reaction-select');
-            sel.onchange = (e) => {
-                if (e.target.value === 'custom') {
-                    openCustomModal();
-                    sel.value = state.rxIdx; // revert until saved
-                } else {
-                    loadReaction(e.target.value);
-                }
-            };
-            loadReaction(0);
+    
+    let grid = document.getElementById('level-grid');
+    if (grid) {
+        grid.innerHTML = '';
+        REACTIONS.forEach((rx, i) => {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
             
-            if (!localStorage.getItem('STOICHBALANCE_tutorial_seen')) {
-                openTutorial();
+            // Check if solved
+            if (localStorage.getItem('solved_' + rx.name)) {
+                btn.classList.add('solved');
             }
-        }
+            
+            let diffColor = rx.name.includes('[Easy]') ? '#10b981' : (rx.name.includes('[Med]') ? '#f59e0b' : '#ef4444');
+            let cleanName = rx.name;
+            let tag = "";
+            let match = rx.name.match(/\[(.*?)\]/);
+            if(match) {
+                tag = match[0];
+                cleanName = rx.name.replace(tag + ' ', '');
+            }
+            
+            btn.innerHTML = `<span style="color:${diffColor};">${tag}</span> ${cleanName} <div class="eq-preview">${rx.left.join(' + ')} → ${rx.right.join(' + ')}</div>`;
+            
+            btn.onclick = () => startGame(i);
+            grid.appendChild(btn);
+        });
+    }
+    
+    if (!localStorage.getItem('STOICHBALANCE_tutorial_seen')) {
+        openTutorial();
+    }
+}
 
-        function loadReaction(idx) {
+function loadReaction(idx) {
     state.hintLevel = 0;
             state.rxIdx = parseInt(idx);
             let rx = REACTIONS[state.rxIdx];
@@ -844,13 +866,13 @@ function toggleMute() {
                     }
                     playSound('ding');
                     triggerConfetti();
-    if(!state.completed.has(state.rxIdx)) {
+    if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
         currentStreak++;
         puzzlesSolvedCount++;
         localStorage.setItem('stoich_streak', currentStreak);
         localStorage.setItem('stoich_solved', puzzlesSolvedCount);
         updateCountersDOM();
-        state.completed.add(state.rxIdx);
+        localStorage.setItem('solved_' + REACTIONS[state.rxIdx].name, 'true');
     }
                     
                     let optimalMoves = (rx.left.length + rx.right.length) * 2; // rough estimate
@@ -990,16 +1012,23 @@ function downloadReport() {
 }
 
 
-function goToLevels() {
+
+function goToLevels(selectedForm) {
     let name = document.getElementById('student-name').value.trim();
     if(!name) {
         alert("Please enter your Student Name before continuing!");
         return;
     }
-    let formVal = document.getElementById('student-form').value;
     
+    // Save to localStorage
     localStorage.setItem('stoich_student_name', name);
-    localStorage.setItem('stoich_student_form', formVal);
+    localStorage.setItem('stoich_student_form', selectedForm);
+    
+    currentForm = selectedForm;
+    REACTIONS = (currentForm === 'Form 5') ? FORM_5_REACTIONS : FORM_4_REACTIONS;
+    
+    // Re-render grid for specific form
+    init();
     
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('level-screen').style.display = 'flex';
@@ -1016,7 +1045,10 @@ function startGame(index) {
 function returnToMenu() {
     document.getElementById('main-menu').classList.remove('hidden');
     // If they already entered their name, take them straight to the level grid
-    if(document.getElementById('student-name').value.trim() !== '') {
+    let savedName = document.getElementById('student-name').value.trim();
+    if(savedName !== '') {
+        currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
+        REACTIONS = (currentForm === 'Form 5') ? FORM_5_REACTIONS : FORM_4_REACTIONS;
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('level-screen').style.display = 'flex';
     } else {
