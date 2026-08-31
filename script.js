@@ -773,7 +773,7 @@ function loadReaction(idx) {
             const cont = document.getElementById('element-scales-container');
             cont.innerHTML = `
                 <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
-                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;">🔍 <span class="full-text" style="margin-left:5px;">Tiny Scales!</span></div>
+                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;">🔍 <span class="full-text" style="margin-left:5px; white-space: normal; line-height: 1.1;">Tiny Scales!</span></div>
                 </div>
             `;
 
@@ -797,7 +797,7 @@ function loadReaction(idx) {
 
                 cont.innerHTML += `
                     <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
-                        <div class="scale-header" style="font-weight: bold; font-size: 14px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-wrap: break-word;">${fullName}</div>
+                        <div class="scale-header" style="font-weight: 900; font-size: 15px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
                         
                         <!-- Book Stacks -->
                         <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
