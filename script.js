@@ -1061,10 +1061,13 @@ function goToLevels(selectedForm) {
     currentForm = selectedForm;
     if (currentForm === 'Form 5') {
         REACTIONS = FORM_5_REACTIONS;
+        document.body.classList.remove('dev-mode');
     } else if (currentForm === 'Developer') {
         REACTIONS = FORM_DEV_REACTIONS;
+        document.body.classList.add('dev-mode');
     } else {
         REACTIONS = FORM_4_REACTIONS;
+        document.body.classList.remove('dev-mode');
     }
     
     // Re-render grid for specific form
@@ -1090,10 +1093,13 @@ function returnToMenu() {
         currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
         if (currentForm === 'Form 5') {
             REACTIONS = FORM_5_REACTIONS;
+            document.body.classList.remove('dev-mode');
         } else if (currentForm === 'Developer') {
             REACTIONS = FORM_DEV_REACTIONS;
+            document.body.classList.add('dev-mode');
         } else {
             REACTIONS = FORM_4_REACTIONS;
+            document.body.classList.remove('dev-mode');
         }
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('level-screen').style.display = 'flex';
