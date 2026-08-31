@@ -417,7 +417,8 @@ function init() {
                 cleanName = rx.name.replace(tag + ' ', '');
             }
             
-            btn.innerHTML = `<span style="color:${diffColor};">${tag}</span> ${cleanName} <div class="eq-preview">${rx.left.join(' + ')} → ${rx.right.join(' + ')}</div>`;
+            let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${i + 1}</div>`;
+            btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${rx.left.join(' + ')} ➔ ${rx.right.join(' + ')}</div>`;
             
             btn.onclick = () => startGame(i);
             grid.appendChild(btn);
