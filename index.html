@@ -66,7 +66,7 @@
         </div>
     </header>
 
-    <button onclick="openTutorial()" style="position:fixed; bottom:20px; left:20px; z-index:9000; background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:50px; height:50px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s; padding-bottom:3px;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
+    <button onclick="openTutorial()" style="position:fixed; bottom:20px; left:20px; z-index:9000; background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s; padding-bottom:3px;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
 
     <div class="app-body">
         
@@ -127,7 +127,7 @@
             <!-- Right Sidebar: Teacher Guide -->
         <div class="right-sidebar" id="teacher-guide">
             <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; width:100%; display:flex; justify-content:center; white-space:nowrap; padding-bottom:4px;" onclick="document.getElementById('teacher-guide').classList.toggle('collapsed')">
-                <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;"><svg style="width:28px;height:28px;color:#3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> <span class="full-text" style="margin-left:5px;">PROF. BEAKER</span></div>
+                <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;"><svg style="width:28px;height:28px;color:#ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> <span class="full-text" style="margin-left:5px;">PROF. BEAKER</span></div>
             </div>
             <div class="chat-wrapper">
                 <div class="chat-container" id="chat-box"></div>
@@ -136,7 +136,7 @@
             <div class="guide-btns">
                 <div style="display: flex; gap: 5px; width: 100%;">
                     <button class="btn-hint" style="flex: 9; padding: 6px 10px;" onclick="revealHeuristicHint()">💡 Give me a Hint!</button>
-                    <button onclick="clearChat()" style="flex: 1; padding: 6px; display: flex; justify-content: center; align-items: center; background:#64748b; color:white; border-color:#475569; box-shadow:0 4px 0 #475569;" data-tooltip="Clear Chat"><svg style="width:22px;height:22px;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                    <button onclick="clearChat()" style="flex: 1; padding: 6px; display: flex; justify-content: center; align-items: center; background:#64748b; color:white; border-color:#475569; box-shadow:0 4px 0 #475569;" data-tooltip="Clear Chat"><svg style="width:24px;height:24px;margin-right:0px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                 </div>
                 
             </div>
@@ -254,7 +254,7 @@
                 <h2 style="color:var(--primary); font-size:28px; font-weight:900;">Bots & Puzzles!</h2>
                 <div style="display:flex; flex-direction:column; gap:15px; margin:15px 0; text-align:left;">
                     <div style="background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px; padding:10px; font-weight:bold; color:#166534;">
-                        <strong><svg style="width:28px;height:28px;color:#3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Prof. Beaker:</strong> Stuck? Open the right panel and click "Give me a Hint!". The bot will pulse the exact screens you need to look at!
+                        <strong><svg style="width:28px;height:28px;color:#ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Prof. Beaker:</strong> Stuck? Open the right panel and click "Give me a Hint!". The bot will pulse the exact screens you need to look at!
                     </div>
                     <div style="background:#fdf4ff; border:2px solid #fbcfe8; border-radius:12px; padding:10px; font-weight:bold; color:#86198f;">
                         <strong>📋 Puzzles:</strong> The dropdown at the top lets you pick different puzzles. Watch the counter to see how many you've solved!
@@ -289,11 +289,11 @@ window.onclick = function(event) {
     
     <!-- Floating Game Controls (Left Side) -->
     <div style="position:fixed; bottom:20px; left:80px; display:flex; gap: 10px; z-index:9000;">
-        <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
-            <svg style="width:30px;height:30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+        <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
+            <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
         </button>
-        <button onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Start Over">
-            <svg style="width:30px;height:30px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <button onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Start Over">
+            <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
     </div>
 
