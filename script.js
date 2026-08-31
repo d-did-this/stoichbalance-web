@@ -4,8 +4,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if(localStorage.getItem('stoich_student_name')) {
         document.getElementById('student-name').value = localStorage.getItem('stoich_student_name');
     }
-    if(localStorage.getItem('stoich_student_age')) {
-        document.getElementById('student-age').value = localStorage.getItem('stoich_student_age');
+    if(localStorage.getItem('stoich_student_form')) {
+        document.getElementById('student-form').value = localStorage.getItem('stoich_student_form');
     }
 });
 let currentStreak = parseInt(localStorage.getItem('stoich_streak') || '0');
@@ -978,8 +978,8 @@ function toggleMute() {
         window.onload = init;
 function downloadReport() {
     const name = document.getElementById('student-name').value || 'Unknown Student';
-    const age = document.getElementById('student-age').value || 'N/A';
-    const text = "STOICHBALANCE - TEACHER REPORT\nDate: " + new Date().toLocaleString() + "\nStudent: " + name + " (Age: " + age + ")\n\nTotal Puzzles Solved: " + puzzlesSolvedCount + "\nCurrent Streak: " + currentStreak + "\nTotal Hints Used: " + totalHintsUsed + "\n\nKeep up the great work!";
+    const age = document.getElementById('student-form').value || 'N/A';
+    const text = "STOICHBALANCE - TEACHER REPORT\nDate: " + new Date().toLocaleString() + "\nStudent: " + name + " (" + (document.getElementById('student-form').value || 'Form 4') + "\n\nTotal Puzzles Solved: " + puzzlesSolvedCount + "\nCurrent Streak: " + currentStreak + "\nTotal Hints Used: " + totalHintsUsed + "\n\nKeep up the great work!";
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -989,30 +989,39 @@ function downloadReport() {
     URL.revokeObjectURL(url);
 }
 
-function startGame(index) {
+
+function goToLevels() {
     let name = document.getElementById('student-name').value.trim();
-    let age = document.getElementById('student-age').value.trim();
-    
-    if(!name || !age) {
-        alert("Please enter your Name and Age before starting!");
+    if(!name) {
+        alert("Please enter your Student Name before continuing!");
         return;
     }
+    let formVal = document.getElementById('student-form').value;
     
     localStorage.setItem('stoich_student_name', name);
-    localStorage.setItem('stoich_student_age', age);
+    localStorage.setItem('stoich_student_form', formVal);
     
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('level-screen').style.display = 'flex';
+}
+
+function startGame(index) {
     document.getElementById('main-menu').classList.add('hidden');
-    
-    // Play whoosh sound
     if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
-    
-    // Load the selected reaction
     state.rxIdx = index;
     loadReaction(index);
 }
 
+
 function returnToMenu() {
     document.getElementById('main-menu').classList.remove('hidden');
-    // Refresh the grid to show new solved checkmarks
+    // If they already entered their name, take them straight to the level grid
+    if(document.getElementById('student-name').value.trim() !== '') {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('level-screen').style.display = 'flex';
+    } else {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('level-screen').style.display = 'none';
+    }
     init();
 }
