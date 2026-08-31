@@ -418,7 +418,9 @@ function init() {
             }
             
             let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${i + 1}</div>`;
-            btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${rx.left.join(' + ')} ➔ ${rx.right.join(' + ')}</div>`;
+            let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
+            let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
+            btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
             
             btn.onclick = () => startGame(i);
             grid.appendChild(btn);
