@@ -44,17 +44,22 @@
     <header class="header">
         <div style="display:flex; align-items:center; gap:15px;">
             <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!">
-                <span class="logo-icon">🧪</span> STOICHBALANCE
+                STOICHBALANCE
             </h1>
-            <div id="puzzle-counter" style="background:var(--st-green); color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #047857; box-shadow:0 4px 0 #047857; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 5</div>
+            <div id="puzzle-counter" style="background:var(--st-green); color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #047857; box-shadow:0 4px 0 #047857; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 15</div>
             <div id="streak-counter" style="background:#f59e0b; color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #b45309; box-shadow:0 4px 0 #b45309; cursor:help;" data-tooltip="Your current streak! Don't use hints!">🔥 0</div>
         </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items:center;">
-            <label style="font-weight:900; color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
-            <button onclick="returnToMenu()" data-tooltip="Go back to the Main Menu">🏠 Menu</button>
-            <button onclick="toggleGuide()" data-tooltip="Show or hide Prof. Beaker!">👨‍🔬 Beaker</button>
-            <button onclick="toggleMute()" id="mute-btn" data-tooltip="Toggle sound effects">🔊 Sound On</button>
-            <button onclick="downloadReport()" data-tooltip="Download report for teacher">📄 Report</button>
+        <div style="display: flex; gap: 12px; align-items:center; position: relative;">
+            <button onclick="returnToMenu()" data-tooltip="Go back to the Main Menu">🏠 MENU</button>
+            <div class="dropdown">
+                <button class="dropbtn" onclick="document.getElementById('settings-dropdown').classList.toggle('show')">⋮ Settings</button>
+                <div id="settings-dropdown" class="dropdown-content">
+                    <label class="dropdown-item" style="color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
+                    <button class="dropdown-item" onclick="toggleMute()" id="mute-btn">🔊 Sound On</button>
+                    <button class="dropdown-item" onclick="downloadReport()">📄 Report</button>
+                    <button class="dropdown-item" onclick="openTutorial()">❓ Help & Guide</button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -117,8 +122,8 @@
 
         <!-- Right Sidebar: Teacher Guide -->
         <div class="right-sidebar" id="teacher-guide">
-            <div class="sidebar-title-wrapper" data-tooltip="I'm the Helper Bot! Ask me for a hint!">
-                <div class="sidebar-title">👨‍🔬 PROF. BEAKER</div>
+            <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer;" onclick="document.getElementById('teacher-guide').classList.toggle('collapsed')">
+                <div class="sidebar-title">👨‍🔬 <span class="full-text">PROF. BEAKER</span></div>
             </div>
             <div class="chat-wrapper">
                 <div class="chat-container" id="chat-box"></div>
@@ -267,5 +272,17 @@
     </div>
 
     <script src="script.js"></script>
-</body>
+<script>
+window.onclick = function(event) {
+    if (!event.target.closest('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+</script></body>
 </html>
