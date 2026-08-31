@@ -369,3 +369,38 @@
     outline: none;
     box-sizing: border-box;
 }
+
+/* ========================================= */
+/* DEV MODE UI (Clean, uncluttered, mature)  */
+/* ========================================= */
+body.dev-mode .header {
+    justify-content: space-between;
+    padding: 15px 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-bottom: 2px solid #e2e8f0;
+}
+body.dev-mode .header h1 {
+    font-size: 24px;
+    color: #334155;
+    letter-spacing: 2px;
+}
+body.dev-mode .logo-icon { display: none; }
+body.dev-mode #puzzle-counter { display: none; }
+body.dev-mode #streak-counter { display: none; }
+body.dev-mode label:has(#hard-mode-toggle) { display: none !important; }
+body.dev-mode #mute-btn { display: none !important; }
+body.dev-mode button[onclick="downloadReport()"] { display: none !important; }
+body.dev-mode button[onclick="toggleGuide()"] { display: none !important; }
+body.dev-mode button[onclick="openTutorial()"] { display: none !important; }
+body.dev-mode .right-sidebar { display: none !important; }
+
+body.dev-mode .panel-header {
+    background: #f1f5f9;
+    color: #475569;
+    text-shadow: none;
+    border-bottom: 2px solid #cbd5e1;
+    font-size: 14px;
+    letter-spacing: 2px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
