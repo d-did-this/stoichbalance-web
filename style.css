@@ -392,7 +392,7 @@
 /* --- Collapsible Sidebars --- */
 .left-sidebar, .right-sidebar { transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), min-width 0.3s; overflow-x: hidden; }
 
-.left-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; flex: none !important; align-items: center; overflow: hidden; }
+.left-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; height: min-content !important; flex: none !important; align-items: center; overflow: hidden; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 .left-sidebar.collapsed .scale-card, .left-sidebar.collapsed p, .left-sidebar.collapsed .scale-footer { display: none !important; }
 .left-sidebar.collapsed .sidebar-title span.full-text { display: none !important; }
 .left-sidebar.collapsed .sidebar-title { font-size: 28px !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; margin:0 !important; }
@@ -400,7 +400,7 @@
 
 
 
-.right-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; flex: none !important; align-items: center; overflow: hidden; }
+.right-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; height: min-content !important; flex: none !important; align-items: center; overflow: hidden; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 .right-sidebar.collapsed .chat-wrapper, .right-sidebar.collapsed .guide-btns { display: none !important; }
 .right-sidebar.collapsed .sidebar-title span.full-text { display: none !important; }
 .right-sidebar.collapsed .sidebar-title { font-size: 28px !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; margin:0 !important; }
@@ -496,3 +496,14 @@
     padding: 10px 5px !important; /* adjust padding when collapsed */
 }
 /* ------------------------------------- */
+
+/* Flat work panels for Three Block Layout */
+.work-panel.card {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+.workspace-grid {
+    background: #ffffff !important;
+}
