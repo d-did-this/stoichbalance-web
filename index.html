@@ -8,6 +8,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="main-menu" class="menu-overlay">
+        <div class="menu-card card">
+            <h1 class="menu-title"><span class="logo-icon">🧪</span> STOICHBALANCE</h1>
+            <p class="menu-subtitle">Welcome to the Chemistry Lab! Let's get balancing.</p>
+            
+            <div class="student-info">
+                <input type="text" id="student-name" placeholder="Student Name" required>
+                <input type="number" id="student-age" placeholder="Age" required min="5" max="99">
+            </div>
+
+            <div style="text-align:left; margin-top:10px;">
+                <h3 style="color:var(--text-dark); font-weight:900;">Select a Puzzle:</h3>
+                <div class="level-grid" id="level-grid"></div>
+            </div>
+            
+            <div style="display:flex; justify-content:center; margin-top:10px;">
+                <button onclick="document.getElementById('main-menu').classList.add('hidden'); document.getElementById('custom-modal').style.display='flex';" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:10px 20px; font-size:16px;">🛠️ Create Custom Puzzle</button>
+            </div>
+        </div>
+    </div>
+    
 
     <header class="header">
         <div style="display:flex; align-items:center; gap:15px;">
@@ -19,7 +40,7 @@
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items:center;">
             <label style="font-weight:900; color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
-            <select id="reaction-select" data-tooltip="Pick a puzzle to solve or create a new one!"></select>
+            <button onclick="returnToMenu()" data-tooltip="Go back to the Main Menu">🏠 Menu</button>
             <button onclick="toggleGuide()" data-tooltip="Show or hide Prof. Beaker!">👨‍🔬 Beaker</button>
             <button onclick="toggleMute()" id="mute-btn" data-tooltip="Toggle sound effects">🔊 Sound On</button>
             <button onclick="downloadReport()" data-tooltip="Download report for teacher">📄 Report</button>
