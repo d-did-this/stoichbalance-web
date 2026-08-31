@@ -395,7 +395,14 @@
 .left-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; height: min-content !important; flex: none !important; align-items: center; overflow: hidden; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 .left-sidebar.collapsed .scale-card, .left-sidebar.collapsed p, .left-sidebar.collapsed .scale-footer { display: none !important; }
 .left-sidebar.collapsed .sidebar-title span.full-text { display: none !important; }
-.left-sidebar.collapsed .sidebar-title { font-size: 28px !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; margin:0 !important; }
+.left-sidebar
+.collapsed .sidebar-title {
+    /* We keep the background and border so it looks like a floating button */
+    padding: 10px !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+
 .left-sidebar.collapsed .sidebar-title-wrapper { border: 3px solid #cbd5e1 !important; background: #ffffff !important; padding: 10px !important; border-radius: 16px !important; box-shadow: 0 4px 0 #cbd5e1 !important; justify-content: center !important; }
 
 
@@ -403,7 +410,14 @@
 .right-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; height: min-content !important; flex: none !important; align-items: center; overflow: hidden; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 .right-sidebar.collapsed .chat-wrapper, .right-sidebar.collapsed .guide-btns { display: none !important; }
 .right-sidebar.collapsed .sidebar-title span.full-text { display: none !important; }
-.right-sidebar.collapsed .sidebar-title { font-size: 28px !important; padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; margin:0 !important; }
+.right-sidebar
+.collapsed .sidebar-title {
+    /* We keep the background and border so it looks like a floating button */
+    padding: 10px !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+
 .right-sidebar.collapsed .sidebar-title-wrapper { border: 3px solid #cbd5e1 !important; background: #ffffff !important; padding: 10px !important; border-radius: 16px !important; box-shadow: 0 4px 0 #cbd5e1 !important; justify-content: center !important; }
 
 
@@ -501,4 +515,12 @@
 /* Ensure the left sidebar is slightly wider if text gets cramped */
 .left-sidebar:not(.collapsed) {
     min-width: 240px !important; 
+}
+
+.master-card {
+    margin-bottom: 25px !important; /* huge gap below master scale */
+}
+.equation-grid-wrapper {
+    margin-bottom: 25px !important; /* huge gap below equation */
+    margin-top: 0 !important;
 }
