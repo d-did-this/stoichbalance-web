@@ -301,6 +301,10 @@
     transform: rotate(10deg);
 }
 
+
+
+
+
 .menu-card {
     background: #ffffff; 
     padding: 40px; 
@@ -312,28 +316,32 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     border-radius: 30px;
     
-    /* Desktop: Large Horizontal Rectangle */
+    /* Login Screen - Small and fit */
     width: 90vw;
-    height: 70vh;
-    max-width: 1200px;
-    max-height: 800px;
+    max-width: 500px;
+    height: auto;
     overflow: hidden;
 }
 
-.full-screen-menu {
-    /* Kept class if needed for specificity, but rely on .menu-card sizing */
+.massive-card {
+    /* Puzzle Grid Screen - As big as the screen can support */
+    width: 98vw !important;
+    height: 96vh !important;
+    max-width: 2000px !important;
+    max-height: none !important;
     padding: 30px 40px !important;
 }
 
 @media (max-width: 768px) {
     .menu-card {
-        /* Mobile: Vertical Rectangle */
-        width: 92vw;
-        height: 88vh;
         padding: 20px;
         border-radius: 20px;
     }
-    .full-screen-menu {
+    .massive-card {
+        width: 100vw !important;
+        height: 100vh !important;
+        border-radius: 0px !important;
+        border: none !important;
         padding: 15px !important;
     }
 }
