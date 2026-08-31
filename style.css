@@ -473,3 +473,23 @@
 .sidebar-title {
     box-sizing: border-box !important;
 }
+
+/* Make Prof Beaker sidebar stretch and scroll */
+.right-sidebar:not(.collapsed) {
+    height: calc(100vh - 100px) !important; /* Stretch to near bottom */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.right-sidebar:not(.collapsed) .chat-wrapper {
+    flex: 1 !important; /* Take remaining space */
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important; /* Required for flex children to scroll */
+}
+
+.right-sidebar:not(.collapsed) .chat-container {
+    flex: 1 !important;
+    overflow-y: auto !important; /* Scroll vertically */
+    padding-right: 5px; /* Prevent scrollbar overlapping content */
+}
