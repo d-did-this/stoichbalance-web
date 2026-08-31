@@ -396,6 +396,13 @@ let REACTIONS = FORM_4_REACTIONS;
 function init() {
     updateCountersDOM();
     
+    let savedName = localStorage.getItem('stoich_student_name') || '';
+    let savedForm = localStorage.getItem('stoich_student_form') || currentForm;
+    let greet = document.getElementById('user-greeting');
+    if (greet && savedName) {
+        greet.innerText = "👋 Welcome, " + savedName + " (" + savedForm + ")";
+    }
+
     let grid = document.getElementById('level-grid');
     if (grid) {
         grid.innerHTML = '';
