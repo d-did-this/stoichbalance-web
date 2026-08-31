@@ -370,37 +370,27 @@
     box-sizing: border-box;
 }
 
-/* ========================================= */
-/* DEV MODE UI (Clean, uncluttered, mature)  */
-/* ========================================= */
-body.dev-mode .header {
-    justify-content: space-between;
-    padding: 15px 30px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    border-bottom: 2px solid #e2e8f0;
-}
-body.dev-mode .header h1 {
-    font-size: 24px;
-    color: #334155;
-    letter-spacing: 2px;
-}
-body.dev-mode .logo-icon { display: none; }
-body.dev-mode #puzzle-counter { display: none; }
-body.dev-mode #streak-counter { display: none; }
-body.dev-mode label:has(#hard-mode-toggle) { display: none !important; }
-body.dev-mode #mute-btn { display: none !important; }
-body.dev-mode button[onclick="downloadReport()"] { display: none !important; }
-body.dev-mode button[onclick="toggleGuide()"] { display: none !important; }
-body.dev-mode button[onclick="openTutorial()"] { display: none !important; }
-body.dev-mode .sidebar-title-wrapper, body.dev-mode .chat-wrapper, body.dev-mode .btn-hint { display: none !important; }
 
-body.dev-mode .panel-header {
-    background: #f1f5f9;
-    color: #475569;
-    text-shadow: none;
-    border-bottom: 2px solid #cbd5e1;
-    font-size: 14px;
-    letter-spacing: 2px;
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+
+/* --- Clean Mature UI --- */
+.dropdown { position: relative; display: inline-block; }
+.dropbtn { font-size: 20px; padding: 6px 12px; background: #f1f5f9; border: 3px solid #cbd5e1; border-radius: 12px; cursor: pointer; color: #475569; }
+.dropdown-content {
+    display: none; position: absolute; right: 0; top: 110%; background-color: #ffffff;
+    min-width: 200px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;
+    border-radius: 12px; border: 3px solid #cbd5e1; flex-direction: column; padding: 5px; gap: 5px;
 }
+.dropdown-content.show { display: flex; }
+.dropdown-content button, .dropdown-content label {
+    width: 100%; text-align: left; padding: 10px; font-size: 14px; background: transparent; border: none; box-shadow: none; border-radius: 8px; cursor: pointer; color: #334155; font-weight: bold; display: flex; align-items: center; gap: 8px;
+}
+.dropdown-content button:hover, .dropdown-content label:hover { background-color: #f1f5f9; transform: none; box-shadow: none; }
+
+.header-right { display: flex; gap: 10px; align-items: center; }
+
+/* Refined panels */
+.panel-header {
+    background: #1e293b; color: #ffffff; padding: 10px; font-size: 16px; font-weight: 800; letter-spacing: 1px;
+    border-bottom: none; border-top-left-radius: 12px; border-top-right-radius: 12px; text-shadow: none; text-align: center;
+}
+.work-panel .panel-header { background: #334155; }
