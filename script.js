@@ -773,7 +773,7 @@ function loadReaction(idx) {
             const cont = document.getElementById('element-scales-container');
             cont.innerHTML = `
                 <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
-                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:24px;height:24px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:20px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
+                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:24px;height:24px;margin-right:8px;color:#ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:20px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
                 </div>
             `;
 
