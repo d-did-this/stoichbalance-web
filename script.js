@@ -799,20 +799,16 @@ function loadReaction(idx) {
                     <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
                         <div class="scale-header">${fullName}</div>
                         
-                        <!-- DOM Tiny Seesaw -->
-                        <div class="tiny-seesaw-container">
-                            <div class="seesaw-beam" id="ts-beam-${el}" style="transform: rotate(${tilt}deg);">
-                                <div class="seesaw-jar left-jar" id="ts-jar-l-${el}" style="transform: rotate(${-tilt}deg);">
-                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objL, 16, 4)}</div>
-                                </div>
-                                <div class="seesaw-jar right-jar" id="ts-jar-r-${el}" style="transform: rotate(${-tilt}deg);">
-                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objR, 16, 4)}</div>
-                                </div>
+                        <!-- Book Stacks -->
+                        <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
+                            <div style="position:absolute; bottom:-10px; width:100%; display:flex; justify-content:center;"><div style="width:10px; height:20px; background:#cbd5e1; border-radius:5px;"></div></div>
+                            <div class="book-stack left-stack" style="display:flex; flex-direction:column-reverse; gap:3px; align-items:center; z-index:2; width:45px;">
+                                ${Array(l).fill('<div style="width:40px; height:12px; background:#ef4444; border:2px solid #b91c1c; border-radius:3px; box-shadow:0 2px 0 #b91c1c;"></div>').join('')}
                             </div>
-                            <div class="seesaw-pin"></div>
-                            <div class="seesaw-base"></div>
+                            <div class="book-stack right-stack" style="display:flex; flex-direction:column-reverse; gap:3px; align-items:center; z-index:2; width:45px;">
+                                ${Array(r).fill('<div style="width:40px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('')}
+                            </div>
                         </div>
-
                         <div class="scale-footer"><span style="color:${l>r?'#ef4444':''}">${l}</span><span style="color:${r>l?'#ef4444':''}">${r}</span></div>
                     </div>
                 `;
