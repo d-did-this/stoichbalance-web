@@ -554,7 +554,7 @@ function loadReaction(idx) {
             if (state.expectedMove) {
                 if (state.expectedMove.side === side && state.expectedMove.molecule === formula) {
                     document.getElementById('chat-box').innerHTML = '';
-                    addChatMessage(`<strong>🎉 Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
+                    addChatMessage(`<strong>🌟 Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
                     state.wrongMovesCounter = 0;
                     state.expectedMove = null;
                 } else {
@@ -909,7 +909,7 @@ function loadReaction(idx) {
                     let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
                     let starStr = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
 
-                    addChatMessage(`<strong>🎉 YOU DID IT! 🎉</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
+                    addChatMessage(`<strong>🌟 YOU DID IT! 🌟</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
                 }
             }
         }
@@ -961,7 +961,7 @@ function loadReaction(idx) {
     updateCountersDOM();
 
             if(state.hardMode && state.hintsUsed >= 3) {
-                addChatMessage(`🚨 You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
+                🚨 You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
                 return;
             }
             state.hintsUsed++;
@@ -994,7 +994,7 @@ function loadReaction(idx) {
             let molBadge = `<span style="background:#ffffff; color:#1e293b; padding:4px 8px; border-radius:8px; border:2px solid #cbd5e1; font-weight:900; box-shadow:0 2px 0 #cbd5e1; display:inline-block; margin:2px 0;">${molName}</span>`;
             
             if (state.hintLevel === 1) {
-                addChatMessage(`🤔 Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
+                🔍 Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
                 
                 let tinyScale = document.getElementById(`scale-card-${hintData.element}`);
                 if(tinyScale) {
@@ -1003,7 +1003,7 @@ function loadReaction(idx) {
                 }
             } 
             else if (state.hintLevel === 2) {
-                addChatMessage(`⚖️ To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
+                👈 To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
                 
                 let dropArea = document.getElementById(`area-${hintData.sideNeeds}`);
                 if(dropArea) {
@@ -1013,7 +1013,7 @@ function loadReaction(idx) {
             }
             else {
                 state.expectedMove = { side: hintData.sideNeeds, molecule: hintData.bestMolecule };
-                addChatMessage(`💡 <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
+                💡 <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
                 
                 let trays = document.getElementById(`tray-${hintData.sideNeeds}`).children;
                 for(let btn of trays) {
