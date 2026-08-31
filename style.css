@@ -444,3 +444,17 @@
     padding: 15px;
     margin: 10px 0;
 }
+
+/* Force sidebars to hug content height and not stretch vertically */
+.left-sidebar:not(.collapsed), .right-sidebar:not(.collapsed) {
+    align-self: flex-start !important;
+    height: fit-content !important;
+}
+
+/* Fix chat wrapper border */
+.chat-wrapper {
+    border: 2px solid #cbd5e1 !important;
+    border-radius: 16px !important;
+    background: #f8fafc !important;
+    box-shadow: none !important;
+}
