@@ -52,8 +52,8 @@
         }
 
         /* --- Layout --- */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; background: #ffffff; border-bottom: var(--border-thick); z-index: 100; box-shadow: var(--shadow-toy); flex-wrap: wrap; gap: 10px; }
-        .header h1 { font-size: clamp(18px, 2vw, 24px); font-weight: 900; margin: 0; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #1e293b; border-bottom: 4px solid #0f172a; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: clamp(18px, 2vw, 24px); font-weight: 900; margin: 0; color: #ffffff; display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
         .logo-icon { font-size: clamp(20px, 2.5vw, 28px); animation: bounceIn 0.5s ease backwards; }
         
         select, button { font-family: var(--font-ui); font-size: clamp(14px, 1.5vw, 16px); padding: 6px 14px; border-radius: 12px; border: 3px solid #cbd5e1; font-weight: 800; background: #ffffff; cursor: pointer; transition: all 0.2s; color: var(--text-dark); outline: none; box-shadow: 0 4px 0 #cbd5e1; white-space: nowrap; }
