@@ -13,13 +13,13 @@ function updateCountersDOM() {
     let p = document.getElementById('puzzle-counter');
     if(p) p.innerText = puzzlesSolvedCount + ' Solved';
     let s = document.getElementById('streak-counter');
-    if(s) s.innerText = '🔥 ' + currentStreak;
+    if(s) s.innerText = '?? ' + currentStreak;
 }
 let isMuted = false;
 function toggleMute() {
     isMuted = !isMuted;
     const btn = document.getElementById('mute-btn');
-    if(btn) btn.innerHTML = isMuted ? '🔇 Muted' : '🔊 Sound On';
+    if(btn) btn.innerHTML = isMuted ? '?? Muted' : '?? Sound On';
 }
 // JS Dynamic Tooltips Engine (Guarantees NO clipping, always front layer)
         let activeTooltip = null;
@@ -67,43 +67,43 @@ function toggleMute() {
         let currentForm = 'Form 4';
 
 const FORM_4_REACTIONS = [
-    { name: "[Easy] Making Water 💧", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] },
-    { name: "[Easy] Salt Formation 🧂", left: ["Na(s)", "Cl2(g)"], right: ["NaCl(s)"] },
-    { name: "[Easy] Making Ammonia 💨", left: ["N2(g)", "H2(g)"], right: ["NH3(g)"] },
-    { name: "[Med] Burning Methane 🔥", left: ["CH4(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Med] Rusting Iron 🧲", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] },
-    { name: "[Easy] Burning Magnesium ✨", left: ["Mg(s)", "O2(g)"], right: ["MgO(s)"] },
-    { name: "[Med] Potassium in Water 💥", left: ["K(s)", "H2O(l)"], right: ["KOH(aq)", "H2(g)"] },
-    { name: "[Easy] Calcium Oxidation 🪨", left: ["Ca(s)", "O2(g)"], right: ["CaO(s)"] },
-    { name: "[Med] Sulfur Trioxide ☁️", left: ["SO2(g)", "O2(g)"], right: ["SO3(g)"] },
-    { name: "[Hard] Phosphorus Burning 🎇", left: ["P4(s)", "O2(g)"], right: ["P4O10(s)"] },
-    { name: "[Med] Peroxide Fizz 🫧", left: ["H2O2(aq)"], right: ["H2O(l)", "O2(g)"] },
-    { name: "[Med] Zinc & Acid 🧪", left: ["Zn(s)", "HCl(aq)"], right: ["ZnCl2(aq)", "H2(g)"] },
-    { name: "[Easy] Soot Formation 🌑", left: ["C(s)", "O2(g)"], right: ["CO(g)"] },
-    { name: "[Med] Aluminum Bromide 🏺", left: ["Al(s)", "Br2(l)"], right: ["AlBr3(s)"] },
-    { name: "[Easy] Monoxide Burning 🔥", left: ["CO(g)", "O2(g)"], right: ["CO2(g)"] }
+    { name: "[Easy] Making Water ??", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] },
+    { name: "[Easy] Salt Formation ??", left: ["Na(s)", "Cl2(g)"], right: ["NaCl(s)"] },
+    { name: "[Easy] Making Ammonia ??", left: ["N2(g)", "H2(g)"], right: ["NH3(g)"] },
+    { name: "[Med] Burning Methane ??", left: ["CH4(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Rusting Iron ??", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] },
+    { name: "[Easy] Burning Magnesium ?", left: ["Mg(s)", "O2(g)"], right: ["MgO(s)"] },
+    { name: "[Med] Potassium in Water ??", left: ["K(s)", "H2O(l)"], right: ["KOH(aq)", "H2(g)"] },
+    { name: "[Easy] Calcium Oxidation ??", left: ["Ca(s)", "O2(g)"], right: ["CaO(s)"] },
+    { name: "[Med] Sulfur Trioxide ??", left: ["SO2(g)", "O2(g)"], right: ["SO3(g)"] },
+    { name: "[Hard] Phosphorus Burning ??", left: ["P4(s)", "O2(g)"], right: ["P4O10(s)"] },
+    { name: "[Med] Peroxide Fizz ??", left: ["H2O2(aq)"], right: ["H2O(l)", "O2(g)"] },
+    { name: "[Med] Zinc & Acid ??", left: ["Zn(s)", "HCl(aq)"], right: ["ZnCl2(aq)", "H2(g)"] },
+    { name: "[Easy] Soot Formation ??", left: ["C(s)", "O2(g)"], right: ["CO(g)"] },
+    { name: "[Med] Aluminum Bromide ??", left: ["Al(s)", "Br2(l)"], right: ["AlBr3(s)"] },
+    { name: "[Easy] Monoxide Burning ??", left: ["CO(g)", "O2(g)"], right: ["CO2(g)"] }
 ];
 
 const FORM_5_REACTIONS = [
-    { name: "[Med] Burning Methanol 🔥", left: ["CH3OH(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Hard] Baking Soda 🧁", left: ["NaHCO3(s)"], right: ["Na2CO3(s)", "H2O(l)", "CO2(g)"] },
-    { name: "[Hard] Aluminum Thermite 💥", left: ["Al(s)", "Fe2O3(s)"], right: ["Al2O3(s)", "Fe(s)"] },
-    { name: "[Hard] Glucose Combustion 🌿", left: ["C6H12O6(s)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Hard] Copper Nitric Acid 🧪", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] },
-    { name: "[Med] Chlorate Decomp 🧨", left: ["KClO3(s)"], right: ["KCl(s)", "O2(g)"] },
-    { name: "[Hard] Iron Smelting ⚔️", left: ["Fe2O3(s)", "CO(g)"], right: ["Fe(s)", "CO2(g)"] },
-    { name: "[Hard] Ammonia Oxidation 💨", left: ["NH3(g)", "O2(g)"], right: ["NO(g)", "H2O(g)"] },
-    { name: "[Boss] Octane Combustion ⛽", left: ["C8H18(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Med] Golden Rain 🌧️", left: ["Pb(NO3)2(aq)", "KI(aq)"], right: ["PbI2(s)", "KNO3(aq)"] },
-    { name: "[Hard] Ethane Burning 🔥", left: ["C2H6(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Med] Neutralization 💧", left: ["NaOH(aq)", "H2SO4(aq)"], right: ["Na2SO4(aq)", "H2O(l)"] },
-    { name: "[Med] Copper Precipitate 🟦", left: ["CuSO4(aq)", "NaOH(aq)"], right: ["Cu(OH)2(s)", "Na2SO4(aq)"] },
-    { name: "[Med] Silver Chloride 🪙", left: ["AgNO3(aq)", "CaCl2(aq)"], right: ["AgCl(s)", "Ca(NO3)2(aq)"] },
-    { name: "[Hard] Propane Combustion 🔥", left: ["C3H8(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] }
+    { name: "[Med] Burning Methanol ??", left: ["CH3OH(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Hard] Baking Soda ??", left: ["NaHCO3(s)"], right: ["Na2CO3(s)", "H2O(l)", "CO2(g)"] },
+    { name: "[Hard] Aluminum Thermite ??", left: ["Al(s)", "Fe2O3(s)"], right: ["Al2O3(s)", "Fe(s)"] },
+    { name: "[Hard] Glucose Combustion ??", left: ["C6H12O6(s)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Hard] Copper Nitric Acid ??", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] },
+    { name: "[Med] Chlorate Decomp ??", left: ["KClO3(s)"], right: ["KCl(s)", "O2(g)"] },
+    { name: "[Hard] Iron Smelting ??", left: ["Fe2O3(s)", "CO(g)"], right: ["Fe(s)", "CO2(g)"] },
+    { name: "[Hard] Ammonia Oxidation ??", left: ["NH3(g)", "O2(g)"], right: ["NO(g)", "H2O(g)"] },
+    { name: "[Boss] Octane Combustion ?", left: ["C8H18(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Golden Rain ???", left: ["Pb(NO3)2(aq)", "KI(aq)"], right: ["PbI2(s)", "KNO3(aq)"] },
+    { name: "[Hard] Ethane Burning ??", left: ["C2H6(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Neutralization ??", left: ["NaOH(aq)", "H2SO4(aq)"], right: ["Na2SO4(aq)", "H2O(l)"] },
+    { name: "[Med] Copper Precipitate ??", left: ["CuSO4(aq)", "NaOH(aq)"], right: ["Cu(OH)2(s)", "Na2SO4(aq)"] },
+    { name: "[Med] Silver Chloride ??", left: ["AgNO3(aq)", "CaCl2(aq)"], right: ["AgCl(s)", "Ca(NO3)2(aq)"] },
+    { name: "[Hard] Propane Combustion ??", left: ["C3H8(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] }
 ];
 
 const FORM_DEV_REACTIONS = [
-    { name: "[Test] Developer Sandbox 🛠️", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] }
+    { name: "[Test] Developer Sandbox ???", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] }
 ];
 
 let REACTIONS = FORM_4_REACTIONS;
@@ -355,7 +355,7 @@ let REACTIONS = FORM_4_REACTIONS;
                 return;
             }
 
-            let newReaction = { name: "🛠️ " + name, left: left, right: right };
+            let newReaction = { name: "??? " + name, left: left, right: right };
             REACTIONS.push(newReaction);
             
             populateDropdown();
@@ -373,7 +373,7 @@ let REACTIONS = FORM_4_REACTIONS;
             el.textContent = `${comp} / ${total}`;
             
             if (comp === total) {
-                el.setAttribute('data-tooltip', `Amazing! ${comp} out of ${total} completed! Congrats! 🎉`);
+                el.setAttribute('data-tooltip', `Amazing! ${comp} out of ${total} completed! Congrats! ??`);
                 el.style.background = '#facc15';
                 el.style.borderColor = '#ca8a04';
                 el.style.boxShadow = '0 4px 0 #ca8a04';
@@ -391,10 +391,10 @@ let REACTIONS = FORM_4_REACTIONS;
             const sel = document.getElementById('reaction-select');
             sel.innerHTML = '';
             REACTIONS.forEach((rx, i) => {
-                let badge = state.completed.has(i) ? '✅ ' : '';
+                let badge = state.completed.has(i) ? '? ' : '';
                 sel.add(new Option(`${badge}Puzzle: ${rx.name}`, i));
             });
-            sel.add(new Option(`➕ Create Custom Puzzle...`, 'custom'));
+            sel.add(new Option(`? Create Custom Puzzle...`, 'custom'));
         }
 
         function showTutSlide(n) {
@@ -424,7 +424,7 @@ function init() {
     let savedForm = localStorage.getItem('stoich_student_form') || currentForm;
     let greet = document.getElementById('user-greeting');
     if (greet && savedName) {
-        greet.innerText = "👋 Welcome, " + savedName + " (" + savedForm + ")";
+        greet.innerText = "?? Welcome, " + savedName + " (" + savedForm + ")";
     }
 
     let grid = document.getElementById('level-grid');
@@ -480,7 +480,7 @@ function loadReaction(idx) {
             
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = '';
-            addChatMessage(`Hello there! 👋 We are solving: <strong>${rx.name}</strong>!<br/><br/>Try dragging colorful molecule blocks from the top into the big white boxes below!`, 'agent');
+            addChatMessage(`Hello there! ?? We are solving: <strong>${rx.name}</strong>!<br/><br/>Try dragging colorful molecule blocks from the top into the big white boxes below!`, 'agent');
 
             document.getElementById('header-reactants').setAttribute('data-tooltip', `REACTANTS are the starting ingredients! (${rx.left.join(', ')})`);
             document.getElementById('header-products').setAttribute('data-tooltip', `PRODUCTS are what we make! (${rx.right.join(', ')})`);
@@ -554,7 +554,7 @@ function loadReaction(idx) {
             if (state.expectedMove) {
                 if (state.expectedMove.side === side && state.expectedMove.molecule === formula) {
                     document.getElementById('chat-box').innerHTML = '';
-                    addChatMessage(`<strong>🎉 Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
+                    addChatMessage(`<strong>?? Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
                     state.wrongMovesCounter = 0;
                     state.expectedMove = null;
                 } else {
@@ -649,7 +649,7 @@ function loadReaction(idx) {
                         <div style="font-size: 16px; font-weight: 900; color: #334155; margin-bottom: 6px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 4px; width: 100%; text-align: center;">${MOLECULE_NAMES[f]||f}</div>
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span style="font-size:14px; color:#64748b;">Drag me!</span>
-                            <span style="font-size:20px; color:var(--primary);">→</span>
+                            <span style="font-size:20px; color:var(--primary);">?</span>
                             ${generateMarbleCluster(f, 30)}
                         </div>
                     `;
@@ -685,7 +685,7 @@ function loadReaction(idx) {
                         card.title = "Click to remove";
                         
                         card.innerHTML = `
-                            <div class="mol-remove-overlay">❌</div>
+                            <div class="mol-remove-overlay">?</div>
                             <div class="mol-formula">${getFormulaHTML(f)}</div>
                             ${generateMarbleCluster(f, 36)}
                         `;
@@ -766,106 +766,109 @@ function loadReaction(idx) {
         }
 
         function renderScales(lTotals, rTotals) {
-            let rx = REACTIONS[state.rxIdx];
-            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
-            let allElements = Array.from(allElsSet);
-            
-            const cont = document.getElementById('element-scales-container');
-            cont.innerHTML = `
-                <div class="sidebar-title-wrapper" data-tooltip="These scales show if each Element's atoms are balanced!">
-                    <div class="sidebar-title">🔍 Tiny Scales!</div>
+    let rx = REACTIONS[state.rxIdx];
+    let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+    let allElements = Array.from(allElsSet);
+    
+    const cont = document.getElementById('element-scales-container');
+    
+    // Header is handled separately or we inject it here if empty
+    if (!cont.querySelector('.sidebar-title-wrapper')) {
+        cont.innerHTML = `<div class="sidebar-title-wrapper" data-tooltip="Click to toggle size!" onclick="toggleScaleSize()">
+            <div class="sidebar-title" style="background:#0ea5e9; font-size:14px; cursor:pointer;">
+                <svg style="width:16px;height:16px;vertical-align:middle;margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Element Balances
+            </div>
+        </div>
+        <div id="scales-content"></div>`;
+    }
+    
+    const contentBox = cont.querySelector('#scales-content') || cont;
+    if (cont.querySelector('#scales-content')) {
+        contentBox.innerHTML = '';
+    } else {
+        // Fallback
+        cont.innerHTML += '<div id="scales-content"></div>';
+    }
+
+    let totalL = 0, totalR = 0, balancedCount = 0;
+
+    allElements.forEach(el => {
+        let l = lTotals[el] || 0, r = rTotals[el] || 0;
+        totalL += l; totalR += r;
+        let diff = l - r;
+        
+        let sClass = 'unbalanced';
+        let tip = `Oh no, ${FULL_ELEMENT_NAMES[el]} atoms are unbalanced!`;
+        
+        if (diff === 0 && l > 0) { 
+            sClass = 'balanced'; 
+            balancedCount++; 
+            tip = `Yay! ${FULL_ELEMENT_NAMES[el]} atoms are perfectly balanced!`; 
+        } else if (diff === 0) { 
+            sClass = 'balanced'; 
+            balancedCount++; 
+            tip = `Empty! Add some blocks!`; 
+        }
+
+        let fullName = `${FULL_ELEMENT_NAMES[el] || el} (${el})`;
+        
+        // Calculate bar width (max 20 atoms for 100%)
+        let totalAtoms = l + r;
+        let leftPct = totalAtoms > 0 ? (l / totalAtoms) * 100 : 50;
+        
+        let barColor = diff === 0 && l > 0 ? '#10b981' : (diff > 0 ? '#3b82f6' : (diff < 0 ? '#f59e0b' : '#cbd5e1'));
+
+        contentBox.innerHTML += `
+            <div class="atom-tracker ${sClass}" data-tooltip="${tip}">
+                <div class="atom-name">
+                    <span>${fullName}</span>
+                    <span>${diff === 0 && l > 0 ? '✓' : ''}</span>
                 </div>
-            `;
-
-            let totalL = 0, totalR = 0, balancedCount = 0;
-
-            allElements.forEach(el => {
-                let l = lTotals[el] || 0, r = rTotals[el] || 0;
-                totalL += l; totalR += r;
-                let diff = l - r;
-                
-                let sClass = 'state-red', tilt = 0;
-                let tip = `Oh no, ${FULL_ELEMENT_NAMES[el]} atoms are unbalanced!`;
-                
-                if (diff === 0 && l > 0) { sClass = 'state-green'; balancedCount++; tip = `Yay! ${FULL_ELEMENT_NAMES[el]} atoms are perfectly balanced!`; }
-                else if (diff === 0) { sClass = ''; balancedCount++; tip = `Empty! Add some blocks!`; } 
-                else { tilt = diff>0?-15:15; }
-
-                let objL = {}; if(l>0) objL[el] = l;
-                let objR = {}; if(r>0) objR[el] = r;
-                let fullName = `${FULL_ELEMENT_NAMES[el] || el} (${el})`;
-
-                cont.innerHTML += `
-                    <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
-                        <div class="scale-header">${fullName}</div>
-                        
-                        <!-- DOM Tiny Seesaw -->
-                        <div class="tiny-seesaw-container">
-                            <div class="seesaw-beam" id="ts-beam-${el}" style="transform: rotate(${tilt}deg);">
-                                <div class="seesaw-jar left-jar" id="ts-jar-l-${el}" style="transform: rotate(${-tilt}deg);">
-                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objL, 16, 4)}</div>
-                                </div>
-                                <div class="seesaw-jar right-jar" id="ts-jar-r-${el}" style="transform: rotate(${-tilt}deg);">
-                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objR, 16, 4)}</div>
-                                </div>
-                            </div>
-                            <div class="seesaw-pin"></div>
-                            <div class="seesaw-base"></div>
-                        </div>
-
-                        <div class="scale-footer"><span style="color:${l>r?'#ef4444':''}">${l}</span><span style="color:${r>l?'#ef4444':''}">${r}</span></div>
+                <div class="atom-bar-container">
+                    <div class="atom-count left">${l}</div>
+                    <div class="balance-indicator">
+                        <div class="balance-fill" style="width: ${leftPct}%; background: ${barColor};"></div>
                     </div>
-                `;
-            });
+                    <div class="atom-count right">${r}</div>
+                </div>
+            </div>
+        `;
+    });
 
-            // Master Scale logic
-            let mDiff = totalL - totalR;
-            let mTilt = mDiff===0 ? 0 : (mDiff>0?-10:10);
-            
-            document.getElementById('ms-beam').style.transform = `rotate(${mTilt}deg)`;
-            
-            // Counter-rotate the jars so they stay physically upright like swinging buckets!
-            document.getElementById('ms-jar-left').style.transform = `rotate(${-mTilt}deg)`;
-            document.getElementById('ms-jar-right').style.transform = `rotate(${-mTilt}deg)`;
-
-            // Hexagonal packing in the master bucket (Radius 12 => size 26, max 8 per base row in 200px jar)
-            document.getElementById('ms-marbles-left').innerHTML = generateDomMarblesGrid(200, lTotals, 26, 8);
-            document.getElementById('ms-marbles-right').innerHTML = generateDomMarblesGrid(200, rTotals, 26, 8);
-
-            const mCard = document.getElementById('master-scale');
-            const mText = document.getElementById('ms-status-text');
-            const mEmoji = document.getElementById('ms-emoji');
-            
-            mCard.className = "master-card card";
-            
-            if (totalL === 0 && totalR === 0) {
-                mCard.classList.add("state-red");
-                mText.textContent = "It's empty! Add molecules!"; mEmoji.textContent = "🤔";
-            } else if (balancedCount === allElements.length) {
-                let lCounts = countMolecules(state.left);
-                let rCounts = countMolecules(state.right);
-                if (checkCanSimplify(lCounts, rCounts)) {
-                    mCard.classList.add("state-yellow");
-                    mText.textContent = "Equal, but too big! Take some away!"; mEmoji.textContent = "😅";
-                } else {
-                    mCard.classList.add("state-green");
-                    mText.textContent = "YAY! PERFECTLY BALANCED!"; mEmoji.textContent = "🎉";
-                }
-            } else {
-                if (Math.abs(mDiff) > 0 && Math.abs(mDiff) <= 2) {
-                    mCard.classList.add("state-yellow");
-                    mText.textContent = "So Close! Keep going!"; mEmoji.textContent = "👀";
-                } else {
-                    mCard.classList.add("state-red");
-                    mText.textContent = "Uh Oh! Unbalanced!"; mEmoji.textContent = "😢";
-                }
-            }
+    if (balancedCount === allElements.length && balancedCount > 0) {
+        document.getElementById('master-scale').className = 'master-card card state-green';
+        if (!state.isSolved) {
+            state.isSolved = true;
+            playSound('win');
+            triggerConfetti();
+            state.streak++;
+            updateCounter();
+            addChatMessage("Brilliant! The equation is perfectly balanced!", 'success');
+            setTimeout(() => {
+                alert("Perfectly Balanced! Loading next level...");
+                state.rxIdx++;
+                resetEquation();
+            }, 3000);
         }
+    } else {
+        document.getElementById('master-scale').className = 'master-card card state-red';
+        state.isSolved = false;
+    }
+}
 
-        /* --- Friendly Chat System --- */
-        function toggleGuide() {
-            document.getElementById('teacher-guide').classList.toggle('collapsed');
-        }
+function toggleScaleSize() {
+    let content = document.getElementById('scales-content');
+    if (content) {
+        content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function toggleGuide() {
+    let chatWrapper = document.querySelector('.chat-wrapper');
+    if (chatWrapper) {
+        chatWrapper.style.display = chatWrapper.style.display === 'none' ? 'block' : 'none';
+    }
+}
 
         function addChatMessage(msg, type) {
             const chatBox = document.getElementById('chat-box');
@@ -911,9 +914,9 @@ function loadReaction(idx) {
                     
                     let optimalMoves = (rx.left.length + rx.right.length) * 2; // rough estimate
                     let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
-                    let starStr = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
+                    let starStr = '?'.repeat(stars) + '?'.repeat(3-stars);
 
-                    addChatMessage(`<strong>🎉 YOU DID IT! 🎉</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
+                    addChatMessage(`<strong>?? YOU DID IT! ??</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
                 }
             }
         }
@@ -965,7 +968,7 @@ function loadReaction(idx) {
     updateCountersDOM();
 
             if(state.hardMode && state.hintsUsed >= 3) {
-                addChatMessage(`🚨 You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
+                addChatMessage(`?? You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
                 return;
             }
             state.hintsUsed++;
@@ -998,7 +1001,7 @@ function loadReaction(idx) {
             let molBadge = `<span style="background:#ffffff; color:#1e293b; padding:4px 8px; border-radius:8px; border:2px solid #cbd5e1; font-weight:900; box-shadow:0 2px 0 #cbd5e1; display:inline-block; margin:2px 0;">${molName}</span>`;
             
             if (state.hintLevel === 1) {
-                addChatMessage(`🤔 Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
+                addChatMessage(`?? Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
                 
                 let tinyScale = document.getElementById(`scale-card-${hintData.element}`);
                 if(tinyScale) {
@@ -1007,7 +1010,7 @@ function loadReaction(idx) {
                 }
             } 
             else if (state.hintLevel === 2) {
-                addChatMessage(`⚖️ To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
+                addChatMessage(`?? To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
                 
                 let dropArea = document.getElementById(`area-${hintData.sideNeeds}`);
                 if(dropArea) {
@@ -1017,7 +1020,7 @@ function loadReaction(idx) {
             }
             else {
                 state.expectedMove = { side: hintData.sideNeeds, molecule: hintData.bestMolecule };
-                addChatMessage(`💡 <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
+                addChatMessage(`?? <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
                 
                 let trays = document.getElementById(`tray-${hintData.sideNeeds}`).children;
                 for(let btn of trays) {
@@ -1109,6 +1112,21 @@ function returnToMenu() {
     }
     init();
 }
+
+
+// Dropdown Logic
+window.onclick = function(event) {
+    if (!event.target.closest('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+
 
 
 // Dropdown Logic
