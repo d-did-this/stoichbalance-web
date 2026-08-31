@@ -9,23 +9,30 @@
 </head>
 <body>
     <div id="main-menu" class="menu-overlay">
-        <div class="menu-card card">
+        <!-- Step 1: Login Screen -->
+        <div class="menu-card card" id="login-screen">
             <h1 class="menu-title"><span class="logo-icon">🧪</span> STOICHBALANCE</h1>
-            <p class="menu-subtitle">Welcome to the Chemistry Lab! Let's get balancing.</p>
+            <p class="menu-subtitle">Welcome to the Chemistry Lab!</p>
             
-            <div class="student-info">
-                <input type="text" id="student-name" placeholder="Student Name" required>
-                <input type="number" id="student-age" placeholder="Age" required min="5" max="99">
+            <div class="student-info" style="flex-direction:column; align-items:center; gap:15px; margin-top:20px;">
+                <input type="text" id="student-name" placeholder="Student Name" required style="width:100%; max-width:350px; text-align:center;">
+                <select id="student-form" style="width:100%; max-width:350px; padding:12px 20px; font-size:20px; font-weight:800; border-radius:12px; border:3px solid #cbd5e1; outline:none; font-family:var(--font-ui); color:var(--text-dark); text-align:center; cursor:pointer;">
+                    <option value="Form 4">Form 4</option>
+                    <option value="Form 5">Form 5</option>
+                </select>
+                <button onclick="goToLevels()" style="background:var(--primary); color:white; border:3px solid #1d4ed8; padding:15px 30px; font-size:22px; font-weight:900; border-radius:12px; cursor:pointer; width:100%; max-width:350px; box-shadow:0 6px 0 #1d4ed8; transition:all 0.2s; margin-top:10px;">Next ➡️</button>
             </div>
+        </div>
 
-            <div style="text-align:left; margin-top:10px;">
-                <h3 style="color:var(--text-dark); font-weight:900;">Select a Puzzle:</h3>
-                <div class="level-grid" id="level-grid"></div>
+        <!-- Step 2: Level Select Screen -->
+        <div class="menu-card card" id="level-screen" style="display:none; max-width:900px; max-height:95vh;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <button onclick="document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
+                <h2 class="menu-title" style="font-size:28px;">Select a Puzzle</h2>
+                <div style="width:80px;"></div> <!-- Spacer to keep title centered -->
             </div>
             
-            <div style="display:flex; justify-content:center; margin-top:10px;">
-                <button onclick="document.getElementById('main-menu').classList.add('hidden'); document.getElementById('custom-modal').style.display='flex';" style="background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:10px 20px; font-size:16px;">🛠️ Create Custom Puzzle</button>
-            </div>
+            <div class="level-grid" id="level-grid"></div>
         </div>
     </div>
     
