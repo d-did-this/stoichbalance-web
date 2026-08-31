@@ -553,3 +553,24 @@
 .left-sidebar:not(.collapsed) {
     min-width: 240px !important; 
 }
+
+.left-sidebar.collapsed .sidebar-title-wrapper, .right-sidebar.collapsed .sidebar-title-wrapper {
+    padding: 0 !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    box-sizing: border-box !important;
+    border-radius: 16px !important;
+}
+
+.left-sidebar.collapsed .sidebar-title, .right-sidebar.collapsed .sidebar-title {
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
