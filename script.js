@@ -82,6 +82,10 @@ const FORM_5_REACTIONS = [
     { name: "[Hard] Copper Nitric Acid 🧪", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] }
 ];
 
+const FORM_DEV_REACTIONS = [
+    { name: "[Test] Developer Sandbox 🛠️", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] }
+];
+
 let REACTIONS = FORM_4_REACTIONS;
 
         const MOLECULE_NAMES = { "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor", "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron", "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium", "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas", "NaCl(s)": "Sodium Chloride", "CH4(g)": "Methane", "Fe2O3(s)": "Iron(III) Oxide", "NaHCO3(s)": "Sodium Bicarbonate", "Na2CO3(s)": "Sodium Carbonate", "Al(s)": "Solid Aluminum", "Al2O3(s)": "Aluminum Oxide", "C6H12O6(s)": "Glucose", "Cu(s)": "Copper", "HNO3(aq)": "Nitric Acid", "Cu(NO3)2(aq)": "Copper(II) Nitrate", "NO2(g)": "Nitrogen Dioxide" };
@@ -1035,7 +1039,13 @@ function goToLevels(selectedForm) {
     localStorage.setItem('stoich_student_form', selectedForm);
     
     currentForm = selectedForm;
-    REACTIONS = (currentForm === 'Form 5') ? FORM_5_REACTIONS : FORM_4_REACTIONS;
+    if (currentForm === 'Form 5') {
+        REACTIONS = FORM_5_REACTIONS;
+    } else if (currentForm === 'Developer') {
+        REACTIONS = FORM_DEV_REACTIONS;
+    } else {
+        REACTIONS = FORM_4_REACTIONS;
+    }
     
     // Re-render grid for specific form
     init();
@@ -1058,7 +1068,13 @@ function returnToMenu() {
     let savedName = document.getElementById('student-name').value.trim();
     if(savedName !== '') {
         currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
-        REACTIONS = (currentForm === 'Form 5') ? FORM_5_REACTIONS : FORM_4_REACTIONS;
+        if (currentForm === 'Form 5') {
+            REACTIONS = FORM_5_REACTIONS;
+        } else if (currentForm === 'Developer') {
+            REACTIONS = FORM_DEV_REACTIONS;
+        } else {
+            REACTIONS = FORM_4_REACTIONS;
+        }
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('level-screen').style.display = 'flex';
     } else {
