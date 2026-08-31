@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STOICHBALANCE V17 - Custom Mode!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #bae6fd;
+            --surface: #ffffff;
+            --text-dark: #334155;
+            --text-muted: #64748b;
+            
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            
+            --st-red: #ef4444;
+            --st-red-light: #fee2e2;
+            --st-yellow: #f59e0b;
+            --st-yellow-light: #fef3c7;
+            --st-green: #10b981;
+            --st-green-light: #d1fae5;
+            
+            --border-thick: clamp(2px, 0.4vw, 4px) solid #94a3b8;
+            --border-radius: 20px;
+            --shadow-toy: 0 clamp(4px, 1vw, 8px) 0 rgba(148, 163, 184, 0.2);
+            
+            --font-ui: 'Nunito', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg-body); 
+            background-image: radial-gradient(#7dd3fc 15%, transparent 15%), radial-gradient(#7dd3fc 15%, transparent 15%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            color: var(--text-dark); 
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            overflow-x: hidden; 
+            font-family: var(--font-ui);
+            font-size: clamp(14px, 1.2vw, 16px); 
+        }
+
+        /* --- JS Dynamic Tooltips --- */
+        .js-tooltip {
+            position: fixed; background: #ffffff; color: #1e293b;
+            padding: 10px 14px; border-radius: 12px; font-size: clamp(14px, 1.2vw, 16px); font-weight: 800;
+            white-space: nowrap; z-index: 2147483647; 
+            border: 3px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            pointer-events: none; opacity: 0; transition: opacity 0.15s ease-out;
+            font-family: var(--font-ui);
+        }
+        .html-tip {
+            border-color: var(--primary); box-shadow: 0 10px 30px rgba(59,130,246,0.3);
+            padding: 12px 16px; border-radius: 16px;
+        }
+
+        /* --- Layout --- */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 6px 15px; background: #ffffff; border-bottom: var(--border-thick); z-index: 100; box-shadow: var(--shadow-toy); flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: clamp(18px, 2vw, 24px); font-weight: 900; margin: 0; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+        .logo-icon { font-size: clamp(20px, 2.5vw, 28px); animation: bounceIn 0.5s ease backwards; }
+        
+        select, button { font-family: var(--font-ui); font-size: clamp(14px, 1.5vw, 16px); padding: 6px 14px; border-radius: 12px; border: 3px solid #cbd5e1; font-weight: 800; background: #ffffff; cursor: pointer; transition: all 0.2s; color: var(--text-dark); outline: none; box-shadow: 0 4px 0 #cbd5e1; white-space: nowrap; }
+        select:hover, button:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 var(--primary); }
+        select:active, button:active { transform: translateY(4px); box-shadow: 0 0 0 var(--primary); }
+
+        .app-body { display: flex; flex: 1; padding: clamp(10px, 2vw, 15px); gap: clamp(10px, 2vw, 20px); flex-wrap: wrap; }
+
+        /* --- Cards (Toy Blocks) --- */
+        .card { background: var(--surface); border: var(--border-thick); border-radius: var(--border-radius); box-shadow: var(--shadow-toy); transition: all 0.3s ease; }
+
+        /* --- Left Sidebar (Element Scales) --- */
+        .left-sidebar { flex: 1 1 250px; min-width: 250px; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
+        .sidebar-title-wrapper { display: flex; width: 100%; text-align: center; justify-content: center; cursor: help; margin-bottom: 5px; }
+        .sidebar-title { font-size: clamp(16px, 1.8vw, 18px); font-weight: 900; color: #ffffff; background: #0ea5e9; padding: 10px 20px; border-radius: 16px; border: 3px solid #0284c7; box-shadow: 0 4px 0 #0284c7; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
+
+        .scale-card { padding: 15px 10px; display: flex; flex-direction: column; align-items: center; position: relative; background: #ffffff; cursor: help; }
+        .scale-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
+        .scale-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
+        
+        .scale-header { font-size: clamp(18px, 2vw, 24px); font-weight: 900; margin-bottom: 2px; color: var(--text-dark); }
+        .scale-footer { display: flex; justify-content: space-between; width: 100%; padding: 0 15px; font-size: clamp(20px, 2vw, 24px); font-weight: 900; color: var(--text-dark); margin-top: 5px; }
+
+        /* --- CSS DOM Seesaws --- */
+        .seesaw-container { position: relative; width: 100%; max-width: 900px; height: 90px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px; margin-top: 5px; }
+        .seesaw-base { width: 80px; height: 45px; background: linear-gradient(to bottom, #cbd5e1, #94a3b8); clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); border-radius: 4px; z-index: 10; border-bottom: 4px solid #64748b; }
+        .seesaw-pin { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 22px; height: 22px; border-radius: 50%; background: #facc15; border: 4px solid #ca8a04; z-index: 20; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .seesaw-beam { position: absolute; bottom: 55px; left: 50%; margin-left: -400px; width: 800px; height: 16px; border-radius: 8px; background: #f8fafc; border: 4px solid #94a3b8; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: center center; z-index: 15; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 10px; }
+        .seesaw-jar { width: 200px; height: 80px; background: rgba(255, 255, 255, 0.65); border: 4px solid #38bdf8; border-top: none; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; box-shadow: inset 0 -10px 20px rgba(56, 189, 248, 0.2); position: relative; bottom: -4px; transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: bottom center; }
+        .jar-marbles-container { position: relative; width: 100%; height: 100%; overflow: hidden; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+
+        /* Tiny CSS Seesaws */
+        .tiny-seesaw-container { position: relative; width: 100%; max-width: 200px; height: 70px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px; margin-top: 15px; }
+        .tiny-seesaw-container .seesaw-base { width: 50px; height: 30px; }
+        .tiny-seesaw-container .seesaw-pin { width: 16px; height: 16px; bottom: 27px; border-width: 3px; }
+        .tiny-seesaw-container .seesaw-beam { width: 180px; height: 10px; bottom: 30px; border-width: 3px; padding: 0 10px; margin-left: -90px; }
+        .tiny-seesaw-container .seesaw-jar { width: 60px; height: 40px; border-width: 3px; border-radius: 8px; border-top: none; bottom: -3px; }
+
+        /* --- Center Content --- */
+        .center-content { flex: 3 1 600px; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+        /* Master Scale */
+        .master-card { position: relative; z-index: 50; width: 100%; padding: clamp(10px, 1.5vw, 15px); display: flex; flex-direction: column; align-items: center; border-width: 3px; }
+        .master-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
+        .master-card.state-yellow { border-color: var(--st-yellow); background: var(--st-yellow-light); }
+        .master-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
+
+        .equation-grid-wrapper { margin: 0 auto 75px auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .eq-left-container { position: absolute; left: 10px; width: 200px; display: flex; justify-content: center; }
+        .eq-center-container { z-index: 10; display: flex; justify-content: center; align-items: center; }
+        .eq-right-container { position: absolute; right: 10px; width: 200px; display: flex; justify-content: center; }
+        
+        .eq-left { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; white-space: nowrap; }
+        .eq-right { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; white-space: nowrap; }
+        
+        .eq-mol { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 14px; background: #ffffff; border: 4px solid #cbd5e1; box-shadow: 0 4px 0 #94a3b8; }
+        .eq-coeff { color: #ffffff; background: #ef4444; font-size: clamp(20px, 2.5vw, 28px); font-weight: 900; padding: 2px 12px; border-radius: 10px; border: 3px solid #b91c1c; box-shadow: 0 4px 0 #b91c1c; cursor: help; text-shadow: 1px 1px 0px #7f1d1d; display: inline-block; }
+        .eq-formula { font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; color: #1e293b; letter-spacing: 2px; display: inline-block; cursor: help; }
+        .eq-arrow { color: #ffffff; background: #3b82f6; font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; cursor: help; padding: 6px 14px; border-radius: 14px; border: 4px solid #1d4ed8; box-shadow: 0 4px 0 #1e3a8a; }
+        .eq-plus { color: #64748b; font-size: clamp(28px, 4vw, 40px); font-weight: 900; text-shadow: 2px 2px 0 #cbd5e1; }
+        .subscript { font-size: 0.6em; vertical-align: sub; font-weight: 900; color: #64748b; }
+        
+        .status-footer { display: flex; flex-direction: column; align-items: center; margin-top: 10px; font-size: clamp(20px, 2.5vw, 24px); font-weight: 900; color: var(--text-dark); letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+        .status-emoji { font-size: clamp(36px, 4.5vw, 45px); margin-bottom: 5px; }
+
+        /* Workspace Grid */
+        .workspace-grid { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; flex: 1; min-height: 150px; position: relative; z-index: 10; }
+        .work-panel { flex: 1 1 250px; min-width: 250px; display: flex; flex-direction: column; border-width: clamp(2px, 0.4vw, 4px); border-radius: 20px; }
+        .panel-header { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #ffffff; padding: 12px; text-align: center; font-size: clamp(18px, 2vw, 22px); font-weight: 900; text-transform: uppercase; letter-spacing: 2px; border-bottom: 4px solid #1d4ed8; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: help; border-top-left-radius: 16px; border-top-right-radius: 16px; text-shadow: 2px 2px 0px #1e3a8a; }
+        #header-products { background: linear-gradient(135deg, #10b981, #059669); border-bottom: 4px solid #047857; text-shadow: 2px 2px 0px #064e3b; }
+        
+        /* Supply Trays */
+        .supply-tray { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; background: #eff6ff; border-bottom: 3px dashed #93c5fd; position: relative; z-index: 50; }
+        .tray-btn { position: relative; cursor: grab; padding: 8px 16px; border-radius: 12px; border: 3px solid var(--primary); background: #ffffff; color: var(--primary); font-size: clamp(16px, 2vw, 20px); font-weight: 900; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 0 var(--primary); }
+        .tray-btn:hover { background: var(--primary); color: #ffffff; transform: translateY(-4px); box-shadow: 0 8px 0 #1d4ed8; }
+        .tray-btn:active { cursor: grabbing; transform: translateY(4px); box-shadow: 0 0 0 var(--primary); }
+
+        /* Drop Area */
+        .drop-area { flex: 1; padding: 10px; display: flex; flex-direction: column; gap: 12px; background: #ffffff; position: relative; transition: all 0.3s; min-height: 80px; }
+        .drop-area.drag-over { background: #dbeafe; border: 4px dashed var(--primary); border-radius: 16px; }
+        .drop-area:empty { display: flex; align-items: center; justify-content: center; border: 4px dashed #cbd5e1; border-radius: 16px; margin: 10px; }
+        .drop-area:empty::before { content: "👇 Drop Here! 👇"; color: #94a3b8; font-weight: 900; font-size: clamp(16px, 2vw, 20px); }
+
+        .mol-row { display: flex; flex-wrap: wrap; gap: 15px; width: 100%; align-items: flex-start; }
+        
+        /* Mol Cards (Soft Red Overlay on Hover) */
+        .mol-card { border: 3px solid #cbd5e1; border-radius: 16px; padding: 12px; background: #f8fafc; display: flex; flex-direction: column; align-items: center; position: relative; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 90px; box-shadow: 0 6px 0 #cbd5e1; overflow: hidden; cursor: pointer; }
+        .mol-formula { font-size: clamp(20px, 2.5vw, 26px); font-weight: 900; margin-bottom: 8px; color: var(--text-dark); pointer-events: none; }
+        
+        .mol-remove-overlay {
+            position: absolute; inset: 0; background: rgba(239, 68, 68, 0.15); border-radius: 13px;
+            color: rgba(239, 68, 68, 0.8); display: flex; align-items: center; justify-content: center;
+            font-size: 32px; opacity: 0; transition: opacity 0.2s; z-index: 50; pointer-events: none;
+        }
+        .mol-card:hover { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; border-color: var(--st-red); }
+        .mol-card:hover .mol-remove-overlay { opacity: 1; }
+        
+        /* HTML Marbles (Shiny Candy Toy) */
+        .atom-cluster { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px; max-width: 140px; pointer-events: none; }
+        .atom-marble { 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; 
+            box-shadow: inset -3px -3px 5px rgba(0,0,0,0.2), inset 3px 3px 5px rgba(255,255,255,0.9), 0 3px 5px rgba(0,0,0,0.15);
+            border: 2px solid rgba(0,0,0,0.2); text-shadow: 1px 1px 0px rgba(255,255,255,0.5);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Panel Tallies */
+        .panel-tally { background: #f8fafc; border-top: 3px solid #e2e8f0; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 40px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
+        .tally-item { display: flex; align-items: center; gap: 6px; font-size: clamp(14px, 1.5vw, 16px); font-weight: 900; padding: 4px 12px; border-radius: 16px; color: white; border: 3px solid rgba(0,0,0,0.1); box-shadow: 0 4px 0 rgba(0,0,0,0.1); cursor: help; }
+        .tally-green { background: var(--st-green); }
+        .tally-red { background: var(--st-red); }
+
+        /* --- Right Sidebar (Teacher Guide) --- */
+        .right-sidebar { flex: 1 1 250px; min-width: 280px; max-width: 350px; display: flex; flex-direction: column; gap: 15px; transition: margin-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: sticky; top: 15px; height: calc(100vh - 100px); align-self: flex-start; }
+        .right-sidebar.collapsed { margin-right: -380px; display: none; }
+        
+        .chat-wrapper { flex: 1; background: #ffffff; border-radius: 20px; display: flex; flex-direction: column; border: var(--border-thick); box-shadow: var(--shadow-toy); min-height: 0; overflow: hidden; }
+        .chat-container { flex: 1; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; gap: 15px; }
+        .chat-disclaimer { font-size: clamp(10px, 1vw, 12px); color: #94a3b8; text-align: center; padding: 10px; background: #f8fafc; border-top: 3px solid #e2e8f0; line-height: 1.2; font-weight: 800; }
+        
+        .chat-bubble { padding: 15px 18px; border-radius: 18px; font-size: clamp(14px, 1.5vw, 16px); font-weight: 800; line-height: 1.5; animation: bounceIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); border: 3px solid #cbd5e1; box-shadow: 0 4px 0 rgba(0,0,0,0.05); position: relative; }
+        .chat-system { background: #f8fafc; color: #475569; border-bottom-left-radius: 5px; }
+        .chat-agent { background: #e0f2fe; color: #0369a1; border-color: #38bdf8; border-bottom-right-radius: 5px; }
+        .chat-success { background: #dcfce7; color: #166534; border-color: #22c55e; border-bottom-left-radius: 5px; }
+        
+        .guide-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
+        .btn-hint { background: var(--st-yellow); color: #000; border-color: #d97706; box-shadow: 0 4px 0 #d97706; cursor: pointer; }
+        .btn-hint:hover { background: #fbbf24; border-color: #d97706; color: #000; box-shadow: 0 6px 0 #d97706; }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!">
+                <span class="logo-icon">🧪</span> STOICHBALANCE
+            </h1>
+            <div id="puzzle-counter" style="background:var(--st-green); color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #047857; box-shadow:0 4px 0 #047857; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 5</div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items:center;">
+            <label style="font-weight:900; color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
+            <select id="reaction-select" data-tooltip="Pick a puzzle to solve or create a new one!"></select>
+            <button onclick="toggleGuide()" data-tooltip="Show or hide the Helper Bot!">🤖 Helper</button>
+        </div>
+    </header>
+
+    <button onclick="openTutorial()" style="position:fixed; bottom:20px; left:20px; z-index:9000; background:#ec4899; color:white; border:3px solid #be185d; box-shadow:0 4px 0 #be185d; padding:10px 20px; border-radius:100px; font-weight:900; font-size:18px; cursor:pointer; font-family:var(--font-ui); transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">❓ Help & Guide</button>
+
+    <div class="app-body">
+        
+        <!-- Left Sidebar: Element Scales -->
+        <div class="left-sidebar" id="element-scales-container"></div>
+
+        <!-- Center Content -->
+        <div class="center-content">
+            <!-- Master Scale -->
+            <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
+                
+                <!-- Equation Grid perfectly aligned over widened jars -->
+                <div class="equation-grid-wrapper">
+                    <div class="eq-left-container"><div class="eq-left" id="eq-left-content"></div></div>
+                    <div class="eq-center-container"><div class="eq-arrow" data-tooltip="Transforms into 👉">→</div></div>
+                    <div class="eq-right-container"><div class="eq-right" id="eq-right-content"></div></div>
+                </div>
+                
+                <!-- CSS DOM SEESAW (Physically contained marbles) -->
+                <div class="seesaw-container">
+                    <div class="seesaw-beam" id="ms-beam">
+                        <div class="seesaw-jar left-jar" id="ms-jar-left">
+                            <div class="jar-marbles-container" id="ms-marbles-left"></div>
+                        </div>
+                        <div class="seesaw-jar right-jar" id="ms-jar-right">
+                            <div class="jar-marbles-container" id="ms-marbles-right"></div>
+                        </div>
+                    </div>
+                    <div class="seesaw-pin"></div>
+                    <div class="seesaw-base"></div>
+                </div>
+
+                <div class="status-footer">
+                    <div class="status-emoji" id="ms-emoji">😢</div>
+                    <div id="ms-status-text">Unbalanced!</div>
+                </div>
+            </div>
+
+            <!-- Workspace Boxes -->
+            <div class="workspace-grid">
+                <div class="work-panel card">
+                    <div class="panel-header" id="header-reactants" data-tooltip="These are the Reactants!">👈 REACTANTS</div>
+                    <div class="supply-tray" id="tray-left"></div>
+                    <div class="drop-area" id="area-left" ondragover="allowDrop(event)" ondrop="drop(event, 'left')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                    <div class="panel-tally" id="tally-left"></div>
+                </div>
+                
+                <div class="work-panel card">
+                    <div class="panel-header" id="header-products" data-tooltip="These are the Products!">PRODUCTS 👉</div>
+                    <div class="supply-tray" id="tray-right"></div>
+                    <div class="drop-area" id="area-right" ondragover="allowDrop(event)" ondrop="drop(event, 'right')" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)"></div>
+                    <div class="panel-tally" id="tally-right"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Teacher Guide -->
+        <div class="right-sidebar" id="teacher-guide">
+            <div class="sidebar-title-wrapper" data-tooltip="I'm the Helper Bot! Ask me for a hint!">
+                <div class="sidebar-title">🤖 HELPER BOT</div>
+            </div>
+            <div class="chat-wrapper">
+                <div class="chat-container" id="chat-box"></div>
+                <div class="chat-disclaimer">Hints may not be perfectly accurate. If stuck, please refer to teachers or guides.</div>
+            </div>
+            <div class="guide-btns">
+                <div style="display: flex; gap: 5px; width: 100%;">
+                    <button class="btn-hint" style="flex: 9; padding: 6px 10px;" onclick="revealHeuristicHint()">💡 Give me a Hint!</button>
+                    <button style="flex: 1; padding: 6px; display: flex; justify-content: center; align-items: center;" onclick="clearChat()" data-tooltip="Clear Chat">🧹</button>
+                </div>
+                <div style="display: flex; gap: 5px; width: 100%;">
+                    <button onclick="undo()" style="flex: 1;" data-tooltip="Undo Last Move">↩️ Undo</button>
+                    <button onclick="resetEquation()" style="flex: 1;">🔄 Start Over</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Custom Puzzle Modal -->
+    <div id="custom-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
+        <div class="card" style="background:white; padding:25px; width:450px; max-width:90%; display:flex; flex-direction:column; gap:15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <h2 style="color:var(--primary); font-size:24px; font-weight:900; text-align:center;">🛠️ Create Custom Puzzle</h2>
+            <div>
+                <label style="font-weight:900; color:#475569;">Puzzle Name:</label>
+                <input type="text" id="custom-name" placeholder="e.g. My Awesome Reaction" style="width:100%; padding:10px; border-radius:8px; border:3px solid #cbd5e1; font-family:var(--font-ui); font-size:16px; margin-top:5px; font-weight:bold; outline:none;">
+            </div>
+            <div>
+                <label style="font-weight:900; color:#475569;">Reactants (comma separated):</label>
+                <input type="text" id="custom-left" placeholder="e.g. H2, O2" style="width:100%; padding:10px; border-radius:8px; border:3px solid #cbd5e1; font-family:var(--font-ui); font-size:16px; margin-top:5px; font-weight:bold; outline:none;">
+            </div>
+            <div>
+                <label style="font-weight:900; color:#475569;">Products (comma separated):</label>
+                <input type="text" id="custom-right" placeholder="e.g. H2O" style="width:100%; padding:10px; border-radius:8px; border:3px solid #cbd5e1; font-family:var(--font-ui); font-size:16px; margin-top:5px; font-weight:bold; outline:none;">
+            </div>
+            <div id="custom-error" style="color:#ef4444; font-weight:900; display:none; text-align:center; background:#fee2e2; padding:10px; border-radius:8px; border:2px solid #ef4444;"></div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button onclick="closeCustomModal()" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1;">Cancel</button>
+                <button onclick="saveCustomPuzzle()" style="flex:1; background:var(--st-green); color:white; border-color:#047857; box-shadow:0 4px 0 #047857;">Save & Play</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorial-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+        <div class="card" style="background:white; padding:30px; width:600px; max-width:90%; display:flex; flex-direction:column; gap:20px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); text-align:center; position:relative; overflow:hidden;">
+            
+            <!-- Slide 1 -->
+            <div id="tut-slide-1" class="tut-slide">
+                <div style="font-size:50px; margin-bottom:10px;">⚖️</div>
+                <h2 style="color:var(--primary); font-size:28px; font-weight:900;">The Master Scale</h2>
+                <p style="font-size:18px; color:#475569; font-weight:700; line-height:1.5;">Welcome to STOICHBALANCE! Your goal is to balance the chemical equation so that the left side (<span style="color:var(--primary);">Reactants</span>) and right side (<span style="color:var(--st-green);">Products</span>) weigh exactly the same.</p>
+                <div style="background:#f8fafc; border:3px solid #cbd5e1; border-radius:16px; padding:15px; margin:15px 0;">
+                    <div style="font-weight:900; color:var(--st-red); font-size:20px;">😢 Uh Oh! Unbalanced!</div>
+                    <div style="color:#64748b; font-size:14px; margin-top:5px; font-weight:bold;">Keep adding blocks until the Master Scale is perfectly level!</div>
+                </div>
+                <button onclick="showTutSlide(2)" style="margin-top:10px; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:100%; padding:12px; font-size:18px;">Next ➡️</button>
+            </div>
+
+            <!-- Slide 2 -->
+            <div id="tut-slide-2" class="tut-slide" style="display:none;">
+                <h2 style="color:var(--primary); font-size:28px; font-weight:900;">Molecules & Marbles</h2>
+                <p style="font-size:16px; color:#475569; font-weight:700; line-height:1.5;">The big blocks are <strong>Molecules</strong>. The tiny colorful circles inside are <strong>Atoms (Marbles)</strong>!</p>
+                <div style="display:flex; justify-content:center; margin:15px 0;">
+                    <div class="mol-card" style="cursor:default; transform:scale(1.2); pointer-events:none;">
+                        <div class="mol-formula">H<span class="subscript">2</span>O</div>
+                        <div class="atom-cluster">
+                            <div class="atom-marble" style="background:#ef4444; color:#fff; width:36px; height:36px; font-size:16px;">H</div>
+                            <div class="atom-marble" style="background:#ef4444; color:#fff; width:36px; height:36px; font-size:16px;">H</div>
+                            <div class="atom-marble" style="background:#3b82f6; color:#fff; width:36px; height:36px; font-size:16px;">O</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background:#fffbeb; border:3px solid #fcd34d; border-radius:12px; padding:10px; margin-bottom:15px; text-align:left; font-weight:bold; color:#713f12;">
+                    💡 <strong>Pro Tip:</strong> Hover your mouse over the big Equation at the top of the screen to peek inside the molecules!
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="showTutSlide(1)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="showTutSlide(3)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div id="tut-slide-3" class="tut-slide" style="display:none;">
+                <h2 style="color:var(--primary); font-size:28px; font-weight:900;">Tiny Scales</h2>
+                <p style="font-size:16px; color:#475569; font-weight:700; line-height:1.5;">The left sidebar contains <strong>Tiny Scales</strong>. These track the balance of one <em>specific</em> element!</p>
+                <div style="display:flex; justify-content:center; margin:15px 0;">
+                    <div class="scale-card card state-red" style="transform:scale(0.85); width:200px;">
+                        <div class="scale-header">Hydrogen</div>
+                        <div class="tiny-seesaw-container">
+                            <div class="seesaw-beam" style="transform: rotate(-15deg);">
+                                <div class="seesaw-jar left-jar" style="transform: rotate(15deg);"><div class="jar-marbles-container"><div class="atom-marble" style="position:absolute; left:20px; bottom:5px; width:16px; height:16px; font-size:7px; background:#ef4444; color:#fff;">H</div></div></div>
+                                <div class="seesaw-jar right-jar" style="transform: rotate(15deg);"><div class="jar-marbles-container"></div></div>
+                            </div>
+                            <div class="seesaw-pin"></div>
+                            <div class="seesaw-base"></div>
+                        </div>
+                        <div class="scale-footer"><span style="color:#ef4444">1</span><span>0</span></div>
+                    </div>
+                </div>
+                <p style="font-size:14px; color:#64748b; font-weight:bold;">If it's tipping to the left, you need to add more of that element to the right side!</p>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button onclick="showTutSlide(2)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="showTutSlide(4)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div id="tut-slide-4" class="tut-slide" style="display:none;">
+                <h2 style="color:var(--primary); font-size:28px; font-weight:900;">Adding & Removing</h2>
+                <div style="display:flex; flex-direction:column; gap:15px; margin:15px 0; text-align:left;">
+                    <div style="background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; padding:15px; font-weight:bold; color:#334155;">
+                        <span style="font-size:24px; margin-right:10px;">👇</span> <strong>To Add:</strong> Drag the shiny buttons from the top trays into the large dashed drop zones. You can also just click the tray button!
+                    </div>
+                    <div style="background:#fef2f2; border:2px dashed #fecaca; border-radius:12px; padding:15px; font-weight:bold; color:#991b1b;">
+                        <span style="font-size:24px; margin-right:10px;">❌</span> <strong>To Remove:</strong> Hover over any block you've placed in the drop zone. It will glow red. Click it to delete it!
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="showTutSlide(3)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="showTutSlide(5)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div id="tut-slide-5" class="tut-slide" style="display:none;">
+                <h2 style="color:var(--primary); font-size:28px; font-weight:900;">Bots & Puzzles!</h2>
+                <div style="display:flex; flex-direction:column; gap:15px; margin:15px 0; text-align:left;">
+                    <div style="background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px; padding:10px; font-weight:bold; color:#166534;">
+                        <strong>🤖 Helper Bot:</strong> Stuck? Open the right panel and click "Give me a Hint!". The bot will pulse the exact screens you need to look at!
+                    </div>
+                    <div style="background:#fdf4ff; border:2px solid #fbcfe8; border-radius:12px; padding:10px; font-weight:bold; color:#86198f;">
+                        <strong>📋 Puzzles:</strong> The dropdown at the top lets you pick different puzzles. Watch the counter to see how many you've solved!
+                    </div>
+                    <div style="background:#eff6ff; border:2px solid #bfdbfe; border-radius:12px; padding:10px; font-weight:bold; color:#1e40af;">
+                        <strong>🛠️ Custom Mode:</strong> At the bottom of the dropdown, click "Create Custom Puzzle" to type your own chemical formulas and solve them!
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="showTutSlide(4)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="closeTutorial()" style="flex:2; background:var(--st-green); color:white; border-color:#047857; box-shadow:0 4px 0 #047857; padding:12px; font-size:18px;">Let's Play! 🚀</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // JS Dynamic Tooltips Engine (Guarantees NO clipping, always front layer)
+        let activeTooltip = null;
+        document.body.addEventListener('mouseover', (e) => {
+            let target = e.target.closest('[data-tooltip], [data-html-tooltip]');
+            if(target) {
+                if(activeTooltip) activeTooltip.remove();
+                
+                let isHtml = target.hasAttribute('data-html-tooltip');
+                let content = isHtml ? target.getAttribute('data-html-tooltip') : target.getAttribute('data-tooltip');
+                
+                activeTooltip = document.createElement('div');
+                activeTooltip.className = isHtml ? 'js-tooltip html-tip' : 'js-tooltip';
+                activeTooltip.innerHTML = content;
+                document.body.appendChild(activeTooltip);
+                
+                let rect = target.getBoundingClientRect();
+                let tipRect = activeTooltip.getBoundingClientRect();
+                
+                let top = rect.bottom + 10;
+                let left = rect.left + (rect.width/2) - (tipRect.width/2);
+                
+                // Flip top if offscreen bottom
+                if(top + tipRect.height > window.innerHeight) top = rect.top - tipRect.height - 10;
+                // Boundary limits X
+                if(left < 10) left = 10;
+                if(left + tipRect.width > window.innerWidth - 10) left = window.innerWidth - tipRect.width - 10;
+                
+                activeTooltip.style.top = top + 'px';
+                activeTooltip.style.left = left + 'px';
+                
+                // Reflow for CSS transition
+                activeTooltip.offsetHeight;
+                activeTooltip.style.opacity = 1;
+            }
+        });
+        document.body.addEventListener('mouseout', (e) => {
+            let target = e.target.closest('[data-tooltip], [data-html-tooltip]');
+            if(target && activeTooltip) {
+                activeTooltip.remove();
+                activeTooltip = null;
+            }
+        });
+
+        const REACTIONS = [
+            { name: "Making Water 💧", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] },
+            { name: "Burning Methanol 🔥", left: ["CH3OH(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+            { name: "Iron & Chlorine 🧲", left: ["Fe(s)", "Cl2(g)"], right: ["FeCl3(s)"] },
+            { name: "Sodium in Water 💥", left: ["Na(s)", "H2O(l)"], right: ["NaOH(aq)", "H2(g)"] },
+            { name: "Making Ammonia 💨", left: ["N2(g)", "H2(g)"], right: ["NH3(g)"] }
+        ];
+
+        const MOLECULE_NAMES = {
+            "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor",
+            "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron",
+            "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium",
+            "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas"
+        };
+
+        const FULL_ELEMENT_NAMES = {
+            "H": "Hydrogen", "O": "Oxygen", "C": "Carbon", "Fe": "Iron", "Cl": "Chlorine", "Na": "Sodium", "N": "Nitrogen", "S": "Sulfur"
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            if (type === 'clink') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'whoosh') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'ding') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 1.0);
+            }
+        }
+
+        function triggerConfetti() {
+            for(let i=0; i<40; i++) {
+                let conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.left = '50%';
+                conf.style.top = '30%';
+                conf.style.width = '12px';
+                conf.style.height = '12px';
+                conf.style.backgroundColor = ['#ef4444', '#3b82f6', '#f59e0b', '#10b981', '#ec4899'][Math.floor(Math.random()*5)];
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+                conf.style.zIndex = '9999';
+                conf.style.pointerEvents = 'none';
+                document.body.appendChild(conf);
+                
+                let angle = Math.random() * Math.PI * 2;
+                let vel = 10 + Math.random() * 15;
+                let vx = Math.cos(angle) * vel;
+                let vy = Math.sin(angle) * vel - 10;
+                let rot = Math.random() * 360;
+                let vrot = (Math.random() - 0.5) * 20;
+                
+                let x = window.innerWidth/2;
+                let y = window.innerHeight * 0.3;
+                
+                let anim = setInterval(() => {
+                    x += vx;
+                    vy += 0.5;
+                    y += vy;
+                    rot += vrot;
+                    conf.style.transform = `translate(${x - window.innerWidth/2}px, ${y - window.innerHeight*0.3}px) rotate(${rot}deg)`;
+                    if (y > window.innerHeight) {
+                        clearInterval(anim);
+                        conf.remove();
+                    }
+                }, 16);
+            }
+        }
+
+        let state = { 
+            rxIdx: 0, left: [], right: [], elementColors: {}, hintLevel: 0, lastHintElement: null, expectedMove: null, wrongMovesCounter: 0, 
+            history: [], moves: 0, hardMode: false, hintsUsed: 0, completed: new Set() 
+        };
+
+        const DISTINCT_COLORS = [
+            { bg: "#ef4444", color: "#fff" }, { bg: "#3b82f6", color: "#fff" }, 
+            { bg: "#f59e0b", color: "#000" }, { bg: "#8b5cf6", color: "#fff" }, 
+            { bg: "#10b981", color: "#fff" }, { bg: "#ec4899", color: "#fff" }, 
+            { bg: "#06b6d4", color: "#000" } 
+        ];
+
+        function assignColors(reaction) {
+            let elements = new Set();
+            [...reaction.left, ...reaction.right].forEach(f => {
+                Object.keys(parseFormula(f)).forEach(el => elements.add(el));
+            });
+            state.elementColors = {};
+            let colorIdx = 0;
+            elements.forEach(el => {
+                state.elementColors[el] = DISTINCT_COLORS[colorIdx % DISTINCT_COLORS.length];
+                colorIdx++;
+            });
+        }
+
+        function parseFormula(f) {
+            let core = f.split('(')[0];
+            let atoms = {};
+            let parts = core.match(/([A-Z][a-z]*)(\d*)/g) || [];
+            parts.forEach(p => {
+                let [, el, count] = p.match(/([A-Z][a-z]*)(\d*)/);
+                atoms[el] = (atoms[el] || 0) + (parseInt(count) || 1);
+            });
+            return atoms;
+        }
+
+        function getFormulaHTML(f) {
+            let stateMatch = f.match(/\(([a-z]+)\)/);
+            let stateStr = stateMatch ? `<span style="font-size:0.6em; color:#94a3b8; font-style:italic; margin-left:2px;">(${stateMatch[1]})</span>` : '';
+            let core = f.split('(')[0];
+            return core.replace(/([A-Z][a-z]*)(\d+)/g, (match, el, num) => {
+                return `${el}<span class="subscript">${num}</span>`;
+            }) + stateStr;
+        }
+
+        function getFormulaHTMLForEquation(f) {
+            let stateMatch = f.match(/\(([a-z]+)\)/);
+            let stateStr = stateMatch ? `<span style="font-size:0.5em; color:#94a3b8; font-style:italic; margin-left:4px;">(${stateMatch[1]})</span>` : '';
+            let core = f.split('(')[0];
+            
+            let html = core.replace(/([A-Z][a-z]*)(\d+)/g, (match, el, num) => {
+                let col = state.elementColors[el];
+                
+                let marblesHtml = '';
+                for(let i=0; i<num; i++) {
+                    marblesHtml += `<div class="atom-marble" style="background:${col.bg}; color:${col.color}; width:28px; height:28px; font-size:14px; margin:0 3px;">${el}</div>`;
+                }
+                
+                let tooltipHTML = `
+                    <div style="margin-bottom: 12px; color:#64748b; font-size:16px; text-align:center;">The tiny <strong style="color:var(--primary); font-size:22px;">${num}</strong> means this molecule<br/>has ${num} atoms (marbles) inside it!</div>
+                    <div style="display:flex; justify-content:center;">${marblesHtml}</div>
+                `;
+
+                return `${el}<span class="subscript-wrapper" data-html-tooltip='${tooltipHTML.replace(/'/g, "&apos;")}'>
+                    <span class="subscript" style="border-bottom: 3px dotted #94a3b8; cursor:help;">${num}</span>
+                </span>`;
+            });
+            return html + stateStr;
+        }
+
+        function calculateTotals(arr) {
+            let totals = {};
+            arr.forEach(f => {
+                let atoms = parseFormula(f);
+                for (let [el, num] of Object.entries(atoms)) {
+                    totals[el] = (totals[el] || 0) + num;
+                }
+            });
+            return totals;
+        }
+
+        function countMolecules(arr) {
+            let counts = {};
+            arr.forEach(f => counts[f] = (counts[f]||0) + 1);
+            return counts;
+        }
+
+        function gcd(a, b) { return !b ? a : gcd(b, a % b); }
+        function checkCanSimplify(lCounts, rCounts) {
+            let rx = REACTIONS[state.rxIdx];
+            let allVals = [];
+            let isMissing = false;
+            [...rx.left, ...rx.right].forEach(f => {
+                let c = (lCounts[f] || 0) + (rCounts[f] || 0);
+                if(c > 0) allVals.push(c);
+                else isMissing = true;
+            });
+            if(allVals.length === 0 || isMissing) return false;
+            let g = allVals[0];
+            for(let i=1; i<allVals.length; i++) g = gcd(g, allVals[i]);
+            return g > 1;
+        }
+
+        function dragStart(e, side, formula) {
+            e.dataTransfer.setData("application/json", JSON.stringify({side, formula}));
+            e.dataTransfer.effectAllowed = "copy";
+        }
+        function allowDrop(e) { e.preventDefault(); }
+        function dragEnter(e) { e.currentTarget.classList.add('drag-over'); }
+        function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+        function drop(e, targetSide) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            let data = e.dataTransfer.getData("application/json");
+            if(data) {
+                let parsed = JSON.parse(data);
+                if(parsed.side === targetSide) addMolecule(targetSide, parsed.formula);
+            }
+        }
+
+        function openCustomModal() {
+            document.getElementById('custom-modal').style.display = 'flex';
+            document.getElementById('custom-name').value = '';
+            document.getElementById('custom-left').value = '';
+            document.getElementById('custom-right').value = '';
+            document.getElementById('custom-error').style.display = 'none';
+        }
+
+        function closeCustomModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        function saveCustomPuzzle() {
+            let name = document.getElementById('custom-name').value.trim() || "Custom Puzzle";
+            let leftStr = document.getElementById('custom-left').value.trim();
+            let rightStr = document.getElementById('custom-right').value.trim();
+            let errorEl = document.getElementById('custom-error');
+
+            if(!leftStr || !rightStr) {
+                errorEl.textContent = "Please enter both Reactants and Products!";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Replace spaces but keep valid alphanumeric for formula parsing
+            let left = leftStr.split(',').map(s => s.replace(/\s+/g, '')).filter(s => s.length > 0);
+            let right = rightStr.split(',').map(s => s.replace(/\s+/g, '')).filter(s => s.length > 0);
+
+            if(left.length === 0 || right.length === 0) {
+                errorEl.textContent = "Invalid format! Use commas like: H2, O2";
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Validate that elements match on both sides
+            let lElements = new Set();
+            let rElements = new Set();
+            left.forEach(f => Object.keys(parseFormula(f)).forEach(e => lElements.add(e)));
+            right.forEach(f => Object.keys(parseFormula(f)).forEach(e => rElements.add(e)));
+            
+            let lArray = Array.from(lElements).sort();
+            let rArray = Array.from(rElements).sort();
+            if(JSON.stringify(lArray) !== JSON.stringify(rArray)) {
+                errorEl.textContent = `Elements don't match! Reactants have [${lArray.join(',')}] but Products have [${rArray.join(',')}]`;
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            let newReaction = { name: "🛠️ " + name, left: left, right: right };
+            REACTIONS.push(newReaction);
+            
+            populateDropdown();
+            let newIdx = REACTIONS.length - 1;
+            document.getElementById('reaction-select').value = newIdx;
+            loadReaction(newIdx);
+            
+            closeCustomModal();
+        }
+
+        function updateCounter() {
+            let total = REACTIONS.length;
+            let comp = state.completed.size;
+            let el = document.getElementById('puzzle-counter');
+            el.textContent = `${comp} / ${total}`;
+            
+            if (comp === total) {
+                el.setAttribute('data-tooltip', `Amazing! ${comp} out of ${total} completed! Congrats! 🎉`);
+                el.style.background = '#facc15';
+                el.style.borderColor = '#ca8a04';
+                el.style.boxShadow = '0 4px 0 #ca8a04';
+                el.style.color = '#713f12';
+            } else {
+                el.setAttribute('data-tooltip', `${comp} out of ${total} completed! Solve more!`);
+                el.style.background = 'var(--st-green)';
+                el.style.borderColor = '#047857';
+                el.style.boxShadow = '0 4px 0 #047857';
+                el.style.color = 'white';
+            }
+        }
+
+        function populateDropdown() {
+            const sel = document.getElementById('reaction-select');
+            sel.innerHTML = '';
+            REACTIONS.forEach((rx, i) => {
+                let badge = state.completed.has(i) ? '✅ ' : '';
+                sel.add(new Option(`${badge}Puzzle: ${rx.name}`, i));
+            });
+            sel.add(new Option(`➕ Create Custom Puzzle...`, 'custom'));
+        }
+
+        function showTutSlide(n) {
+            for(let i=1; i<=5; i++) {
+                let el = document.getElementById('tut-slide-' + i);
+                if(el) el.style.display = 'none';
+            }
+            let target = document.getElementById('tut-slide-' + n);
+            if(target) target.style.display = 'block';
+        }
+
+        function openTutorial() {
+            document.getElementById('tutorial-modal').style.display = 'flex';
+            showTutSlide(1);
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorial-modal').style.display = 'none';
+            localStorage.setItem('STOICHBALANCE_tutorial_seen', 'true');
+        }
+
+        function init() {
+            populateDropdown();
+            const sel = document.getElementById('reaction-select');
+            sel.onchange = (e) => {
+                if (e.target.value === 'custom') {
+                    openCustomModal();
+                    sel.value = state.rxIdx; // revert until saved
+                } else {
+                    loadReaction(e.target.value);
+                }
+            };
+            loadReaction(0);
+            
+            if (!localStorage.getItem('STOICHBALANCE_tutorial_seen')) {
+                openTutorial();
+            }
+        }
+
+        function loadReaction(idx) {
+            state.rxIdx = parseInt(idx);
+            let rx = REACTIONS[state.rxIdx];
+            assignColors(rx);
+            state.left = [...rx.left]; 
+            state.right = [...rx.right];
+            state.hintLevel = 0;
+            state.lastHintElement = null;
+            state.expectedMove = null;
+            state.wrongMovesCounter = 0;
+            state.history = [];
+            state.moves = 0;
+            state.hintsUsed = 0;
+            
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            addChatMessage(`Hello there! 👋 We are solving: <strong>${rx.name}</strong>!<br/><br/>Try dragging colorful molecule blocks from the top into the big white boxes below!`, 'agent');
+
+            document.getElementById('header-reactants').setAttribute('data-tooltip', `REACTANTS are the starting ingredients! (${rx.left.join(', ')})`);
+            document.getElementById('header-products').setAttribute('data-tooltip', `PRODUCTS are what we make! (${rx.right.join(', ')})`);
+
+            renderTrays();
+            updateCounter();
+            updateUI();
+        }
+
+        function clearChat() {
+            document.getElementById('chat-box').innerHTML = '';
+            addChatMessage(`Chat cleared! What's next?`, 'agent');
+            state.expectedMove = null;
+            state.wrongMovesCounter = 0;
+            state.hintLevel = 0;
+            state.lastHintElement = null;
+        }
+
+        function solveOneStep(side, formula) {
+            state.wrongMovesCounter = 0;
+            state.expectedMove = null;
+            state[side].push(formula);
+            document.getElementById('chat-box').innerHTML = '';
+            addChatMessage(`I've added the <strong>${MOLECULE_NAMES[formula]||formula}</strong> block for you! Let's continue!`, 'success');
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+
+        function resetEquation() { loadReaction(state.rxIdx); }
+        
+        function saveState() {
+            state.history.push({ left: [...state.left], right: [...state.right] });
+        }
+
+        function undo() {
+            if(state.history.length > 0) {
+                let last = state.history.pop();
+                state.left = [...last.left];
+                state.right = [...last.right];
+                playSound('whoosh');
+                updateUI();
+            }
+        }
+
+        function toggleHardMode() {
+            state.hardMode = document.getElementById('hard-mode-toggle').checked;
+            document.getElementById('element-scales-container').style.display = state.hardMode ? 'none' : 'flex';
+        }
+
+        function addMolecule(side, formula) { 
+            saveState();
+            state.moves++;
+            state[side].push(formula); 
+            playSound('clink');
+            
+            // Common Mistake Detection
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            let addedAtoms = parseFormula(formula);
+            let isExcess = false;
+            let excessEl = '';
+            for(let [el, num] of Object.entries(addedAtoms)) {
+                if(side === 'left' && lTotals[el] - num > (rTotals[el] || 0)) { isExcess = true; excessEl = el; break; }
+                if(side === 'right' && rTotals[el] - num > (lTotals[el] || 0)) { isExcess = true; excessEl = el; break; }
+            }
+            if(isExcess) {
+                addChatMessage(`Careful! You already have too much <strong>${FULL_ELEMENT_NAMES[excessEl] || excessEl}</strong> on the ${side==='left'?'Reactants':'Products'} side! Adding this block tips the scale even further!`, 'system');
+            }
+
+            if (state.expectedMove) {
+                if (state.expectedMove.side === side && state.expectedMove.molecule === formula) {
+                    document.getElementById('chat-box').innerHTML = '';
+                    addChatMessage(`<strong>🎉 Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
+                    state.wrongMovesCounter = 0;
+                    state.expectedMove = null;
+                } else {
+                    state.wrongMovesCounter++;
+                    let msg = `Oops! That wasn't the exact block the hint suggested. Try re-reading the hint!`;
+                    if (state.wrongMovesCounter >= 2) {
+                        msg += `<br><br><button onclick="solveOneStep('${state.expectedMove.side}', '${state.expectedMove.molecule}')" style="background:#10b981; color:white; border-color:#047857; box-shadow: 0 4px 0 #047857; width:100%;">Solve this step for me</button>`;
+                    }
+                    addChatMessage(msg, 'system');
+                }
+            }
+            
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+        
+        function removeMolecule(side, index) { 
+            saveState();
+            state.moves++;
+            state[side].splice(index, 1); 
+            playSound('whoosh');
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+
+        function updateUI() {
+            renderEquationGrid();
+            renderWorkspaceAreas();
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            renderTallies(lTotals, rTotals);
+            renderScales(lTotals, rTotals);
+            checkWinState(lTotals, rTotals);
+        }
+
+        function renderEquationGrid() {
+            let rx = REACTIONS[state.rxIdx];
+            let lCounts = countMolecules(state.left);
+            let rCounts = countMolecules(state.right);
+
+            const renderSide = (mols, counts) => {
+                return mols.map((f, i) => {
+                    let plus = i > 0 ? ` <div class="eq-plus">+</div> ` : '';
+                    let c = counts[f] || 0;
+                    
+                    let clusterHtml = generateMarbleCluster(f, 20);
+                    let coeffVisuals = '';
+                    for(let k=0; k<c; k++) coeffVisuals += `<div style="display:inline-block; margin:2px;">${clusterHtml}</div>`;
+                    let coeffTooltip = `<div style="margin-bottom:10px; font-size:16px; text-align:center;">You added <strong>${c}</strong> of these!</div><div style="display:flex; flex-wrap:wrap; justify-content:center; max-width:200px;">${coeffVisuals}</div>`;
+
+                    let coeffMarkup = `<span class="eq-coeff" ${c > 0 ? `data-html-tooltip='${coeffTooltip.replace(/'/g, "&apos;")}'` : ''}>${c}</span>`;
+
+                    return `${plus}<div class="eq-mol">
+                        <span class="subscript-wrapper" style="margin-right:8px;">${coeffMarkup}</span>
+                        <span class="eq-formula" data-tooltip="This is ${MOLECULE_NAMES[f]||f}!">${getFormulaHTMLForEquation(f)}</span>
+                    </div>`;
+                }).join('');
+            };
+
+            document.getElementById('eq-left-content').innerHTML = renderSide(rx.left, lCounts);
+            document.getElementById('eq-right-content').innerHTML = renderSide(rx.right, rCounts);
+        }
+
+        function generateMarbleCluster(formula, size=24) {
+            let atomsObj = parseFormula(formula);
+            let html = `<div class="atom-cluster">`;
+            for (let [el, num] of Object.entries(atomsObj)) {
+                let col = state.elementColors[el];
+                for(let i=0; i<num; i++) {
+                    html += `<div class="atom-marble" style="background:${col.bg}; color:${col.color}; width:${size}px; height:${size}px; font-size:${size*0.45}px;">${el}</div>`;
+                }
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function renderTrays() {
+            let rx = REACTIONS[state.rxIdx];
+            const renderSide = (id, arr, sideStr) => {
+                const tray = document.getElementById(id);
+                tray.innerHTML = '';
+                arr.forEach(f => {
+                    let btn = document.createElement('div');
+                    btn.className = 'tray-btn';
+                    btn.draggable = true;
+                    btn.ondragstart = (e) => dragStart(e, sideStr, f);
+                    btn.onclick = () => addMolecule(sideStr, f); 
+                    
+                    let previewHTML = `
+                        <div style="font-size: 16px; font-weight: 900; color: #334155; margin-bottom: 6px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 4px; width: 100%; text-align: center;">${MOLECULE_NAMES[f]||f}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size:14px; color:#64748b;">Drag me!</span>
+                            <span style="font-size:20px; color:var(--primary);">→</span>
+                            ${generateMarbleCluster(f, 30)}
+                        </div>
+                    `;
+                    
+                    btn.setAttribute('data-html-tooltip', previewHTML.replace(/'/g, "&apos;"));
+                    btn.innerHTML = getFormulaHTML(f);
+                    tray.appendChild(btn);
+                });
+            };
+            renderSide('tray-left', rx.left, 'left');
+            renderSide('tray-right', rx.right, 'right');
+        }
+
+        function renderWorkspaceAreas() {
+            const renderSide = (id, arr, sideStr) => {
+                const area = document.getElementById(id);
+                area.innerHTML = '';
+                
+                let groups = {};
+                arr.forEach((f, idx) => {
+                    if(!groups[f]) groups[f] = [];
+                    groups[f].push(idx);
+                });
+
+                Object.keys(groups).forEach(f => {
+                    let row = document.createElement('div');
+                    row.className = 'mol-row';
+                    
+                    groups[f].forEach(idx => {
+                        let card = document.createElement('div');
+                        card.className = 'mol-card';
+                        card.onclick = () => removeMolecule(sideStr, idx);
+                        card.title = "Click to remove";
+                        
+                        card.innerHTML = `
+                            <div class="mol-remove-overlay">❌</div>
+                            <div class="mol-formula">${getFormulaHTML(f)}</div>
+                            ${generateMarbleCluster(f, 36)}
+                        `;
+                        row.appendChild(card);
+                    });
+                    
+                    area.appendChild(row);
+                });
+            };
+            renderSide('area-left', state.left, 'left');
+            renderSide('area-right', state.right, 'right');
+        }
+
+        function renderTallies(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElements = new Set();
+            [...rx.left, ...rx.right].forEach(f => { Object.keys(parseFormula(f)).forEach(el => allElements.add(el)); });
+            
+            const renderSide = (id, totals, oppositeTotals) => {
+                const tally = document.getElementById(id);
+                tally.innerHTML = '';
+                allElements.forEach(el => {
+                    let count = totals[el] || 0;
+                    let opCount = oppositeTotals[el] || 0;
+                    
+                    let statusClass = 'tally-red';
+                    let tip = `Uh oh! Atoms don't match!`;
+                    if(count > 0 || opCount > 0) {
+                        if(count === opCount) { statusClass = 'tally-green'; tip = `Perfect! These match exactly!`; }
+                    }
+
+                    if (count > 0 || opCount > 0) {
+                        let col = state.elementColors[el];
+                        tally.innerHTML += `
+                            <div class="tally-item ${statusClass}" data-tooltip="${tip}">
+                                <div class="atom-marble" style="background:${col.bg}; color:${col.color}; width:24px; height:24px; font-size:12px; border:2px solid rgba(0,0,0,0.2); box-shadow:none;">${el}</div>
+                                <span>= ${count}</span>
+                            </div>
+                        `;
+                    }
+                });
+            };
+            renderSide('tally-left', lTotals, rTotals);
+            renderSide('tally-right', rTotals, lTotals);
+        }
+
+        // DOM Hexagonal Packing Math (Draws perfectly inside the HTML Divs!)
+        function generateDomMarblesGrid(jarWidth, countsObj, size, maxPerRowBase) {
+            let html = '';
+            let flatMarbles = [];
+            for(let [el, num] of Object.entries(countsObj)) {
+                for(let i=0; i<num; i++) flatMarbles.push(el);
+            }
+            
+            let row = 0;
+            let indexInRow = 0;
+            let currentMax = maxPerRowBase;
+            let r = size/2;
+            
+            for(let i=0; i<flatMarbles.length; i++) {
+                let el = flatMarbles[i];
+                if(indexInRow >= currentMax) {
+                    row++;
+                    indexInRow = 0;
+                    currentMax = (row % 2 === 0) ? maxPerRowBase : (maxPerRowBase - 1);
+                }
+                
+                let rowWidth = (currentMax - 1) * (r * 2.1);
+                let startX = (jarWidth / 2) - (rowWidth / 2);
+                let left = startX + (indexInRow * (r * 2.1));
+                let bottom = 5 + (row * (r * 1.8)); // 5px padding from floor
+                
+                let col = state.elementColors[el];
+                html += `<div class="atom-marble" style="position:absolute; left:${left - r}px; bottom:${bottom}px; width:${size}px; height:${size}px; font-size:${size*0.45}px; background:${col.bg}; color:${col.color}; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">${el}</div>`;
+                indexInRow++;
+            }
+            return html;
+        }
+
+        function renderScales(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            let allElements = Array.from(allElsSet);
+            
+            const cont = document.getElementById('element-scales-container');
+            cont.innerHTML = `
+                <div class="sidebar-title-wrapper" data-tooltip="These scales show if each Element's atoms are balanced!">
+                    <div class="sidebar-title">🔍 Tiny Scales!</div>
+                </div>
+            `;
+
+            let totalL = 0, totalR = 0, balancedCount = 0;
+
+            allElements.forEach(el => {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                totalL += l; totalR += r;
+                let diff = l - r;
+                
+                let sClass = 'state-red', tilt = 0;
+                let tip = `Oh no, ${FULL_ELEMENT_NAMES[el]} atoms are unbalanced!`;
+                
+                if (diff === 0 && l > 0) { sClass = 'state-green'; balancedCount++; tip = `Yay! ${FULL_ELEMENT_NAMES[el]} atoms are perfectly balanced!`; }
+                else if (diff === 0) { sClass = ''; balancedCount++; tip = `Empty! Add some blocks!`; } 
+                else { tilt = diff>0?-15:15; }
+
+                let objL = {}; if(l>0) objL[el] = l;
+                let objR = {}; if(r>0) objR[el] = r;
+                let fullName = `${FULL_ELEMENT_NAMES[el] || el} (${el})`;
+
+                cont.innerHTML += `
+                    <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
+                        <div class="scale-header">${fullName}</div>
+                        
+                        <!-- DOM Tiny Seesaw -->
+                        <div class="tiny-seesaw-container">
+                            <div class="seesaw-beam" id="ts-beam-${el}" style="transform: rotate(${tilt}deg);">
+                                <div class="seesaw-jar left-jar" id="ts-jar-l-${el}" style="transform: rotate(${-tilt}deg);">
+                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objL, 16, 4)}</div>
+                                </div>
+                                <div class="seesaw-jar right-jar" id="ts-jar-r-${el}" style="transform: rotate(${-tilt}deg);">
+                                    <div class="jar-marbles-container">${generateDomMarblesGrid(60, objR, 16, 4)}</div>
+                                </div>
+                            </div>
+                            <div class="seesaw-pin"></div>
+                            <div class="seesaw-base"></div>
+                        </div>
+
+                        <div class="scale-footer"><span style="color:${l>r?'#ef4444':''}">${l}</span><span style="color:${r>l?'#ef4444':''}">${r}</span></div>
+                    </div>
+                `;
+            });
+
+            // Master Scale logic
+            let mDiff = totalL - totalR;
+            let mTilt = mDiff===0 ? 0 : (mDiff>0?-10:10);
+            
+            document.getElementById('ms-beam').style.transform = `rotate(${mTilt}deg)`;
+            
+            // Counter-rotate the jars so they stay physically upright like swinging buckets!
+            document.getElementById('ms-jar-left').style.transform = `rotate(${-mTilt}deg)`;
+            document.getElementById('ms-jar-right').style.transform = `rotate(${-mTilt}deg)`;
+
+            // Hexagonal packing in the master bucket (Radius 12 => size 26, max 8 per base row in 200px jar)
+            document.getElementById('ms-marbles-left').innerHTML = generateDomMarblesGrid(200, lTotals, 26, 8);
+            document.getElementById('ms-marbles-right').innerHTML = generateDomMarblesGrid(200, rTotals, 26, 8);
+
+            const mCard = document.getElementById('master-scale');
+            const mText = document.getElementById('ms-status-text');
+            const mEmoji = document.getElementById('ms-emoji');
+            
+            mCard.className = "master-card card";
+            
+            if (totalL === 0 && totalR === 0) {
+                mCard.classList.add("state-red");
+                mText.textContent = "It's empty! Add molecules!"; mEmoji.textContent = "🤔";
+            } else if (balancedCount === allElements.length) {
+                let lCounts = countMolecules(state.left);
+                let rCounts = countMolecules(state.right);
+                if (checkCanSimplify(lCounts, rCounts)) {
+                    mCard.classList.add("state-yellow");
+                    mText.textContent = "Equal, but too big! Take some away!"; mEmoji.textContent = "😅";
+                } else {
+                    mCard.classList.add("state-green");
+                    mText.textContent = "YAY! PERFECTLY BALANCED!"; mEmoji.textContent = "🎉";
+                }
+            } else {
+                if (Math.abs(mDiff) > 0 && Math.abs(mDiff) <= 2) {
+                    mCard.classList.add("state-yellow");
+                    mText.textContent = "So Close! Keep going!"; mEmoji.textContent = "👀";
+                } else {
+                    mCard.classList.add("state-red");
+                    mText.textContent = "Uh Oh! Unbalanced!"; mEmoji.textContent = "😢";
+                }
+            }
+        }
+
+        /* --- Friendly Chat System --- */
+        function toggleGuide() {
+            document.getElementById('teacher-guide').classList.toggle('collapsed');
+        }
+
+        function addChatMessage(msg, type) {
+            const chatBox = document.getElementById('chat-box');
+            let bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-${type}`;
+            bubble.innerHTML = msg;
+            chatBox.appendChild(bubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function checkWinState(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            let balancedCount = 0;
+            
+            for(let el of allElsSet) {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                if(l === r && l > 0) balancedCount++;
+            }
+
+            if (balancedCount === allElsSet.size && allElsSet.size > 0) {
+                let lCounts = countMolecules(state.left);
+                let rCounts = countMolecules(state.right);
+                if (checkCanSimplify(lCounts, rCounts)) {
+                    addChatMessage(`You did it! But wait... we can make it simpler! Try taking away the exact same amount of molecules from BOTH sides!`, 'system');
+                } else {
+                    if (!state.completed.has(state.rxIdx)) {
+                        state.completed.add(state.rxIdx);
+                        updateCounter();
+                        populateDropdown();
+                        document.getElementById('reaction-select').value = state.rxIdx;
+                    }
+                    playSound('ding');
+                    triggerConfetti();
+                    
+                    let optimalMoves = (rx.left.length + rx.right.length) * 2; // rough estimate
+                    let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
+                    let starStr = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
+
+                    addChatMessage(`<strong>🎉 YOU DID IT! 🎉</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
+                }
+            }
+        }
+
+        function getBestHintData() {
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            
+            let imbalances = [];
+            for(let el of allElsSet) {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                if(l !== r) {
+                    let diff = Math.abs(l - r);
+                    let sideNeeds = l < r ? 'left' : 'right';
+                    let mols = sideNeeds === 'left' ? rx.left : rx.right;
+                    
+                    let options = mols.filter(m => parseFormula(m)[el] > 0);
+                    if(options.length === 0) continue;
+
+                    let bestOption = options[0];
+                    let minComplexity = 999;
+                    options.forEach(opt => {
+                        let complexity = Object.keys(parseFormula(opt)).length;
+                        if(complexity < minComplexity) { minComplexity = complexity; bestOption = opt; }
+                    });
+                    
+                    imbalances.push({
+                        element: el,
+                        diff: diff,
+                        sideNeeds: sideNeeds,
+                        bestMolecule: bestOption,
+                        score: diff + (10 - minComplexity)
+                    });
+                }
+            }
+            
+            if(imbalances.length === 0) return null;
+            imbalances.sort((a,b) => b.score - a.score);
+            return imbalances[0];
+        }
+
+        function revealHeuristicHint() {
+            if(state.hardMode && state.hintsUsed >= 3) {
+                addChatMessage(`🚨 You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
+                return;
+            }
+            state.hintsUsed++;
+
+            let hintData = getBestHintData();
+            if(!hintData) {
+                addChatMessage(`Looks perfectly balanced to me! You're doing great!`, 'agent');
+                return;
+            }
+
+            if(state.lastHintElement !== hintData.element) {
+                state.hintLevel = 1;
+                state.lastHintElement = hintData.element;
+            } else {
+                state.hintLevel++;
+                if(state.hintLevel > 3) state.hintLevel = 3; // Cap at 3
+            }
+
+            let isLeft = hintData.sideNeeds === 'left';
+            let sideName = isLeft ? "REACTANTS (left side)" : "PRODUCTS (right side)";
+            let sideColor = isLeft ? "var(--primary)" : "var(--st-green)";
+            let sideBorder = isLeft ? "#1d4ed8" : "#047857";
+            let sideNameBadge = `<span style="background:${sideColor}; color:white; padding:4px 8px; border-radius:8px; border:2px solid ${sideBorder}; font-weight:900; box-shadow:0 2px 0 ${sideBorder}; display:inline-block; margin:2px 0;">${sideName}</span>`;
+            
+            let fullName = FULL_ELEMENT_NAMES[hintData.element] || hintData.element;
+            let fullNameBadge = `<span style="background:var(--st-yellow); color:#713f12; padding:4px 8px; border-radius:8px; border:2px solid #ca8a04; font-weight:900; box-shadow:0 2px 0 #ca8a04; display:inline-block; margin:2px 0;">${fullName}</span>`;
+            
+            let molName = MOLECULE_NAMES[hintData.bestMolecule] || hintData.bestMolecule;
+            let molHTML = generateMarbleCluster(hintData.bestMolecule, 32);
+            let molBadge = `<span style="background:#ffffff; color:#1e293b; padding:4px 8px; border-radius:8px; border:2px solid #cbd5e1; font-weight:900; box-shadow:0 2px 0 #cbd5e1; display:inline-block; margin:2px 0;">${molName}</span>`;
+            
+            if (state.hintLevel === 1) {
+                addChatMessage(`🤔 Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
+                
+                let tinyScale = document.getElementById(`scale-card-${hintData.element}`);
+                if(tinyScale) {
+                    tinyScale.style.boxShadow = "0 0 0 5px var(--st-yellow), 0 10px 20px rgba(0,0,0,0.2)";
+                    setTimeout(() => { tinyScale.style.boxShadow = "var(--shadow-toy)"; }, 5000);
+                }
+            } 
+            else if (state.hintLevel === 2) {
+                addChatMessage(`⚖️ To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
+                
+                let dropArea = document.getElementById(`area-${hintData.sideNeeds}`);
+                if(dropArea) {
+                    dropArea.style.boxShadow = "0 0 0 5px var(--st-yellow), inset 0 0 20px rgba(234, 179, 8, 0.3)";
+                    setTimeout(() => { dropArea.style.boxShadow = ""; }, 5000);
+                }
+            }
+            else {
+                state.expectedMove = { side: hintData.sideNeeds, molecule: hintData.bestMolecule };
+                addChatMessage(`💡 <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
+                
+                let trays = document.getElementById(`tray-${hintData.sideNeeds}`).children;
+                for(let btn of trays) {
+                    if(btn.innerHTML.includes(hintData.bestMolecule)) {
+                        btn.style.transform = "scale(1.2)";
+                        btn.style.boxShadow = "0 0 0 5px var(--st-yellow), 0 10px 20px rgba(0,0,0,0.2)";
+                        setTimeout(() => { btn.style.transform = ""; btn.style.boxShadow = "0 4px 0 var(--primary)"; }, 5000);
+                        break;
+                    }
+                }
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
