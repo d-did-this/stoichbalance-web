@@ -1119,3 +1119,22 @@ function toggleFullScreen() {
         }
     }
 }
+
+// Fullscreen Logic
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+document.addEventListener('msfullscreenchange', updateFullscreenIcon);
+
+function updateFullscreenIcon() {
+    const fsIcon = document.getElementById('fs-icon');
+    if (!fsIcon) return;
+    
+    const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (isFull) {
+        // Compress Icon
+        fsIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 9L4 4m5 5V4m0 5H4m7 11l-5 5m5-5v5m0-5H4m16-6l-5-5m5 5v-5m0 5h-5m5 11l-5-5m5 5v-5m0 5h-5"></path>';
+    } else {
+        // Expand Icon
+        fsIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>';
+    }
+}
