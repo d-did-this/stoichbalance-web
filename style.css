@@ -535,7 +535,7 @@
     align-items: center !important;
     margin: 0 auto !important;
     box-sizing: border-box !important;
-    border-radius: 50% !important; /* Make it a circular button when collapsed */
+    border-radius: 16px !important; /* Make it a square button when collapsed */
 }
 
 
