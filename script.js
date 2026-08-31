@@ -772,8 +772,8 @@ function loadReaction(idx) {
             
             const cont = document.getElementById('element-scales-container');
             cont.innerHTML = `
-                <div class="sidebar-title-wrapper" data-tooltip="These scales show if each Element's atoms are balanced!">
-                    <div class="sidebar-title">🔍 Tiny Scales!</div>
+                <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
+                    <div class="sidebar-title">🔍 <span class="full-text">Tiny Scales!</span></div>
                 </div>
             `;
 
