@@ -773,7 +773,7 @@ function loadReaction(idx) {
             const cont = document.getElementById('element-scales-container');
             cont.innerHTML = `
                 <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
-                    <div class="sidebar-title">🔍 <span class="full-text">Tiny Scales!</span></div>
+                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;">🔍 <span class="full-text" style="margin-left:5px;">Tiny Scales!</span></div>
                 </div>
             `;
 
