@@ -79,83 +79,6 @@
             <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
                 
                 <!-- Equation Grid perfectly aligned over widened jars -->
-                le=1.0">
-    <title>STOICHBALANCE V17 - Custom Mode!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="main-menu" class="menu-overlay">
-        <!-- Step 1: Login Screen -->
-        <div class="menu-card card" id="login-screen">
-            <h1 class="menu-title"><span class="logo-icon">🧪</span> STOICHBALANCE</h1>
-            <p class="menu-subtitle">Welcome to the Chemistry Lab!</p>
-            
-            <div class="student-info" style="flex-direction:column; align-items:center; gap:15px; margin-top:20px;">
-                <input type="text" id="student-name" placeholder="Student Name" required style="width:100%; max-width:350px; text-align:center;">
-                
-                <div style="display:flex; gap:15px; width:100%; max-width:450px;">
-                    <button onclick="goToLevels('Form 4')" style="flex:1; background:#3b82f6; color:white; border:3px solid #1d4ed8; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #1d4ed8; transition:all 0.2s;">📘 Form 4</button>
-                    <button onclick="goToLevels('Form 5')" style="flex:1; background:#10b981; color:white; border:3px solid #047857; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #047857; transition:all 0.2s;">📗 Form 5</button>
-                    <button onclick="goToLevels('Developer')" style="flex:1; background:#64748b; color:white; border:3px solid #475569; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #475569; transition:all 0.2s;">🛠️ Dev Mode</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 2: Level Select Screen -->
-        <div class="menu-card massive-card card" id="level-screen" class="menu-card massive-card" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%;">
-                <button onclick="document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
-                <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                    <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
-                    <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
-                </div>
-                <div style="width:85px;"></div> <!-- Spacer to keep title perfectly centered -->
-            </div>
-            
-            <div class="level-grid" id="level-grid"></div>
-        </div>
-    </div>
-    
-
-    <header class="header">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!">
-                STOICHBALANCE
-            </h1>
-            <div id="puzzle-counter" style="background:var(--st-green); color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #047857; box-shadow:0 4px 0 #047857; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 15</div>
-            <div id="streak-counter" style="background:#f59e0b; color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #b45309; box-shadow:0 4px 0 #b45309; cursor:help;" data-tooltip="Your current streak! Don't use hints!">🔥 0</div>
-        </div>
-        <div style="display: flex; gap: 12px; align-items:center; position: relative;">
-            <button class="menu-special-btn dropbtn" onclick="returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:5px;"><svg style="width:20px;height:20px;margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Menu</button>
-            <div class="dropdown">
-                <button class="dropbtn" onclick="document.getElementById('settings-dropdown').classList.toggle('show')">⋮ Settings</button>
-                <div id="settings-dropdown" class="dropdown-content">
-                    <label class="dropdown-item" style="color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
-                    <button class="dropdown-item" onclick="toggleMute()" id="mute-btn">🔊 Sound On</button>
-                    <button class="dropdown-item" onclick="downloadReport()">📄 Report</button>
-                    <button class="dropdown-item" onclick="openTutorial()">❓ Help & Guide</button>
-                </div>
-            </div>
-            <button id="fs-btn" onclick="toggleFullScreen()" data-tooltip="Toggle Full Screen" style="display:flex; align-items:center; justify-content:center; padding: 6px 10px;">
-                <svg id="fs-icon" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"></path></svg>
-            </button>
-        </div>
-    </header>
-
-    
-
-    <div class="app-body">
-        
-        <!-- Left Sidebar: Element Scales -->
-        <div class="left-sidebar" id="element-scales-container"></div>
-
-        <!-- Center Content -->
-        <div class="center-content">
-            <!-- Master Scale -->
-            <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
-                
-                <!-- Equation Grid perfectly aligned over widened jars -->
                 <!-- CSS DOM SEESAW (Physically contained marbles) -->
                 <div class="seesaw-container">
                     <div class="seesaw-beam" id="ms-beam">
@@ -193,87 +116,7 @@
                 </div>
             
                 </div>
-                
-            </div>
-            le=1.0">
-    <title>STOICHBALANCE V17 - Custom Mode!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="main-menu" class="menu-overlay">
-        <!-- Step 1: Login Screen -->
-        <div class="menu-card card" id="login-screen">
-            <h1 class="menu-title"><span class="logo-icon">🧪</span> STOICHBALANCE</h1>
-            <p class="menu-subtitle">Welcome to the Chemistry Lab!</p>
-            
-            <div class="student-info" style="flex-direction:column; align-items:center; gap:15px; margin-top:20px;">
-                <input type="text" id="student-name" placeholder="Student Name" required style="width:100%; max-width:350px; text-align:center;">
-                
-                <div style="display:flex; gap:15px; width:100%; max-width:450px;">
-                    <button onclick="goToLevels('Form 4')" style="flex:1; background:#3b82f6; color:white; border:3px solid #1d4ed8; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #1d4ed8; transition:all 0.2s;">📘 Form 4</button>
-                    <button onclick="goToLevels('Form 5')" style="flex:1; background:#10b981; color:white; border:3px solid #047857; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #047857; transition:all 0.2s;">📗 Form 5</button>
-                    <button onclick="goToLevels('Developer')" style="flex:1; background:#64748b; color:white; border:3px solid #475569; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #475569; transition:all 0.2s;">🛠️ Dev Mode</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Step 2: Level Select Screen -->
-        <div class="menu-card massive-card card" id="level-screen" class="menu-card massive-card" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%;">
-                <button onclick="document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
-                <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                    <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
-                    <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
-                </div>
-                <div style="width:85px;"></div> <!-- Spacer to keep title perfectly centered -->
-            </div>
-            
-            <div class="level-grid" id="level-grid"></div>
-        </div>
-    </div>
-    
-
-    <header class="header">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!">
-                STOICHBALANCE
-            </h1>
-            <div id="puzzle-counter" style="background:var(--st-green); color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #047857; box-shadow:0 4px 0 #047857; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 15</div>
-            <div id="streak-counter" style="background:#f59e0b; color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #b45309; box-shadow:0 4px 0 #b45309; cursor:help;" data-tooltip="Your current streak! Don't use hints!">🔥 0</div>
-        </div>
-        <div style="display: flex; gap: 12px; align-items:center; position: relative;">
-            <button class="menu-special-btn dropbtn" onclick="returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:5px;"><svg style="width:20px;height:20px;margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Menu</button>
-            <div class="dropdown">
-                <button class="dropbtn" onclick="document.getElementById('settings-dropdown').classList.toggle('show')">⋮ Settings</button>
-                <div id="settings-dropdown" class="dropdown-content">
-                    <label class="dropdown-item" style="color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
-                    <button class="dropdown-item" onclick="toggleMute()" id="mute-btn">🔊 Sound On</button>
-                    <button class="dropdown-item" onclick="downloadReport()">📄 Report</button>
-                    <button class="dropdown-item" onclick="openTutorial()">❓ Help & Guide</button>
-                </div>
-            </div>
-            <button id="fs-btn" onclick="toggleFullScreen()" data-tooltip="Toggle Full Screen" style="display:flex; align-items:center; justify-content:center; padding: 6px 10px;">
-                <svg id="fs-icon" style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"></path></svg>
-            </button>
-        </div>
-    </header>
-
-    
-
-    <div class="app-body">
-        
-        <!-- Left Sidebar: Element Scales -->
-        <div class="left-sidebar" id="element-scales-container"></div>
-
-        <!-- Center Content -->
-        <div class="center-content">
-            <!-- Master Scale -->
-            <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
-                
-                <!-- Equation Grid perfectly aligned over widened jars -->
-                
-            
 <div class="equation-grid-wrapper">
                     <div class="eq-left-container"><div class="eq-left" id="eq-left-content"></div></div>
                     <div class="eq-center-container"><div class="eq-arrow" data-tooltip="Transforms into 👉">→</div></div>
@@ -282,10 +125,11 @@
                 
                 
 </div>
-<!-- Right Sidebar: Teacher Guide -->
+
+        <!-- Right Sidebar: Teacher Guide -->
         <div class="right-sidebar" id="teacher-guide">
             <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; width:100%; display:flex; justify-content:center; white-space:nowrap; padding-bottom:4px;" onclick="document.getElementById('teacher-guide').classList.toggle('collapsed')">
-                <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;"><svg class="title-svg" style="width:32px;height:32px;color:#ffffff;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <span class="full-text" style="font-size:20px;font-weight:900;margin-left:5px;">PROF. BEAKER</span></div>
+                <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;"><svg style="width:28px;height:28px;color:#ffffff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <span class="full-text" style="margin-left:5px;">PROF. BEAKER</span></div>
             </div>
             <div class="chat-wrapper">
                 <div class="chat-container" id="chat-box"></div>
@@ -446,6 +290,7 @@ window.onclick = function(event) {
 </script>
     
     
+    
     <!-- Floating Game Controls (Left Side) -->
     <div style="position:fixed; bottom:20px; left:20px; display:flex; gap: 15px; z-index:9000; align-items:center;">
         <button onclick="openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
@@ -456,6 +301,7 @@ window.onclick = function(event) {
             <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
     </div>
+
 
 
 
