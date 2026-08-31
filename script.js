@@ -71,7 +71,17 @@ const FORM_4_REACTIONS = [
     { name: "[Easy] Salt Formation 🧂", left: ["Na(s)", "Cl2(g)"], right: ["NaCl(s)"] },
     { name: "[Easy] Making Ammonia 💨", left: ["N2(g)", "H2(g)"], right: ["NH3(g)"] },
     { name: "[Med] Burning Methane 🔥", left: ["CH4(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Med] Rusting Iron 🧲", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] }
+    { name: "[Med] Rusting Iron 🧲", left: ["Fe(s)", "O2(g)"], right: ["Fe2O3(s)"] },
+    { name: "[Easy] Burning Magnesium ✨", left: ["Mg(s)", "O2(g)"], right: ["MgO(s)"] },
+    { name: "[Med] Potassium in Water 💥", left: ["K(s)", "H2O(l)"], right: ["KOH(aq)", "H2(g)"] },
+    { name: "[Easy] Calcium Oxidation 🪨", left: ["Ca(s)", "O2(g)"], right: ["CaO(s)"] },
+    { name: "[Med] Sulfur Trioxide ☁️", left: ["SO2(g)", "O2(g)"], right: ["SO3(g)"] },
+    { name: "[Hard] Phosphorus Burning 🎇", left: ["P4(s)", "O2(g)"], right: ["P4O10(s)"] },
+    { name: "[Med] Peroxide Fizz 🫧", left: ["H2O2(aq)"], right: ["H2O(l)", "O2(g)"] },
+    { name: "[Med] Zinc & Acid 🧪", left: ["Zn(s)", "HCl(aq)"], right: ["ZnCl2(aq)", "H2(g)"] },
+    { name: "[Easy] Soot Formation 🌑", left: ["C(s)", "O2(g)"], right: ["CO(g)"] },
+    { name: "[Med] Aluminum Bromide 🏺", left: ["Al(s)", "Br2(l)"], right: ["AlBr3(s)"] },
+    { name: "[Easy] Monoxide Burning 🔥", left: ["CO(g)", "O2(g)"], right: ["CO2(g)"] }
 ];
 
 const FORM_5_REACTIONS = [
@@ -79,7 +89,17 @@ const FORM_5_REACTIONS = [
     { name: "[Hard] Baking Soda 🧁", left: ["NaHCO3(s)"], right: ["Na2CO3(s)", "H2O(l)", "CO2(g)"] },
     { name: "[Hard] Aluminum Thermite 💥", left: ["Al(s)", "Fe2O3(s)"], right: ["Al2O3(s)", "Fe(s)"] },
     { name: "[Hard] Glucose Combustion 🌿", left: ["C6H12O6(s)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
-    { name: "[Hard] Copper Nitric Acid 🧪", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] }
+    { name: "[Hard] Copper Nitric Acid 🧪", left: ["Cu(s)", "HNO3(aq)"], right: ["Cu(NO3)2(aq)", "NO2(g)", "H2O(l)"] },
+    { name: "[Med] Chlorate Decomp 🧨", left: ["KClO3(s)"], right: ["KCl(s)", "O2(g)"] },
+    { name: "[Hard] Iron Smelting ⚔️", left: ["Fe2O3(s)", "CO(g)"], right: ["Fe(s)", "CO2(g)"] },
+    { name: "[Hard] Ammonia Oxidation 💨", left: ["NH3(g)", "O2(g)"], right: ["NO(g)", "H2O(g)"] },
+    { name: "[Boss] Octane Combustion ⛽", left: ["C8H18(l)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Golden Rain 🌧️", left: ["Pb(NO3)2(aq)", "KI(aq)"], right: ["PbI2(s)", "KNO3(aq)"] },
+    { name: "[Hard] Ethane Burning 🔥", left: ["C2H6(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] },
+    { name: "[Med] Neutralization 💧", left: ["NaOH(aq)", "H2SO4(aq)"], right: ["Na2SO4(aq)", "H2O(l)"] },
+    { name: "[Med] Copper Precipitate 🟦", left: ["CuSO4(aq)", "NaOH(aq)"], right: ["Cu(OH)2(s)", "Na2SO4(aq)"] },
+    { name: "[Med] Silver Chloride 🪙", left: ["AgNO3(aq)", "CaCl2(aq)"], right: ["AgCl(s)", "Ca(NO3)2(aq)"] },
+    { name: "[Hard] Propane Combustion 🔥", left: ["C3H8(g)", "O2(g)"], right: ["CO2(g)", "H2O(g)"] }
 ];
 
 const FORM_DEV_REACTIONS = [
@@ -88,7 +108,7 @@ const FORM_DEV_REACTIONS = [
 
 let REACTIONS = FORM_4_REACTIONS;
 
-        const MOLECULE_NAMES = { "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor", "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron", "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium", "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas", "NaCl(s)": "Sodium Chloride", "CH4(g)": "Methane", "Fe2O3(s)": "Iron(III) Oxide", "NaHCO3(s)": "Sodium Bicarbonate", "Na2CO3(s)": "Sodium Carbonate", "Al(s)": "Solid Aluminum", "Al2O3(s)": "Aluminum Oxide", "C6H12O6(s)": "Glucose", "Cu(s)": "Copper", "HNO3(aq)": "Nitric Acid", "Cu(NO3)2(aq)": "Copper(II) Nitrate", "NO2(g)": "Nitrogen Dioxide" };
+        const MOLECULE_NAMES = { "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor", "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron", "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium", "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas", "NaCl(s)": "Sodium Chloride", "CH4(g)": "Methane", "Fe2O3(s)": "Iron(III) Oxide", "NaHCO3(s)": "Sodium Bicarbonate", "Na2CO3(s)": "Sodium Carbonate", "Al(s)": "Solid Aluminum", "Al2O3(s)": "Aluminum Oxide", "C6H12O6(s)": "Glucose", "Cu(s)": "Copper", "HNO3(aq)": "Nitric Acid", "Cu(NO3)2(aq)": "Copper(II) Nitrate", "NO2(g)": "Nitrogen Dioxide", "Mg(s)": "Magnesium", "MgO(s)": "Magnesium Oxide", "K(s)": "Potassium", "KOH(aq)": "Potassium Hydroxide", "Ca(s)": "Calcium", "CaO(s)": "Calcium Oxide", "SO2(g)": "Sulfur Dioxide", "SO3(g)": "Sulfur Trioxide", "P4(s)": "White Phosphorus", "P4O10(s)": "Phosphorus Pentoxide", "H2O2(aq)": "Hydrogen Peroxide", "Zn(s)": "Zinc", "HCl(aq)": "Hydrochloric Acid", "ZnCl2(aq)": "Zinc Chloride", "C(s)": "Carbon", "CO(g)": "Carbon Monoxide", "Br2(l)": "Bromine", "AlBr3(s)": "Aluminum Bromide", "KClO3(s)": "Potassium Chlorate", "KCl(s)": "Potassium Chloride", "NO(g)": "Nitric Oxide", "C8H18(l)": "Octane", "Pb(NO3)2(aq)": "Lead(II) Nitrate", "KI(aq)": "Potassium Iodide", "PbI2(s)": "Lead(II) Iodide", "KNO3(aq)": "Potassium Nitrate", "C2H6(g)": "Ethane", "H2SO4(aq)": "Sulfuric Acid", "Na2SO4(aq)": "Sodium Sulfate", "CuSO4(aq)": "Copper(II) Sulfate", "Cu(OH)2(s)": "Copper(II) Hydroxide", "AgNO3(aq)": "Silver Nitrate", "CaCl2(aq)": "Calcium Chloride", "AgCl(s)": "Silver Chloride", "Ca(NO3)2(aq)": "Calcium Nitrate", "C3H8(g)": "Propane" };
 
         const FULL_ELEMENT_NAMES = {
             "H": "Hydrogen", "O": "Oxygen", "C": "Carbon", "Fe": "Iron", "Cl": "Chlorine", "Na": "Sodium", "N": "Nitrogen", "S": "Sulfur"
