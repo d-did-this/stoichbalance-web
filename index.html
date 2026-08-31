@@ -286,11 +286,17 @@ window.onclick = function(event) {
     }
 }
 </script>
-    <!-- Floating Game Controls -->
-    <div style="position:fixed; bottom:20px; right:20px; display:flex; gap: 10px; z-index:9000;">
-        <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; padding: 10px 20px; font-size:18px; border-radius:12px; font-weight:900; cursor:pointer;" data-tooltip="Undo Last Move">↩️ Undo</button>
-        <button onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; padding: 10px 20px; font-size:18px; border-radius:12px; font-weight:900; cursor:pointer;">🔄 Start Over</button>
+    
+    <!-- Floating Game Controls (Left Side) -->
+    <div style="position:fixed; bottom:20px; left:80px; display:flex; gap: 10px; z-index:9000;">
+        <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
+            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+        </button>
+        <button onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Start Over">
+            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        </button>
     </div>
+
 
 </body>
 </html>
