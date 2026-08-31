@@ -1,3 +1,13 @@
+
+// Restore from storage
+window.addEventListener('DOMContentLoaded', () => {
+    if(localStorage.getItem('stoich_student_name')) {
+        document.getElementById('student-name').value = localStorage.getItem('stoich_student_name');
+    }
+    if(localStorage.getItem('stoich_student_age')) {
+        document.getElementById('student-age').value = localStorage.getItem('stoich_student_age');
+    }
+});
 let currentStreak = parseInt(localStorage.getItem('stoich_streak') || '0');
 let puzzlesSolvedCount = parseInt(localStorage.getItem('stoich_solved') || '0');
 let totalHintsUsed = parseInt(localStorage.getItem('stoich_hints') || '0');
@@ -967,7 +977,9 @@ function toggleMute() {
 
         window.onload = init;
 function downloadReport() {
-    const text = "STOICHBALANCE - TEACHER REPORT\nDate: " + new Date().toLocaleString() + "\n\nTotal Puzzles Solved: " + puzzlesSolvedCount + "\nCurrent Streak: " + currentStreak + "\nTotal Hints Used: " + totalHintsUsed + "\n\nKeep up the great work!";
+    const name = document.getElementById('student-name').value || 'Unknown Student';
+    const age = document.getElementById('student-age').value || 'N/A';
+    const text = "STOICHBALANCE - TEACHER REPORT\nDate: " + new Date().toLocaleString() + "\nStudent: " + name + " (Age: " + age + ")\n\nTotal Puzzles Solved: " + puzzlesSolvedCount + "\nCurrent Streak: " + currentStreak + "\nTotal Hints Used: " + totalHintsUsed + "\n\nKeep up the great work!";
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -975,4 +987,32 @@ function downloadReport() {
     a.download = 'Stoichbalance_Report.txt';
     a.click();
     URL.revokeObjectURL(url);
+}
+
+function startGame(index) {
+    let name = document.getElementById('student-name').value.trim();
+    let age = document.getElementById('student-age').value.trim();
+    
+    if(!name || !age) {
+        alert("Please enter your Name and Age before starting!");
+        return;
+    }
+    
+    localStorage.setItem('stoich_student_name', name);
+    localStorage.setItem('stoich_student_age', age);
+    
+    document.getElementById('main-menu').classList.add('hidden');
+    
+    // Play whoosh sound
+    if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
+    
+    // Load the selected reaction
+    state.rxIdx = index;
+    loadReaction(index);
+}
+
+function returnToMenu() {
+    document.getElementById('main-menu').classList.remove('hidden');
+    // Refresh the grid to show new solved checkmarks
+    init();
 }
