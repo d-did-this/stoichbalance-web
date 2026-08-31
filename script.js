@@ -797,7 +797,7 @@ function loadReaction(idx) {
 
                 cont.innerHTML += `
                     <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
-                        <div class="scale-header">${fullName}</div>
+                        <div class="scale-header" style="background: #1e293b; color: white; padding: 6px 10px; border-radius: 8px; display: block; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); text-align: center; margin-bottom: 10px;">${fullName}</div>
                         
                         <!-- Book Stacks -->
                         <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
@@ -809,7 +809,7 @@ function loadReaction(idx) {
                                 ${Array(r).fill('<div style="width:30px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('')}
                             </div>
                         </div>
-                        <div class="scale-footer"><span style="color:${l>r?'#ef4444':''}">${l}</span><span style="color:${r>l?'#ef4444':''}">${r}</span></div>
+                        <div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #f1f5f9; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
                     </div>
                 `;
             });
