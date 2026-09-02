@@ -166,6 +166,11 @@
     <!-- Custom Puzzle Modal -->
     <div id="custom-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
         <div class="card" style="background:white; padding:25px; width:450px; max-width:90%; display:flex; flex-direction:column; gap:15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <div style="display:flex; flex-direction:column; align-items:center; background:#f8fafc; padding: 15px; border-radius: 16px; border:4px solid #cbd5e1; margin-bottom: 20px;">
+           <label style="font-weight:900; font-size:18px; margin-bottom:10px; color:#475569;">🔍 Adjust UI Size</label>
+           <input type="range" min="0.5" max="1.5" step="0.05" value="1" oninput="document.querySelector('.app-body').style.zoom = this.value;" style="width:80%; cursor:pointer;">
+        </div>
+
             <h2 style="color:var(--primary); font-size:24px; font-weight:900; text-align:center;">🛠️ Create Custom Puzzle</h2>
             <div>
                 <label style="font-weight:900; color:#475569;">Puzzle Name:</label>
@@ -312,10 +317,7 @@ window.onclick = function(event) {
 </div> <!-- End app-body -->
 <!-- Floating Game Controls (Left Side) -->
     <div style="position:fixed; bottom:20px; left:20px; display:flex; gap: 15px; z-index:9000; align-items:center;">
-        <div style="display:flex; flex-direction:column; align-items:center; background:#ffffff; padding: 8px 12px; border-radius: 16px; border:4px solid #cbd5e1; box-shadow:0 4px 0 #cbd5e1;">
-           <label style="font-weight:900; font-size:14px; margin-bottom:5px; color:#475569;">🔍 UI SIZE</label>
-           <input type="range" min="0.5" max="1.5" step="0.1" value="1" oninput="document.querySelector('.app-body').style.transform = 'scale(' + this.value + ')'; document.querySelector('.app-body').style.transformOrigin = 'top left';" style="width:100px; cursor:pointer;">
-        </div>
+        
 
         <button onclick="openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
         <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
