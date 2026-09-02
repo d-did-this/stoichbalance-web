@@ -869,17 +869,17 @@
     user-select: auto !important;
 }
 
-/* Distinct colors for Reactants and Products areas (No purple, green, red, blue, yellow, grey, black, white) */
+/* Distinct colors for Reactants and Products areas */
 #header-reactants { 
-    background: linear-gradient(135deg, #d97706, #b45309) !important; /* Amber/Bronze */
-    border-bottom: 3px solid #92400e !important;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important; /* Blue */
+    border-bottom: 3px solid #1e3a8a !important;
 }
 #header-products { 
-    background: linear-gradient(135deg, #db2777, #be185d) !important; /* Pink/Magenta */
-    border-bottom: 3px solid #9d174d !important;
+    background: linear-gradient(135deg, #f97316, #c2410c) !important; /* Orange */
+    border-bottom: 3px solid #9a3412 !important;
 }
-#tray-left, #area-left { border-color: #d97706 !important; }
-#tray-right, #area-right { border-color: #db2777 !important; }
+#tray-left, #area-left { border-color: #3b82f6 !important; }
+#tray-right, #area-right { border-color: #f97316 !important; }
 
 /* Ensure state colors can override the beaker style if needed */
 
