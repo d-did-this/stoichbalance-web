@@ -733,3 +733,40 @@
 .seesaw-jar { width: 280px !important; min-height: 150px !important; }
 /* Ensure the grid wrapper uses absolute positioning as expected by JS */
 .jar-marbles-container { display: block !important; position: relative; width: 100% !important; height: 100% !important; }
+
+/* 3D Seesaw Pin */
+.seesaw-pin {
+    width: 60px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, #64748b 0%, #0f172a 100%) !important;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%) !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 10 !important;
+    filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5)) !important;
+}
+/* Ensure the inner text span is removed or hidden just in case */
+#pin-text { display: none !important; }
+
+.seesaw-beam {
+    width: 100% !important;
+    max-width: 1500px !important;
+    height: 18px !important;
+}
+.seesaw-jar {
+    width: 280px !important;
+    min-height: 80px !important;
+    height: 80px !important;
+}
+
+.tiny-seesaw-container .seesaw-jar {
+    width: auto !important;
+    min-width: 60px !important;
+    padding: 0 10px !important; /* Space for columns */
+}
