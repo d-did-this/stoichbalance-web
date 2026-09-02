@@ -522,13 +522,8 @@
     min-width: 240px !important; 
 }
 
-.master-card {
-    margin-bottom: 25px !important; /* huge gap below master scale */
-}
-.equation-grid-wrapper {
-    margin-bottom: 0px !important; /* normal gap below equation */
-    margin-top: 0 !important;
-}
+
+.equation-grid-wrapper { margin-bottom: 0px !important; margin-top: -15px !important; z-index: 10; }
 
 /* Collapsed state styling */
 .collapsed .sidebar-title {
@@ -844,15 +839,16 @@
     display: none !important;
 }
 
-/* Make master block taller */
+/* Adjusted master block taller */
 .master-card {
-    min-height: 480px !important;
-    padding-top: 60px !important;
-    padding-bottom: 40px !important;
+    min-height: 250px !important;
+    padding-top: 20px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 0px !important;
     justify-content: flex-end !important;
 }
 .master-card .seesaw-container {
-    margin-top: 40px !important;
+    margin-top: 10px !important;
 }
 
 /* Force inputs and menu to be clickable */
