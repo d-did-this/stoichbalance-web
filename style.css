@@ -786,73 +786,21 @@
     width: 100% !important;
 }
 .master-card .seesaw-beam {
-    margin: 0 auto !important;
-    position: relative !important;
-    left: auto !important;
-    z-index: 15 !important;
-}
-.master-card .seesaw-pin {
-    position: absolute !important;
-    bottom: -10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 10 !important;
-    margin: 0 !important;
-}
-
-.master-card.state-red { background: var(--st-red-light) !important; border-color: var(--st-red) !important; transition: all 0.3s ease !important; }
-.master-card.state-yellow { background: var(--st-yellow-light) !important; border-color: var(--st-yellow) !important; transition: all 0.3s ease !important; }
-.master-card.state-green { background: var(--st-green-light) !important; border-color: var(--st-green) !important; transition: all 0.3s ease !important; }
-
-/* Beam longer */
-.tiny-seesaw-container {
-    max-width: 250px !important; 
-}
-.tiny-seesaw-container .seesaw-beam { width: 100% !important; margin-left: 0 !important; left: auto !important; position: relative !important; margin: 0 auto !important; }
-/* Ensure the grid expands properly from the center outwards */
-.tiny-seesaw-container .seesaw-jar {
-    width: auto !important;
-    min-width: 70px !important;
-    padding: 0 10px !important;
-    display: flex !important;
-}
-/* Left jar adds bars to the left */
-#ms-jar-left, .tiny-seesaw-container .seesaw-jar:first-child .jar-marbles-container {
-    justify-content: flex-end !important; 
-}
-/* Right jar adds bars to the right */
-#ms-jar-right, .tiny-seesaw-container .seesaw-jar:last-child .jar-marbles-container {
-    justify-content: flex-start !important;
-}
-
-.scale-card.state-green {
-    background: #e0f2fe !important;
-    border-color: #38bdf8 !important;
-}
-/* Override red to be a bit softer too if needed, but let's stick to user request of changing green */
-
-
-/* Absolute Positioning for Perfect Contact - Master Scale */
-.master-card .seesaw-container {
-    height: 120px !important; 
-    align-items: flex-end !important;
-}
-.master-card .seesaw-beam {
     position: absolute !important;
     bottom: 55px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
     width: 100% !important;
     max-width: 1500px !important;
     z-index: 15 !important;
 }
 .master-card .seesaw-pin {
     position: absolute !important;
-    bottom: 15px !important; 
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
+    bottom: 15px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
     width: 60px !important;
     height: 40px !important;
     z-index: 10 !important;
