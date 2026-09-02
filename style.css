@@ -854,3 +854,23 @@
 .master-card .seesaw-container {
     margin-top: 40px !important;
 }
+
+/* Force inputs and menu to be clickable */
+.menu-overlay,
+.menu-card,
+#login-screen,
+#level-screen,
+.menu-overlay input,
+.menu-overlay button {
+    pointer-events: auto !important;
+    user-select: auto !important;
+}
+
+#custom-modal, #tutorial-modal {
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+}
+#custom-modal input {
+    pointer-events: auto !important;
+    user-select: auto !important;
+}
