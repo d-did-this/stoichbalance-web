@@ -114,46 +114,46 @@ let REACTIONS = FORM_4_REACTIONS;
             "H": "Hydrogen", "O": "Oxygen", "C": "Carbon", "Fe": "Iron", "Cl": "Chlorine", "Na": "Sodium", "N": "Nitrogen", "S": "Sulfur"
         };
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) { if (isMuted) return;
+        window.audioCtx = window.audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        window.playSound = function(type) { if (isMuted) return;
 
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+            if(window.audioCtx.state === 'suspended') window.audioCtx.resume();
+            const osc = window.audioCtx.createOscillator();
+            const gain = window.audioCtx.createGain();
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            gain.connect(window.audioCtx.destination);
             if (type === 'clink') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(800, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, window.audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.3, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.1);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.1);
                         } else if (type === 'click') {
                 osc.type = 'square';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.05);
+                osc.frequency.setValueAtTime(400, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, window.audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.1, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.05);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.05);
             } else if (type === 'whoosh') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.15);
+                osc.frequency.setValueAtTime(300, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, window.audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.15);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.15);
             } else if (type === 'ding') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 1.0);
+                osc.frequency.setValueAtTime(800, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1600, window.audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.4, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 1.0);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 1.0);
             }
         }
 
