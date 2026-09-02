@@ -446,10 +446,14 @@ function init() {
                 let tag = "";
                 let match = rx.name.match(/\[(.*?)\]/);
                 if(match) {
-                    tag = match[1];
-                    cleanName = rx.name.replace(`[${tag}]`, '').trim();
+                    tag = match[0];
+                    cleanName = rx.name.replace(tag + ' ', '').trim();
                 }
-                btn.innerHTML = `<span style="color:${diffColor}; font-size:12px; font-weight:bold; margin-bottom:5px;">${tag.toUpperCase()}</span><span style="font-size:18px;">${cleanName}</span><span style="font-size:12px; color:#94a3b8; margin-top:5px;">Level ${actualIdx + 1}</span>`;
+                
+                let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${actualIdx + 1}</div>`;
+                let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
+                let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
+                btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
                 btn.onclick = () => startGame(actualIdx);
                 grid.appendChild(btn);
             });
