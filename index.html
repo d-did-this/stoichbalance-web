@@ -33,13 +33,16 @@
 
         <!-- Step 2: Level Select Screen -->
         <div class="menu-card massive-card card" id="level-screen" class="menu-card massive-card" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%;">
-                <button onclick="document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; width:100%; padding: 0 10px; box-sizing: border-box;">
+                <button onclick="document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#ffffff; color:#3b82f6; border:3px solid #bfdbfe; padding:10px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #bfdbfe; display:flex; align-items:center; gap:8px; transition:all 0.2s;">
+                    <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+                    Back
+                </button>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                    <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
-                    <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
+                    <h2 class="menu-title" style="font-size:36px; margin:0; color:#1e293b; letter-spacing:-1px;" id="puzzle-menu-title">Select a Puzzle</h2>
+                    <div id="user-greeting" style="font-size:18px; color:#3b82f6; font-weight:800; margin-top:8px; background:#eff6ff; padding:4px 16px; border-radius:20px;"></div>
                 </div>
-                <div style="width:85px;"></div> <!-- Spacer to keep title perfectly centered -->
+                <div style="width:105px;"></div> <!-- Spacer -->
             </div>
             
             <div class="level-grid" id="level-grid"></div>
