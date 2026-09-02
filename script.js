@@ -361,7 +361,7 @@ let REACTIONS = FORM_4_REACTIONS;
             let newReaction = { name: "🛠️ " + name, left: left, right: right };
             REACTIONS.push(newReaction);
             
-            populateDropdown();
+            
             let newIdx = REACTIONS.length - 1;
             document.getElementById('reaction-select').value = newIdx;
             loadReaction(newIdx);
@@ -1021,7 +1021,7 @@ function loadReaction(idx) {
                     if (!state.completed.has(state.rxIdx)) {
                         state.completed.add(state.rxIdx);
                         updateCounter();
-                        populateDropdown();
+                        
                         document.getElementById('reaction-select').value = state.rxIdx;
                     }
                                         playSound('ding');
