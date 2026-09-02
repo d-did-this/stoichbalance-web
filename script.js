@@ -882,21 +882,34 @@ function loadReaction(idx) {
             
             // Triangle > < = removed
 
-            // Chess Bar Rotation Update
-            const chessFill = document.getElementById('chess-bar-fill');
-            const chessText = document.getElementById('chess-status-text');
-            if (chessFill) {
-                let ratio = 50;
-                if (totalL + totalR > 0) {
-                    ratio = (totalL / (totalL + totalR)) * 100;
+            // Status Text Update
+                const statBal = document.getElementById('status-balance');
+                const statSimp = document.getElementById('status-simplified');
+                const statSep = document.getElementById('status-separator');
+
+                if (statBal) {
+                    if (totalL === 0 && totalR === 0) {
+                        statBal.innerText = "EMPTY";
+                        statBal.style.color = "#94a3b8";
+                        if(statSimp) statSimp.style.display = 'none';
+                        if(statSep) statSep.style.display = 'none';
+                    } else if (mTilt === 0) {
+                        statBal.innerText = "BALANCED";
+                        statBal.style.color = "#22c55e";
+                        if (canSimplify) {
+                            if(statSimp) { statSimp.innerText = "NOT SIMPLIFIED"; statSimp.style.color = "#eab308"; statSimp.style.display = "inline"; }
+                            if(statSep) statSep.style.display = "inline";
+                        } else {
+                            if(statSimp) { statSimp.innerText = "SIMPLIFIED!"; statSimp.style.color = "#22c55e"; statSimp.style.display = "inline"; }
+                            if(statSep) statSep.style.display = "inline";
+                        }
+                    } else {
+                        statBal.innerText = "UNBALANCED";
+                        statBal.style.color = "#ef4444";
+                        if(statSimp) statSimp.style.display = 'none';
+                        if(statSep) statSep.style.display = 'none';
+                    }
                 }
-                chessFill.style.width = ratio + '%';
-                
-                // Update specific numbers
-                const evalLeft = document.getElementById('eval-left-mass');
-                const evalRight = document.getElementById('eval-right-mass');
-                if (evalLeft) evalLeft.innerHTML = `<span style="font-size:12px; color:#94a3b8;">LEFT</span> ${totalL}`;
-                if (evalRight) evalRight.innerHTML = `${totalR} <span style="font-size:12px; color:#94a3b8;">RIGHT</span>`;
                 
                 // Color transition
                 if (ratio > 48 && ratio < 52) chessFill.style.background = '#22c55e'; // Green
@@ -914,10 +927,10 @@ function loadReaction(idx) {
                     
                     if (!canSimplify) {
                         badge.style.display = 'block';
-                        if (chessText) { chessText.innerHTML = "Perfectly Balanced"; chessText.style.color = "#22c55e"; }
+                        
                     } else {
                         badge.style.display = 'none';
-                        if (chessText) { chessText.innerHTML = "Simplify Ratio"; chessText.style.color = "#eab308"; }
+                        
                     }
                 } else {
                     badge.style.display = 'none';
