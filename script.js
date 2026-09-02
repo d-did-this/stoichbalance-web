@@ -771,10 +771,11 @@ function loadReaction(idx) {
             let allElements = Array.from(allElsSet);
             
             const cont = document.getElementById('element-scales-container');
-            cont.innerHTML = `
+            let htmlStr = `
                 <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
                     <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:36px;height:36px;color:#ffffff;margin-right:8px;" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:24px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
                 </div>
+                <div class="chat-wrapper" style="padding:15px; display:flex; flex-direction:column; gap:15px; overflow-y:auto;">
             `;
 
             let totalL = 0, totalR = 0, balancedCount = 0;
@@ -795,8 +796,7 @@ function loadReaction(idx) {
                 let objR = {}; if(r>0) objR[el] = r;
                 let fullName = `${FULL_ELEMENT_NAMES[el] || el} (${el})`;
 
-                cont.innerHTML += `
-                    <div class="scale-card card ${sClass} ${lTotals[el]===rTotals[el] ? 'state-balanced' : 'state-unbalanced'}" id="scale-card-${el}" data-tooltip="${tip}">
+                htmlStr += `\n                      <div class="scale-card card ${sClass} ${lTotals[el]===rTotals[el] ? 'state-balanced' : 'state-unbalanced'}" id="scale-card-${el}" data-tooltip="${tip}">
                         <div class="scale-header" style="font-weight: 900; font-size: 20px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
                     <div style="display:flex; justify-content:space-between; width:100%; margin-top:0px; margin-bottom:-8px; padding:0 5px; z-index:20;">
                         <span class="reactant-label">Reactants</span>
