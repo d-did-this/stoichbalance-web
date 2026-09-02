@@ -797,7 +797,7 @@ function loadReaction(idx) {
 
                 cont.innerHTML += `
                     <div class="scale-card card ${sClass}" id="scale-card-${el}" data-tooltip="${tip}">
-                        <div class="scale-header" style="font-weight: 900; font-size: 15px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
+                        <div class="scale-header" style="font-weight: 900; font-size: 20px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
                         
                         <!-- Book Stacks -->
                         <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
