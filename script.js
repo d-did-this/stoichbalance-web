@@ -800,9 +800,13 @@ function loadReaction(idx) {
                         <div class="scale-header" style="font-weight: 900; font-size: 20px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
                         
                         <!-- Book Stacks -->
-                        <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
-                            <div style="position:absolute; bottom:-10px; width:100%; display:flex; justify-content:center;"><div style="width:10px; height:20px; background:#cbd5e1; border-radius:5px;"></div></div>
-                            <div class="book-stack left-stack" style="display:flex; flex-direction:row-reverse; gap:5px; justify-content:flex-end; align-items:flex-end; z-index:2;">
+                        <div class="book-stack-container" style="display:flex; width: 100%; height:100px; padding-bottom:10px; border-bottom: 4px solid #94a3b8; margin-top:15px; position:relative;">
+    <!-- Absolute Pin exactly centered -->
+    <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:linear-gradient(135deg, #64748b 0%, #0f172a 100%); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); z-index: 10;"></div>
+    
+    <!-- Left Half (Reactants) -->
+    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; padding-right: 10px; position: relative;">
+        <div class="book-stack left-stack" style="display:flex; flex-direction:row-reverse; gap:5px; justify-content:flex-end; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                       let html = '';
                                       let remaining = l;
@@ -814,7 +818,10 @@ function loadReaction(idx) {
                                       return html;
                                   })()}
                             </div>
-                            <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
+    </div>
+    <!-- Right Half (Products) -->
+    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; padding-left: 10px; position: relative;">
+        <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                         let html = '';
                                         let remaining = r;
@@ -826,8 +833,9 @@ function loadReaction(idx) {
                                         return html;
                                     })()}
                             </div>
-                        </div>
-                        <div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #f1f5f9; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
+    </div>
+</div>
+<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #f1f5f9; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
                     </div>
                 `;
             });
@@ -883,6 +891,12 @@ function loadReaction(idx) {
                     ratio = (totalL / (totalL + totalR)) * 100;
                 }
                 chessFill.style.width = ratio + '%';
+                
+                // Update specific numbers
+                const evalLeft = document.getElementById('eval-left-mass');
+                const evalRight = document.getElementById('eval-right-mass');
+                if (evalLeft) evalLeft.innerHTML = `<span style="font-size:12px; color:#94a3b8;">LEFT</span> ${totalL}`;
+                if (evalRight) evalRight.innerHTML = `${totalR} <span style="font-size:12px; color:#94a3b8;">RIGHT</span>`;
                 
                 // Color transition
                 if (ratio > 48 && ratio < 52) chessFill.style.background = '#22c55e'; // Green
