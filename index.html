@@ -26,7 +26,7 @@
             <div class="student-info" style="display:flex; flex-direction:column; align-items:center; gap:20px; position: relative; z-index: 10; animation: popIn 1.1s cubic-bezier(0.34, 1.56, 0.64, 1);">
                 <input type="text" id="student-name" placeholder="Enter Your Name..." required style="width:100%; max-width:400px; text-align:center; font-size: 22px; font-weight: 700; padding: 18px; border: 4px solid #bfdbfe; border-radius: 20px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 4px rgba(59,130,246,0.2)';" onblur="this.style.borderColor='#bfdbfe'; this.style.boxShadow='inset 0 2px 4px rgba(0,0,0,0.05)';">
                 
-                <div style="display:flex; gap:20px; width:100%; max-width:450px; justify-content: center; margin-top: 15px;">
+                <div style="display:flex; gap:20px; width:100%; max-width:450px; justify-content: center; margin-top: 0px;">
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 4')" style="flex:1; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color:white; border:none; padding:20px 10px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 8px 0 #1e3a8a, 0 15px 20px rgba(37,99,235,0.3); transition:all 0.1s; transform: translateY(0);" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 #1e3a8a';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #1e3a8a, 0 15px 20px rgba(37,99,235,0.3)';">Form 4</button>
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 5')" style="flex:1; background: linear-gradient(135deg, #10b981, #047857); color:white; border:none; padding:20px 10px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 8px 0 #064e3b, 0 15px 20px rgba(16,185,129,0.3); transition:all 0.1s; transform: translateY(0);" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 #064e3b';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #064e3b, 0 15px 20px rgba(16,185,129,0.3)';">Form 5</button>
                 </div>
@@ -90,7 +90,7 @@
         <div class="center-content">
             <!-- Master Scale -->
             <!-- Modern Evaluation Bar -->
-    <div id="eval-bar-container" style="width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 5px; margin-top: 15px;">
+    <div id="eval-bar-container" style="width: 100%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin-bottom: 5px; margin-top: 0px;">
     <div id="main-eval-box" class="state-red" style="font-weight: 900; font-size: 22px; color: #475569; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 15px; justify-content: center; background: #ffffff; border: 4px solid #cbd5e1; border-radius: 16px; padding: 12px 30px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); width: 100%; margin: 0 auto; box-sizing: border-box;">
         <span id="status-label" style="color: #94a3b8; font-size: 18px;">THE CHEMICAL EQUATION IS :</span>
         <span id="status-balance" style="color: #ef4444;">UNBALANCED</span>
@@ -125,13 +125,15 @@
                 
             </div>
 
-            <div class="equation-grid-wrapper">
-                    <div class="eq-left-container"><div class="eq-left" id="eq-left-content"></div></div>
-                    <div class="eq-center-container"><div class="eq-arrow" data-tooltip="Transforms into 👉" style="display:flex; justify-content:center; align-items:center; background:#3b82f6; color:white; border-radius:12px; padding:4px 16px; border:3px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; font-weight:bold;">
+                        <div class="equation-grid-wrapper" style="overflow: hidden !important;">
+                <div id="eq-scale-wrapper" style="display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:center; width:100%; transform-origin: center center; transition: transform 0.2s;">
+                    <div class="eq-left-container" style="flex: 0 0 auto !important; width: auto !important;"><div class="eq-left" id="eq-left-content"></div></div>
+                    <div class="eq-center-container" style="flex: 0 0 auto !important;"><div class="eq-arrow" data-tooltip="Transforms into 🔄" style="display:flex; justify-content:center; align-items:center; background:#3b82f6; color:white; border-radius:12px; padding:4px 16px; border:3px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; font-weight:bold;">
     <svg style="width:36px; height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
 </div></div>
-                    <div class="eq-right-container"><div class="eq-right" id="eq-right-content"></div></div>
+                    <div class="eq-right-container" style="flex: 0 0 auto !important; width: auto !important;"><div class="eq-right" id="eq-right-content"></div></div>
                 </div>
+            </div>
 
               <!-- Workspace Boxes -->
             <div class="workspace-grid">
