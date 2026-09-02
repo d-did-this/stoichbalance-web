@@ -421,7 +421,13 @@ let REACTIONS = FORM_4_REACTIONS;
 
         
 function init() {
-    updateCountersDOM();
+    state.completed = new Set();
+    REACTIONS.forEach((rx, i) => {
+        if (localStorage.getItem('solved_' + rx.name)) {
+            state.completed.add(i);
+        }
+    });
+    updateCounter();
     
     let savedName = localStorage.getItem('stoich_student_name') || '';
     let savedForm = localStorage.getItem('stoich_student_form') || currentForm;
