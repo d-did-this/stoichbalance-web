@@ -843,17 +843,27 @@ function loadReaction(idx) {
             
             mCard.className = "master-card card";
             
-            // Triangle > < =
-            const pinText = document.getElementById('pin-text');
-            if (!pinText) {
-                const pin = document.querySelector('.seesaw-pin');
-                if (pin) pin.innerHTML = '<span id="pin-text" style="color:white; font-weight:900; font-size:20px; position:absolute; top:8px; left:-8px;">=</span>';
+            // Background Color Logic
+            let lCounts = countMolecules(state.left);
+            let rCounts = countMolecules(state.right);
+            if (totalL === 0 && totalR === 0) {
+                mCard.classList.add("state-red");
+            } else if (tilt === 0 && totalL > 0) {
+                if (checkCanSimplify(lCounts, rCounts)) {
+                    mCard.classList.add("state-yellow");
+                } else {
+                    mCard.classList.add("state-green");
+                }
+            } else {
+                if (Math.abs(totalL - totalR) <= 5) {
+                    mCard.classList.add("state-yellow");
+                } else {
+                    mCard.classList.add("state-red");
+                }
             }
-            if (document.getElementById('pin-text')) {
-                if (totalL > totalR) document.getElementById('pin-text').innerHTML = '>';
-                else if (totalL < totalR) document.getElementById('pin-text').innerHTML = '<';
-                else document.getElementById('pin-text').innerHTML = '=';
-            }
+
+            
+            // Triangle > < = removed
 
             // Chess Bar Rotation Update
             const chessFill = document.getElementById('chess-bar-fill');
@@ -881,18 +891,18 @@ function loadReaction(idx) {
                     
                     if (!canSimplify) {
                         badge.style.display = 'block';
-                        if (chessText) { chessText.innerHTML = "Balanced and Simplified!"; chessText.style.color = "#22c55e"; }
+                        if (chessText) { chessText.innerHTML = "Perfectly Balanced"; chessText.style.color = "#22c55e"; }
                     } else {
                         badge.style.display = 'none';
-                        if (chessText) { chessText.innerHTML = "Balanced but NOT Simplified!"; chessText.style.color = "#eab308"; }
+                        if (chessText) { chessText.innerHTML = "Simplify Ratio"; chessText.style.color = "#eab308"; }
                     }
                 } else {
                     badge.style.display = 'none';
                     if (chessText) {
                         let diff = Math.abs(totalL - totalR);
-                        if (totalL === 0 && totalR === 0) { chessText.innerHTML = "Empty"; chessText.style.color = "#64748b"; }
-                        else if (diff <= 5) { chessText.innerHTML = "Closer..."; chessText.style.color = "#f97316"; }
-                        else if (diff <= 15) { chessText.innerHTML = "Close!"; chessText.style.color = "#ef4444"; }
+                        if (totalL === 0 && totalR === 0) { chessText.innerHTML = "Empty Scale"; chessText.style.color = "#94a3b8"; }
+                        else if (diff <= 5) { chessText.innerHTML = "Almost there"; chessText.style.color = "#f97316"; }
+                        else if (diff <= 15) { chessText.innerHTML = "Close"; chessText.style.color = "#ef4444"; }
                         else { chessText.innerHTML = "Unbalanced"; chessText.style.color = "#b91c1c"; }
                     }
                 }
