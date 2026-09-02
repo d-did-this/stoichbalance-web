@@ -88,13 +88,19 @@
         <div class="center-content">
             <!-- Master Scale -->
             <!-- Modern Evaluation Bar -->
-    <div id="eval-bar-container" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 25px;">
-    <div style="font-weight: 900; font-size: 26px; color: #475569; letter-spacing: 1px; text-transform: uppercase;">
-        <span id="status-balance">UNBALANCED</span>
-        <span id="status-separator" style="margin: 0 10px; color: #cbd5e1; display:none;">|</span>
-        <span id="status-simplified" style="display:none; color: #eab308;">NOT SIMPLIFIED</span>
+    <div id="eval-bar-container" style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 15px;">
+        <div style="font-weight: 900; font-size: 24px; color: #475569; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 20px; justify-content: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                BALANCED 
+                <div id="status-balance-icon" style="width:28px; height:28px; border-radius:50%; background:#ef4444; color:white; display:flex; align-items:center; justify-content:center; font-size:16px;">&#10060;</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                SIMPLIFIED 
+                <div id="status-simplified-icon" style="width:28px; height:28px; border-radius:50%; background:#e2e8f0; color:#94a3b8; display:flex; align-items:center; justify-content:center; font-size:16px;">-</div>
+            </div>
+        </div>
     </div>
-</div>
+  </div>
 <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
 
                 
