@@ -888,7 +888,13 @@ function loadReaction(idx) {
 
             // Status Text Update
                 const statBal = document.getElementById('status-balance');
+                const statLabel = document.getElementById('status-label');
                 
+                if (statLabel && rx && rx.name) {
+                    let cleanName = rx.name.replace(/\[.*?\]\s*/, '').replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{27BF}]/gu, '').trim();
+                    statLabel.innerText = `THE ${cleanName.toUpperCase()} EQUATION IS :`;
+                }
+
                 let textLCounts = countMolecules(state.left);
                 let textRCounts = countMolecules(state.right);
                 let canSimplify = checkCanSimplify(textLCounts, textRCounts);
