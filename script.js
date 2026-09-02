@@ -626,6 +626,20 @@ function loadReaction(idx) {
             checkWinState(lTotals, rTotals);
         }
 
+                function autoScaleEquation() {
+            let wrap = document.querySelector('.equation-grid-wrapper');
+            let scaleWrap = document.getElementById('eq-scale-wrapper');
+            if (!wrap || !scaleWrap) return;
+            scaleWrap.style.transform = 'scale(1)';
+            // measure
+            let wrapWidth = wrap.clientWidth;
+            let contentWidth = scaleWrap.scrollWidth;
+            if (contentWidth > wrapWidth && wrapWidth > 0) {
+                let scale = wrapWidth / contentWidth;
+                scaleWrap.style.transform = 'scale(' + scale + ')';
+            }
+        }
+
         function renderEquationGrid() {
             let rx = REACTIONS[state.rxIdx];
             let lCounts = countMolecules(state.left);
