@@ -846,7 +846,8 @@ function loadReaction(idx) {
 
             // Master Scale logic
             let mDiff = totalL - totalR;
-            let mTilt = mDiff===0 ? 0 : (mDiff>0?-10:10);
+            // Gradual tilt calculation (max 6 degrees so it doesn't overflow)
+            let mTilt = Math.max(-6, Math.min(6, -mDiff * 1.2));
             
             document.getElementById('ms-beam').style.transform = `rotate(${mTilt}deg)`;
             
