@@ -687,7 +687,7 @@
 }
 .seesaw-jar {
     width: 280px !important;
-    min-height: 120px !important;
+    min-height: 150px !important; margin-top: 40px !important;
 }
 .jar-marbles-container {
     display: flex !important;
