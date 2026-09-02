@@ -192,12 +192,7 @@ let REACTIONS = FORM_4_REACTIONS;
             history: [], moves: 0, hardMode: false, hintsUsed: 0, completed: new Set() 
         };
 
-        const DISTINCT_COLORS = [
-            { bg: "#ef4444", color: "#fff" }, { bg: "#3b82f6", color: "#fff" }, 
-            { bg: "#f59e0b", color: "#000" }, { bg: "#8b5cf6", color: "#fff" }, 
-            { bg: "#10b981", color: "#fff" }, { bg: "#ec4899", color: "#fff" }, 
-            { bg: "#06b6d4", color: "#000" } 
-        ];
+        const DISTINCT_COLORS = [ { bg: '#6366f1', color: '#fff' }, { bg: '#0ea5e9', color: '#fff' }, { bg: '#f59e0b', color: '#000' }, { bg: '#8b5cf6', color: '#fff' }, { bg: '#14b8a6', color: '#fff' }, { bg: '#d946ef', color: '#fff' }, { bg: '#64748b', color: '#fff' } ];
 
         function assignColors(reaction) {
             let elements = new Set();
