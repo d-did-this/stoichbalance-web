@@ -130,6 +130,14 @@ let REACTIONS = FORM_4_REACTIONS;
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
                 osc.start(audioCtx.currentTime);
                 osc.stop(audioCtx.currentTime + 0.1);
+                        } else if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.05);
             } else if (type === 'whoosh') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, audioCtx.currentTime);
@@ -457,7 +465,7 @@ function init() {
                     let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
                     btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
                     
-                    btn.onclick = () => startGame(actualIdx);
+                    btn.onclick = () => { playSound('click'); startGame(actualIdx); };
                     grid.appendChild(btn);
                 });
                 
@@ -476,10 +484,10 @@ function init() {
                 `;
                 
                 let prevBtn = document.getElementById('prev-page-btn');
-                if (prevBtn) prevBtn.onclick = () => { if (window.currentPage > 0) { window.currentPage--; renderPage(); } };
+                if (prevBtn) prevBtn.onclick = () => { playSound('click'); if (window.currentPage > 0) { window.currentPage--; renderPage(); } };
                 
                 let nextBtn = document.getElementById('next-page-btn');
-                if (nextBtn) nextBtn.onclick = () => { if (window.currentPage < maxPage) { window.currentPage++; renderPage(); } };
+                if (nextBtn) nextBtn.onclick = () => { playSound('click'); if (window.currentPage < maxPage) { window.currentPage++; renderPage(); } };
             }
             renderPage();
         }
