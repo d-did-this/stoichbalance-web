@@ -66,7 +66,7 @@
         .card { background: var(--surface); border: var(--border-thick); border-radius: var(--border-radius); box-shadow: var(--shadow-toy); transition: all 0.3s ease; }
 
         /* --- Left Sidebar (Element Scales) --- */
-        .left-sidebar { flex: 1 1 220px; min-width: 220px; max-width: 220px; display: flex; flex-direction: column; gap: 15px; }
+        .left-sidebar { flex: 1 1 220px; min-width: 260px; max-width: 260px; display: flex; flex-direction: column; gap: 15px; }
         .sidebar-title-wrapper { display: flex; width: 100%; text-align: center; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; white-space: nowrap; }
         .sidebar-title { font-size: clamp(16px, 1.8vw, 18px); font-weight: 900; color: #ffffff; background: #0ea5e9; padding: 10px 20px; border-radius: 16px; border: 3px solid #0284c7; box-shadow: 0 4px 0 #0284c7; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
 
@@ -521,7 +521,7 @@
     margin-bottom: 25px !important; /* huge gap below master scale */
 }
 .equation-grid-wrapper {
-    margin-bottom: 25px !important; /* huge gap below equation */
+    margin-bottom: 0px !important; /* normal gap below equation */
     margin-top: 0 !important;
 }
 
@@ -576,4 +576,9 @@
 }
 
 .equation-grid-wrapper { max-width: none !important; }
+
+
+.title-svg { flex-shrink: 0 !important; }
+
+
 
