@@ -468,8 +468,8 @@ function loadReaction(idx) {
             state.rxIdx = parseInt(idx);
             let rx = REACTIONS[state.rxIdx];
             assignColors(rx);
-            state.left = [...rx.left]; 
-            state.right = [...rx.right];
+            state.left = []; 
+            state.right = [];
             state.hintLevel = 0;
             state.lastHintElement = null;
             state.expectedMove = null;
@@ -687,7 +687,7 @@ function loadReaction(idx) {
                         card.innerHTML = `
                             <div class="mol-remove-overlay">❌</div>
                             <div class="mol-formula">${getFormulaHTML(f)}</div>
-                            ${generateMarbleCluster(f, 36)}
+                            ${generateMarbleCluster(f, 30)}
                         `;
                         row.appendChild(card);
                     });
@@ -992,7 +992,7 @@ function loadReaction(idx) {
                     }
                     playSound('ding');
                     triggerConfetti();
-                    setTimeout(() => { const winModal = document.getElementById('win-modal'); if (winModal) winModal.style.display = 'flex'; }, 1200);
+                    setTimeout(() => { const winModal = document.getElementById('win-modal'); if (winModal) winModal.style.display = 'flex'; }, 400);
     if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
         currentStreak++;
         puzzlesSolvedCount++;
