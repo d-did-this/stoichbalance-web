@@ -792,12 +792,12 @@
     z-index: 15 !important;
 }
 .master-card .seesaw-pin {
-    position: absolute !important;
-    bottom: -10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin-top: -2px !important;
     z-index: 10 !important;
-    margin: 0 !important;
 }
 
 .master-card.state-red { background: var(--st-red-light) !important; border-color: var(--st-red) !important; transition: all 0.3s ease !important; }
@@ -831,3 +831,15 @@
 }
 /* Override red to be a bit softer too if needed, but let's stick to user request of changing green */
 
+
+.tiny-seesaw-container {
+    flex-direction: column !important;
+    align-items: center !important;
+}
+.tiny-seesaw-container .seesaw-pin {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin-top: -2px !important;
+}
