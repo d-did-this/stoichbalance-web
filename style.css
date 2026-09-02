@@ -838,3 +838,19 @@
     background: linear-gradient(135deg, #64748b 0%, #0f172a 100%) !important;
     border: none !important;
 }
+
+/* Hide duplicate triangle base */
+.master-card .seesaw-base {
+    display: none !important;
+}
+
+/* Make master block taller */
+.master-card {
+    min-height: 480px !important;
+    padding-top: 60px !important;
+    padding-bottom: 40px !important;
+    justify-content: flex-end !important;
+}
+.master-card .seesaw-container {
+    margin-top: 40px !important;
+}
