@@ -82,8 +82,8 @@
     cursor: help; 
     border-radius: 16px;
 }
-        .scale-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
-        .scale-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
+        
+        
         
         .scale-header { font-size: clamp(18px, 2vw, 24px); font-weight: 900; margin-bottom: 2px; color: var(--text-dark); }
         .scale-footer { display: flex; justify-content: space-between; width: 100%; padding: 0 15px; font-size: clamp(20px, 2vw, 24px); font-weight: 900; color: var(--text-dark); margin-top: 5px; }
@@ -534,7 +534,7 @@
 }
 
 
-.equation-grid-wrapper { margin-bottom: 15px !important; margin-top: 0px !important; z-index: 10; }
+.equation-grid-wrapper { margin-bottom: 5px !important; margin-top: 0px !important; z-index: 10; }
 
 /* Collapsed state styling */
 .collapsed .sidebar-title {
@@ -595,9 +595,11 @@
 
 
 .equation-grid-wrapper {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: #ffffff !important;
+    border: 4px solid #cbd5e1 !important;
+    border-radius: 20px !important;
+    padding: 10px 20px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important;
 }
 
 /* 1. Move "So Close" text up and smaller */
@@ -793,7 +795,7 @@
 }
 .master-card .seesaw-beam {
     position: absolute !important;
-    bottom: 55px !important;
+    bottom: 85px !important;
     left: 0 !important;
     right: 0 !important;
     margin: 0 auto !important;
@@ -803,7 +805,7 @@
 }
 .master-card .seesaw-pin {
     position: absolute !important;
-    bottom: 15px !important;
+    bottom: 45px !important;
     left: 0 !important;
     right: 0 !important;
     margin: 0 auto !important;
@@ -852,10 +854,10 @@
 
 /* Adjusted master block taller */
 .master-card {
-    min-height: 320px !important;
+    min-height: 400px !important;
     padding-top: 20px !important;
     padding-bottom: 10px !important;
-    margin-bottom: 15px !important;
+    margin-bottom: 5px !important;
     justify-content: flex-end !important;
 }
 .master-card .seesaw-container {
@@ -892,13 +894,5 @@
 }
 
 /* Ensure state colors can override the beaker style if needed */
-.scale-card.state-red { 
-    border-color: var(--st-red) !important; 
-    background: var(--st-red-light) !important; 
-    box-shadow: inset 0 -10px 20px rgba(239, 68, 68, 0.2) !important;
-}
-.scale-card.state-green { 
-    border-color: var(--st-green) !important; 
-    background: var(--st-green-light) !important; 
-    box-shadow: inset 0 -10px 20px rgba(34, 197, 94, 0.2) !important;
-}
+
+
