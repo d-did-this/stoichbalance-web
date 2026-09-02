@@ -422,41 +422,67 @@ function init() {
         greet.innerText = "👋 Welcome, " + savedName + " (" + savedForm + ")";
     }
 
-                let grid = document.getElementById('level-grid');
+                        let grid = document.getElementById('level-grid');
         if (grid) {
-            grid.innerHTML = '';
+            if (typeof window.currentPage === 'undefined') window.currentPage = 0;
+            const itemsPerPage = 6;
+            const maxPage = Math.ceil(REACTIONS.length / itemsPerPage) - 1;
             
-            // Remove pagination controls if they exist
-            let pControl = document.getElementById('pagination-controls');
-            if (pControl) pControl.remove();
-            
-            REACTIONS.forEach((rx, i) => {
-                let btn = document.createElement('button');
-                btn.className = 'level-btn';
+            function renderPage() {
+                grid.innerHTML = '';
+                let start = window.currentPage * itemsPerPage;
+                let end = start + itemsPerPage;
+                let currentItems = REACTIONS.slice(start, end);
                 
-                // Check if solved
-                if (localStorage.getItem('solved_' + rx.name)) {
-                    btn.classList.add('solved');
+                currentItems.forEach((rx, i) => {
+                    let actualIdx = start + i;
+                    let btn = document.createElement('button');
+                    btn.className = 'level-btn';
+                    
+                    if (localStorage.getItem('solved_' + rx.name)) {
+                        btn.classList.add('solved');
+                    }
+                    
+                    let diffColor = rx.name.includes('[Easy]') ? '#10b981' : (rx.name.includes('[Med]') ? '#f59e0b' : '#ef4444');
+                    let cleanName = rx.name;
+                    let tag = "";
+                    let match = rx.name.match(/\[(.*?)\]/);
+                    if(match) {
+                        tag = match[0];
+                        cleanName = rx.name.replace(tag + ' ', '').trim();
+                    }
+                    
+                    let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${actualIdx + 1}</div>`;
+                    let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
+                    let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
+                    btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+                    
+                    btn.onclick = () => startGame(actualIdx);
+                    grid.appendChild(btn);
+                });
+                
+                let pControl = document.getElementById('pagination-controls');
+                if (!pControl) {
+                    pControl = document.createElement('div');
+                    pControl.id = 'pagination-controls';
+                    pControl.style.cssText = "display:flex; justify-content:center; align-items:center; gap:20px; margin-top:20px; width:100%;";
+                    grid.parentNode.appendChild(pControl);
                 }
                 
-                let diffColor = rx.name.includes('[Easy]') ? '#10b981' : (rx.name.includes('[Med]') ? '#f59e0b' : '#ef4444');
-                let cleanName = rx.name;
-                let tag = "";
-                let match = rx.name.match(/\[(.*?)\]/);
-                if(match) {
-                    tag = match[0];
-                    cleanName = rx.name.replace(tag + ' ', '');
-                }
+                pControl.innerHTML = `
+                    <button id="prev-page-btn" style="background:#ffffff; color:#3b82f6; border:3px solid #bfdbfe; padding:10px 20px; border-radius:12px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #bfdbfe; visibility: ${window.currentPage > 0 ? 'visible' : 'hidden'}"><svg style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>Prev</button>
+                    <span style="font-weight:bold; color:#64748b; font-size: 16px;">Page ${window.currentPage + 1} of ${maxPage + 1}</span>
+                    <button id="next-page-btn" style="background:#ffffff; color:#3b82f6; border:3px solid #bfdbfe; padding:10px 20px; border-radius:12px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #bfdbfe; visibility: ${window.currentPage < maxPage ? 'visible' : 'hidden'}">Next<svg style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-left:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg></button>
+                `;
                 
-                let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${i + 1}</div>`;
-                let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
-                let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
-                btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+                let prevBtn = document.getElementById('prev-page-btn');
+                if (prevBtn) prevBtn.onclick = () => { if (window.currentPage > 0) { window.currentPage--; renderPage(); } };
                 
-                btn.onclick = () => startGame(i);
-                grid.appendChild(btn);
-            });
-    }
+                let nextBtn = document.getElementById('next-page-btn');
+                if (nextBtn) nextBtn.onclick = () => { if (window.currentPage < maxPage) { window.currentPage++; renderPage(); } };
+            }
+            renderPage();
+        }
     
     if (!localStorage.getItem('STOICHBALANCE_tutorial_seen')) {
         openTutorial();
