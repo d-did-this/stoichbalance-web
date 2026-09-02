@@ -85,13 +85,16 @@
                 <div id="simplified-badge" style="display:none; position: absolute; top: -15px; right: -15px; background: #eab308; color: white; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 18px; border: 3px solid #ca8a04; box-shadow: 0 4px 0 #ca8a04; z-index: 100; transform: rotate(15deg);">🌟 FULLY SIMPLIFIED!</div>
                 
                 
-                <div id="chess-bar-wrapper" style="width: 100%; max-width: 600px; margin: -20px auto 20px auto; display: flex; flex-direction: column; align-items: center; gap: 8px; position:relative; z-index:100;">
-                    <div id="chess-status-text" style="font-weight: 900; font-size: 24px; color: #334155;">Balanced!</div>
-                    <div style="width: 100%; height: 28px; background: #ef4444; border-radius: 14px; border: 3px solid #cbd5e1; box-shadow: inset 0 3px 6px rgba(0,0,0,0.2); overflow: hidden; position: relative;">
+                
+                <!-- Sleek Minimalist Chess Bar -->
+                <div id="chess-bar-wrapper" style="width: 100%; max-width: 300px; margin: 15px auto 0 auto; display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; position: relative;">
                         <div id="chess-bar-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: 50%; background: #22c55e; transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
-                        <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #ffffff; z-index: 2;"></div>
+                        <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 100%; background: #94a3b8; z-index: 2;"></div>
                     </div>
+                    <div id="chess-status-text" style="font-weight: 800; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px;">Balanced</div>
                 </div>
+
 
 
                 <div class="seesaw-container">
@@ -165,10 +168,7 @@
     <!-- Custom Puzzle Modal -->
     <div id="custom-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
         <div class="card" style="background:white; padding:25px; width:450px; max-width:90%; display:flex; flex-direction:column; gap:15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
-        <div style="display:flex; flex-direction:column; align-items:center; background:#f8fafc; padding: 15px; border-radius: 16px; border:4px solid #cbd5e1; margin-bottom: 20px;">
-           <label style="font-weight:900; font-size:18px; margin-bottom:10px; color:#475569;">🔍 Adjust UI Size</label>
-           <input type="range" min="0.5" max="1.5" step="0.05" value="1" oninput="document.querySelector('.app-body').style.zoom = this.value;" style="width:80%; cursor:pointer;">
-        </div>
+        
 
             <h2 style="color:var(--primary); font-size:24px; font-weight:900; text-align:center;">🛠️ Create Custom Puzzle</h2>
             <div>
@@ -318,7 +318,11 @@ window.onclick = function(event) {
     <div style="position:fixed; bottom:20px; left:20px; display:flex; gap: 15px; z-index:9000; align-items:center;">
         
 
-        <button onclick="openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
+        
+        <button onclick="document.getElementById('settings-modal').style.display='flex'" style="background:#64748b; color:#ffffff; border:4px solid #475569; box-shadow:0 4px 0 #475569; width:60px; height:60px; border-radius:50%; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Settings">
+            <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+<button onclick="openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
         <button onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
             <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
         </button>
@@ -329,6 +333,21 @@ window.onclick = function(event) {
 
 
 
+
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2500; align-items:center; justify-content:center; backdrop-filter:blur(3px);">
+        <div class="card" style="background:white; padding:25px; width:400px; max-width:90%; display:flex; flex-direction:column; gap:15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align:center;">
+            <h2 style="color:var(--primary); font-size:24px; font-weight:900; margin-bottom: 10px;">⚙️ Settings</h2>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; background:#f8fafc; padding: 15px; border-radius: 16px; border:2px solid #cbd5e1; margin-bottom: 10px;">
+                <label style="font-weight:900; font-size:16px; margin-bottom:10px; color:#475569;">🔍 Adjust UI Size</label>
+                <input type="range" min="0.5" max="1.5" step="0.05" value="1" oninput="document.querySelector('.app-body').style.zoom = this.value;" style="width:100%; cursor:pointer;">
+            </div>
+
+            <button onclick="document.getElementById('settings-modal').style.display='none'" style="background:var(--primary); color:white; border:3px solid #0284c7; box-shadow:0 4px 0 #0284c7; padding:10px; font-weight:900; font-size:18px; border-radius:12px; cursor:pointer;">Close</button>
+        </div>
+    </div>
 
 </body>
 </html>
