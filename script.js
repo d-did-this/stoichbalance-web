@@ -883,40 +883,27 @@ function loadReaction(idx) {
             // Triangle > < = removed
 
             // Status Text Update
-                const statBal = document.getElementById('status-balance');
-                const statSimp = document.getElementById('status-simplified');
-                const statSep = document.getElementById('status-separator');
+                const balIcon = document.getElementById('status-balance-icon');
+                const simpIcon = document.getElementById('status-simplified-icon');
                 
                 let textLCounts = countMolecules(state.left);
                 let textRCounts = countMolecules(state.right);
                 let canSimplify = checkCanSimplify(textLCounts, textRCounts);
                 
-                const chessFill = document.getElementById('chess-bar-fill');
-                let rL = totalL === 0 ? 1 : totalL;
-                let rR = totalR === 0 ? 1 : totalR;
-                let ratio = (rL / (rL + rR)) * 100;
-
-                if (statBal) {
+                if (balIcon && simpIcon) {
                     if (totalL === 0 && totalR === 0) {
-                        statBal.innerText = "EMPTY";
-                        statBal.style.color = "#94a3b8";
-                        if(statSimp) statSimp.style.display = 'none';
-                        if(statSep) statSep.style.display = 'none';
+                        balIcon.innerHTML = '-'; balIcon.style.background = '#e2e8f0'; balIcon.style.color = '#94a3b8';
+                        simpIcon.innerHTML = '-'; simpIcon.style.background = '#e2e8f0'; simpIcon.style.color = '#94a3b8';
                     } else if (mTilt === 0) {
-                        statBal.innerText = "BALANCED";
-                        statBal.style.color = "#22c55e";
+                        balIcon.innerHTML = '&#9989;'; balIcon.style.background = '#22c55e'; balIcon.style.color = 'white';
                         if (canSimplify) {
-                            if(statSimp) { statSimp.innerText = "NOT SIMPLIFIED"; statSimp.style.color = "#eab308"; statSimp.style.display = "inline"; }
-                            if(statSep) statSep.style.display = "inline";
+                            simpIcon.innerHTML = '&#10060;'; simpIcon.style.background = '#ef4444'; simpIcon.style.color = 'white';
                         } else {
-                            if(statSimp) { statSimp.innerText = "SIMPLIFIED!"; statSimp.style.color = "#22c55e"; statSimp.style.display = "inline"; }
-                            if(statSep) statSep.style.display = "inline";
+                            simpIcon.innerHTML = '&#9989;'; simpIcon.style.background = '#22c55e'; simpIcon.style.color = 'white';
                         }
                     } else {
-                        statBal.innerText = "UNBALANCED";
-                        statBal.style.color = "#ef4444";
-                        if(statSimp) statSimp.style.display = 'none';
-                        if(statSep) statSep.style.display = 'none';
+                        balIcon.innerHTML = '&#10060;'; balIcon.style.background = '#ef4444'; balIcon.style.color = 'white';
+                        simpIcon.innerHTML = '-'; simpIcon.style.background = '#e2e8f0'; simpIcon.style.color = '#94a3b8';
                     }
                 }
                 
