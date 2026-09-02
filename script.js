@@ -802,10 +802,19 @@ function loadReaction(idx) {
                         <!-- Book Stacks -->
                         <div class="book-stack-container" style="display:flex; justify-content:space-around; align-items:flex-end; height:100px; padding-bottom:10px; border-bottom: 4px solid #cbd5e1; margin-top:15px; position:relative;">
                             <div style="position:absolute; bottom:-10px; width:100%; display:flex; justify-content:center;"><div style="width:10px; height:20px; background:#cbd5e1; border-radius:5px;"></div></div>
-                            <div class="book-stack left-stack" style="display:flex; flex-direction:column-reverse; gap:3px; align-items:center; z-index:2; width:45px;">
-                                ${Array(l).fill('<div style="width:30px; height:12px; background:#ef4444; border:2px solid #b91c1c; border-radius:3px; box-shadow:0 2px 0 #b91c1c;"></div>').join('')}
+                            <div class="book-stack left-stack" style="display:flex; flex-direction:row; gap:5px; align-items:center; z-index:2; width:45px;">
+                                ${(function(){
+                                      let html = '';
+                                      let remaining = l;
+                                      while(remaining > 0) {
+                                          let chunk = Math.min(5, remaining);
+                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#ef4444; border:2px solid #b91c1c; border-radius:3px; box-shadow:0 2px 0 #b91c1c;"></div>').join('') + '</div>';
+                                          remaining -= chunk;
+                                      }
+                                      return html;
+                                  })()}
                             </div>
-                            <div class="book-stack right-stack" style="display:flex; flex-direction:column-reverse; gap:3px; align-items:center; z-index:2; width:45px;">
+                            <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; align-items:center; z-index:2; width:45px;">
                                 ${Array(r).fill('<div style="width:30px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('')}
                             </div>
                         </div>
@@ -825,8 +834,8 @@ function loadReaction(idx) {
             document.getElementById('ms-jar-right').style.transform = `rotate(${-mTilt}deg)`;
 
             // Hexagonal packing in the master bucket (Radius 12 => size 26, max 8 per base row in 200px jar)
-            document.getElementById('ms-marbles-left').innerHTML = generateDomMarblesGrid(200, lTotals, 26, 8);
-            document.getElementById('ms-marbles-right').innerHTML = generateDomMarblesGrid(200, rTotals, 26, 8);
+            document.getElementById('ms-marbles-left').innerHTML = generateDomMarblesGrid(280, lTotals, 26, 8);
+            document.getElementById('ms-marbles-right').innerHTML = generateDomMarblesGrid(280, rTotals, 26, 8);
 
             const mCard = document.getElementById('master-scale');
             const mText = document.getElementById('ms-status-text');
@@ -834,26 +843,61 @@ function loadReaction(idx) {
             
             mCard.className = "master-card card";
             
-            if (totalL === 0 && totalR === 0) {
-                mCard.classList.add("state-red");
-                mText.textContent = "It's empty! Add molecules!"; mEmoji.textContent = "🤔";
-            } else if (balancedCount === allElements.length) {
-                let lCounts = countMolecules(state.left);
-                let rCounts = countMolecules(state.right);
-                if (checkCanSimplify(lCounts, rCounts)) {
-                    mCard.classList.add("state-yellow");
-                    mText.textContent = "Equal, but too big! Take some away!"; mEmoji.textContent = "😅";
-                } else {
-                    mCard.classList.add("state-green");
-                    mText.textContent = "YAY! PERFECTLY BALANCED!"; mEmoji.textContent = "🎉";
+            const mText = document.getElementById('ms-status-text');
+            const mEmoji = document.getElementById('ms-emoji');
+            
+            // Triangle > < =
+            const pinText = document.getElementById('pin-text');
+            if (!pinText) {
+                const pin = document.querySelector('.seesaw-pin');
+                if (pin) pin.innerHTML = '<span id="pin-text" style="color:white; font-weight:900; font-size:20px; position:absolute; top:8px; left:-8px;">=</span>';
+            }
+            if (document.getElementById('pin-text')) {
+                if (totalL > totalR) document.getElementById('pin-text').innerHTML = '>';
+                else if (totalL < totalR) document.getElementById('pin-text').innerHTML = '<';
+                else document.getElementById('pin-text').innerHTML = '=';
+            }
+
+            // Chess Bar Rotation Update
+            const chessFill = document.getElementById('chess-bar-fill');
+            const chessText = document.getElementById('chess-status-text');
+            if (chessFill) {
+                let ratio = 50;
+                if (totalL + totalR > 0) {
+                    ratio = (totalL / (totalL + totalR)) * 100;
                 }
-            } else {
-                if (Math.abs(mDiff) > 0 && Math.abs(mDiff) <= 2) {
-                    mCard.classList.add("state-yellow");
-                    mText.textContent = "So Close! Keep going!"; mEmoji.textContent = "👀";
+                chessFill.style.width = ratio + '%';
+                
+                // Color transition
+                if (ratio > 48 && ratio < 52) chessFill.style.background = '#22c55e'; // Green
+                else if (ratio > 40 && ratio < 60) chessFill.style.background = '#eab308'; // Yellow
+                else chessFill.style.background = '#3b82f6'; // Blue
+            }
+
+            // Simplification Badge & Text update
+            const badge = document.getElementById('simplified-badge');
+            if (badge) {
+                if (mTilt === 0 && totalL > 0) {
+                    let lCounts = countMolecules(state.left);
+                    let rCounts = countMolecules(state.right);
+                    let canSimplify = checkCanSimplify(lCounts, rCounts);
+                    
+                    if (!canSimplify) {
+                        badge.style.display = 'block';
+                        if (chessText) { chessText.innerHTML = "Balanced and Simplified!"; chessText.style.color = "#22c55e"; }
+                    } else {
+                        badge.style.display = 'none';
+                        if (chessText) { chessText.innerHTML = "Balanced but NOT Simplified!"; chessText.style.color = "#eab308"; }
+                    }
                 } else {
-                    mCard.classList.add("state-red");
-                    mText.textContent = "Uh Oh! Unbalanced!"; mEmoji.textContent = "😢";
+                    badge.style.display = 'none';
+                    if (chessText) {
+                        let diff = Math.abs(totalL - totalR);
+                        if (totalL === 0 && totalR === 0) { chessText.innerHTML = "Empty"; chessText.style.color = "#64748b"; }
+                        else if (diff <= 5) { chessText.innerHTML = "Closer..."; chessText.style.color = "#f97316"; }
+                        else if (diff <= 15) { chessText.innerHTML = "Close!"; chessText.style.color = "#ef4444"; }
+                        else { chessText.innerHTML = "Unbalanced"; chessText.style.color = "#b91c1c"; }
+                    }
                 }
             }
         }
