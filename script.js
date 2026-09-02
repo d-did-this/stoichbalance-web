@@ -866,23 +866,25 @@ function loadReaction(idx) {
             const mEmoji = document.getElementById('ms-emoji');
             
             mCard.className = "master-card card";
+            const evalBox = document.getElementById('main-eval-box');
+            if (evalBox) evalBox.className = ""; // Reset
             
             // Background Color Logic
             let lCounts = countMolecules(state.left);
             let rCounts = countMolecules(state.right);
             if (totalL === 0 && totalR === 0) {
-                mCard.classList.add("state-red");
+                if (evalBox) evalBox.classList.add("state-red");
             } else if (mTilt === 0 && totalL > 0) {
                 if (checkCanSimplify(lCounts, rCounts)) {
-                    mCard.classList.add("state-yellow");
+                    if (evalBox) evalBox.classList.add("state-yellow");
                 } else {
-                    mCard.classList.add("state-green");
+                    if (evalBox) evalBox.classList.add("state-green");
                 }
             } else {
                 if (Math.abs(totalL - totalR) <= 5) {
-                    mCard.classList.add("state-yellow");
+                    if (evalBox) evalBox.classList.add("state-yellow");
                 } else {
-                    mCard.classList.add("state-red");
+                    if (evalBox) evalBox.classList.add("state-red");
                 }
             }
 
