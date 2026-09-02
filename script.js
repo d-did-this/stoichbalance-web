@@ -775,7 +775,7 @@ function loadReaction(idx) {
                 <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
                     <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:36px;height:36px;color:#ffffff;margin-right:8px;" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:24px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
                 </div>
-                <div class="chat-wrapper" id="tiny-scales-grid" style="padding:15px; display:flex; flex-direction:column; gap:20px; overflow-x:hidden; overflow-y:auto; width:100%; box-sizing:border-box;">
+                <div id="tiny-scales-grid" style="display:flex; flex-direction:column; gap:20px; width:100%; box-sizing:border-box;">
             `;
 
             let totalL = 0, totalR = 0, balancedCount = 0;
@@ -804,12 +804,12 @@ function loadReaction(idx) {
                         
                         </div>
                         <!-- Book Stacks -->
-                        <div class="book-stack-container" style="display:flex; width: 100%; height:100px; padding-bottom:10px; border-bottom: 4px solid #94a3b8; margin-top:15px; position:relative;">
+                        <div class="book-stack-container" style="display:flex; width: 100%; height:100px; padding-bottom:10px; margin-top:15px; position:relative;">
     <!-- Absolute Pin exactly centered -->
     <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:linear-gradient(135deg, #64748b 0%, #0f172a 100%); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); z-index: 10;"></div>
     
     <!-- Left Half (Reactants) -->
-    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; padding-right: 10px; position: relative;">
+    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; border-bottom: 4px solid #d97706; padding-right: 10px; position: relative;">
         <div class="book-stack left-stack" style="display:flex; flex-direction:row-reverse; gap:5px; justify-content:flex-end; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                       let html = '';
@@ -824,7 +824,7 @@ function loadReaction(idx) {
                             </div>
     </div>
     <!-- Right Half (Products) -->
-    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; padding-left: 10px; position: relative;">
+    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; border-bottom: 4px solid #db2777; padding-left: 10px; position: relative;">
         <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                         let html = '';
