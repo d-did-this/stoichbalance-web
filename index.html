@@ -87,7 +87,11 @@
             <div id="chess-bar-fill" style="position: absolute; top: 0; left: 0; height: 100%; width: 50%; background: #22c55e; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
             <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: #ffffff; z-index: 2; border-radius: 2px;"></div>
         </div>
-        <div id="chess-status-text" style="font-weight: 900; font-size: 16px; color: #475569; letter-spacing: 0.5px;">BALANCED</div>
+        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-top: -4px;">
+              <div id="eval-left-mass" style="font-weight: 900; font-size: 20px; color: #ef4444; text-align: left; width: 60px;">0</div>
+              <div id="chess-status-text" style="font-weight: 900; font-size: 16px; color: #475569; letter-spacing: 0.5px; text-align: center;">BALANCED</div>
+              <div id="eval-right-mass" style="font-weight: 900; font-size: 20px; color: #3b82f6; text-align: right; width: 60px;">0</div>
+          </div>
     </div>
 <div class="master-card card state-red" id="master-scale" data-tooltip="The BIG scale! Make both sides weigh exactly the same!">
 
