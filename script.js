@@ -891,8 +891,8 @@ function loadReaction(idx) {
                 const statLabel = document.getElementById('status-label');
                 
                 if (statLabel && rx && rx.name) {
-                    let cleanName = rx.name.replace(/\[.*?\]\s*/, '').replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{27BF}]/gu, '').trim();
-                    statLabel.innerText = `THE ${cleanName.toUpperCase()} EQUATION IS :`;
+                    let cleanName = rx.name.replace(/\[.*?\]\s*/, '').replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{27BF}]/gu, '').trim().toUpperCase();
+                    statLabel.innerHTML = `THE <span style="font-weight:900; color:#1e293b;">${cleanName}</span> EQUATION IS :`;
                 }
 
                 let textLCounts = countMolecules(state.left);
