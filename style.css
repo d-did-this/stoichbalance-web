@@ -908,3 +908,19 @@
     box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
     padding: 15px !important;
 }
+
+/* Strip ALL borders, backgrounds, and shadows from the master scale to make it sit on a line */
+.master-card {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 4px solid #94a3b8 !important; /* The floor line */
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 250px !important;
+}
+.master-card.state-red, .master-card.state-green, .master-card.state-yellow {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 4px solid #94a3b8 !important;
+    box-shadow: none !important;
+}
