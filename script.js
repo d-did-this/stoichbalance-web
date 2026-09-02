@@ -1016,9 +1016,20 @@ function loadReaction(idx) {
                         populateDropdown();
                         document.getElementById('reaction-select').value = state.rxIdx;
                     }
-                    playSound('ding');
+                                        playSound('ding');
                     triggerConfetti();
-                    setTimeout(() => { const winModal = document.getElementById('win-modal'); if (winModal) winModal.style.display = 'flex'; }, 400);
+                    const winModal = document.getElementById('win-modal'); 
+                    if (winModal) {
+                        winModal.style.display = 'flex';
+                        let mvEl = document.getElementById('win-modal-moves');
+                        let efEl = document.getElementById('win-modal-efficiency');
+                        if (mvEl) mvEl.innerText = state.moves;
+                        if (efEl) {
+                            let optimalMoves = (rx.left.length + rx.right.length) * 2;
+                            let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
+                            efEl.innerText = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
+                        }
+                    }
     if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
         currentStreak++;
         puzzlesSolvedCount++;
