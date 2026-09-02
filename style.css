@@ -727,3 +727,9 @@
 .tally-item:last-child {
     border-right: none !important;
 }
+
+/* Widened beam, short/wide jars */
+.seesaw-beam { width: 95% !important; max-width: 1200px !important; height: 18px !important; }
+.seesaw-jar { width: 280px !important; min-height: 150px !important; }
+/* Ensure the grid wrapper uses absolute positioning as expected by JS */
+.jar-marbles-container { display: block !important; position: relative; width: 100% !important; height: 100% !important; }
