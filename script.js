@@ -1022,7 +1022,7 @@ function loadReaction(idx) {
                         state.completed.add(state.rxIdx);
                         updateCounter();
                         
-                        document.getElementById('reaction-select').value = state.rxIdx;
+                        
                     }
                                         playSound('ding');
                     triggerConfetti();
