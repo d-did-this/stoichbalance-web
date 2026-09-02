@@ -194,8 +194,8 @@
         /* Panel Tallies */
         .panel-tally { background: #f8fafc; border-top: 3px solid #e2e8f0; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 40px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
         .tally-item { display: flex; align-items: center; gap: 6px; font-size: clamp(14px, 1.5vw, 16px); font-weight: 900; padding: 4px 12px; border-radius: 16px; color: white; border: 3px solid rgba(0,0,0,0.1); box-shadow: 0 4px 0 rgba(0,0,0,0.1); cursor: help; }
-        .tally-green { background: var(--st-green); }
-        .tally-red { background: var(--st-red); }
+        .tally-green { background: linear-gradient(135deg, #db2777, #be185d) !important; }
+        .tally-red { background: linear-gradient(135deg, #d97706, #b45309) !important; }
 
         /* --- Right Sidebar (Teacher Guide) --- */
         .right-sidebar:not(.collapsed) { flex: 1 1 250px; min-width: 280px; max-width: 350px; display: flex; flex-direction: column; gap: 15px;  position: sticky; top: 15px; height: calc(100vh - 100px); align-self: flex-start; }
@@ -850,7 +850,7 @@
 
 /* Adjusted master block taller */
 .master-card {
-    min-height: 400px !important;
+    min-height: 250px !important;
     padding-top: 20px !important;
     padding-bottom: 10px !important;
     margin-bottom: 5px !important;
@@ -906,10 +906,3 @@
 .chat-wrapper, .scale-card, .guide-btns { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: top center; }
 
 
-/* Thin blue border around the entire sidebars as requested */
-#element-scales-container:not(.collapsed), #teacher-guide:not(.collapsed) {
-    border: 2px solid #38bdf8 !important;
-    border-radius: 24px !important;
-    padding: 12px !important;
-    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1) !important;
-}
