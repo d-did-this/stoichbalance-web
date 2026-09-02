@@ -66,7 +66,7 @@
         .card { background: var(--surface); border: var(--border-thick); border-radius: var(--border-radius); box-shadow: var(--shadow-toy); transition: all 0.3s ease; }
 
         /* --- Left Sidebar (Element Scales) --- */
-        .left-sidebar { flex: 1 1 220px; min-width: 320px; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
+        .left-sidebar:not(.collapsed) { flex: 1 1 220px; min-width: 320px; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
         .sidebar-title-wrapper { display: flex; width: 100%; text-align: center; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; white-space: nowrap; }
         .sidebar-title { font-size: clamp(16px, 1.8vw, 18px); font-weight: 900; color: #ffffff; background: #0ea5e9; padding: 10px 20px; border-radius: 16px; border: 3px solid #0284c7; box-shadow: 0 4px 0 #0284c7; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
 
@@ -172,7 +172,7 @@
         .tally-red { background: var(--st-red); }
 
         /* --- Right Sidebar (Teacher Guide) --- */
-        .right-sidebar { flex: 1 1 250px; min-width: 280px; max-width: 350px; display: flex; flex-direction: column; gap: 15px; transition: margin-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: sticky; top: 15px; height: calc(100vh - 100px); align-self: flex-start; }
+        .right-sidebar:not(.collapsed) { flex: 1 1 250px; min-width: 280px; max-width: 350px; display: flex; flex-direction: column; gap: 15px; transition: margin-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: sticky; top: 15px; height: calc(100vh - 100px); align-self: flex-start; }
         
         
         .chat-wrapper { flex: 1; background: #ffffff; border-radius: 20px; display: flex; flex-direction: column; border: var(--border-thick); box-shadow: var(--shadow-toy); min-height: 0; overflow: visible; }
@@ -390,7 +390,7 @@
 .dropdown-item input[type="checkbox"] { transform: scale(1.5); margin-right: 5px; cursor: pointer; }
 
 /* --- Collapsible Sidebars --- */
-.left-sidebar, .right-sidebar { transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), min-width 0.3s; overflow-x: hidden; }
+.left-sidebar, .right-sidebar:not(.collapsed) { transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), min-width 0.3s; overflow-x: hidden; }
 
 .left-sidebar.collapsed { width: 70px !important; min-width: 70px !important; max-width: 70px !important; height: min-content !important; flex: none !important; align-items: center; overflow: hidden; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
 .left-sidebar.collapsed .scale-card, .left-sidebar.collapsed p, .left-sidebar.collapsed .scale-footer { display: none !important; }
@@ -588,3 +588,95 @@
     border: none !important;
     box-shadow: none !important;
 }
+
+/* 1. Move "So Close" text up and smaller */
+.status-footer {
+    margin-top: -30px !important;
+    margin-bottom: 25px !important;
+}
+#ms-status-text {
+    font-size: clamp(20px, 2vw, 24px) !important;
+}
+.status-emoji {
+    font-size: 24px !important;
+}
+
+/* 2. Increase length of big scale beakers */
+.seesaw-beam {
+    width: 90% !important;
+    max-width: 900px !important;
+    height: 30px !important;
+    border-radius: 15px !important;
+}
+.seesaw-jar {
+    width: 200px !important;
+    min-height: 220px !important;
+}
+.seesaw-base {
+    border-bottom: 50px solid #94a3b8 !important;
+    border-left: 30px solid transparent !important;
+    border-right: 30px solid transparent !important;
+}
+
+/* 3. Wrap long equations */
+.equation-grid-wrapper {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 15px !important;
+}
+.eq-left-container, .eq-right-container {
+    position: relative !important;
+    flex: 1 1 40% !important;
+    width: auto !important;
+    left: auto !important;
+    right: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+.eq-left, .eq-right {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 15px !important;
+}
+.eq-center-container {
+    position: relative !important;
+    flex: 0 0 60px !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 10px !important;
+}
+
+/* 4. Tiny Scale Grid Layout (Auto 2 columns) */
+.left-sidebar:not(.collapsed) {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    grid-auto-rows: min-content !important;
+    align-content: start !important;
+    gap: 15px !important;
+}
+.sidebar-title-wrapper {
+    grid-column: 1 / -1 !important;
+}
+
+/* 6. Sidebar Background Colors */
+.left-sidebar:not(.collapsed) {
+    background: #f0fdf4 !important; /* Soft mint */
+    border: 4px solid #bbf7d0 !important;
+    border-radius: 24px !important;
+    padding: 20px !important;
+}
+.right-sidebar:not(.collapsed) {
+    background: #eff6ff !important; /* Soft blue */
+    border: 4px solid #bfdbfe !important;
+    border-radius: 24px !important;
+    padding: 20px !important;
+}
+
+
+.left-sidebar:not(.collapsed) { min-width: 320px !important; max-width: 320px !important; }
+
