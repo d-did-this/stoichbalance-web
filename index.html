@@ -10,9 +10,15 @@
 <body>
     <div id="main-menu" class="menu-overlay">
         <!-- Step 1: Login Screen -->
-        <div class="menu-card card" id="login-screen">
+        <div class="menu-card card" id="login-screen" style="position: relative; overflow: hidden; border-width: 4px; border-color: #38bdf8; box-shadow: 0 20px 50px rgba(56,189,248,0.2);">
+    <!-- Decorative Atoms -->
+    <div style="position: absolute; top: -20px; left: -20px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none;">⚛️</div>
+    <div style="position: absolute; bottom: -20px; right: -20px; font-size: 80px; opacity: 0.1; transform: rotate(15deg); pointer-events: none;">🧪</div>
+    <div style="position: absolute; top: 40%; right: -30px; font-size: 50px; opacity: 0.05; pointer-events: none;">🔥</div>
+
             <h1 class="menu-title"><span class="logo-icon">🧪</span> STOICHBALANCE</h1>
-            <p class="menu-subtitle">Welcome to the Chemistry Lab!</p>
+            <p class="menu-subtitle" style="font-size: 24px; letter-spacing: 2px; color: var(--primary); text-transform: uppercase;">Interactive Simulation</p>
+<p style="font-weight: 800; color: #64748b; margin-top: 10px;">Master Chemical Equations Visually!</p>
             
             <div class="student-info" style="flex-direction:column; align-items:center; gap:15px; margin-top:20px;">
                 <input type="text" id="student-name" placeholder="Student Name" required style="width:100%; max-width:350px; text-align:center;">
@@ -20,7 +26,7 @@
                 <div style="display:flex; gap:15px; width:100%; max-width:450px;">
                     <button onclick="goToLevels('Form 4')" style="flex:1; background:#3b82f6; color:white; border:3px solid #1d4ed8; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #1d4ed8; transition:all 0.2s;">📘 Form 4</button>
                     <button onclick="goToLevels('Form 5')" style="flex:1; background:#10b981; color:white; border:3px solid #047857; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #047857; transition:all 0.2s;">📗 Form 5</button>
-                    <button onclick="goToLevels('Developer')" style="flex:1; background:#64748b; color:white; border:3px solid #475569; padding:15px 10px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 6px 0 #475569; transition:all 0.2s;">🛠️ Dev Mode</button>
+                    
                 </div>
             </div>
         </div>
