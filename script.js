@@ -815,7 +815,16 @@ function loadReaction(idx) {
                                   })()}
                             </div>
                             <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
-                                ${Array(r).fill('<div style="width:30px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('')}
+                                ${(function(){
+                                        let html = '';
+                                        let remaining = r;
+                                        while(remaining > 0) {
+                                            let chunk = Math.min(5, remaining);
+                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('') + '</div>';
+                                            remaining -= chunk;
+                                        }
+                                        return html;
+                                    })()}
                             </div>
                         </div>
                         <div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #f1f5f9; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
