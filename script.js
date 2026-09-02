@@ -886,6 +886,15 @@ function loadReaction(idx) {
                 const statBal = document.getElementById('status-balance');
                 const statSimp = document.getElementById('status-simplified');
                 const statSep = document.getElementById('status-separator');
+                
+                let textLCounts = countMolecules(state.left);
+                let textRCounts = countMolecules(state.right);
+                let canSimplify = checkCanSimplify(textLCounts, textRCounts);
+                
+                const chessFill = document.getElementById('chess-bar-fill');
+                let rL = totalL === 0 ? 1 : totalL;
+                let rR = totalR === 0 ? 1 : totalR;
+                let ratio = (rL / (rL + rR)) * 100;
 
                 if (statBal) {
                     if (totalL === 0 && totalR === 0) {
@@ -911,12 +920,7 @@ function loadReaction(idx) {
                     }
                 }
                 
-                // Color transition
-                if (ratio > 48 && ratio < 52) chessFill.style.background = '#22c55e'; // Green
-                else if (ratio > 40 && ratio < 60) chessFill.style.background = '#eab308'; // Yellow
-                else chessFill.style.background = '#3b82f6'; // Blue
-            }
-
+                
             // Simplification Badge & Text update
             const badge = document.getElementById('simplified-badge');
             if (badge) {
