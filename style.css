@@ -574,3 +574,6 @@
     justify-content: center !important;
     align-items: center !important;
 }
+
+.equation-grid-wrapper { max-width: none !important; }
+
