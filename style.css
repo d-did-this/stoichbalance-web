@@ -680,3 +680,50 @@
 
 .left-sidebar:not(.collapsed) { min-width: 320px !important; max-width: 320px !important; }
 
+
+.seesaw-beam {
+    width: 95% !important;
+    max-width: 1000px !important;
+}
+.seesaw-jar {
+    width: 280px !important;
+    min-height: 120px !important;
+}
+.jar-marbles-container {
+    display: flex !important;
+    flex-wrap: wrap-reverse !important; /* Build from bottom up */
+    justify-content: center !important;
+    align-content: flex-start !important;
+    width: 100% !important;
+    padding: 5px !important;
+}
+
+/* Align Top */
+.left-sidebar:not(.collapsed), .right-sidebar:not(.collapsed), .center-content {
+    margin-top: 0 !important;
+    align-self: flex-start !important;
+}
+
+/* Tally Bar Split Fix */
+.panel-tally {
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: 0 0 20px 20px !important;
+    overflow: hidden;
+    display: flex;
+    width: 100%;
+}
+.tally-item {
+    flex: 1;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 12px 5px !important;
+    font-size: 20px !important;
+    border-right: 2px solid rgba(0,0,0,0.1) !important;
+    justify-content: center !important;
+}
+.tally-item:last-child {
+    border-right: none !important;
+}
