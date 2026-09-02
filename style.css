@@ -124,9 +124,9 @@
 
         /* Master Scale */
         .master-card { position: relative; z-index: 50; width: 100%; padding: clamp(10px, 1.5vw, 15px); display: flex; flex-direction: column; align-items: center; border-width: 3px; }
-        .master-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
-        .master-card.state-yellow { border-color: var(--st-yellow); background: var(--st-yellow-light); }
-        .master-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
+        .master-card.state-red { border-color: var(--st-red); }
+        .master-card.state-yellow { border-color: var(--st-yellow); }
+        .master-card.state-green { border-color: var(--st-green); }
 
         .equation-grid-wrapper { margin: 0 auto 75px auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center; position: relative; }
         .eq-left-container { position: absolute; left: 10px; width: 200px; display: flex; justify-content: center; }
@@ -820,6 +820,7 @@
     left: 0 !important;
     right: 0 !important;
     margin: 0 auto !important;
+    transform: none !important; /* Fix off-center triangle */
     width: 60px !important;
     height: 40px !important;
     z-index: 10 !important;
