@@ -66,7 +66,7 @@
         .card { background: var(--surface); border: var(--border-thick); border-radius: var(--border-radius); box-shadow: var(--shadow-toy); transition: all 0.3s ease; }
 
         /* --- Left Sidebar (Element Scales) --- */
-        .left-sidebar:not(.collapsed) { flex: 1 1 220px; min-width: 320px; max-width: 320px; display: flex; flex-direction: column; gap: 15px; }
+        .left-sidebar:not(.collapsed) { flex: 1 1 220px; min-width: 320px; max-width: 320px; display: flex; flex-direction: column; gap: 15px; align-items: stretch; }
         .sidebar-title-wrapper { display: flex; width: 100%; text-align: center; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; white-space: nowrap; }
         .sidebar-title { font-size: clamp(16px, 1.8vw, 18px); font-weight: 900; color: #ffffff; background: #0ea5e9; padding: 10px 20px; border-radius: 16px; border: 3px solid #0284c7; box-shadow: 0 4px 0 #0284c7; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
 
@@ -194,8 +194,8 @@
         /* Panel Tallies */
         .panel-tally { background: #f8fafc; border-top: 3px solid #e2e8f0; padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 40px; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }
         .tally-item { display: flex; align-items: center; gap: 6px; font-size: clamp(14px, 1.5vw, 16px); font-weight: 900; padding: 4px 12px; border-radius: 16px; color: white; border: 3px solid rgba(0,0,0,0.1); box-shadow: 0 4px 0 rgba(0,0,0,0.1); cursor: help; }
-        .tally-green { background: linear-gradient(135deg, #db2777, #be185d) !important; }
-        .tally-red { background: linear-gradient(135deg, #d97706, #b45309) !important; }
+        .tally-green { background: var(--st-green) !important; }
+        .tally-red { background: var(--st-red) !important; }
 
         /* --- Right Sidebar (Teacher Guide) --- */
         .right-sidebar:not(.collapsed) { flex: 1 1 250px; min-width: 280px; max-width: 350px; display: flex; flex-direction: column; gap: 15px;  position: sticky; top: 15px; height: calc(100vh - 100px); align-self: flex-start; }
@@ -906,3 +906,12 @@
 .chat-wrapper, .scale-card, .guide-btns { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transform-origin: top center; }
 
 
+
+/* Clean white boxes for the sidebars */
+#element-scales-container:not(.collapsed), #teacher-guide:not(.collapsed) {
+    background: #ffffff !important;
+    border: 2px solid #38bdf8 !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+    padding: 15px !important;
+}
