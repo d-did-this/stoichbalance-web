@@ -802,6 +802,7 @@ function loadReaction(idx) {
                         <span class="reactant-label">Reactants</span>
                         <span class="product-label">Products</span>
                         
+                        </div>
                         <!-- Book Stacks -->
                         <div class="book-stack-container" style="display:flex; width: 100%; height:100px; padding-bottom:10px; border-bottom: 4px solid #94a3b8; margin-top:15px; position:relative;">
     <!-- Absolute Pin exactly centered -->
@@ -842,6 +843,8 @@ function loadReaction(idx) {
                     </div>
                 `;
             });
+            htmlStr += `</div>`;
+            cont.innerHTML = htmlStr;
 
             // Master Scale logic
             let mDiff = totalL - totalR;
@@ -987,6 +990,7 @@ function loadReaction(idx) {
                     }
                     playSound('ding');
                     triggerConfetti();
+                    setTimeout(() => { const winModal = document.getElementById('win-modal'); if (winModal) winModal.style.display = 'flex'; }, 1200);
     if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
         currentStreak++;
         puzzlesSolvedCount++;
