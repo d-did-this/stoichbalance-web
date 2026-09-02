@@ -89,7 +89,12 @@
         .tiny-seesaw-container { position: relative; width: 100%; max-width: 200px; height: 70px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 5px; margin-top: 15px; }
         .tiny-seesaw-container .seesaw-base { width: 50px; height: 30px; }
         .tiny-seesaw-container .seesaw-pin { width: 16px; height: 16px; bottom: 27px; border-width: 3px; }
-        .tiny-seesaw-container .seesaw-beam { width: 180px; height: 10px; bottom: 30px; border-width: 3px; padding: 0 10px; margin-left: -90px; }
+        .tiny-seesaw-container .seesaw-beam {
+    width: 100% !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    left: auto !important;
+}
         .tiny-seesaw-container .seesaw-jar { width: 60px; height: 40px; border-width: 3px; border-radius: 8px; border-top: none; bottom: -3px; }
 
         /* --- Center Content --- */
@@ -783,6 +788,7 @@
 .master-card .seesaw-beam {
     margin: 0 auto !important;
     position: relative !important;
+    left: auto !important;
     z-index: 15 !important;
 }
 .master-card .seesaw-pin {
@@ -802,9 +808,7 @@
 .tiny-seesaw-container {
     max-width: 250px !important; 
 }
-.tiny-seesaw-container .seesaw-beam {
-    width: 100% !important;
-}
+.tiny-seesaw-container .seesaw-beam { width: 100% !important; margin-left: 0 !important; left: auto !important; position: relative !important; margin: 0 auto !important; }
 /* Ensure the grid expands properly from the center outwards */
 .tiny-seesaw-container .seesaw-jar {
     width: auto !important;
@@ -826,3 +830,4 @@
     border-color: #38bdf8 !important;
 }
 /* Override red to be a bit softer too if needed, but let's stick to user request of changing green */
+
