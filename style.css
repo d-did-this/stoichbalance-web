@@ -534,7 +534,7 @@
 }
 
 
-.equation-grid-wrapper { margin-bottom: 0px !important; margin-top: -15px !important; z-index: 10; }
+.equation-grid-wrapper { margin-bottom: 15px !important; margin-top: 0px !important; z-index: 10; }
 
 /* Collapsed state styling */
 .collapsed .sidebar-title {
@@ -852,10 +852,10 @@
 
 /* Adjusted master block taller */
 .master-card {
-    min-height: 250px !important;
+    min-height: 320px !important;
     padding-top: 20px !important;
     padding-bottom: 10px !important;
-    margin-bottom: 0px !important;
+    margin-bottom: 15px !important;
     justify-content: flex-end !important;
 }
 .master-card .seesaw-container {
