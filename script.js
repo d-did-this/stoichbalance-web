@@ -816,7 +816,7 @@ function loadReaction(idx) {
                                       let remaining = l;
                                       while(remaining > 0) {
                                           let chunk = Math.min(5, remaining);
-                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#ef4444; border:2px solid #b91c1c; border-radius:3px; box-shadow:0 2px 0 #b91c1c;"></div>').join('') + '</div>';
+                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#d97706; border:2px solid #b45309; border-radius:3px; box-shadow:0 2px 0 #b45309;"></div>').join('') + '</div>';
                                           remaining -= chunk;
                                       }
                                       return html;
@@ -831,7 +831,7 @@ function loadReaction(idx) {
                                         let remaining = r;
                                         while(remaining > 0) {
                                             let chunk = Math.min(5, remaining);
-                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#22c55e; border:2px solid #15803d; border-radius:3px; box-shadow:0 2px 0 #15803d;"></div>').join('') + '</div>';
+                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#db2777; border:2px solid #9d174d; border-radius:3px; box-shadow:0 2px 0 #9d174d;"></div>').join('') + '</div>';
                                             remaining -= chunk;
                                         }
                                         return html;
