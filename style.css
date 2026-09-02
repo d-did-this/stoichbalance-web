@@ -72,7 +72,6 @@
         /* Outer container borders matching Prof. Beaker sky-blue */
         #element-scales-container { border: 4px solid #0ea5e9 !important; border-radius: 20px; box-shadow: 0 4px 0 #0284c7; }
         #teacher-guide { border: 4px solid #0ea5e9 !important; border-radius: 20px; box-shadow: 0 4px 0 #0284c7; }
-
         .scale-card { 
     padding: 15px 10px; 
     display: flex; 
@@ -91,8 +90,8 @@
         .scale-card.state-red   { background: rgba(255,255,255,0.65) !important; }
         .scale-card.state-green { background: rgba(255,255,255,0.65) !important; }
         /* Reactant / Product label pills */
-        .reactant-label { background: #3b82f6; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-        .product-label  { background: #10b981; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        .reactant-label { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; }
+        .product-label  { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; }
         
         
         
@@ -124,9 +123,9 @@
 
         /* Master Scale */
         .master-card { position: relative; z-index: 50; width: 100%; padding: clamp(10px, 1.5vw, 15px); display: flex; flex-direction: column; align-items: center; border-width: 3px; }
-        .master-card.state-red { border-color: var(--st-red); }
+        .master-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
         .master-card.state-yellow { border-color: var(--st-yellow); }
-        .master-card.state-green { border-color: var(--st-green); }
+        .master-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
 
         .equation-grid-wrapper { margin: 0 auto 75px auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center; position: relative; }
         .eq-left-container { position: absolute; left: 10px; width: 200px; display: flex; justify-content: center; }
