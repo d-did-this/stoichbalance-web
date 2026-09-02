@@ -889,34 +889,28 @@ function loadReaction(idx) {
 
             // Status Text Update
                 const statBal = document.getElementById('status-balance');
-                const statSimp = document.getElementById('status-simplified');
-                const statSep = document.getElementById('status-separator');
                 
                 let textLCounts = countMolecules(state.left);
                 let textRCounts = countMolecules(state.right);
                 let canSimplify = checkCanSimplify(textLCounts, textRCounts);
                 
+                let isChemBalanced = (balancedCount === allElsSet.size && allElsSet.size > 0);
+                
                 if (statBal) {
                     if (totalL === 0 && totalR === 0) {
                         statBal.innerText = "EMPTY";
                         statBal.style.color = "#94a3b8";
-                        if(statSimp) statSimp.style.display = 'none';
-                        if(statSep) statSep.style.display = 'none';
-                    } else if (mTilt === 0) {
-                        statBal.innerText = "BALANCED";
-                        statBal.style.color = "#22c55e";
+                    } else if (isChemBalanced) {
                         if (canSimplify) {
-                            if(statSimp) { statSimp.innerText = "NOT SIMPLIFIED"; statSimp.style.color = "#eab308"; statSimp.style.display = "inline"; }
-                            if(statSep) statSep.style.display = "inline";
+                            statBal.innerText = "BALANCED BUT NOT SIMPLIFIED";
+                            statBal.style.color = "#eab308"; // Yellow
                         } else {
-                            if(statSimp) { statSimp.innerText = "SIMPLIFIED!"; statSimp.style.color = "#22c55e"; statSimp.style.display = "inline"; }
-                            if(statSep) statSep.style.display = "inline";
+                            statBal.innerText = "BALANCED & SIMPLIFIED";
+                            statBal.style.color = "#22c55e"; // Green
                         }
                     } else {
                         statBal.innerText = "UNBALANCED";
-                        statBal.style.color = "#ef4444";
-                        if(statSimp) statSimp.style.display = 'none';
-                        if(statSep) statSep.style.display = 'none';
+                        statBal.style.color = "#ef4444"; // Red
                     }
                 }
                 
@@ -924,7 +918,8 @@ function loadReaction(idx) {
             // Simplification Badge & Text update
             const badge = document.getElementById('simplified-badge');
             if (badge) {
-                if (mTilt === 0 && totalL > 0) {
+                let isChemBalanced = (balancedCount === allElsSet.size && allElsSet.size > 0);
+                if (isChemBalanced && totalL > 0) {
                     let lCounts = countMolecules(state.left);
                     let rCounts = countMolecules(state.right);
                     let canSimplify = checkCanSimplify(lCounts, rCounts);
