@@ -809,14 +809,14 @@ function loadReaction(idx) {
     <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:linear-gradient(135deg, #64748b 0%, #0f172a 100%); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); z-index: 10;"></div>
     
     <!-- Left Half (Reactants) -->
-    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; border-bottom: 4px solid #d97706; padding-right: 10px; position: relative;">
+    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; border-bottom: 4px solid #3b82f6; padding-right: 10px; position: relative;">
         <div class="book-stack left-stack" style="display:flex; flex-direction:row-reverse; gap:5px; justify-content:flex-end; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                       let html = '';
                                       let remaining = l;
                                       while(remaining > 0) {
                                           let chunk = Math.min(5, remaining);
-                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#d97706; border:2px solid #b45309; border-radius:3px; box-shadow:0 2px 0 #b45309;"></div>').join('') + '</div>';
+                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#3b82f6; border:2px solid #1d4ed8; border-radius:3px; box-shadow:0 2px 0 #1d4ed8;"></div>').join('') + '</div>';
                                           remaining -= chunk;
                                       }
                                       return html;
@@ -824,14 +824,14 @@ function loadReaction(idx) {
                             </div>
     </div>
     <!-- Right Half (Products) -->
-    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; border-bottom: 4px solid #db2777; padding-left: 10px; position: relative;">
+    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; border-bottom: 4px solid #f97316; padding-left: 10px; position: relative;">
         <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
                                 ${(function(){
                                         let html = '';
                                         let remaining = r;
                                         while(remaining > 0) {
                                             let chunk = Math.min(5, remaining);
-                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#db2777; border:2px solid #9d174d; border-radius:3px; box-shadow:0 2px 0 #9d174d;"></div>').join('') + '</div>';
+                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#f97316; border:2px solid #c2410c; border-radius:3px; box-shadow:0 2px 0 #c2410c;"></div>').join('') + '</div>';
                                             remaining -= chunk;
                                         }
                                         return html;
