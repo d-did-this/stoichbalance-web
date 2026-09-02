@@ -70,7 +70,18 @@
         .sidebar-title-wrapper { display: flex; width: 100%; text-align: center; justify-content: center; align-items: center; cursor: pointer; margin-bottom: 5px; white-space: nowrap; }
         .sidebar-title { font-size: clamp(16px, 1.8vw, 18px); font-weight: 900; color: #ffffff; background: #0ea5e9; padding: 10px 20px; border-radius: 16px; border: 3px solid #0284c7; box-shadow: 0 4px 0 #0284c7; text-transform: uppercase; letter-spacing: 2px; width: 100%; }
 
-        .scale-card { padding: 15px 10px; display: flex; flex-direction: column; align-items: center; position: relative; background: #ffffff; cursor: help; }
+        .scale-card { 
+    padding: 15px 10px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    position: relative; 
+    background: rgba(255, 255, 255, 0.65) !important; 
+    border: 4px solid #38bdf8 !important; 
+    box-shadow: inset 0 -10px 20px rgba(56, 189, 248, 0.2) !important; 
+    cursor: help; 
+    border-radius: 16px;
+}
         .scale-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
         .scale-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
         
@@ -869,4 +880,25 @@
 #custom-modal input {
     pointer-events: auto !important;
     user-select: auto !important;
+}
+
+/* Force new uniform colors for reactant and product boxes */
+#header-reactants, #header-products { 
+    background: #6366f1 !important; 
+    border-bottom: 3px solid #4f46e5 !important;
+}
+#tray-left, #area-left, #tray-right, #area-right {
+    border-color: #6366f1 !important;
+}
+
+/* Ensure state colors can override the beaker style if needed */
+.scale-card.state-red { 
+    border-color: var(--st-red) !important; 
+    background: var(--st-red-light) !important; 
+    box-shadow: inset 0 -10px 20px rgba(239, 68, 68, 0.2) !important;
+}
+.scale-card.state-green { 
+    border-color: var(--st-green) !important; 
+    background: var(--st-green-light) !important; 
+    box-shadow: inset 0 -10px 20px rgba(34, 197, 94, 0.2) !important;
 }
