@@ -717,7 +717,7 @@ function loadReaction(idx) {
                         if(count === opCount) { statusClass = 'tally-green'; tip = `Perfect! These match exactly!`; }
                     }
 
-                    if (count > 0 || opCount > 0) {
+                    if (count >= 0) { // Always show all elements in the tally bar, even 0
                         let col = state.elementColors[el];
                         tally.innerHTML += `
                             <div class="tally-item ${statusClass}" data-tooltip="${tip}">
