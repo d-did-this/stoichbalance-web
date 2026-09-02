@@ -124,7 +124,7 @@
         /* Master Scale */
         .master-card { position: relative; z-index: 50; width: 100%; padding: clamp(10px, 1.5vw, 15px); display: flex; flex-direction: column; align-items: center; border-width: 3px; }
         .master-card.state-red { border-color: var(--st-red); background: var(--st-red-light); }
-        .master-card.state-yellow { border-color: var(--st-yellow); }
+        
         .master-card.state-green { border-color: var(--st-green); background: var(--st-green-light); }
 
         .equation-grid-wrapper { margin: 0 auto 75px auto; width: 100%; max-width: 800px; display: flex; align-items: center; justify-content: center; position: relative; }
@@ -674,14 +674,7 @@
     margin: 10px !important;
 }
 
-/* 4. Tiny Scale Grid Layout (Auto 2 columns) */
-.left-sidebar:not(.collapsed) {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
-    grid-auto-rows: min-content !important;
-    align-content: start !important;
-    gap: 15px !important;
-}
+
 .sidebar-title-wrapper {
     grid-column: 1 / -1 !important;
 }
