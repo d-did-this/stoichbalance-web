@@ -1156,11 +1156,11 @@ button:active {
             </div>
         </button>
         <div style="display:flex; gap:20px;">
-            <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('challenge-screen').style.display='flex';" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#fffbeb; color:#92400e; border:4px solid #fcd34d; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #fcd34d; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #fcd34d';">
+            <button class="menu-btn" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('challenge-screen').style.display='flex';" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#fffbeb; color:#92400e; border:4px solid #fcd34d; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #fcd34d; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #fcd34d';">
                 <div style="font-size:36px; margin-bottom:5px;">🏆</div>
                 <div style="font-size:24px; font-weight:900;">Challenge</div>
             </button>
-            <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('periodic-screen').style.display='flex'; renderPeriodicTable();" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#faf5ff; color:#4c1d95; border:4px solid #d8b4fe; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #d8b4fe; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d8b4fe';">
+            <button class="menu-btn" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('periodic-screen').style.display='flex'; renderPeriodicTable();" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#faf5ff; color:#4c1d95; border:4px solid #d8b4fe; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #d8b4fe; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d8b4fe';">
                 <div style="font-size:36px; margin-bottom:5px;">📊</div>
                 <div style="font-size:24px; font-weight:900;">Elements</div>
             </button>
@@ -1190,21 +1190,7 @@ button:active {
             <div class="level-grid" id="level-grid"></div>
         </div>
     </div>
-        <!-- Challenge Screen -->
-<div class="menu-card massive-card card" id="challenge-screen" style="z-index: 10; display:none; flex-direction:column; align-items:center; width:90vw; max-width:1000px; max-height:85vh; overflow-y:auto;">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-        <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('challenge-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
-        <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-            <h2 class="menu-title" style="font-size:32px; margin:0; color:#ef4444;">Challenge Mode</h2>
-        </div>
-        <div style="width:85px;"></div>
-    </div>
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; min-height:400px;">
-        <div style="font-size:60px; margin-bottom:20px;">🚧</div>
-        <div style="font-size:36px; font-weight:900; color:#cbd5e1;">Work in progress</div>
-    </div>
-</div>
-<!-- Step 3: Sandbox Screen -->
+        <!-- Step 3: Sandbox Screen -->
         <div class="menu-card massive-card card" id="sandbox-screen" style="z-index: 10; display:none; flex-direction:column; align-items:center; width:90vw; max-width:1000px; max-height:85vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                 <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
@@ -3346,18 +3332,33 @@ function returnToMenu() {
         menu.style.opacity = '0';
         menu.style.transition = 'opacity 0.3s ease';
         
-        let savedName = document.getElementById('student-name').value.trim();
+        // If Challenge Mode, go to main menu
+        if (state.challengeMode) {
+            login.style.display = 'flex';
+            if(window.goToMainMenu) window.goToMainMenu(); // Challenge reset
+            return;
+        }
+
+        let isSandbox = REACTIONS[state.rxIdx] && REACTIONS[state.rxIdx].name && (REACTIONS[state.rxIdx].name.startsWith('Custom Level') || REACTIONS[state.rxIdx].name === 'Sandbox Equation');
+
+        let savedName = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
         if(savedName !== '') {
             currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
             if (currentForm === 'Form 5') {
                 REACTIONS = FORM_5_REACTIONS;
-            } else if (currentForm === 'Developer') {
+            } else if (currentForm === 'Dev') {
                 REACTIONS = FORM_DEV_REACTIONS;
             } else {
                 REACTIONS = FORM_4_REACTIONS;
             }
-            login.style.display = 'none';
-            level.style.display = 'flex';
+            
+            if (isSandbox) {
+                // If it was a Sandbox level, go back to Sandbox Screen instead!
+                if(window.goToSandbox) window.goToSandbox();
+            } else {
+                login.style.display = 'none';
+                level.style.display = 'flex';
+            }
         } else {
             login.style.display = 'flex';
             level.style.display = 'none';
@@ -3679,6 +3680,7 @@ document.getElementById('periodic-group-label').innerHTML = `
     <div style="font-size:72px; font-weight:900; color:${bg}; line-height:1;">${data[1]}</div>
     <div style="font-size:24px; font-weight:900; color:#334155;">${data[2]}</div>
     <div style="font-size:20px; font-weight:bold; color:#64748b; background:white; padding:4px 12px; border-radius:10px;">Atomic No. ${data[0]}</div>
+    <div style="font-size:18px; font-weight:bold; color:#94a3b8; margin-top:-5px;">Group ${groupNum} • Period ${period}</div>
 </div>`;
 
 
@@ -3828,94 +3830,7 @@ window.currentView = 'scale';
 
 
 
-window.goToSandbox = function() {
-    let name = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
-    localStorage.setItem('stoich_student_name', name);
-    document.getElementById('login-screen').style.display = 'none';
-    
-    // We create a fresh div for Sandbox to avoid Form 4/5 pagination interference!
-    let sandboxWrap = document.getElementById('sandbox-dedicated-screen');
-    if(!sandboxWrap) {
-        sandboxWrap = document.createElement('div');
-        sandboxWrap.id = 'sandbox-dedicated-screen';
-        sandboxWrap.className = 'menu-card massive-card card';
-        sandboxWrap.style.cssText = 'z-index: 10000; display: flex; flex-direction: column; align-items: center; width: 95vw; max-width: 1200px; max-height: 90vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);';
-        document.getElementById('main-menu').appendChild(sandboxWrap);
-    }
-    sandboxWrap.style.display = 'flex';
-    
-    const backSvg = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
-    
-    sandboxWrap.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-            <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-dedicated-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">${backSvg} Back</button>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;">Sandbox Mode</h2>
-                <div style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0; margin-top:10px;">Create and play your own custom equations!</div>
-            </div>
-            <div style="width:85px;"></div>
-        </div>
-        <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
-    `;
-    
-    
-    CUSTOM_REACTIONS = JSON.parse(localStorage.getItem('stoich_custom_levels') || '[]');
-    CUSTOM_REACTIONS.forEach(cr => {
-        if (!REACTIONS.some(r => r.name === cr.name)) {
-            REACTIONS.push(cr);
-        }
-    });
-    let grid = document.getElementById('sandbox-dedicated-grid');
 
-    
-    let addBtn = document.createElement('button');
-    addBtn.className = 'level-btn';
-    addBtn.style.cssText = 'border: 4px dashed #94a3b8; background: #f8fafc; color: #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; transition:all 0.1s;';
-    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px;">
-        <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-    </div>
-    <div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
-    addBtn.onmouseover = () => { addBtn.style.borderColor = '#10b981'; addBtn.style.color = '#10b981'; addBtn.querySelector('div').style.borderColor = '#10b981'; addBtn.querySelector('div').style.color = '#10b981'; };
-    addBtn.onmouseout = () => { addBtn.style.borderColor = '#94a3b8'; addBtn.style.color = '#94a3b8'; addBtn.querySelector('div').style.borderColor = '#cbd5e1'; addBtn.querySelector('div').style.color = '#94a3b8'; };
-    
-    addBtn.onclick = () => {
-        if(typeof playSound !== 'undefined') playSound('click');
-        document.getElementById('sandbox-input-modal').style.display = 'flex';
-        document.getElementById('sandbox-error').style.display = 'none';
-        document.getElementById('sandbox-reactants').value = '';
-        document.getElementById('sandbox-products').value = '';
-    };
-    grid.appendChild(addBtn);
-    
-    REACTIONS.forEach((rx, idx) => {
-        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
-            let btn = document.createElement('button');
-            btn.className = 'level-btn';
-            btn.style.cssText = 'border: 4px solid #10b981; box-shadow: 0 8px 0 #059669; background: #ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; padding:25px; transition:all 0.1s;';
-            btn.onmouseover = () => { btn.style.transform = 'translateY(-6px)'; };
-            btn.onmouseout = () => { btn.style.transform = 'translateY(0)'; };
-            btn.onmousedown = () => { btn.style.transform = 'translateY(2px)'; btn.style.boxShadow = '0 0 0 transparent'; };
-            btn.onmouseup = () => { btn.style.transform = 'translateY(-6px)'; btn.style.boxShadow = '0 8px 0 #059669'; };
-            
-            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            
-            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
-                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
-            </div>
-            <div style="font-size: 24px; font-weight: 900; color: #1e293b; text-align: center; margin-bottom: 10px;">${rx.name}</div>
-            <div style="font-size: 20px; font-weight:bold; background:#f1f5f9; padding:10px 20px; border-radius:12px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
-            
-            btn.onclick = () => { 
-                if(typeof playSound !== 'undefined') playSound('click');
-                document.getElementById('sandbox-dedicated-screen').style.display = 'none';
-                if (typeof engine === 'undefined' || !engine) { init(); }
-                startGame(idx); 
-            };
-            grid.appendChild(btn);
-        }
-    });
-};
 
 window.renderSandboxGrid = function() {
             let grid = document.getElementById('sandbox-grid');
@@ -4252,82 +4167,7 @@ localStorage.setItem('stoich_custom_levels', JSON.stringify(CUSTOM_REACTIONS));
 
 
 <script>
-window.goToSandbox = function() {
-    let name = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
-    localStorage.setItem('stoich_student_name', name);
-    document.getElementById('login-screen').style.display = 'none';
-    
-    let sandboxWrap = document.getElementById('sandbox-dedicated-screen');
-    if(!sandboxWrap) {
-        sandboxWrap = document.createElement('div');
-        sandboxWrap.id = 'sandbox-dedicated-screen';
-        sandboxWrap.className = 'menu-card massive-card card';
-        sandboxWrap.style.cssText = 'z-index: 10000; display: flex; flex-direction: column; align-items: center; width: 95vw; max-width: 1200px; max-height: 90vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);';
-        document.getElementById('main-menu').appendChild(sandboxWrap);
-    }
-    sandboxWrap.style.display = 'flex';
-    
-    const backSvg = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
-    
-    sandboxWrap.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-            <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-dedicated-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">${backSvg} Back</button>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;">Sandbox Mode</h2>
-                <div style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0; margin-top:10px;">Create and play your own custom equations!</div>
-            </div>
-            <div style="width:85px;"></div>
-        </div>
-        <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
-    `;
-    
-    let grid = document.getElementById('sandbox-dedicated-grid');
-    
-    let addBtn = document.createElement('button');
-    addBtn.className = 'level-btn';
-    addBtn.style.cssText = 'border: 4px dashed #94a3b8; background: #f8fafc; color: #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; transition:all 0.1s;';
-    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px;">
-        <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-    </div>
-    <div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
-    addBtn.onmouseover = () => { addBtn.style.borderColor = '#10b981'; addBtn.style.color = '#10b981'; addBtn.querySelector('div').style.borderColor = '#10b981'; addBtn.querySelector('div').style.color = '#10b981'; };
-    addBtn.onmouseout = () => { addBtn.style.borderColor = '#94a3b8'; addBtn.style.color = '#94a3b8'; addBtn.querySelector('div').style.borderColor = '#cbd5e1'; addBtn.querySelector('div').style.color = '#94a3b8'; };
-    
-    addBtn.onclick = () => {
-        if(typeof playSound !== 'undefined') playSound('click');
-        document.getElementById('sandbox-choice-modal').style.display = 'flex';
-    };
-    grid.appendChild(addBtn);
-    
-    REACTIONS.forEach((rx, idx) => {
-        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
-            let btn = document.createElement('button');
-            btn.className = 'level-btn';
-            btn.style.cssText = 'border: 4px solid #10b981; box-shadow: 0 8px 0 #059669; background: #ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; padding:25px; transition:all 0.1s;';
-            btn.onmouseover = () => { btn.style.transform = 'translateY(-6px)'; };
-            btn.onmouseout = () => { btn.style.transform = 'translateY(0)'; };
-            btn.onmousedown = () => { btn.style.transform = 'translateY(2px)'; btn.style.boxShadow = '0 0 0 transparent'; };
-            btn.onmouseup = () => { btn.style.transform = 'translateY(-6px)'; btn.style.boxShadow = '0 8px 0 #059669'; };
-            
-            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            
-            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
-                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
-            </div>
-            <div style="font-size: 24px; font-weight: 900; color: #1e293b; text-align: center; margin-bottom: 10px;">${rx.name}</div>
-            <div style="font-size: 20px; font-weight:bold; background:#f1f5f9; padding:10px 20px; border-radius:12px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
-            
-            btn.onclick = () => { 
-                if(typeof playSound !== 'undefined') playSound('click');
-                document.getElementById('sandbox-dedicated-screen').style.display = 'none';
-                if (typeof engine === 'undefined' || !engine) { init(); }
-                startGame(idx); 
-            };
-            grid.appendChild(btn);
-        }
-    });
-};
+
 
 
 window.chalSelectedLevel = 'easy';
@@ -4467,6 +4307,94 @@ window.goToMainMenu = function() {
 
 </script>
 
+<script>
+
+window.goToSandbox = function() {
+    let name = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
+    localStorage.setItem('stoich_student_name', name);
+    document.getElementById('login-screen').style.display = 'none';
+    
+    let sandboxWrap = document.getElementById('sandbox-dedicated-screen');
+    if(!sandboxWrap) {
+        sandboxWrap = document.createElement('div');
+        sandboxWrap.id = 'sandbox-dedicated-screen';
+        sandboxWrap.className = 'menu-card massive-card card';
+        sandboxWrap.style.cssText = 'z-index: 10000; display: flex; flex-direction: column; align-items: center; width: 95vw; max-width: 1200px; max-height: 90vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);';
+        document.getElementById('main-menu').appendChild(sandboxWrap);
+    }
+    sandboxWrap.style.display = 'flex';
+    
+    const backSvg = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
+    
+    sandboxWrap.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+            <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-dedicated-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">${backSvg} Back</button>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;">Sandbox Mode</h2>
+                <div style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0; margin-top:10px;">Create and play your own custom equations!</div>
+            </div>
+            <div style="width:85px;"></div>
+        </div>
+        <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
+    `;
+    
+    // LOAD CUSTOM REACTIONS PERMANENTLY!
+    CUSTOM_REACTIONS = JSON.parse(localStorage.getItem('stoich_custom_levels') || '[]');
+    CUSTOM_REACTIONS.forEach(cr => {
+        if (!REACTIONS.some(r => r.name === cr.name)) {
+            REACTIONS.push(cr);
+        }
+    });
+
+    let grid = document.getElementById('sandbox-dedicated-grid');
+    
+    let addBtn = document.createElement('button');
+    addBtn.className = 'level-btn';
+    addBtn.style.cssText = 'border: 4px dashed #94a3b8; background: #f8fafc; color: #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; transition:all 0.1s;';
+    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px;">
+        <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+    </div>
+    <div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
+    addBtn.onmouseover = () => { addBtn.style.borderColor = '#10b981'; addBtn.style.color = '#10b981'; addBtn.querySelector('div').style.borderColor = '#10b981'; addBtn.querySelector('div').style.color = '#10b981'; };
+    addBtn.onmouseout = () => { addBtn.style.borderColor = '#94a3b8'; addBtn.style.color = '#94a3b8'; addBtn.querySelector('div').style.borderColor = '#cbd5e1'; addBtn.querySelector('div').style.color = '#94a3b8'; };
+    
+    addBtn.onclick = () => {
+        if(typeof playSound !== 'undefined') playSound('click');
+        document.getElementById('sandbox-choice-modal').style.display = 'flex';
+    };
+    grid.appendChild(addBtn);
+    
+    REACTIONS.forEach((rx, idx) => {
+        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.style.cssText = 'border: 4px solid #10b981; box-shadow: 0 8px 0 #059669; background: #ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; padding:25px; transition:all 0.1s;';
+            btn.onmouseover = () => { btn.style.transform = 'translateY(-6px)'; };
+            btn.onmouseout = () => { btn.style.transform = 'translateY(0)'; };
+            btn.onmousedown = () => { btn.style.transform = 'translateY(2px)'; btn.style.boxShadow = '0 0 0 transparent'; };
+            btn.onmouseup = () => { btn.style.transform = 'translateY(-6px)'; btn.style.boxShadow = '0 8px 0 #059669'; };
+            
+            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            
+            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
+                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
+            </div>
+            <div style="font-size: 24px; font-weight: 900; color: #1e293b; text-align: center; margin-bottom: 10px;">${rx.name}</div>
+            <div style="font-size: 20px; font-weight:bold; background:#f1f5f9; padding:10px 20px; border-radius:12px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+            
+            btn.onclick = () => { 
+                if(typeof playSound !== 'undefined') playSound('click');
+                document.getElementById('sandbox-dedicated-screen').style.display = 'none';
+                if (typeof engine === 'undefined' || !engine) { init(); }
+                startGame(idx); 
+            };
+            grid.appendChild(btn);
+        }
+    });
+};
+
+</script>
 </body>
 </html>
 
