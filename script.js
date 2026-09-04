@@ -655,7 +655,6 @@ function loadReaction(idx) {
                 attempts++;
             }
         }
-        }
 
         function renderEquationGrid() {
             let rx = REACTIONS[state.rxIdx];
@@ -1217,30 +1216,33 @@ function downloadReport() {
 
 
 function goToLevels(selectedForm) {
-    let name = document.getElementById('student-name').value.trim();
-    if(!name) {
-        alert("Please enter your Student Name before continuing!");
-        return;
+    try {
+        let name = document.getElementById('student-name').value.trim();
+        if(!name) {
+            alert("Please enter your Student Name before continuing!");
+            return;
+        }
+        
+        localStorage.setItem('stoich_student_name', name);
+        localStorage.setItem('stoich_student_form', selectedForm);
+        
+        currentForm = selectedForm;
+        if (currentForm === 'Form 5') {
+            REACTIONS = FORM_5_REACTIONS;
+        } else if (currentForm === 'Developer') {
+            REACTIONS = FORM_DEV_REACTIONS;
+        } else {
+            REACTIONS = FORM_4_REACTIONS;
+        }
+        
+        init();
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('level-screen').style.display = 'flex';
+    } catch(e) {
+        alert("ERROR: " + e.stack);
+        console.error(e);
     }
-    
-    // Save to localStorage
-    localStorage.setItem('stoich_student_name', name);
-    localStorage.setItem('stoich_student_form', selectedForm);
-    
-    currentForm = selectedForm;
-    if (currentForm === 'Form 5') {
-        REACTIONS = FORM_5_REACTIONS;
-    } else if (currentForm === 'Developer') {
-        REACTIONS = FORM_DEV_REACTIONS;
-    } else {
-        REACTIONS = FORM_4_REACTIONS;
-    }
-    
-    // Re-render grid for specific form
-    init();
-    
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('level-screen').style.display = 'flex';
 }
 
 function startGame(index) {
