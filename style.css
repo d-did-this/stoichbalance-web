@@ -60,7 +60,7 @@
         select:hover, button:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 6px 0 var(--primary); }
         select:active, button:active { transform: translateY(4px); box-shadow: 0 0 0 var(--primary); }
 
-        .app-body { display: flex; flex: 1; padding: clamp(10px, 2vw, 15px); gap: clamp(10px, 2vw, 20px); flex-wrap: wrap; }
+        .app-body { display: flex; flex: 1; padding: clamp(10px, 2vw, 15px); gap: clamp(10px, 2vw, 20px); flex-wrap: nowrap; }
 
         /* --- Cards (Toy Blocks) --- */
         .card { background: var(--surface); border: var(--border-thick); border-radius: var(--border-radius); box-shadow: var(--shadow-toy); transition: all 0.3s ease; }
