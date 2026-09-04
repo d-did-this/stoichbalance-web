@@ -421,6 +421,8 @@ let REACTIONS = FORM_4_REACTIONS;
 
         
 function init() {
+    initPhysics();
+
     state.completed = new Set();
     REACTIONS.forEach((rx, i) => {
         if (localStorage.getItem('solved_' + rx.name)) {
@@ -1312,3 +1314,22 @@ function updateFullscreenIcon() {
 
 
 
+
+// Expose functions to global scope for HTML onclick handlers
+window.goToLevels = goToLevels;
+window.returnToMenu = returnToMenu;
+window.toggleMute = toggleMute;
+window.downloadReport = downloadReport;
+window.openTutorial = openTutorial;
+window.toggleFullScreen = toggleFullScreen;
+window.revealHeuristicHint = revealHeuristicHint;
+window.clearChat = clearChat;
+window.createCustomEquation = createCustomEquation;
+window.showTutSlide = showTutSlide;
+window.closeTutorial = closeTutorial;
+window.undo = undo;
+window.resetEquation = resetEquation;
+window.startGame = startGame;
+window.toggleHardMode = toggleHardMode;
+window.addMolecule = addMolecule;
+window.removeMolecule = removeMolecule;
