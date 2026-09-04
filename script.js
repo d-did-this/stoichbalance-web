@@ -504,6 +504,7 @@ function init() {
 }
 
 function loadReaction(idx) {
+    window.manualZoom = false;
     state.hintLevel = 0;
             state.rxIdx = parseInt(idx);
             let rx = REACTIONS[state.rxIdx];
@@ -632,18 +633,26 @@ function loadReaction(idx) {
             checkWinState(lTotals, rTotals);
         }
 
-                function autoScaleEquation() {
-            let wrap = document.querySelector('.equation-grid-wrapper');
-            let scaleWrap = document.getElementById('eq-scale-wrapper');
-            if (!wrap || !scaleWrap) return;
-            scaleWrap.style.transform = 'scale(1)';
-            // measure
-            let wrapWidth = wrap.clientWidth;
-            let contentWidth = scaleWrap.scrollWidth;
-            if (contentWidth > wrapWidth && wrapWidth > 0) {
-                let scale = wrapWidth / contentWidth;
-                scaleWrap.style.transform = 'scale(' + scale + ')';
+                        function autoAdjustUISize() {
+            if (window.manualZoom) return;
+            
+            let slider = document.getElementById('ui-size-slider');
+            let leftC = document.querySelector('.eq-left-container');
+            let rightC = document.querySelector('.eq-right-container');
+            if (!slider || !leftC || !rightC) return;
+            
+            let zoomVal = 1.0;
+            document.querySelector('.app-body').style.zoom = zoomVal;
+            slider.value = zoomVal;
+            
+            let attempts = 0;
+            while (rightC.offsetTop > leftC.offsetTop + 20 && zoomVal > 0.5 && attempts < 20) {
+                zoomVal -= 0.05;
+                document.querySelector('.app-body').style.zoom = zoomVal;
+                slider.value = zoomVal;
+                attempts++;
             }
+        }
         }
 
         function renderEquationGrid() {
