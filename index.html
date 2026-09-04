@@ -64,7 +64,7 @@
                 <div id="settings-dropdown" class="dropdown-content">
                     <div style="padding: 10px; border-bottom: 2px solid #e2e8f0; margin-bottom: 5px;">
                         <label style="font-weight:900; font-size:14px; color:#475569; display:block; text-align:center; margin-bottom:5px;">🔍 Adjust UI Size</label>
-                        <input type="range" min="0.5" max="1.5" step="0.05" value="1" oninput="document.querySelector('.app-body').style.zoom = this.value;" style="width:100%; cursor:pointer;">
+                        <input type="range" id="ui-size-slider" min="0.5" max="1.5" step="0.05" value="1" oninput="window.manualZoom = true; document.querySelector('.app-body').style.zoom = this.value;" style="width:100%; cursor:pointer;">
                     </div>
 
                     <label class="dropdown-item" style="color:var(--primary); cursor:pointer;"><input type="checkbox" id="hard-mode-toggle" onchange="toggleHardMode()"> 🔥 Hard Mode</label>
@@ -125,13 +125,12 @@
                 
             </div>
 
-                        <div class="equation-grid-wrapper" style="overflow: visible !important;">
-                <div id="eq-scale-wrapper" style="display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:center; width:100%; transform-origin: left center; transition: transform 0.2s;">
-                    <div class="eq-left-container" style="flex: 0 0 auto !important; width: auto !important;"><div class="eq-left" id="eq-left-content"></div></div>
-                    <div class="eq-center-container" style="flex: 0 0 auto !important;"><div class="eq-arrow" data-tooltip="Transforms into 🔄" style="display:flex; justify-content:center; align-items:center; background:#3b82f6; color:white; border-radius:12px; padding:4px 16px; border:3px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; font-weight:bold;">
+                                    <div class="equation-grid-wrapper">
+                    <div class="eq-left-container"><div class="eq-left" id="eq-left-content"></div></div>
+                    <div class="eq-center-container"><div class="eq-arrow" data-tooltip="Transforms into 🔄" style="display:flex; justify-content:center; align-items:center; background:#3b82f6; color:white; border-radius:12px; padding:4px 16px; border:3px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; font-weight:bold;">
     <svg style="width:36px; height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
 </div></div>
-                    <div class="eq-right-container" style="flex: 0 0 auto !important; width: auto !important;"><div class="eq-right" id="eq-right-content"></div></div>
+                    <div class="eq-right-container"><div class="eq-right" id="eq-right-content"></div></div>
                 </div>
             </div>
 
