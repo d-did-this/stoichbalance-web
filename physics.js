@@ -1,6 +1,9 @@
+let physicsInitialized = false;
 
 
 function initPhysics() {
+    if (physicsInitialized) return;
+    physicsInitialized = true;
     const Engine = Matter.Engine,
           Render = Matter.Render,
           Runner = Matter.Runner,
