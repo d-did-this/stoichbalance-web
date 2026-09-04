@@ -1966,50 +1966,86 @@ let REACTIONS = FORM_4_REACTIONS;
 
                 tour.addStep({
                     title: 'Welcome to Stoichbalance!',
-                    text: 'This is the main puzzle area where you balance chemical equations!',
+                    text: 'Let me give you a quick tour of the puzzle interface!',
                     attachTo: { element: '.app-body', on: 'bottom' },
                     buttons: [{ text: 'Next', action: tour.next }]
                 });
 
                 tour.addStep({
-                    text: 'Here is the Menu button. Click this to return to the puzzle selection screen.',
+                    text: 'Here is the Menu button. Click this to go back to the level select screen.',
                     attachTo: { element: '.menu-special-btn', on: 'bottom' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
                 });
                 
                 tour.addStep({
-                    text: 'Need to adjust size or sound? Use the Settings dropdown.',
+                    text: 'Here is the Settings menu, where you can adjust the UI size or mute the sound.',
                     attachTo: { element: '.dropdown', on: 'bottom' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
                 });
 
                 tour.addStep({
-                    text: 'These are the Master Scales. They show the overall balance of the entire equation!',
-                    attachTo: { element: '#master-scale', on: 'bottom' },
+                    text: 'This is the Equation. You can hover over the formulas and numbers in this equation to get explanations of what the atom numbers and element names mean!',
+                    attachTo: { element: '.equation-grid-wrapper', on: 'bottom' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
                 });
 
                 tour.addStep({
-                    text: 'These are the supply trays. Drag molecule blocks from here...',
-                    attachTo: { element: '#tray-left', on: 'right' },
-                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
-                });
-
-                tour.addStep({
-                    text: '...and drop them into these big work panels to add them to the equation!',
+                    text: 'Here is the Reactant box. You can drag starting molecules from the tray and drop them into this box.',
                     attachTo: { element: '#area-left', on: 'right' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
                 });
 
                 tour.addStep({
-                    text: 'These tiny scales appear for each individual element. They tell you exactly which element is unbalanced!',
+                    text: 'And here is the Product box. You drop the produced molecules into this box.',
+                    attachTo: { element: '#area-right', on: 'left' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'This bottom bar shows the total atoms for each element on this side. If it turns green, it means both sides have the exact same number of atoms for that specific element!',
+                    attachTo: { element: '#tally-left', on: 'top' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'These are the Tiny Scales! They show you exactly how many atoms are on the reactant side versus the product side. We need to make sure both sides have the exact same number of atoms!',
                     attachTo: { element: '#element-scales-container', on: 'right' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
                 });
 
                 tour.addStep({
-                    text: 'I am Prof. Beaker! If you are stuck, just click "Give me a Hint!" and I will help you out.',
+                    text: 'If you ever need more space on the screen, you can click the title of "Tiny Scales" or "Prof. Beaker" to collapse and expand them!',
+                    attachTo: { element: '#element-scales-container .sidebar-title-wrapper', on: 'right' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'This evaluation bar says UNBALANCED right now. We need to balance the equation to make this bar turn completely green and say SIMPLIFIED!',
+                    attachTo: { element: '#main-eval-box', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'I am Prof. Beaker! I will help you if you are stuck!',
                     attachTo: { element: '#teacher-guide', on: 'left' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'Each time you click "Give me a Hint!", I will give you a clue. Clicking it a 4th time will give you the exact answer! But be careful—using hints resets your fire streak!',
+                    attachTo: { element: 'button[onclick*="revealHeuristicHint"]', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'This is your Fire Streak! Try to solve puzzles perfectly without using hints to build up your streak!',
+                    attachTo: { element: '#streak-counter', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'And this shows how many total puzzles you have solved so far! Good luck!',
+                    attachTo: { element: '#puzzle-counter', on: 'bottom' },
                     buttons: [{ text: 'Back', action: tour.back }, { text: 'Finish', action: tour.complete }]
                 });
 
@@ -2543,20 +2579,18 @@ function loadReaction(idx) {
             // Background Color Logic
             let lCounts = countMolecules(state.left);
             let rCounts = countMolecules(state.right);
+            let isChemBalancedColor = (balancedCount === allElsSet.size && allElsSet.size > 0);
+            
             if (totalL === 0 && totalR === 0) {
                 if (evalBox) evalBox.classList.add("state-red");
-            } else if (mTilt === 0 && totalL > 0) {
+            } else if (isChemBalancedColor) {
                 if (checkCanSimplify(lCounts, rCounts)) {
                     if (evalBox) evalBox.classList.add("state-yellow");
                 } else {
                     if (evalBox) evalBox.classList.add("state-green");
                 }
             } else {
-                if (Math.abs(totalL - totalR) <= 5) {
-                    if (evalBox) evalBox.classList.add("state-yellow");
-                } else {
-                    if (evalBox) evalBox.classList.add("state-red");
-                }
+                if (evalBox) evalBox.classList.add("state-red");
             }
 
             
