@@ -1203,15 +1203,28 @@ button:active {
         </div>
         
         <!-- Sandbox Input Modal (Overlay) -->
-        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
-            <div class="card" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:20px; background:#fffbeb; border:4px solid #fcd34d; padding:30px; border-radius:24px; box-shadow: 0 10px 25px rgba(245,158,11,0.5); position:relative;">
-                <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:15px; right:15px; background:#f8fafc; border:3px solid #cbd5e1; color:#64748b; font-weight:bold; border-radius:10px; cursor:pointer; font-size:16px; padding:5px 10px;">X</button>
-                <h3 style="margin:0; font-size:24px; color:#92400e; text-align:center;">Build Custom Equation</h3>
-                <input type="text" id="sandbox-input" placeholder="e.g. CH4 + O2 = CO2 + H2O" style="width:100%; box-sizing:border-box; text-align:center; font-size: 24px; font-weight: 900; padding: 20px; border: 4px solid #f59e0b; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; font-family:var(--font-ui); color:#92400e;" />
-                <button onclick="submitSandbox()" style="width:100%; background: linear-gradient(135deg, #f59e0b, #d97706); color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 8px 0 #b45309; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 #b45309';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #b45309';">Save & Play!</button>
-                <div id="sandbox-error" style="color:#ef4444; font-weight:bold; text-align:center; display:none;"></div>
+        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+    <div class="card" style="width:100%; max-width:800px; display:flex; flex-direction:column; gap:20px; background:#fffbeb; border:4px solid #fcd34d; padding:40px; border-radius:32px; box-shadow: 0 10px 40px rgba(245,158,11,0.5); position:relative;">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f8fafc; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:12px; cursor:pointer; font-size:20px; padding:8px 16px;">X</button>
+        <h3 style="margin:0; font-size:36px; color:#92400e; text-align:center; font-weight:900;">Build Custom Equation</h3>
+        <p style="text-align:center; font-size:18px; color:#b45309; font-weight:bold; margin-top:-10px;">Separate molecules with a plus sign (e.g., CH4 + O2)</p>
+        
+        <div style="display:flex; gap:20px; align-items:center;">
+            <div style="flex:1;">
+                <label style="font-size:20px; font-weight:900; color:#d97706; margin-bottom:10px; display:block;">Reactants (Left Side)</label>
+                <input type="text" id="sandbox-reactants" placeholder="e.g. H2 + O2" style="width:100%; box-sizing:border-box; text-align:center; font-size: 28px; font-weight: 900; padding: 20px; border: 4px solid #f59e0b; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; color:#92400e;" />
+            </div>
+            <div style="font-size:48px; font-weight:900; color:#f59e0b; margin-top:35px;">&rarr;</div>
+            <div style="flex:1;">
+                <label style="font-size:20px; font-weight:900; color:#d97706; margin-bottom:10px; display:block;">Products (Right Side)</label>
+                <input type="text" id="sandbox-products" placeholder="e.g. H2O" style="width:100%; box-sizing:border-box; text-align:center; font-size: 28px; font-weight: 900; padding: 20px; border: 4px solid #f59e0b; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; color:#92400e;" />
             </div>
         </div>
+        
+        <button onclick="submitSandbox()" style="width:100%; margin-top:20px; background: linear-gradient(135deg, #f59e0b, #d97706); color:white; border:none; padding:20px; font-size:28px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 8px 0 #b45309; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #b45309';">💾 Save & Play!</button>
+        <div id="sandbox-error" style="color:#ef4444; font-size:20px; font-weight:bold; text-align:center; display:none; background:#fee2e2; padding:15px; border-radius:12px; border:3px solid #f87171;"></div>
+    </div>
+</div>
 
         <!-- Step 4: Periodic Table Screen -->
         <div class="menu-card massive-card card" id="periodic-screen" style="z-index: 9999; display:none; flex-direction:column; align-items:center; max-width:95vw; max-height:95vh; overflow-y:auto; background:white; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:40px; border-radius:24px; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
@@ -3380,59 +3393,47 @@ window.onclick = function(event) {
 
         // --- Sandbox Mode ---
         window.submitSandbox = function() {
-            if(typeof playSound !== 'undefined') playSound('click');
-            let input = document.getElementById('sandbox-input').value.trim();
-            const err = document.getElementById('sandbox-error');
+            let reactants = document.getElementById('sandbox-reactants').value;
+            let products = document.getElementById('sandbox-products').value;
+            let err = document.getElementById('sandbox-error');
             
-            // Handle common mistakes
-            input = input.replace('=', '->');
-            
-            if(!input.includes('->')) {
-                err.innerText = "Equation must contain '->' or '=' separating reactants and products.";
+            if(!reactants.trim() || !products.trim()) {
+                err.innerText = "Please fill in both Reactants and Products!";
                 err.style.display = 'block';
                 return;
             }
             
-            let parts = input.split('->');
-            let leftStr = parts[0].trim();
-            let rightStr = parts[1].trim();
+            let leftStr = reactants.replace(/\s+/g,'').split('+');
+            let rightStr = products.replace(/\s+/g,'').split('+');
             
-            if(!leftStr || !rightStr) {
-                err.innerText = "Both sides of the equation must have molecules.";
+            let leftMols = [], rightMols = [];
+            let valid = true;
+            
+            try {
+                leftStr.forEach(m => { if(m) { parseFormula(m); leftMols.push(m); } });
+                rightStr.forEach(m => { if(m) { parseFormula(m); rightMols.push(m); } });
+            } catch(e) {
+                valid = false;
+            }
+            
+            if(!valid || leftMols.length===0 || rightMols.length===0) {
+                err.innerText = "Invalid formula! Please check elements (e.g. use proper capitalization like Na, Cl).";
                 err.style.display = 'block';
                 return;
             }
             
-            // Clean molecules (strip leading coefficients and fix casing)
-            const cleanMol = (mol) => {
-                let m = mol.trim().replace(/^[\d\s]+/, '').replace(/[^a-zA-Z0-9\(\)]/g, '');
-                // Basic autocorrect for lowercase elements (e.g. h2 -> H2, nh3 -> NH3)
-                m = m.replace(/[a-z]+/g, match => match.charAt(0).toUpperCase() + match.slice(1));
-                return m;
-            };
-            
-            let leftMols = leftStr.split('+').map(cleanMol).filter(m => m.length > 0);
-            let rightMols = rightStr.split('+').map(cleanMol).filter(m => m.length > 0);
-            
-            if(leftMols.length === 0 || rightMols.length === 0) {
-                err.innerText = "Invalid molecules.";
-                err.style.display = 'block';
-                return;
-            }
-            
-            
-            let customCount = REACTIONS.filter(r => r.name.startsWith("Custom Level")).length + 1;
+            let customCount = REACTIONS.filter(r => r.name && r.name.startsWith("Custom Level")).length + 1;
             let customRx = {
                 name: "Custom Level " + customCount,
                 left: leftMols,
                 right: rightMols
             };
             REACTIONS.push(customRx);
-
             
-            err.style.display = 'none';
             document.getElementById('sandbox-input-modal').style.display = 'none';
-            renderSandboxGrid();
+            if(window.goToSandbox) {
+                window.goToSandbox(); // Refresh the grid!
+            }
         };
 
         // --- Periodic Table ---
@@ -3710,6 +3711,88 @@ window.goToSandbox = function() {
             btn.onclick = () => { 
                 if(typeof playSound !== 'undefined') playSound('click');
                 document.getElementById('level-screen').style.display = 'none';
+                if (typeof engine === 'undefined' || !engine) { init(); }
+                startGame(idx); 
+            };
+            grid.appendChild(btn);
+        }
+    });
+};
+
+
+window.goToSandbox = function() {
+    let name = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
+    localStorage.setItem('stoich_student_name', name);
+    document.getElementById('login-screen').style.display = 'none';
+    
+    // We create a fresh div for Sandbox to avoid Form 4/5 pagination interference!
+    let sandboxWrap = document.getElementById('sandbox-dedicated-screen');
+    if(!sandboxWrap) {
+        sandboxWrap = document.createElement('div');
+        sandboxWrap.id = 'sandbox-dedicated-screen';
+        sandboxWrap.className = 'menu-card massive-card card';
+        sandboxWrap.style.cssText = 'z-index: 10000; display: flex; flex-direction: column; align-items: center; width: 95vw; max-width: 1200px; max-height: 90vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);';
+        document.getElementById('main-menu').appendChild(sandboxWrap);
+    }
+    sandboxWrap.style.display = 'flex';
+    
+    const backSvg = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
+    
+    sandboxWrap.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+            <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-dedicated-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">${backSvg} Back</button>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;">Sandbox Mode</h2>
+                <div style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0; margin-top:10px;">Create and play your own custom equations!</div>
+            </div>
+            <div style="width:85px;"></div>
+        </div>
+        <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
+    `;
+    
+    let grid = document.getElementById('sandbox-dedicated-grid');
+    
+    let addBtn = document.createElement('button');
+    addBtn.className = 'level-btn';
+    addBtn.style.cssText = 'border: 4px dashed #94a3b8; background: #f8fafc; color: #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; transition:all 0.1s;';
+    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px;">
+        <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+    </div>
+    <div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
+    addBtn.onmouseover = () => { addBtn.style.borderColor = '#10b981'; addBtn.style.color = '#10b981'; addBtn.querySelector('div').style.borderColor = '#10b981'; addBtn.querySelector('div').style.color = '#10b981'; };
+    addBtn.onmouseout = () => { addBtn.style.borderColor = '#94a3b8'; addBtn.style.color = '#94a3b8'; addBtn.querySelector('div').style.borderColor = '#cbd5e1'; addBtn.querySelector('div').style.color = '#94a3b8'; };
+    
+    addBtn.onclick = () => {
+        if(typeof playSound !== 'undefined') playSound('click');
+        document.getElementById('sandbox-input-modal').style.display = 'flex';
+        document.getElementById('sandbox-error').style.display = 'none';
+        document.getElementById('sandbox-reactants').value = '';
+        document.getElementById('sandbox-products').value = '';
+    };
+    grid.appendChild(addBtn);
+    
+    REACTIONS.forEach((rx, idx) => {
+        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.style.cssText = 'border: 4px solid #10b981; box-shadow: 0 8px 0 #059669; background: #ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; padding:25px; transition:all 0.1s;';
+            btn.onmouseover = () => { btn.style.transform = 'translateY(-6px)'; };
+            btn.onmouseout = () => { btn.style.transform = 'translateY(0)'; };
+            btn.onmousedown = () => { btn.style.transform = 'translateY(2px)'; btn.style.boxShadow = '0 0 0 transparent'; };
+            btn.onmouseup = () => { btn.style.transform = 'translateY(-6px)'; btn.style.boxShadow = '0 8px 0 #059669'; };
+            
+            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            
+            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
+                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
+            </div>
+            <div style="font-size: 24px; font-weight: 900; color: #1e293b; text-align: center; margin-bottom: 10px;">${rx.name}</div>
+            <div style="font-size: 20px; font-weight:bold; background:#f1f5f9; padding:10px 20px; border-radius:12px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+            
+            btn.onclick = () => { 
+                if(typeof playSound !== 'undefined') playSound('click');
+                document.getElementById('sandbox-dedicated-screen').style.display = 'none';
                 if (typeof engine === 'undefined' || !engine) { init(); }
                 startGame(idx); 
             };
