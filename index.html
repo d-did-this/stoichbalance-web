@@ -262,8 +262,22 @@
     transform: scale(1.0) translateY(10px);
     box-shadow: 0 0 0 var(--primary);
 }
-
-
+.level-btn-title {
+    font-size: clamp(14px, 1.8vw, 18px);
+    font-weight: 900;
+    color: var(--text-dark);
+    text-align: center;
+    line-height: 1.2;
+}
+.level-tag {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 900;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 5px;
+}
 .level-btn .eq-preview {
     font-size: 13px;
     color: #334155;
@@ -287,7 +301,7 @@
     border-color: #15803d;
     box-shadow: 0 15px 0 #15803d;
 }
-.level-btn.solved 
+.level-btn.solved .level-btn-title { color: #166534; }
 .level-btn.solved .eq-preview { background: #dcfce7; border-color: #86efac; color: #15803d; }
 .level-btn.solved::after {
     content: '✅ SOLVED';
@@ -355,7 +369,11 @@
         border: none !important;
         padding: 15px !important;
     }
-    
+    .level-grid {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto !important;
+        overflow-y: auto;
+    }
     .app-body {
         flex-direction: column !important;
         overflow-y: auto !important;
@@ -382,9 +400,41 @@
         flex: 1 1 100% !important;
     }
 }
+.level-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-rows: repeat(2, 1fr) !important;
+    gap: 30px;
+    flex: 1;
+    border: 4px dashed #94a3b8;
+    padding: 20px;
+    border-radius: 24px;
+}
 
-
-
+.level-btn { position: relative;
+    background: #ffffff;
+    border: 4px solid #cbd5e1;
+    padding: 20px;
+    border-radius: 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 250px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 8px 0 #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    outline: none;
+    box-sizing: border-box;
+}
 
 /* --- Dropdown Settings Menu --- */
 .dropdown { position: relative; display: inline-block; }
@@ -953,8 +1003,14 @@ button:active {
     align-items: center;
     justify-content: center;
 }
-
-
+.level-grid {
+    align-items: stretch;
+}
+.level-btn { position: relative;
+    height: 100% !important;
+    width: 100% !important;
+    flex: 1;
+}
 
 @keyframes jiggle {
     0% { transform: rotate(0deg); }
@@ -986,14 +1042,21 @@ button:active {
     bottom: 80px !important;
 }
 
-
-
+.level-grid {
+    grid-template-columns: 1fr !important;
+}
+.level-btn { position: relative;
+    min-height: 120px !important;
+    flex-direction: row !important;
+    padding: 15px 30px !important;
+}
 .level-btn .eq-preview {
     font-size: 20px !important;
     width: auto !important;
     padding: 10px 20px !important;
 }
 
+.header { position: relative !important; z-index: 10000 !important; }
 .level-grid {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr) !important;
@@ -1006,7 +1069,7 @@ button:active {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: space-between !important;
+    justify-content: center !important;
     width: 100% !important;
     min-height: 250px !important;
     padding: 25px !important;
@@ -2272,6 +2335,1320 @@ function init() {
                     let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
                     let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
                     btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+                    
+                    btn.onclick = () => { playSound('click'); startGame(actualIdx); };
+                    grid.appendChild(btn);
+                });
+                
+                let pControl = document.getElementById('pagination-controls');
+                if (!pControl) {
+                    pControl = document.createElement('div');
+                    pControl.id = 'pagination-controls';
+                    pControl.style.cssText = "display:flex; justify-content:center; align-items:center; gap:20px; margin-top:20px; width:100%;";
+                    grid.parentNode.appendChild(pControl);
+                }
+                
+                pControl.innerHTML = `
+                    <button id="prev-page-btn" style="background:#ffffff; color:#3b82f6; border:3px solid #bfdbfe; padding:10px 20px; border-radius:12px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #bfdbfe; visibility: ${window.currentPage > 0 ? 'visible' : 'hidden'}"><svg style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-right:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>Prev</button>
+                    <span style="font-weight:bold; color:#64748b; font-size: 16px;">Page ${window.currentPage + 1} of ${maxPage + 1}</span>
+                    <button id="next-page-btn" style="background:#ffffff; color:#3b82f6; border:3px solid #bfdbfe; padding:10px 20px; border-radius:12px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #bfdbfe; visibility: ${window.currentPage < maxPage ? 'visible' : 'hidden'}">Next<svg style="width:20px;height:20px;display:inline-block;vertical-align:middle;margin-left:5px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg></button>
+                `;
+                
+                let prevBtn = document.getElementById('prev-page-btn');
+                if (prevBtn) prevBtn.onclick = () => { playSound('click'); if (window.currentPage > 0) { window.currentPage--; renderPage(); } };
+                
+                let nextBtn = document.getElementById('next-page-btn');
+                if (nextBtn) nextBtn.onclick = () => { playSound('click'); if (window.currentPage < maxPage) { window.currentPage++; renderPage(); } };
+            }
+            renderPage();
+        }
+    
+    if (!localStorage.getItem('STOICHBALANCE_tutorial_seen')) {
+        openTutorial();
+    }
+}
+
+function loadReaction(idx) {
+    window.manualZoom = false;
+    state.hintLevel = 0;
+            state.rxIdx = parseInt(idx);
+            let rx = REACTIONS[state.rxIdx];
+            assignColors(rx);
+            state.left = []; 
+            state.right = [];
+            state.hintLevel = 0;
+            state.lastHintElement = null;
+            state.expectedMove = null;
+            state.wrongMovesCounter = 0;
+            state.history = [];
+            state.moves = 0;
+            state.hintsUsed = 0;
+            
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '';
+            addChatMessage(`Hello there! 👋 We are solving: <strong>${rx.name}</strong>!<br/><br/>Try dragging colorful molecule blocks from the top into the big white boxes below!`, 'agent');
+
+            document.getElementById('header-reactants').setAttribute('data-tooltip', `REACTANTS are the starting ingredients! (${rx.left.join(', ')})`);
+            document.getElementById('header-products').setAttribute('data-tooltip', `PRODUCTS are what we make! (${rx.right.join(', ')})`);
+
+            renderTrays();
+            updateCounter();
+            updateUI();
+            
+            // Restore persistent collapse states
+            if (localStorage.getItem('stoich_tiny_collapsed') === 'true') {
+                document.getElementById('element-scales-container').classList.add('collapsed');
+            } else {
+                document.getElementById('element-scales-container').classList.remove('collapsed');
+            }
+            if (localStorage.getItem('stoich_beaker_collapsed') === 'true') {
+                document.getElementById('teacher-guide').classList.add('collapsed');
+            } else {
+                document.getElementById('teacher-guide').classList.remove('collapsed');
+            }
+        }
+
+        function clearChat() {
+            document.getElementById('chat-box').innerHTML = '';
+            addChatMessage(`Chat cleared! What's next?`, 'agent');
+            state.expectedMove = null;
+            state.wrongMovesCounter = 0;
+            state.hintLevel = 0;
+            state.lastHintElement = null;
+        }
+
+        function solveOneStep(side, formula) {
+            state.wrongMovesCounter = 0;
+            state.expectedMove = null;
+            state[side].push(formula);
+            document.getElementById('chat-box').innerHTML = '';
+            addChatMessage(`I've added the <strong>${MOLECULE_NAMES[formula]||formula}</strong> block for you! Let's continue!`, 'success');
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+
+        function resetEquation() { loadReaction(state.rxIdx); }
+        
+        function saveState() {
+            state.history.push({ left: [...state.left], right: [...state.right] });
+        }
+
+        function undo() {
+            if(state.history.length > 0) {
+                let last = state.history.pop();
+                state.left = [...last.left];
+                state.right = [...last.right];
+                playSound('whoosh');
+                updateUI();
+                if(typeof confetti !== 'undefined') {
+                    confetti({
+                        particleCount: 20,
+                        spread: 60,
+                        origin: { y: 0.6 },
+                        colors: ['#94a3b8', '#cbd5e1', '#e2e8f0'],
+                        ticks: 50,
+                        gravity: 1.5,
+                        scalar: 0.8
+                    });
+                }
+            }
+        }
+
+        function toggleHardMode() {
+            state.hardMode = document.getElementById('hard-mode-toggle').checked;
+            document.getElementById('element-scales-container').style.display = state.hardMode ? 'none' : 'flex';
+        }
+
+        function addMolecule(side, formula) { 
+            saveState();
+            state.moves++;
+            state[side].push(formula); 
+            playSound('clink');
+            
+            // Common Mistake Detection
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            let addedAtoms = parseFormula(formula);
+            let isExcess = false;
+            let excessEl = '';
+            for(let [el, num] of Object.entries(addedAtoms)) {
+                if(side === 'left' && lTotals[el] - num > (rTotals[el] || 0)) { isExcess = true; excessEl = el; break; }
+                if(side === 'right' && rTotals[el] - num > (lTotals[el] || 0)) { isExcess = true; excessEl = el; break; }
+            }
+            if(isExcess) {
+                addChatMessage(`Careful! You already have too much <strong>${FULL_ELEMENT_NAMES[excessEl] || excessEl}</strong> on the ${side==='left'?'Reactants':'Products'} side! Adding this block tips the scale even further!`, 'system');
+            }
+
+            if (state.expectedMove) {
+                if (state.expectedMove.side === side && state.expectedMove.molecule === formula) {
+                    document.getElementById('chat-box').innerHTML = '';
+                    addChatMessage(`<strong>🌟 Great job!</strong> You followed the hint perfectly! Let's keep balancing!`, 'success');
+                    state.wrongMovesCounter = 0;
+                    state.expectedMove = null;
+                } else {
+                    state.wrongMovesCounter++;
+                    let msg = `Oops! That wasn't the exact block the hint suggested. Try re-reading the hint!`;
+                    if (state.wrongMovesCounter >= 2) {
+                        msg += `<br><br><button onclick="solveOneStep('${state.expectedMove.side}', '${state.expectedMove.molecule}')" style="background:#10b981; color:white; border-color:#047857; box-shadow: 0 4px 0 #047857; width:100%;">Solve this step for me</button>`;
+                    }
+                    addChatMessage(msg, 'system');
+                }
+            }
+            
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+        
+        function removeMolecule(side, index) { 
+            saveState();
+            state.moves++;
+            state[side].splice(index, 1); 
+            playSound('whoosh');
+            state.hintLevel = 0; 
+            state.lastHintElement = null; 
+            updateUI(); 
+        }
+
+        let inactivityTimer = null;
+        function resetInactivityTimer() {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            let guide = document.getElementById('teacher-guide');
+            if(guide) guide.querySelector('.sidebar-title-wrapper').classList.remove('jiggle-anim');
+            inactivityTimer = setTimeout(() => {
+                let g = document.getElementById('teacher-guide');
+                if(g && g.classList.contains('collapsed')) {
+                    g.querySelector('.sidebar-title-wrapper').classList.add('jiggle-anim');
+                }
+            }, 45000);
+        }
+
+        function updateUI() {
+            resetInactivityTimer();
+            renderEquationGrid();
+            renderWorkspaceAreas();
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            renderTallies(lTotals, rTotals);
+            renderScales(lTotals, rTotals);
+            checkWinState(lTotals, rTotals);
+        }
+
+                        function autoAdjustUISize() {
+            if (window.manualZoom) return;
+            
+            let slider = document.getElementById('ui-size-slider');
+            let leftC = document.querySelector('.eq-left-container');
+            let rightC = document.querySelector('.eq-right-container');
+            if (!slider || !leftC || !rightC) return;
+            
+            let zoomVal = 1.0;
+            document.querySelector('.app-body').style.zoom = zoomVal;
+            slider.value = zoomVal;
+            
+            let attempts = 0;
+            while (rightC.offsetTop > leftC.offsetTop + 20 && zoomVal > 0.5 && attempts < 20) {
+                zoomVal -= 0.05;
+                document.querySelector('.app-body').style.zoom = zoomVal;
+                slider.value = zoomVal;
+                attempts++;
+            }
+        }
+
+        function renderEquationGrid() {
+            let rx = REACTIONS[state.rxIdx];
+            let lCounts = countMolecules(state.left);
+            let rCounts = countMolecules(state.right);
+
+            const renderSide = (mols, counts) => {
+                return mols.map((f, i) => {
+                    let plus = i > 0 ? ` <div class="eq-plus">+</div> ` : '';
+                    let c = counts[f] || 0;
+                    
+                    let clusterHtml = generateMarbleCluster(f, 20);
+                    let coeffVisuals = '';
+                    for(let k=0; k<c; k++) coeffVisuals += `<div style="display:inline-block; margin:2px;">${clusterHtml}</div>`;
+                    let coeffTooltip = `<div style="margin-bottom:10px; font-size:16px; text-align:center;">You added <strong>${c}</strong> of these!</div><div style="display:flex; flex-wrap:wrap; justify-content:center; max-width:200px;">${coeffVisuals}</div>`;
+
+                    let coeffMarkup = `<span class="eq-coeff" ${c > 0 ? `data-html-tooltip='${coeffTooltip.replace(/'/g, "&apos;")}'` : ''}>${c}</span>`;
+
+                    return `${plus}<div class="eq-mol">
+                        <span class="subscript-wrapper" style="margin-right:8px;">${coeffMarkup}</span>
+                        <span class="eq-formula" data-tooltip="This is ${MOLECULE_NAMES[f]||f}!">${getFormulaHTMLForEquation(f)}</span>
+                    </div>`;
+                }).join('');
+            };
+
+            document.getElementById('eq-left-content').innerHTML = renderSide(rx.left, lCounts);
+            document.getElementById('eq-right-content').innerHTML = renderSide(rx.right, rCounts);
+        }
+
+        function generateMarbleCluster(formula, size=24) {
+            let atomsObj = parseFormula(formula);
+            let html = `<div class="atom-cluster">`;
+            for (let [el, num] of Object.entries(atomsObj)) {
+                let col = state.elementColors[el];
+                for(let i=0; i<num; i++) {
+                    html += `<div class="atom-marble" style="background:${col.bg}; color:${col.color}; width:${size}px; height:${size}px; font-size:${size*0.45}px;">${el}</div>`;
+                }
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function renderTrays() {
+            let rx = REACTIONS[state.rxIdx];
+            const renderSide = (id, arr, sideStr) => {
+                const tray = document.getElementById(id);
+                tray.innerHTML = '';
+                arr.forEach(f => {
+                    let btn = document.createElement('div');
+                    btn.className = 'tray-btn';
+                    btn.draggable = true;
+                    btn.ondragstart = (e) => dragStart(e, sideStr, f);
+                    btn.onclick = () => addMolecule(sideStr, f); 
+                    
+                    let previewHTML = `
+                        <div style="font-size: 16px; font-weight: 900; color: #334155; margin-bottom: 6px; border-bottom: 2px dashed #e2e8f0; padding-bottom: 4px; width: 100%; text-align: center;">${MOLECULE_NAMES[f]||f}</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size:14px; color:#64748b;">Drag me!</span>
+                            <span style="font-size:20px; color:var(--primary);">→</span>
+                            ${generateMarbleCluster(f, 30)}
+                        </div>
+                    `;
+                    
+                    btn.setAttribute('data-html-tooltip', previewHTML.replace(/'/g, "&apos;"));
+                    btn.innerHTML = getFormulaHTML(f);
+                    tray.appendChild(btn);
+                });
+            };
+            renderSide('tray-left', rx.left, 'left');
+            renderSide('tray-right', rx.right, 'right');
+        }
+
+        function renderWorkspaceAreas() {
+            const renderSide = (id, arr, sideStr) => {
+                const area = document.getElementById(id);
+                area.innerHTML = '';
+                
+                let groups = {};
+                arr.forEach((f, idx) => {
+                    if(!groups[f]) groups[f] = [];
+                    groups[f].push(idx);
+                });
+
+                Object.keys(groups).forEach(f => {
+                    let row = document.createElement('div');
+                    row.className = 'mol-row';
+                    
+                    groups[f].forEach(idx => {
+                        let card = document.createElement('div');
+                        card.className = 'mol-card';
+                        card.onclick = () => removeMolecule(sideStr, idx);
+                        card.title = "Click to remove";
+                        
+                        card.innerHTML = `
+                            <div class="mol-remove-overlay">❌</div>
+                            <div class="mol-formula">${getFormulaHTML(f)}</div>
+                            ${generateMarbleCluster(f, 30)}
+                        `;
+                        row.appendChild(card);
+                    });
+                    
+                    area.appendChild(row);
+                });
+            };
+            renderSide('area-left', state.left, 'left');
+            renderSide('area-right', state.right, 'right');
+        }
+
+        function renderTallies(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElements = new Set();
+            [...rx.left, ...rx.right].forEach(f => { Object.keys(parseFormula(f)).forEach(el => allElements.add(el)); });
+            
+            const renderSide = (id, totals, oppositeTotals) => {
+                const tally = document.getElementById(id);
+                tally.innerHTML = '';
+                allElements.forEach(el => {
+                    let count = totals[el] || 0;
+                    let opCount = oppositeTotals[el] || 0;
+                    
+                    let statusClass = 'tally-red';
+                    let tip = `Uh oh! Atoms don't match!`;
+                    if(count > 0 || opCount > 0) {
+                        if(count === opCount) { statusClass = 'tally-green'; tip = `Perfect! These match exactly!`; }
+                    }
+
+                    if (count >= 0) { // Always show all elements in the tally bar, even 0
+                        let col = state.elementColors[el];
+                        tally.innerHTML += `
+                            <div class="tally-item ${statusClass}" data-tooltip="${tip}">
+                                <div class="atom-marble" style="background:${col.bg}; color:${col.color}; width:24px; height:24px; font-size:12px; border:2px solid rgba(0,0,0,0.2); box-shadow:none;">${el}</div>
+                                <span>= ${count}</span>
+                            </div>
+                        `;
+                    }
+                });
+            };
+            renderSide('tally-left', lTotals, rTotals);
+            renderSide('tally-right', rTotals, lTotals);
+        }
+
+        // DOM Hexagonal Packing Math (Draws perfectly inside the HTML Divs!)
+        function generateDomMarblesGrid(jarWidth, countsObj, size, maxPerRowBase) {
+            let html = '';
+            let flatMarbles = [];
+            for(let [el, num] of Object.entries(countsObj)) {
+                for(let i=0; i<num; i++) flatMarbles.push(el);
+            }
+            
+            let row = 0;
+            let indexInRow = 0;
+            let currentMax = maxPerRowBase;
+            let r = size/2;
+            
+            for(let i=0; i<flatMarbles.length; i++) {
+                let el = flatMarbles[i];
+                if(indexInRow >= currentMax) {
+                    row++;
+                    indexInRow = 0;
+                    currentMax = (row % 2 === 0) ? maxPerRowBase : (maxPerRowBase - 1);
+                }
+                
+                let rowWidth = (currentMax - 1) * (r * 2.1);
+                let startX = (jarWidth / 2) - (rowWidth / 2);
+                let left = startX + (indexInRow * (r * 2.1));
+                let bottom = 5 + (row * (r * 1.8)); // 5px padding from floor
+                
+                let col = state.elementColors[el];
+                html += `<div class="atom-marble" style="position:absolute; left:${left - r}px; bottom:${bottom}px; width:${size}px; height:${size}px; font-size:${size*0.45}px; background:${col.bg}; color:${col.color}; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">${el}</div>`;
+                indexInRow++;
+            }
+            return html;
+        }
+
+        function renderScales(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            let allElements = Array.from(allElsSet);
+            
+            const cont = document.getElementById('element-scales-container');
+            let htmlStr = `
+                <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="if(typeof playSound !== 'undefined') { let g = document.getElementById('element-scales-container'); if(g.classList.contains('collapsed')) { playSound('expand'); localStorage.setItem('stoich_tiny_collapsed', 'false'); } else { playSound('collapse'); localStorage.setItem('stoich_tiny_collapsed', 'true'); } } document.getElementById('element-scales-container').classList.toggle('collapsed')">
+                    <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:36px;height:36px;color:#ffffff;margin-right:8px;" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:24px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
+                </div>
+                <div id="tiny-scales-grid" style="display:flex; flex-direction:column; gap:20px; width:100%; box-sizing:border-box;">
+            `;
+
+            let totalL = 0, totalR = 0, balancedCount = 0;
+
+            allElements.forEach(el => {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                totalL += l; totalR += r;
+                let diff = l - r;
+                
+                let sClass = 'state-red', tilt = 0;
+                let tip = `Oh no, ${FULL_ELEMENT_NAMES[el]} atoms are unbalanced!`;
+                
+                if (diff === 0 && l > 0) { sClass = 'state-green'; balancedCount++; tip = `Yay! ${FULL_ELEMENT_NAMES[el]} atoms are perfectly balanced!`; }
+                else if (diff === 0) { sClass = ''; balancedCount++; tip = `Empty! Add some blocks!`; } 
+                else { tilt = diff>0?-15:15; }
+
+                let objL = {}; if(l>0) objL[el] = l;
+                let objR = {}; if(r>0) objR[el] = r;
+                let fullName = `${FULL_ELEMENT_NAMES[el] || el} (${el})`;
+
+                htmlStr += `
+                      <div class="scale-card card ${sClass} ${lTotals[el]===rTotals[el] ? 'state-balanced' : 'state-unbalanced'}" id="scale-card-${el}" data-tooltip="${tip}">
+                        <div class="scale-header" style="font-weight: 900; font-size: 20px; text-align: center; margin-bottom: 5px; white-space: normal; line-height: 1.2; word-break: break-word;">${fullName}</div>
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-top:0px; margin-bottom:-8px; padding:0 5px; z-index:20;">
+                        <span class="reactant-label">Reactants</span>
+                        <span class="product-label">Products</span>
+                        
+                        </div>
+                        <!-- Book Stacks -->
+                        <div class="book-stack-container" style="display:flex; width: 100%; height:100px; padding-bottom:10px; margin-top:15px; position:relative;">
+    <!-- Absolute Pin exactly centered -->
+    <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); width:16px; height:16px; background:linear-gradient(135deg, #64748b 0%, #0f172a 100%); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); z-index: 10;"></div>
+    
+    <!-- Left Half (Reactants) -->
+    <div style="flex:1; display:flex; justify-content:flex-end; align-items:flex-end; border-right: 2px dashed #cbd5e1; border-bottom: 4px solid #3b82f6; padding-right: 10px; position: relative;">
+        <div class="book-stack left-stack" style="display:flex; flex-direction:row-reverse; gap:5px; justify-content:flex-end; align-items:flex-end; z-index:2;">
+                                ${(function(){
+                                      let html = '';
+                                      let remaining = l;
+                                      while(remaining > 0) {
+                                          let chunk = Math.min(5, remaining);
+                                          html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#3b82f6; border:2px solid #1d4ed8; border-radius:3px; box-shadow:0 2px 0 #1d4ed8;"></div>').join('') + '</div>';
+                                          remaining -= chunk;
+                                      }
+                                      return html;
+                                  })()}
+                            </div>
+    </div>
+    <!-- Right Half (Products) -->
+    <div style="flex:1; display:flex; justify-content:flex-start; align-items:flex-end; border-bottom: 4px solid #f97316; padding-left: 10px; position: relative;">
+        <div class="book-stack right-stack" style="display:flex; flex-direction:row; gap:5px; justify-content:flex-start; align-items:flex-end; z-index:2;">
+                                ${(function(){
+                                        let html = '';
+                                        let remaining = r;
+                                        while(remaining > 0) {
+                                            let chunk = Math.min(5, remaining);
+                                            html += '<div style="display:flex; flex-direction:column-reverse; gap:3px;">' + Array(chunk).fill('<div style="width:30px; height:12px; background:#f97316; border:2px solid #c2410c; border-radius:3px; box-shadow:0 2px 0 #c2410c;"></div>').join('') + '</div>';
+                                            remaining -= chunk;
+                                        }
+                                        return html;
+                                    })()}
+                            </div>
+    </div>
+</div>
+<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #1e293b; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#ffffff'};">${l}</span><span style="color:${r>l?'#ef4444':'#ffffff'};">${r}</span></div>
+                    </div>
+                `;
+            });
+            htmlStr += `</div>`;
+            cont.innerHTML = htmlStr;
+
+            // Master Scale logic
+            let mDiff = totalL - totalR;
+            // Gradual tilt calculation (max 6 degrees so it doesn't overflow)
+            let mTilt = Math.max(-6, Math.min(6, -mDiff * 1.2));
+            
+            document.getElementById('ms-beam').style.transform = `rotate(${mTilt}deg)`;
+            
+            // Counter-rotate the jars so they stay physically upright like swinging buckets!
+            document.getElementById('ms-jar-left').style.transform = `rotate(${-mTilt}deg)`;
+            document.getElementById('ms-jar-right').style.transform = `rotate(${-mTilt}deg)`;
+
+            // Hexagonal packing in the master bucket (Radius 12 => size 26, max 8 per base row in 200px jar)
+            document.getElementById('ms-marbles-left').innerHTML = generateDomMarblesGrid(280, lTotals, 26, 8);
+            document.getElementById('ms-marbles-right').innerHTML = generateDomMarblesGrid(280, rTotals, 26, 8);
+
+            const mCard = document.getElementById('master-scale');
+            const mText = document.getElementById('ms-status-text');
+            const mEmoji = document.getElementById('ms-emoji');
+            
+            mCard.className = "master-card card";
+            const evalBox = document.getElementById('main-eval-box');
+            if (evalBox) evalBox.className = ""; // Reset
+            
+            // Background Color Logic
+            let lCounts = countMolecules(state.left);
+            let rCounts = countMolecules(state.right);
+            let isChemBalancedColor = (balancedCount === allElsSet.size && allElsSet.size > 0);
+            
+            if (totalL === 0 && totalR === 0) {
+                if (evalBox) evalBox.classList.add("state-red");
+            } else if (isChemBalancedColor) {
+                if (checkCanSimplify(lCounts, rCounts)) {
+                    if (evalBox) evalBox.classList.add("state-yellow");
+                } else {
+                    if (evalBox) evalBox.classList.add("state-green");
+                }
+            } else {
+                if (evalBox) evalBox.classList.add("state-red");
+            }
+
+            
+            // Triangle > < = removed
+
+            // Status Text Update
+                const statBal = document.getElementById('status-balance');
+                const statLabel = document.getElementById('status-label');
+                
+                if (statLabel && rx && rx.name) {
+                    let cleanName = rx.name.replace(/\[.*?\]\s*/, '').replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{27BF}]/gu, '').trim().toUpperCase();
+                    statLabel.innerHTML = `THE <span style="font-weight:900; color:#1e293b;">${cleanName}</span> EQUATION IS :`;
+                }
+
+                let textLCounts = countMolecules(state.left);
+                let textRCounts = countMolecules(state.right);
+                let canSimplify = checkCanSimplify(textLCounts, textRCounts);
+                
+                let isChemBalanced = (balancedCount === allElsSet.size && allElsSet.size > 0);
+                
+                if (statBal) {
+                    if (totalL === 0 && totalR === 0) {
+                        statBal.innerText = "EMPTY";
+                        statBal.style.color = "#94a3b8";
+                    } else if (isChemBalanced) {
+                        if (canSimplify) {
+                            statBal.innerText = "BALANCED BUT NOT SIMPLIFIED";
+                            statBal.style.color = "#eab308"; // Yellow
+                        } else {
+                            statBal.innerText = "BALANCED & SIMPLIFIED";
+                            statBal.style.color = "#22c55e"; // Green
+                        }
+                    } else {
+                        statBal.innerText = "UNBALANCED";
+                        statBal.style.color = "#ef4444"; // Red
+                    }
+                }
+                
+                
+            // Simplification Badge & Text update
+            const badge = document.getElementById('simplified-badge');
+            if (badge) {
+                let isChemBalanced = (balancedCount === allElsSet.size && allElsSet.size > 0);
+                if (isChemBalanced && totalL > 0) {
+                    let lCounts = countMolecules(state.left);
+                    let rCounts = countMolecules(state.right);
+                    let canSimplify = checkCanSimplify(lCounts, rCounts);
+                    
+                    if (!canSimplify) {
+                        badge.style.display = 'block';
+                        
+                    } else {
+                        badge.style.display = 'none';
+                        
+                    }
+                } else {
+                    badge.style.display = 'none';
+                    if (chessText) {
+                        let diff = Math.abs(totalL - totalR);
+                        if (totalL === 0 && totalR === 0) { chessText.innerHTML = "Empty Scale"; chessText.style.color = "#94a3b8"; }
+                        else if (diff <= 5) { chessText.innerHTML = "Almost there"; chessText.style.color = "#f97316"; }
+                        else if (diff <= 15) { chessText.innerHTML = "Close"; chessText.style.color = "#ef4444"; }
+                        else { chessText.innerHTML = "Unbalanced"; chessText.style.color = "#b91c1c"; }
+                    }
+                }
+            }
+        }
+
+        /* --- Friendly Chat System --- */
+        function toggleGuide() {
+            document.getElementById('teacher-guide').classList.toggle('collapsed');
+        }
+
+        function addChatMessage(msg, type) {
+            const chatBox = document.getElementById('chat-box');
+            let bubble = document.createElement('div');
+            bubble.className = `chat-bubble chat-${type}`;
+            bubble.innerHTML = msg;
+            chatBox.appendChild(bubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function checkWinState(lTotals, rTotals) {
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            let balancedCount = 0;
+            
+            for(let el of allElsSet) {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                if(l === r && l > 0) balancedCount++;
+            }
+
+            if (balancedCount === allElsSet.size && allElsSet.size > 0) {
+                let lCounts = countMolecules(state.left);
+                let rCounts = countMolecules(state.right);
+                if (checkCanSimplify(lCounts, rCounts)) {
+                    addChatMessage(`You did it! But wait... we can make it simpler! Try taking away the exact same amount of molecules from BOTH sides!`, 'system');
+                } else {
+                    if (!state.completed.has(state.rxIdx)) {
+                        state.completed.add(state.rxIdx);
+                        updateCounter();
+                        
+                        
+                    }
+                                        playSound('ding');
+                    triggerConfetti();
+                    const winModal = document.getElementById('win-modal'); 
+                    if (winModal) {
+                        winModal.style.display = 'flex';
+                        let mvEl = document.getElementById('win-modal-moves');
+                        let efEl = document.getElementById('win-modal-efficiency');
+                        if (mvEl) mvEl.innerText = state.moves;
+                        if (efEl) {
+                            let optimalMoves = (rx.left.length + rx.right.length) * 2;
+                            let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
+                            efEl.innerText = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
+                        }
+                    }
+    if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
+        currentStreak++;
+        puzzlesSolvedCount++;
+        localStorage.setItem('stoich_streak', currentStreak);
+        localStorage.setItem('stoich_solved', puzzlesSolvedCount);
+        updateCountersDOM();
+        localStorage.setItem('solved_' + REACTIONS[state.rxIdx].name, 'true');
+    }
+                    
+                    let optimalMoves = (rx.left.length + rx.right.length) * 2; // rough estimate
+                    let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
+                    let starStr = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
+
+                    addChatMessage(`<strong>🌟 YOU DID IT! 🌟</strong><br/>The equation is perfectly balanced!<br/>Moves: <strong>${state.moves}</strong> | Efficiency: ${starStr}<br/><br/><div style="font-size:12px; background:#f0fdf4; padding:8px; border-radius:8px;"><strong>Why didn't we stop earlier?</strong><br/>The simplest integer ratio is the standard way to write chemical equations because it represents the smallest possible fundamental reaction!</div><br/>Pick a new puzzle from the menu to play again!`, 'success');
+                }
+            }
+        }
+
+        function getBestHintData() {
+            let lTotals = calculateTotals(state.left);
+            let rTotals = calculateTotals(state.right);
+            let rx = REACTIONS[state.rxIdx];
+            let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+            
+            let imbalances = [];
+            for(let el of allElsSet) {
+                let l = lTotals[el] || 0, r = rTotals[el] || 0;
+                if(l !== r) {
+                    let diff = Math.abs(l - r);
+                    let sideNeeds = l < r ? 'left' : 'right';
+                    let mols = sideNeeds === 'left' ? rx.left : rx.right;
+                    
+                    let options = mols.filter(m => parseFormula(m)[el] > 0);
+                    if(options.length === 0) continue;
+
+                    let bestOption = options[0];
+                    let minComplexity = 999;
+                    options.forEach(opt => {
+                        let complexity = Object.keys(parseFormula(opt)).length;
+                        if(complexity < minComplexity) { minComplexity = complexity; bestOption = opt; }
+                    });
+                    
+                    imbalances.push({
+                        element: el,
+                        diff: diff,
+                        sideNeeds: sideNeeds,
+                        bestMolecule: bestOption,
+                        score: diff + (10 - minComplexity)
+                    });
+                }
+            }
+            
+            if(imbalances.length === 0) return null;
+            imbalances.sort((a,b) => b.score - a.score);
+            return imbalances[0];
+        }
+
+        function revealHeuristicHint() {
+    totalHintsUsed++;
+    currentStreak = 0;
+    localStorage.setItem('stoich_streak', 0);
+    localStorage.setItem('stoich_hints', totalHintsUsed);
+    updateCountersDOM();
+
+            if(state.hardMode && state.hintsUsed >= 3) {
+                addChatMessage(`🚨 You've used all 3 hints for this puzzle in Hard Mode! You're on your own now!`, 'agent');
+                return;
+            }
+            state.hintsUsed++;
+
+            let hintData = getBestHintData();
+            if(!hintData) {
+                addChatMessage(`Looks perfectly balanced to me! You're doing great!`, 'agent');
+                return;
+            }
+
+            if(state.lastHintElement !== hintData.element) {
+                state.hintLevel = 1;
+                state.lastHintElement = hintData.element;
+            } else {
+                state.hintLevel++;
+                if(state.hintLevel > 4) state.hintLevel = 4; // Cap at 4
+            }
+
+            let isLeft = hintData.sideNeeds === 'left';
+            let sideName = isLeft ? "REACTANTS (left side)" : "PRODUCTS (right side)";
+            let sideColor = isLeft ? "var(--primary)" : "var(--st-green)";
+            let sideBorder = isLeft ? "#1d4ed8" : "#047857";
+            let sideNameBadge = `<span style="background:${sideColor}; color:white; padding:4px 8px; border-radius:8px; border:2px solid ${sideBorder}; font-weight:900; box-shadow:0 2px 0 ${sideBorder}; display:inline-block; margin:2px 0;">${sideName}</span>`;
+            
+            let fullName = FULL_ELEMENT_NAMES[hintData.element] || hintData.element;
+            let fullNameBadge = `<span style="background:var(--st-yellow); color:#713f12; padding:4px 8px; border-radius:8px; border:2px solid #ca8a04; font-weight:900; box-shadow:0 2px 0 #ca8a04; display:inline-block; margin:2px 0;">${fullName}</span>`;
+            
+            let molName = MOLECULE_NAMES[hintData.bestMolecule] || hintData.bestMolecule;
+            let molHTML = generateMarbleCluster(hintData.bestMolecule, 32);
+            let molBadge = `<span style="background:#ffffff; color:#1e293b; padding:4px 8px; border-radius:8px; border:2px solid #cbd5e1; font-weight:900; box-shadow:0 2px 0 #cbd5e1; display:inline-block; margin:2px 0;">${molName}</span>`;
+            
+            if (state.hintLevel === 1) {
+                addChatMessage(`<svg style="width:24px;height:24px;margin-right:6px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> Let's focus on ${fullNameBadge}! Check its tiny scale to the left... it looks like it's tipping! We have too few on the ${sideNameBadge}.`, 'agent');
+                
+                let tinyScale = document.getElementById(`scale-card-${hintData.element}`);
+                if(tinyScale) {
+                    tinyScale.style.boxShadow = "0 0 0 5px var(--st-yellow), 0 10px 20px rgba(0,0,0,0.2)";
+                    setTimeout(() => { tinyScale.style.boxShadow = "var(--shadow-toy)"; }, 5000);
+                }
+            } 
+            else if (state.hintLevel === 2) {
+                addChatMessage(`👈 To fix the ${fullNameBadge} imbalance, we need to add more molecules to the ${sideNameBadge} box!`, 'agent');
+                
+                let dropArea = document.getElementById(`area-${hintData.sideNeeds}`);
+                if(dropArea) {
+                    dropArea.style.boxShadow = "0 0 0 5px var(--st-yellow), inset 0 0 20px rgba(234, 179, 8, 0.3)";
+                    setTimeout(() => { dropArea.style.boxShadow = ""; }, 5000);
+                }
+            }
+            else {
+                state.expectedMove = { side: hintData.sideNeeds, molecule: hintData.bestMolecule };
+                addChatMessage(`💡 <strong>Try this exact move:</strong><br/><br/>Drag a ${molBadge} block into the ${sideNameBadge} box!<br/><br/><div style="display:flex; justify-content:center; background:rgba(255,255,255,0.6); padding:10px; border-radius:16px; border:3px dashed #94a3b8;">${molHTML}</div>`, 'agent');
+                
+                let trays = document.getElementById(`tray-${hintData.sideNeeds}`).children;
+                for(let btn of trays) {
+                    if(btn.innerHTML.includes(hintData.bestMolecule)) {
+                        btn.style.transform = "scale(1.2)";
+                        btn.style.boxShadow = "0 0 0 5px var(--st-yellow), 0 10px 20px rgba(0,0,0,0.2)";
+                        setTimeout(() => { btn.style.transform = ""; btn.style.boxShadow = "0 4px 0 var(--primary)"; }, 5000);
+                        break;
+                    }
+                }
+            }
+            if (state.hintLevel === 4) {
+                if (typeof Shepherd !== 'undefined') {
+                    const hintTour = new Shepherd.Tour({
+                        useModalOverlay: true,
+                        defaultStepOptions: {
+                            cancelIcon: { enabled: true },
+                            classes: 'shadow-md bg-purple-dark',
+                            scrollTo: { behavior: 'smooth', block: 'center' }
+                        }
+                    });
+                    
+                    let targetTray = null;
+                    let trays = document.getElementById('tray-' + hintData.sideNeeds).children;
+                    for(let btn of trays) {
+                        if(btn.innerHTML.includes(hintData.bestMolecule)) {
+                            targetTray = btn; break;
+                        }
+                    }
+
+                    if (targetTray) {
+                        hintTour.addStep({
+                            id: 'hint-tray',
+                            text: 'Professor Beaker here! Click and drag EXACTLY this block...',
+                            attachTo: { element: targetTray, on: 'top' },
+                            buttons: [{ text: 'Next', action: hintTour.next }]
+                        });
+                        
+                        hintTour.addStep({
+                            id: 'hint-drop',
+                            text: '...and drop it into this box right here to balance the ' + FULL_ELEMENT_NAMES[hintData.element] + '!',
+                            attachTo: { element: '#area-' + hintData.sideNeeds, on: 'top' },
+                            buttons: [{ text: 'Got it', action: hintTour.complete }]
+                        });
+                        
+                        hintTour.start();
+                    }
+                }
+            }
+        }
+
+        window.onload = init;
+function downloadReport() {
+    const name = document.getElementById('student-name').value || 'Unknown Student';
+    const age = document.getElementById('student-form').value || 'N/A';
+    const text = `STOICHBALANCE - TEACHER REPORT
+Date: ${new Date().toLocaleString()}
+Student: ${name} (${document.getElementById('student-form').value || 'Form 4'})
+
+Total Puzzles Solved: ${puzzlesSolvedCount}
+Current Streak: ${currentStreak}
+Total Hints Used: ${totalHintsUsed}
+
+Keep up the great work!`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Stoichbalance_Report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+
+
+function goToLevels(selectedForm) {
+    try {
+        let name = document.getElementById('student-name').value.trim();
+        if(!name) {
+            alert("Please enter your Student Name before continuing!");
+            return;
+        }
+        
+        localStorage.setItem('stoich_student_name', name);
+        localStorage.setItem('stoich_student_form', selectedForm);
+        
+        currentForm = selectedForm;
+        if (currentForm === 'Form 5') {
+            REACTIONS = FORM_5_REACTIONS;
+        } else if (currentForm === 'Developer') {
+            REACTIONS = FORM_DEV_REACTIONS;
+        } else {
+            REACTIONS = FORM_4_REACTIONS;
+        }
+        
+        init();
+        
+        let login = document.getElementById('login-screen');
+        let level = document.getElementById('level-screen');
+        login.style.transition = 'opacity 0.3s ease';
+        login.style.opacity = '0';
+        setTimeout(() => {
+            login.style.display = 'none';
+            level.style.display = 'flex';
+            level.style.opacity = '0';
+            level.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => level.style.opacity = '1', 10);
+        }, 300);
+    } catch(e) {
+        alert("ERROR: " + e.stack);
+        console.error(e);
+    }
+}
+
+function startGame(index) {
+    let menu = document.getElementById('main-menu');
+    let app = document.getElementById('game-container');
+    menu.style.transition = 'opacity 0.4s ease';
+    menu.style.opacity = '0';
+    if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
+    setTimeout(() => {
+        menu.classList.add('hidden');
+        app.style.display = 'flex';
+        app.style.opacity = '1';
+        state.rxIdx = index;
+        loadReaction(index);
+        menu.style.opacity = '1'; // reset for later
+    }, 400);
+}
+
+
+function returnToMenu() {
+    document.getElementById('win-modal').style.display = 'none';
+    let app = document.getElementById('game-container');
+    let menu = document.getElementById('main-menu');
+    let level = document.getElementById('level-screen');
+    let login = document.getElementById('login-screen');
+    
+    app.style.transition = 'opacity 0.3s ease';
+    app.style.opacity = '0';
+    
+    setTimeout(() => {
+        app.style.display = 'none';
+        menu.classList.remove('hidden');
+        menu.style.opacity = '0';
+        menu.style.transition = 'opacity 0.3s ease';
+        
+        let savedName = document.getElementById('student-name').value.trim();
+        if(savedName !== '') {
+            currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
+            if (currentForm === 'Form 5') {
+                REACTIONS = FORM_5_REACTIONS;
+            } else if (currentForm === 'Developer') {
+                REACTIONS = FORM_DEV_REACTIONS;
+            } else {
+                REACTIONS = FORM_4_REACTIONS;
+            }
+            login.style.display = 'none';
+            level.style.display = 'flex';
+        } else {
+            login.style.display = 'flex';
+            level.style.display = 'none';
+        }
+        init();
+        setTimeout(() => { menu.style.opacity = '1'; }, 10);
+    }, 300);
+}
+
+window.goBackToLogin = function() {
+    let login = document.getElementById('login-screen');
+    let level = document.getElementById('level-screen');
+    level.style.transition = 'opacity 0.3s ease';
+    level.style.opacity = '0';
+    setTimeout(() => {
+        level.style.display = 'none';
+        login.style.display = 'flex';
+        login.style.opacity = '0';
+        login.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => login.style.opacity = '1', 10);
+    }, 300);
+};
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+            document.documentElement.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
+// Fullscreen Logic
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+document.addEventListener('msfullscreenchange', updateFullscreenIcon);
+
+function updateFullscreenIcon() {
+    const fsIcon = document.getElementById('fs-icon');
+    if (!fsIcon) return;
+    
+    const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    if (isFull) {
+        // Compress Icon
+        fsIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-3.75 3.75M15 9h4.5M15 9V4.5M15 9l3.75-3.75M15 15h4.5M15 15v4.5m0-4.5l3.75 3.75"></path>';
+    } else {
+        // Expand Icon
+        fsIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"></path>';
+    }
+}
+
+
+
+
+// Expose functions to global scope for HTML onclick handlers
+window.goToLevels = goToLevels;
+window.returnToMenu = returnToMenu;
+window.toggleMute = toggleMute;
+window.downloadReport = downloadReport;
+window.openTutorial = openTutorial;
+window.toggleFullScreen = toggleFullScreen;
+window.revealHeuristicHint = revealHeuristicHint;
+window.clearChat = clearChat;
+window.createCustomEquation = createCustomEquation;
+window.showTutSlide = showTutSlide;
+window.closeTutorial = closeTutorial;
+window.undo = undo;
+window.resetEquation = resetEquation;
+window.startGame = startGame;
+window.toggleHardMode = toggleHardMode;
+window.addMolecule = addMolecule;
+window.removeMolecule = removeMolecule;
+</script>
+<script>
+window.onclick = function(event) {
+    if (!event.target.closest('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+
+        // --- Sandbox Mode ---
+        window.submitSandbox = function() {
+            if(typeof playSound !== 'undefined') playSound('click');
+            let input = document.getElementById('sandbox-input').value.trim();
+            const err = document.getElementById('sandbox-error');
+            
+            // Handle common mistakes
+            input = input.replace('=', '->');
+            
+            if(!input.includes('->')) {
+                err.innerText = "Equation must contain '->' or '=' separating reactants and products.";
+                err.style.display = 'block';
+                return;
+            }
+            
+            let parts = input.split('->');
+            let leftStr = parts[0].trim();
+            let rightStr = parts[1].trim();
+            
+            if(!leftStr || !rightStr) {
+                err.innerText = "Both sides of the equation must have molecules.";
+                err.style.display = 'block';
+                return;
+            }
+            
+            // Clean molecules (strip leading coefficients and fix casing)
+            const cleanMol = (mol) => {
+                let m = mol.trim().replace(/^[\d\s]+/, '').replace(/[^a-zA-Z0-9\(\)]/g, '');
+                // Basic autocorrect for lowercase elements (e.g. h2 -> H2, nh3 -> NH3)
+                m = m.replace(/[a-z]+/g, match => match.charAt(0).toUpperCase() + match.slice(1));
+                return m;
+            };
+            
+            let leftMols = leftStr.split('+').map(cleanMol).filter(m => m.length > 0);
+            let rightMols = rightStr.split('+').map(cleanMol).filter(m => m.length > 0);
+            
+            if(leftMols.length === 0 || rightMols.length === 0) {
+                err.innerText = "Invalid molecules.";
+                err.style.display = 'block';
+                return;
+            }
+            
+            let customRx = {
+                name: "Sandbox Equation",
+                left: leftMols,
+                right: rightMols
+            };
+            
+            REACTIONS.push(customRx);
+            
+            err.style.display = 'none';
+            document.getElementById('sandbox-input-modal').style.display = 'none';
+            renderSandboxGrid();
+        };
+
+        // --- Periodic Table ---
+        
+        window.renderPeriodicTable = function() {
+            const grid = document.getElementById('periodic-table-grid');
+            if(grid.innerHTML !== '') return; // Already rendered
+            
+            // Full Periodic Table Data
+            const groups = {
+                'alkali': { name: 'Alkali Metals', bg: '#ef4444' }, // Red
+                'alkaline': { name: 'Alkaline Earth', bg: '#f97316' }, // Orange
+                'transition': { name: 'Transition Metals', bg: '#f59e0b' }, // Amber
+                'post': { name: 'Post-Transition', bg: '#84cc16' }, // Lime
+                'metalloid': { name: 'Metalloids', bg: '#10b981' }, // Emerald
+                'nonmetal': { name: 'Reactive Nonmetals', bg: '#06b6d4' }, // Cyan
+                'halogen': { name: 'Halogens', bg: '#3b82f6' }, // Blue
+                'noble': { name: 'Noble Gases', bg: '#8b5cf6' }, // Violet
+                'lanthanide': { name: 'Lanthanides', bg: '#d946ef' }, // Fuchsia
+                'actinide': { name: 'Actinides', bg: '#f43f5e' } // Rose
+            };
+            
+            const rawElements = [
+                [1,'H','Hydrogen','nonmetal',1,1], [2,'He','Helium','noble',18,1],
+                [3,'Li','Lithium','alkali',1,2], [4,'Be','Beryllium','alkaline',2,2], [5,'B','Boron','metalloid',13,2], [6,'C','Carbon','nonmetal',14,2], [7,'N','Nitrogen','nonmetal',15,2], [8,'O','Oxygen','nonmetal',16,2], [9,'F','Fluorine','halogen',17,2], [10,'Ne','Neon','noble',18,2],
+                [11,'Na','Sodium','alkali',1,3], [12,'Mg','Magnesium','alkaline',2,3], [13,'Al','Aluminum','post',13,3], [14,'Si','Silicon','metalloid',14,3], [15,'P','Phosphorus','nonmetal',15,3], [16,'S','Sulfur','nonmetal',16,3], [17,'Cl','Chlorine','halogen',17,3], [18,'Ar','Argon','noble',18,3],
+                [19,'K','Potassium','alkali',1,4], [20,'Ca','Calcium','alkaline',2,4], [21,'Sc','Scandium','transition',3,4], [22,'Ti','Titanium','transition',4,4], [23,'V','Vanadium','transition',5,4], [24,'Cr','Chromium','transition',6,4], [25,'Mn','Manganese','transition',7,4], [26,'Fe','Iron','transition',8,4], [27,'Co','Cobalt','transition',9,4], [28,'Ni','Nickel','transition',10,4], [29,'Cu','Copper','transition',11,4], [30,'Zn','Zinc','transition',12,4], [31,'Ga','Gallium','post',13,4], [32,'Ge','Germanium','metalloid',14,4], [33,'As','Arsenic','metalloid',15,4], [34,'Se','Selenium','nonmetal',16,4], [35,'Br','Bromine','halogen',17,4], [36,'Kr','Krypton','noble',18,4],
+                [37,'Rb','Rubidium','alkali',1,5], [38,'Sr','Strontium','alkaline',2,5], [39,'Y','Yttrium','transition',3,5], [40,'Zr','Zirconium','transition',4,5], [41,'Nb','Niobium','transition',5,5], [42,'Mo','Molybdenum','transition',6,5], [43,'Tc','Technetium','transition',7,5], [44,'Ru','Ruthenium','transition',8,5], [45,'Rh','Rhodium','transition',9,5], [46,'Pd','Palladium','transition',10,5], [47,'Ag','Silver','transition',11,5], [48,'Cd','Cadmium','transition',12,5], [49,'In','Indium','post',13,5], [50,'Sn','Tin','post',14,5], [51,'Sb','Antimony','metalloid',15,5], [52,'Te','Tellurium','metalloid',16,5], [53,'I','Iodine','halogen',17,5], [54,'Xe','Xenon','noble',18,5],
+                [55,'Cs','Cesium','alkali',1,6], [56,'Ba','Barium','alkaline',2,6], [57,'La','Lanthanum','lanthanide',3,8], [58,'Ce','Cerium','lanthanide',4,8], [59,'Pr','Praseodymium','lanthanide',5,8], [60,'Nd','Neodymium','lanthanide',6,8], [61,'Pm','Promethium','lanthanide',7,8], [62,'Sm','Samarium','lanthanide',8,8], [63,'Eu','Europium','lanthanide',9,8], [64,'Gd','Gadolinium','lanthanide',10,8], [65,'Tb','Terbium','lanthanide',11,8], [66,'Dy','Dysprosium','lanthanide',12,8], [67,'Ho','Holmium','lanthanide',13,8], [68,'Er','Erbium','lanthanide',14,8], [69,'Tm','Thulium','lanthanide',15,8], [70,'Yb','Ytterbium','lanthanide',16,8], [71,'Lu','Lutetium','lanthanide',17,8], 
+                [72,'Hf','Hafnium','transition',4,6], [73,'Ta','Tantalum','transition',5,6], [74,'W','Tungsten','transition',6,6], [75,'Re','Rhenium','transition',7,6], [76,'Os','Osmium','transition',8,6], [77,'Ir','Iridium','transition',9,6], [78,'Pt','Platinum','transition',10,6], [79,'Au','Gold','transition',11,6], [80,'Hg','Mercury','transition',12,6], [81,'Tl','Thallium','post',13,6], [82,'Pb','Lead','post',14,6], [83,'Bi','Bismuth','post',15,6], [84,'Po','Polonium','post',16,6], [85,'At','Astatine','halogen',17,6], [86,'Rn','Radon','noble',18,6],
+                [87,'Fr','Francium','alkali',1,7], [88,'Ra','Radium','alkaline',2,7], [89,'Ac','Actinium','actinide',3,9], [90,'Th','Thorium','actinide',4,9], [91,'Pa','Protactinium','actinide',5,9], [92,'U','Uranium','actinide',6,9], [93,'Np','Neptunium','actinide',7,9], [94,'Pu','Plutonium','actinide',8,9], [95,'Am','Americium','actinide',9,9], [96,'Cm','Curium','actinide',10,9], [97,'Bk','Berkelium','actinide',11,9], [98,'Cf','Californium','actinide',12,9], [99,'Es','Einsteinium','actinide',13,9], [100,'Fm','Fermium','actinide',14,9], [101,'Md','Mendelevium','actinide',15,9], [102,'No','Nobelium','actinide',16,9], [103,'Lr','Lawrencium','actinide',17,9],
+                [104,'Rf','Rutherfordium','transition',4,7], [105,'Db','Dubnium','transition',5,7], [106,'Sg','Seaborgium','transition',6,7], [107,'Bh','Bohrium','transition',7,7], [108,'Hs','Hassium','transition',8,7], [109,'Mt','Meitnerium','unknown',9,7], [110,'Ds','Darmstadtium','unknown',10,7], [111,'Rg','Roentgenium','unknown',11,7], [112,'Cn','Copernicium','transition',12,7], [113,'Nh','Nihonium','post',13,7], [114,'Fl','Flerovium','post',14,7], [115,'Mc','Moscovium','post',15,7], [116,'Lv','Livermorium','post',16,7], [117,'Ts','Tennessine','halogen',17,7], [118,'Og','Oganesson','noble',18,7]
+            ];
+            
+            // Add a title element for groups
+            let groupLabel = document.createElement('div');
+            groupLabel.style.gridColumn = '4 / 12';
+            groupLabel.style.gridRow = '2 / 4';
+            groupLabel.style.display = 'flex';
+            groupLabel.style.alignItems = 'center';
+            groupLabel.style.justifyContent = 'center';
+            groupLabel.style.fontSize = '32px';
+            groupLabel.style.fontWeight = '900';
+            groupLabel.style.color = '#cbd5e1';
+            groupLabel.style.transition = 'color 0.2s';
+            groupLabel.id = 'periodic-group-label';
+            groupLabel.innerText = 'Hover an element';
+            grid.appendChild(groupLabel);
+            
+            // Create cells
+            rawElements.forEach(data => {
+                let cell = document.createElement('div');
+                cell.className = 'pt-cell pt-group-' + data[3];
+                cell.style.gridColumn = data[4];
+                cell.style.gridRow = data[5];
+                
+                let bg = groups[data[3]] ? groups[data[3]].bg : '#94a3b8';
+                let groupName = groups[data[3]] ? groups[data[3]].name : 'Unknown Properties';
+                
+                cell.style.background = bg;
+                cell.style.border = '2px solid rgba(0,0,0,0.2)';
+                cell.style.borderRadius = '8px';
+                cell.style.display = 'flex';
+                cell.style.flexDirection = 'column';
+                cell.style.alignItems = 'center';
+                cell.style.justifyContent = 'center';
+                cell.style.padding = '5px';
+                cell.style.color = 'white';
+                cell.style.fontWeight = '900';
+                cell.style.boxShadow = '0 4px 0 rgba(0,0,0,0.2)';
+                cell.style.cursor = 'help';
+                cell.style.minHeight = '60px';
+                cell.style.transition = 'all 0.2s';
+                
+                cell.onmouseover = () => {
+                    cell.style.transform = 'scale(1.15)';
+                    cell.style.zIndex = '100';
+                    
+                    let period = data[5];
+                    let groupNum = data[4];
+                    if(data[0] >= 57 && data[0] <= 71) { period = 6; groupNum = 3; }
+                    if(data[0] >= 89 && data[0] <= 103) { period = 7; groupNum = 3; }
+                    document.getElementById('periodic-group-label').innerHTML = `<div style="font-size:18px; color:#94a3b8; font-weight:bold;">Group ${groupNum}, Period ${period}</div><div>${groupName}</div>`;
+
+                    document.getElementById('periodic-group-label').style.color = bg;
+                    
+                    // Dim others in grid
+                    let allCells = document.querySelectorAll('.pt-cell');
+                    allCells.forEach(c => {
+                        if(!c.classList.contains('pt-group-' + data[3])) {
+                            c.style.opacity = '0.3';
+                        }
+                    });
+                };
+                
+                cell.onmouseout = () => {
+                    cell.style.transform = 'scale(1)';
+                    cell.style.zIndex = '1';
+                    document.getElementById('periodic-group-label').innerHTML = 'Hover an element';
+                    document.getElementById('periodic-group-label').style.color = '#cbd5e1';
+                    
+                    let allCells = document.querySelectorAll('.pt-cell');
+                    allCells.forEach(c => {
+                        c.style.opacity = '1';
+                    });
+                };
+                
+                cell.innerHTML = `<div style="font-size:10px; opacity:0.8; width:100%; text-align:left; pointer-events:none;">${data[0]}</div>
+                                  <div style="font-size:24px; pointer-events:none; line-height:1;">${data[1]}</div>
+                                  <div style="font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; pointer-events:none;">${data[2]}</div>`;
+                grid.appendChild(cell);
+            });
+            
+            // Gap for lanthanides/actinides
+            let gap = document.createElement('div');
+            gap.style.gridColumn = '1 / -1';
+            gap.style.gridRow = '7';
+            gap.style.height = '15px';
+            grid.appendChild(gap);
+        };
+window.currentView = 'scale';
+
+        const originalRenderScales = renderScales;
+        renderScales = function(lTotals, rTotals) {
+            // Update toggle buttons styling
+            let btnScale = document.getElementById('btn-view-scale');
+            let btnBar = document.getElementById('btn-view-bar');
+            if(btnScale && btnBar) {
+                if(window.currentView === 'scale') {
+                    btnScale.style.background = '#3b82f6'; btnScale.style.color = 'white'; btnScale.style.boxShadow = '0 2px 0 #1d4ed8';
+                    btnBar.style.background = 'transparent'; btnBar.style.color = '#94a3b8'; btnBar.style.boxShadow = 'none';
+                } else {
+                    btnBar.style.background = '#3b82f6'; btnBar.style.color = 'white'; btnBar.style.boxShadow = '0 2px 0 #1d4ed8';
+                    btnScale.style.background = 'transparent'; btnScale.style.color = '#94a3b8'; btnScale.style.boxShadow = 'none';
+                }
+            }
+
+            let mScale = document.getElementById('master-scale');
+            let bView = document.getElementById('bar-chart-view');
+            
+            if (window.currentView === 'scale') {
+                if (mScale) mScale.style.display = 'block';
+                if (bView) bView.style.display = 'none';
+                originalRenderScales(lTotals, rTotals); // Use existing master scale logic
+            } else {
+                if (mScale) mScale.style.display = 'none';
+                if (bView) {
+                    bView.style.display = 'flex';
+                    // Render Bar Chart PhET Style
+                    let rx = REACTIONS[state.rxIdx];
+                    let allElsSet = new Set([...Object.keys(calculateTotals(rx.left)), ...Object.keys(calculateTotals(rx.right))]);
+                    let elements = Array.from(allElsSet);
+                    
+                    let maxCount = 1;
+                    for(let el of elements) {
+                        let l = lTotals[el] || 0;
+                        let r = rTotals[el] || 0;
+                        if (l > maxCount) maxCount = l;
+                        if (r > maxCount) maxCount = r;
+                    }
+                    
+                    let isTotallyBalanced = true;
+                    for(let el of elements) {
+                        if ((lTotals[el]||0) !== (rTotals[el]||0) || (lTotals[el]||0) === 0) isTotallyBalanced = false;
+                    }
+                    
+                    let centerSign = isTotallyBalanced ? '=' : '≠';
+                    
+                    let html = '<div style="display:flex; justify-content:space-around; width:100%; align-items:flex-end; padding:20px 40px; background:#b4c6d0; border-radius:16px;">';
+                    
+                    // LEFT SIDE (Reactants)
+                    html += '<div style="display:flex; gap:30px; align-items:flex-end; justify-content:center; flex:1;">';
+                    for(let el of elements) {
+                        let l = lTotals[el] || 0;
+                        let col = state.elementColors[el] || {bg: '#ccc'};
+                        let h = Math.max((l / maxCount) * 120, 0); // scale up to 120px max height
+                        html += `
+                            <div style="display:flex; flex-direction:column; align-items:center;">
+                                <div style="font-size:32px; font-weight:normal; color:#1e293b; margin-bottom:4px; font-family:Arial, sans-serif;">${l}</div>
+                                ${l > 0 ? `<div style="width:70px; height:${h}px; background:blue; border:4px solid #1e293b; transition:all 0.3s;"></div>` : `<div style="width:70px; height:0px; transition:all 0.3s; margin-top:4px;"></div>`}
+                                <div style="display:flex; align-items:center; gap:6px; margin-top:8px;">
+                                    <div style="width:20px; height:20px; background:radial-gradient(circle at 30% 30%, white, ${col.bg} 60%); border-radius:50%; box-shadow:2px 2px 4px rgba(0,0,0,0.3);"></div>
+                                    <div style="font-size:32px; font-weight:normal; color:#1e293b; font-family:Arial, sans-serif;">${el}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    
+                    // MIDDLE
+                    html += `<div style="font-size:100px; font-weight:bold; color:#1e3a8a; margin:0 40px; font-family:Arial, sans-serif; display:flex; align-items:center; height:100px;">${centerSign}</div>`;
+                    
+                    // RIGHT SIDE (Products)
+                    html += '<div style="display:flex; gap:30px; align-items:flex-end; justify-content:center; flex:1;">';
+                    for(let el of elements) {
+                        let r = rTotals[el] || 0;
+                        let col = state.elementColors[el] || {bg: '#ccc'};
+                        let h = Math.max((r / maxCount) * 120, 0);
+                        html += `
+                            <div style="display:flex; flex-direction:column; align-items:center;">
+                                <div style="font-size:32px; font-weight:normal; color:#1e293b; margin-bottom:4px; font-family:Arial, sans-serif;">${r}</div>
+                                ${r > 0 ? `<div style="width:70px; height:${h}px; background:#d4d4d8; border:4px solid #1e293b; transition:all 0.3s;"></div>` : `<div style="width:70px; height:0px; transition:all 0.3s; margin-top:4px;"></div>`}
+                                <div style="display:flex; align-items:center; gap:6px; margin-top:8px;">
+                                    <div style="width:20px; height:20px; background:radial-gradient(circle at 30% 30%, white, ${col.bg} 60%); border-radius:50%; box-shadow:2px 2px 4px rgba(0,0,0,0.3);"></div>
+                                    <div style="font-size:32px; font-weight:normal; color:#1e293b; font-family:Arial, sans-serif;">${el}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    
+                    html += '</div>';
+                    bView.innerHTML = html;
+                }
+                
+                // Still need to call original to update the eval bar color underneath!
+                // But we don't want to show the scale, so we temporarily hide it
+                // Actually, originalRenderScales updates eval-box colors, which is good.
+                originalRenderScales(lTotals, rTotals);
+                if (mScale) mScale.style.display = 'none'; // hide it again since original shows it
+            }
+        };
+
+        window.renderSandboxGrid = function() {
+            let grid = document.getElementById('sandbox-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            // "Create New" Button
+            let addBtn = document.createElement('button');
+            addBtn.className = 'level-btn';
+            addBtn.style.border = '4px dashed #94a3b8';
+            addBtn.style.background = '#f8fafc';
+            addBtn.style.color = '#94a3b8';
+            addBtn.innerHTML = '<div style="font-size:60px; margin-bottom:10px;">+</div><div style="font-size:24px; font-weight:900;">Create New</div>';
+            addBtn.onclick = () => {
+                if(typeof playSound !== 'undefined') playSound('click');
+                document.getElementById('sandbox-input-modal').style.display = 'flex';
+                document.getElementById('sandbox-error').style.display = 'none';
+                document.getElementById('sandbox-input').value = '';
+            };
+            grid.appendChild(addBtn);
+            
+            // Find custom equations
+            REACTIONS.forEach((rx, idx) => {
+                if(rx.name === "Sandbox Equation") {
+                    let btn = document.createElement('button');
+                    btn.className = 'level-btn';
+                    
+                    let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+                    let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+                    
+                    btn.innerHTML = `<div class="level-tag" style="background:#fcd34d; color:#b45309; padding:4px 10px; border-radius:10px; font-weight:bold; margin-bottom:10px;">Custom</div>
+                                     <div class="level-btn-title" style="margin-bottom:10px;">${rx.name}</div>
+                                     <div class="eq-preview" style="font-size:16px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
                     
                     btn.onclick = () => { 
                         if(typeof playSound !== 'undefined') playSound('click');
