@@ -1203,7 +1203,7 @@ function loadReaction(idx) {
 function downloadReport() {
     const name = document.getElementById('student-name').value || 'Unknown Student';
     const age = document.getElementById('student-form').value || 'N/A';
-    const text = "STOICHBALANCE - TEACHER REPORT\nDate: " + new Date().toLocaleString() + "\nStudent: " + name + " (" + (document.getElementById('student-form').value || 'Form 4') + "\n\nTotal Puzzles Solved: " + puzzlesSolvedCount + "\nCurrent Streak: " + currentStreak + "\nTotal Hints Used: " + totalHintsUsed + "\n\nKeep up the great work!";
+    const text = `STOICHBALANCE - TEACHER REPORT\nDate: ${new Date().toLocaleString()}\nStudent: ${name} (${document.getElementById('student-form').value || 'Form 4'})\n\nTotal Puzzles Solved: ${puzzlesSolvedCount}\nCurrent Streak: ${currentStreak}\nTotal Hints Used: ${totalHintsUsed}\n\nKeep up the great work!`;
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
