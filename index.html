@@ -2711,15 +2711,15 @@ function loadReaction(idx) {
 function downloadReport() {
     const name = document.getElementById('student-name').value || 'Unknown Student';
     const age = document.getElementById('student-form').value || 'N/A';
-    const text = "STOICHBALANCE - TEACHER REPORT
-Date: " + new Date().toLocaleString() + "
-Student: " + name + " (" + (document.getElementById('student-form').value || 'Form 4') + "
+    const text = `STOICHBALANCE - TEACHER REPORT
+Date: ${new Date().toLocaleString()}
+Student: ${name} (${document.getElementById('student-form').value || 'Form 4'})
 
-Total Puzzles Solved: " + puzzlesSolvedCount + "
-Current Streak: " + currentStreak + "
-Total Hints Used: " + totalHintsUsed + "
+Total Puzzles Solved: ${puzzlesSolvedCount}
+Current Streak: ${currentStreak}
+Total Hints Used: ${totalHintsUsed}
 
-Keep up the great work!";
+Keep up the great work!`;
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
