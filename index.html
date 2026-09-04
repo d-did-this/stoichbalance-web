@@ -1161,7 +1161,7 @@ button:active {
         <!-- Step 2: Level Select Screen -->
         <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; display:none; flex-direction:column;">
                           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-                  <button onclick="if(typeof playSound !== 'undefined') playSound('back'); window.goBackToLogin()" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
+                  <button onclick="if(typeof playSound !== 'undefined') playSound('back'); window.goBackToLogin()" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                   <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
                       <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
                       <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
@@ -1175,7 +1175,7 @@ button:active {
         <!-- Step 3: Sandbox Screen -->
         <div class="menu-card massive-card card" id="sandbox-screen" style="z-index: 10; display:none; flex-direction:column; align-items:center; width:90vw; max-width:1000px; max-height:85vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-                <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">◀ Back</button>
+                <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
                     <h2 class="menu-title" style="font-size:32px; margin:0; color:#b45309;">Custom Puzzles</h2>
                     <div style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;">Create and play your own equations!</div>
@@ -1202,7 +1202,7 @@ button:active {
         <!-- Step 4: Periodic Table Screen -->
         <div class="menu-card massive-card card" id="periodic-screen" style="z-index: 9999; display:none; flex-direction:column; align-items:center; max-width:95vw; max-height:95vh; overflow-y:auto; background:white; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:40px; border-radius:24px; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-                <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('periodic-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">◀ Back</button>
+                <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('periodic-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
                     <h2 class="menu-title" style="font-size:32px; margin:0; color:#5b21b6;">Periodic Table of Elements</h2>
                 </div>
@@ -1417,7 +1417,7 @@ button:active {
                     💡 <strong>Pro Tip:</strong> Hover your mouse over the big Equation at the top of the screen to peek inside the molecules!
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(1)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(1)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px; padding:12px; font-size:18px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(3)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
                 </div>
             </div>
@@ -1442,7 +1442,7 @@ button:active {
                 </div>
                 <p style="font-size:14px; color:#64748b; font-weight:bold;">If it's tipping to the left, you need to add more of that element to the right side!</p>
                 <div style="display:flex; gap:10px; margin-top:15px;">
-                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(2)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(2)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px; padding:12px; font-size:18px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(4)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
                 </div>
             </div>
@@ -1459,7 +1459,7 @@ button:active {
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(3)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(3)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px; padding:12px; font-size:18px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(5)" style="flex:1; background:var(--primary); color:white; border-color:#1d4ed8; box-shadow:0 4px 0 #1d4ed8; padding:12px; font-size:18px;">Next ➡️</button>
                 </div>
             </div>
@@ -1479,7 +1479,7 @@ button:active {
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(4)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; padding:12px; font-size:18px;">⬅️ Back</button>
+                    <button onclick="if(typeof playSound !== 'undefined') playSound('click'); showTutSlide(4)" style="flex:1; background:#f1f5f9; color:#475569; border-color:#cbd5e1; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px; padding:12px; font-size:18px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                     <button onclick="if(typeof playSound !== 'undefined') playSound('click'); closeTutorial()" style="flex:2; background:var(--st-green); color:white; border-color:#047857; box-shadow:0 4px 0 #047857; padding:12px; font-size:18px;">Let's Play! 🚀</button>
                 </div>
             </div>
@@ -1519,6 +1519,25 @@ function initPhysics() {
     if (!canvas) return;
 
     const engine = Engine.create();
+    engine.world.gravity.y = 0; // Floating like gas
+    
+    // Brownian motion force
+    Matter.Events.on(engine, 'beforeUpdate', function() {
+        Matter.Composite.allBodies(engine.world).forEach(body => {
+            if(!body.isStatic) {
+                Matter.Body.applyForce(body, body.position, {
+                    x: (Math.random() - 0.5) * 0.02,
+                    y: (Math.random() - 0.5) * 0.02
+                });
+                // Keep them somewhat near the center/visible bounds if they drift too far
+                if (body.position.x < -100) Matter.Body.setPosition(body, { x: window.innerWidth + 100, y: body.position.y });
+                if (body.position.x > window.innerWidth + 100) Matter.Body.setPosition(body, { x: -100, y: body.position.y });
+                if (body.position.y < -100) Matter.Body.setPosition(body, { x: body.position.x, y: window.innerHeight + 100 });
+                if (body.position.y > window.innerHeight + 100) Matter.Body.setPosition(body, { x: body.position.x, y: -100 });
+            }
+        });
+    });
+
     
     // Create renderer
     const render = Render.create({
@@ -3039,7 +3058,11 @@ function loadReaction(idx) {
 
             let hintData = getBestHintData();
             if(!hintData) {
-                addChatMessage(`Looks perfectly balanced to me! You're doing great!`, 'agent');
+                if (Object.keys(state.leftBlocks).length === 0 && Object.keys(state.rightBlocks).length === 0) {
+                    addChatMessage(`You haven't put anything in the trays yet! Start dragging molecules in from the bottom!`, 'agent');
+                } else {
+                    addChatMessage(`Looks perfectly balanced to me! You're doing great!`, 'agent');
+                }
                 return;
             }
 
@@ -3383,13 +3406,15 @@ window.onclick = function(event) {
                 return;
             }
             
+            
+            let customCount = REACTIONS.filter(r => r.name.startsWith("Custom Level")).length + 1;
             let customRx = {
-                name: "Sandbox Equation",
+                name: "Custom Level " + customCount,
                 left: leftMols,
                 right: rightMols
             };
-            
             REACTIONS.push(customRx);
+
             
             err.style.display = 'none';
             document.getElementById('sandbox-input-modal').style.display = 'none';
@@ -3476,7 +3501,12 @@ window.onclick = function(event) {
                     let groupNum = data[4];
                     if(data[0] >= 57 && data[0] <= 71) { period = 6; groupNum = 3; }
                     if(data[0] >= 89 && data[0] <= 103) { period = 7; groupNum = 3; }
-                    document.getElementById('periodic-group-label').innerHTML = `<div style="font-size:18px; color:#94a3b8; font-weight:bold;">Group ${groupNum}, Period ${period}</div><div>${groupName}</div>`;
+                    document.getElementById('periodic-group-label').innerHTML = `
+<div style="display:flex; justify-content:center; gap:10px; margin-bottom: 5px;">
+    <div style="font-size:16px; background:#334155; color:white; padding:4px 12px; border-radius:20px; font-weight:bold;">Group ${groupNum}</div>
+    <div style="font-size:16px; background:#334155; color:white; padding:4px 12px; border-radius:20px; font-weight:bold;">Period ${period}</div>
+</div>
+<div>${groupName}</div>`;
 
                     document.getElementById('periodic-group-label').style.color = bg;
                     
@@ -3628,7 +3658,10 @@ window.currentView = 'scale';
             addBtn.style.border = '4px dashed #94a3b8';
             addBtn.style.background = '#f8fafc';
             addBtn.style.color = '#94a3b8';
-            addBtn.innerHTML = '<div style="font-size:60px; margin-bottom:10px;">+</div><div style="font-size:24px; font-weight:900;">Create New</div>';
+            addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px; transition:all 0.2s;">
+    <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+</div>
+<div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
             addBtn.onclick = () => {
                 if(typeof playSound !== 'undefined') playSound('click');
                 document.getElementById('sandbox-input-modal').style.display = 'flex';
@@ -3639,7 +3672,7 @@ window.currentView = 'scale';
             
             // Find custom equations
             REACTIONS.forEach((rx, idx) => {
-                if(rx.name === "Sandbox Equation") {
+                if(rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation") {
                     let btn = document.createElement('button');
                     btn.className = 'level-btn';
                     
