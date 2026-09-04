@@ -345,6 +345,8 @@
     padding: 30px 40px !important;
 }
 
+
+
 @media (max-width: 768px) {
     .menu-card {
         padding: 20px;
@@ -389,15 +391,6 @@
         flex: 1 1 100% !important;
     }
 }
-    .massive-card {
-        width: 100vw !important;
-        height: 100vh !important;
-        border-radius: 0px !important;
-        border: none !important;
-        padding: 15px !important;
-    }
-}
-
 .level-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr) !important;
