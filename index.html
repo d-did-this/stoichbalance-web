@@ -3571,18 +3571,7 @@ window.openPeriodicPicker = function() {
 };
 
 // Override Sandbox click to initialize builder
-let oldGoToSandbox = window.goToSandbox;
-window.goToSandbox = function() {
-    if(oldGoToSandbox) oldGoToSandbox();
-    // Rebind the Create Custom button to reset the builder
-    let btn = document.querySelector('#sandbox-dedicated-grid .level-btn:first-child');
-    if(btn) {
-        btn.onclick = () => {
-            if(typeof playSound !== 'undefined') playSound('click');
-            document.getElementById('sandbox-choice-modal').style.display = 'flex';
-        };
-    }
-};
+
 
 
         // --- Periodic Table ---
@@ -3812,61 +3801,7 @@ window.currentView = 'scale';
         };
 
         
-window.goToSandbox = function() {
-    let name = document.getElementById('student-name').value.trim();
-    if(!name) { alert("Please enter your Student Name before continuing!"); return; }
-    localStorage.setItem('stoich_student_name', name);
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('level-screen').style.display = 'flex';
-    document.getElementById('puzzle-menu-title').innerText = "Sandbox Mode";
-    document.getElementById('user-greeting').innerText = "Create and play your own custom equations!";
-    
-    let grid = document.getElementById('level-grid');
-    grid.innerHTML = '';
-    
-    let addBtn = document.createElement('button');
-    addBtn.className = 'level-btn';
-    addBtn.style.border = '4px dashed #94a3b8';
-    addBtn.style.background = '#f8fafc';
-    addBtn.style.color = '#94a3b8';
-    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px; transition:all 0.2s;">
-    <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-</div>
-<div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
-    addBtn.onclick = () => {
-        if(typeof playSound !== 'undefined') playSound('click');
-        document.getElementById('sandbox-input-modal').style.display = 'flex';
-        document.getElementById('sandbox-error').style.display = 'none';
-        document.getElementById('sandbox-input').value = '';
-    };
-    grid.appendChild(addBtn);
-    
-    REACTIONS.forEach((rx, idx) => {
-        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
-            let btn = document.createElement('button');
-            btn.className = 'level-btn';
-            btn.style.borderColor = '#10b981';
-            btn.style.boxShadow = '0 8px 0 #059669';
-            
-            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
-            
-            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
-                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
-            </div>
-            <div class="level-btn-title" style="margin-bottom:10px;">${rx.name}</div>
-            <div class="eq-preview" style="font-size:16px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
-            
-            btn.onclick = () => { 
-                if(typeof playSound !== 'undefined') playSound('click');
-                document.getElementById('level-screen').style.display = 'none';
-                if (typeof engine === 'undefined' || !engine) { init(); }
-                startGame(idx); 
-            };
-            grid.appendChild(btn);
-        }
-    });
-};
+
 
 
 window.goToSandbox = function() {
@@ -4230,6 +4165,86 @@ window.vkCheck = function() {
 .vk-pt-btn { border:none; border-radius:6px; cursor:pointer; font-size:18px; font-weight:900; display:flex; align-items:center; justify-content:center; transition:transform 0.1s; box-shadow:inset 0 -3px 0 rgba(0,0,0,0.2); }
 .vk-pt-btn:active { transform:scale(0.9); }
 </style>
+
+
+<script>
+window.goToSandbox = function() {
+    let name = document.getElementById('student-name') ? document.getElementById('student-name').value.trim() : 'Student';
+    localStorage.setItem('stoich_student_name', name);
+    document.getElementById('login-screen').style.display = 'none';
+    
+    let sandboxWrap = document.getElementById('sandbox-dedicated-screen');
+    if(!sandboxWrap) {
+        sandboxWrap = document.createElement('div');
+        sandboxWrap.id = 'sandbox-dedicated-screen';
+        sandboxWrap.className = 'menu-card massive-card card';
+        sandboxWrap.style.cssText = 'z-index: 10000; display: flex; flex-direction: column; align-items: center; width: 95vw; max-width: 1200px; max-height: 90vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);';
+        document.getElementById('main-menu').appendChild(sandboxWrap);
+    }
+    sandboxWrap.style.display = 'flex';
+    
+    const backSvg = `<svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>`;
+    
+    sandboxWrap.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+            <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-dedicated-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">${backSvg} Back</button>
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+                <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;">Sandbox Mode</h2>
+                <div style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0; margin-top:10px;">Create and play your own custom equations!</div>
+            </div>
+            <div style="width:85px;"></div>
+        </div>
+        <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
+    `;
+    
+    let grid = document.getElementById('sandbox-dedicated-grid');
+    
+    let addBtn = document.createElement('button');
+    addBtn.className = 'level-btn';
+    addBtn.style.cssText = 'border: 4px dashed #94a3b8; background: #f8fafc; color: #94a3b8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; transition:all 0.1s;';
+    addBtn.innerHTML = `<div style="width:100px; height:100px; border-radius:50%; border:6px dashed #cbd5e1; display:flex; justify-content:center; align-items:center; color:#94a3b8; margin-bottom:20px;">
+        <svg style="width:60px; height:60px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+    </div>
+    <div style="font-size:28px; font-weight:900; color:#64748b;">Create Custom</div>`;
+    addBtn.onmouseover = () => { addBtn.style.borderColor = '#10b981'; addBtn.style.color = '#10b981'; addBtn.querySelector('div').style.borderColor = '#10b981'; addBtn.querySelector('div').style.color = '#10b981'; };
+    addBtn.onmouseout = () => { addBtn.style.borderColor = '#94a3b8'; addBtn.style.color = '#94a3b8'; addBtn.querySelector('div').style.borderColor = '#cbd5e1'; addBtn.querySelector('div').style.color = '#94a3b8'; };
+    
+    addBtn.onclick = () => {
+        if(typeof playSound !== 'undefined') playSound('click');
+        document.getElementById('sandbox-choice-modal').style.display = 'flex';
+    };
+    grid.appendChild(addBtn);
+    
+    REACTIONS.forEach((rx, idx) => {
+        if(rx.name && (rx.name.startsWith("Custom Level") || rx.name === "Sandbox Equation")) {
+            let btn = document.createElement('button');
+            btn.className = 'level-btn';
+            btn.style.cssText = 'border: 4px solid #10b981; box-shadow: 0 8px 0 #059669; background: #ffffff; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:250px; border-radius:24px; cursor:pointer; padding:25px; transition:all 0.1s;';
+            btn.onmouseover = () => { btn.style.transform = 'translateY(-6px)'; };
+            btn.onmouseout = () => { btn.style.transform = 'translateY(0)'; };
+            btn.onmousedown = () => { btn.style.transform = 'translateY(2px)'; btn.style.boxShadow = '0 0 0 transparent'; };
+            btn.onmouseup = () => { btn.style.transform = 'translateY(-6px)'; btn.style.boxShadow = '0 8px 0 #059669'; };
+            
+            let leftFormatted = rx.left.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            let rightFormatted = rx.right.map(f => f.replace(/([A-Z][a-z]*)(\d+)/g, '$1<sub>$2</sub>')).join(' + ');
+            
+            btn.innerHTML = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
+                <div style="background:#10b981; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #059669;">Custom</div>
+            </div>
+            <div style="font-size: 24px; font-weight: 900; color: #1e293b; text-align: center; margin-bottom: 10px;">${rx.name}</div>
+            <div style="font-size: 20px; font-weight:bold; background:#f1f5f9; padding:10px 20px; border-radius:12px;">${leftFormatted} &rarr; ${rightFormatted}</div>`;
+            
+            btn.onclick = () => { 
+                if(typeof playSound !== 'undefined') playSound('click');
+                document.getElementById('sandbox-dedicated-screen').style.display = 'none';
+                if (typeof engine === 'undefined' || !engine) { init(); }
+                startGame(idx); 
+            };
+            grid.appendChild(btn);
+        }
+    });
+};
+</script>
 
 </body>
 </html>
