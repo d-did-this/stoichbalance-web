@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="style.css?v=1788372420.13204">
 </head>
 <body>
-    <div id="main-menu" class="menu-overlay">`n        <canvas id="physics-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: auto;"></canvas>
+    <div id="main-menu" class="menu-overlay"> <canvas id="physics-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: auto;"></canvas>
         <!-- Step 1: Login Screen -->
-                <div class="menu-card card" id="login-screen" style="z-index: 10; style="position: relative; overflow: hidden; border: none; box-shadow: 0 25px 60px rgba(14, 165, 233, 0.4); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 50px; text-align: center;">
+                <div class="menu-card card" id="login-screen" style="z-index: 10; position: relative; overflow: hidden; border: none; box-shadow: 0 25px 60px rgba(14, 165, 233, 0.4); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 50px; text-align: center;">
             <!-- Animated SVG Decorations -->
             <svg style="position: absolute; top: -30px; left: -30px; width: 150px; height: 150px; opacity: 0.15; color: #0ea5e9; animation: float 6s ease-in-out infinite;" fill="currentColor" viewBox="0 0 24 24"><path d="M19.7 12.6l-5-8.7c-.3-.5-.9-.8-1.5-.8s-1.2.3-1.5.8l-5 8.7c-.8 1.4.2 3.1 1.8 3.1h10c1.6 0 2.6-1.7 1.8-3.1zm-8.2-5.1h1l3.5 6H8l3.5-6z"/><path d="M11 11h2v3h-2z"/></svg>
             <svg style="position: absolute; bottom: -20px; right: -40px; width: 180px; height: 180px; opacity: 0.15; color: #db2777; animation: float 5s ease-in-out infinite reverse;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/><path d="M11 7h2v6h-2zM11 15h2v2h-2z"/></svg>
@@ -34,7 +34,7 @@
         </div>
 
         <!-- Step 2: Level Select Screen -->
-        <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; class="menu-card massive-card" style="display:none;">
+        <div class="menu-card massive-card card" id="level-screen" class="menu-card massive-card" style="z-index: 10; display:none;">
                           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                   <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
                   <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
