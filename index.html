@@ -369,11 +369,7 @@
         border: none !important;
         padding: 15px !important;
     }
-    .level-grid {
-        grid-template-columns: 1fr !important;
-        grid-template-rows: auto !important;
-        overflow-y: auto;
-    }
+    
     .app-body {
         flex-direction: column !important;
         overflow-y: auto !important;
@@ -400,16 +396,7 @@
         flex: 1 1 100% !important;
     }
 }
-.level-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr) !important;
-    grid-template-rows: repeat(2, 1fr) !important;
-    gap: 30px;
-    flex: 1;
-    border: 4px dashed #94a3b8;
-    padding: 20px;
-    border-radius: 24px;
-}
+
 
 .level-btn { position: relative;
     background: #ffffff;
@@ -1003,9 +990,7 @@ button:active {
     align-items: center;
     justify-content: center;
 }
-.level-grid {
-    align-items: stretch;
-}
+
 .level-btn { position: relative;
     height: 100% !important;
     width: 100% !important;
@@ -1042,9 +1027,7 @@ button:active {
     bottom: 80px !important;
 }
 
-.level-grid {
-    grid-template-columns: 1fr !important;
-}
+
 .level-btn { position: relative;
     min-height: 120px !important;
     flex-direction: row !important;
@@ -1054,6 +1037,85 @@ button:active {
     font-size: 20px !important;
     width: auto !important;
     padding: 10px 20px !important;
+}
+
+.level-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    width: 100% !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+}
+.level-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 120px !important;
+    padding: 20px 40px !important;
+    background: #ffffff !important;
+    border: 4px solid #cbd5e1 !important;
+    border-radius: 24px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    cursor: pointer !important;
+    box-shadow: 0 6px 0 #cbd5e1 !important;
+    transition: all 0.1s !important;
+}
+.level-btn:hover {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 6px 0 #3b82f6 !important;
+    transform: translateY(-4px) !important;
+}
+.level-btn:active {
+    transform: translateY(2px) !important;
+    box-shadow: 0 0 0 transparent !important;
+}
+.level-btn-title {
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    color: #1e293b !important;
+    text-align: left !important;
+    flex: 1 !important;
+}
+.level-tag {
+    display: none !important;
+}
+.level-btn .eq-preview {
+    font-size: 22px !important;
+    color: #334155 !important;
+    font-weight: 900 !important;
+    background: #f1f5f9 !important;
+    padding: 15px 30px !important;
+    border-radius: 16px !important;
+    text-align: right !important;
+    width: auto !important;
+    border: 3px solid #e2e8f0 !important;
+}
+.level-btn.solved {
+    background: #f0fdf4 !important;
+    border-color: #22c55e !important;
+    box-shadow: 0 6px 0 #16a34a !important;
+}
+.level-btn.solved:hover {
+    border-color: #15803d !important;
+    box-shadow: 0 6px 0 #15803d !important;
+}
+.level-btn.solved .level-btn-title { color: #166534 !important; }
+.level-btn.solved .eq-preview { background: #dcfce7 !important; border-color: #86efac !important; color: #15803d !important; }
+.level-btn.solved::after {
+    content: '✅ SOLVED';
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: #22c55e;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 900;
 }
 </style>
 </head>
@@ -1131,7 +1193,7 @@ button:active {
                 <div style="width:85px;"></div>
             </div>
             
-            <div id="sandbox-grid" class="level-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:30px; width:100%; padding:20px; align-items:stretch;">
+            <div id="sandbox-grid" class="level-grid" style="padding:20px;">
                 <!-- Grid populated by JS -->
             </div>
         </div>
@@ -1162,7 +1224,7 @@ button:active {
     </div>
 
     <div id="game-container" style="display:none; opacity:0; flex-direction:column; height:100vh; overflow:hidden;">
-    <header class="header" style="padding: 15px 30px; background: #0f172a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: none; z-index: 100; margin-bottom: 0;">
+    <header class="header" style="position: relative; padding: 15px 30px; background: #0f172a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: none; z-index: 10000; margin-bottom: 0;">
         <!-- Left Side: Title & Counters -->
         <div style="display:flex; align-items:center; gap:15px; flex:1;">
             <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!" style="margin:0; font-size: 28px; line-height: 1; color: white;">
