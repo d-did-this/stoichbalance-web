@@ -161,7 +161,8 @@
         
         /* Supply Trays */
         .supply-tray { padding: 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; background: #eff6ff; border-bottom: 3px dashed #93c5fd; position: relative; z-index: 50; }
-        .tray-btn { position: relative; cursor: grab; padding: 8px 16px; border-radius: 12px; border: 3px solid var(--primary); background: #ffffff; color: var(--primary); font-size: clamp(16px, 2vw, 20px); font-weight: 900; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 0 var(--primary); }
+        @keyframes gentlePulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .tray-btn { position: relative; cursor: grab; padding: 8px 16px; border-radius: 12px; border: 3px solid var(--primary); background: #ffffff; color: var(--primary); font-size: clamp(16px, 2vw, 20px); font-weight: 900; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 4px 0 var(--primary); animation: gentlePulse 2s infinite ease-in-out; }
         .tray-btn:hover { background: var(--primary); color: #ffffff; transform: translateY(-4px); box-shadow: 0 8px 0 #1d4ed8; }
         .tray-btn:active { cursor: grabbing; transform: translateY(4px); box-shadow: 0 0 0 var(--primary); }
 
@@ -2068,6 +2069,36 @@ function loadReaction(idx) {
             }
             if(isExcess) {
                 addChatMessage(`Careful! You already have too much <strong>${FULL_ELEMENT_NAMES[excessEl] || excessEl}</strong> on the ${side==='left'?'Reactants':'Products'} side! Adding this block tips the scale even further!`, 'system');
+                
+                if (typeof Shepherd !== 'undefined') {
+                    const mistakeTour = new Shepherd.Tour({
+                        useModalOverlay: true,
+                        defaultStepOptions: {
+                            cancelIcon: { enabled: true },
+                            classes: 'shadow-md bg-purple-dark',
+                            scrollTo: { behavior: 'smooth', block: 'center' }
+                        }
+                    });
+                    
+                    let targetScale = '#scale-card-' + excessEl;
+                    if(document.querySelector(targetScale)) {
+                        mistakeTour.addStep({
+                            id: 'mistake-scale',
+                            text: 'Professor Beaker here! Look at the ' + (FULL_ELEMENT_NAMES[excessEl] || excessEl) + ' scale! You added too much on the ' + (side==='left'?'Reactants':'Products') + ' side.',
+                            attachTo: { element: targetScale, on: 'right' },
+                            buttons: [{ text: 'Next', action: mistakeTour.next }]
+                        });
+                        
+                        mistakeTour.addStep({
+                            id: 'mistake-undo',
+                            text: 'Click here to undo your last move and try a different molecule!',
+                            attachTo: { element: '[data-tooltip="Undo Last Move"]', on: 'top' },
+                            buttons: [{ text: 'Got it', action: mistakeTour.complete }]
+                        });
+                        
+                        mistakeTour.start();
+                    }
+                }
             }
 
             if (state.expectedMove) {
@@ -2722,8 +2753,17 @@ function goToLevels(selectedForm) {
         
         init();
         
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('level-screen').style.display = 'flex';
+        let login = document.getElementById('login-screen');
+        let level = document.getElementById('level-screen');
+        login.style.transition = 'opacity 0.3s ease';
+        login.style.opacity = '0';
+        setTimeout(() => {
+            login.style.display = 'none';
+            level.style.display = 'flex';
+            level.style.opacity = '0';
+            level.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => level.style.opacity = '1', 10);
+        }, 300);
     } catch(e) {
         alert("ERROR: " + e.stack);
         console.error(e);
@@ -2731,10 +2771,16 @@ function goToLevels(selectedForm) {
 }
 
 function startGame(index) {
-    document.getElementById('main-menu').classList.add('hidden');
+    let menu = document.getElementById('main-menu');
+    menu.style.transition = 'opacity 0.4s ease';
+    menu.style.opacity = '0';
     if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
-    state.rxIdx = index;
-    loadReaction(index);
+    setTimeout(() => {
+        menu.classList.add('hidden');
+        state.rxIdx = index;
+        loadReaction(index);
+        menu.style.opacity = '1'; // reset for later
+    }, 400);
 }
 
 
