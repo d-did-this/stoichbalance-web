@@ -995,6 +995,22 @@ button:active {
     transform: translateY(4px) !important;
     box-shadow: 0 0px 0 currentColor !important;
 }
+
+.shepherd-cancel-icon {
+    margin-top: 5px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.level-grid {
+    align-items: stretch;
+}
+.level-btn {
+    height: 100% !important;
+    width: 100% !important;
+    flex: 1;
+}
 </style>
 </head>
 <body>
@@ -2478,7 +2494,7 @@ function loadReaction(idx) {
             
             const cont = document.getElementById('element-scales-container');
             let htmlStr = `
-                <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="document.getElementById('element-scales-container').classList.toggle('collapsed')">
+                <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; padding-bottom:4px;" onclick="if(typeof playSound !== 'undefined') { let g = document.getElementById('element-scales-container'); if(g.classList.contains('collapsed')) playSound('expand'); else playSound('collapse'); } document.getElementById('element-scales-container').classList.toggle('collapsed')">
                     <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%; box-sizing: border-box; text-align:center;"><svg class="title-svg" style="width:36px;height:36px;color:#ffffff;margin-right:8px;" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> <span class="full-text" style="font-size:24px;font-weight:900;margin-left:5px; white-space: nowrap;">TINY SCALES!</span></div>
                 </div>
                 <div id="tiny-scales-grid" style="display:flex; flex-direction:column; gap:20px; width:100%; box-sizing:border-box;">
