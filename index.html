@@ -1922,7 +1922,8 @@ const FORM_DEV_REACTIONS = [
     { name: "[Test] Developer Sandbox 🛠️", left: ["H2(g)", "O2(g)"], right: ["H2O(l)"] }
 ];
 
-let REACTIONS = FORM_4_REACTIONS;
+let CUSTOM_REACTIONS = JSON.parse(localStorage.getItem('stoich_custom_levels') || '[]');
+let REACTIONS = [...FORM_4_REACTIONS, ...FORM_5_REACTIONS, ...CUSTOM_REACTIONS];
 
         const MOLECULE_NAMES = { "H2(g)": "Hydrogen Gas", "O2(g)": "Oxygen Gas", "H2O(l)": "Liquid Water", "H2O(g)": "Water Vapor", "CH3OH(l)": "Methanol", "CO2(g)": "Carbon Dioxide", "Fe(s)": "Solid Iron", "Cl2(g)": "Chlorine Gas", "FeCl3(s)": "Iron(III) Chloride", "Na(s)": "Solid Sodium", "NaOH(aq)": "Aqueous Sodium Hydroxide", "N2(g)": "Nitrogen Gas", "NH3(g)": "Ammonia Gas", "NaCl(s)": "Sodium Chloride", "CH4(g)": "Methane", "Fe2O3(s)": "Iron(III) Oxide", "NaHCO3(s)": "Sodium Bicarbonate", "Na2CO3(s)": "Sodium Carbonate", "Al(s)": "Solid Aluminum", "Al2O3(s)": "Aluminum Oxide", "C6H12O6(s)": "Glucose", "Cu(s)": "Copper", "HNO3(aq)": "Nitric Acid", "Cu(NO3)2(aq)": "Copper(II) Nitrate", "NO2(g)": "Nitrogen Dioxide", "Mg(s)": "Magnesium", "MgO(s)": "Magnesium Oxide", "K(s)": "Potassium", "KOH(aq)": "Potassium Hydroxide", "Ca(s)": "Calcium", "CaO(s)": "Calcium Oxide", "SO2(g)": "Sulfur Dioxide", "SO3(g)": "Sulfur Trioxide", "P4(s)": "White Phosphorus", "P4O10(s)": "Phosphorus Pentoxide", "H2O2(aq)": "Hydrogen Peroxide", "Zn(s)": "Zinc", "HCl(aq)": "Hydrochloric Acid", "ZnCl2(aq)": "Zinc Chloride", "C(s)": "Carbon", "CO(g)": "Carbon Monoxide", "Br2(l)": "Bromine", "AlBr3(s)": "Aluminum Bromide", "KClO3(s)": "Potassium Chlorate", "KCl(s)": "Potassium Chloride", "NO(g)": "Nitric Oxide", "C8H18(l)": "Octane", "Pb(NO3)2(aq)": "Lead(II) Nitrate", "KI(aq)": "Potassium Iodide", "PbI2(s)": "Lead(II) Iodide", "KNO3(aq)": "Potassium Nitrate", "C2H6(g)": "Ethane", "H2SO4(aq)": "Sulfuric Acid", "Na2SO4(aq)": "Sodium Sulfate", "CuSO4(aq)": "Copper(II) Sulfate", "Cu(OH)2(s)": "Copper(II) Hydroxide", "AgNO3(aq)": "Silver Nitrate", "CaCl2(aq)": "Calcium Chloride", "AgCl(s)": "Silver Chloride", "Ca(NO3)2(aq)": "Calcium Nitrate", "C3H8(g)": "Propane" };
 
@@ -3531,11 +3532,10 @@ window.builderSaveAndPlay = function() {
     if(!window.builderValidatedEquation) return;
     
     let customCount = REACTIONS.filter(r => r.name && r.name.startsWith("Custom Level")).length + 1;
-    REACTIONS.push({
-        name: "Custom Level " + customCount,
-        left: window.builderValidatedEquation.left,
-        right: window.builderValidatedEquation.right
-    });
+    let newRx = { name: "Custom Level " + customCount, left: window.builderValidatedEquation.left, right: window.builderValidatedEquation.right };
+CUSTOM_REACTIONS.push(newRx);
+REACTIONS.push(newRx);
+localStorage.setItem('stoich_custom_levels', JSON.stringify(CUSTOM_REACTIONS));
     
     document.getElementById('sandbox-input-modal').style.display = 'none';
     if(window.goToSandbox) window.goToSandbox();
@@ -3834,7 +3834,15 @@ window.goToSandbox = function() {
         <div id="sandbox-dedicated-grid" class="level-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; padding: 20px; margin-top:20px;"></div>
     `;
     
+    
+    CUSTOM_REACTIONS = JSON.parse(localStorage.getItem('stoich_custom_levels') || '[]');
+    CUSTOM_REACTIONS.forEach(cr => {
+        if (!REACTIONS.some(r => r.name === cr.name)) {
+            REACTIONS.push(cr);
+        }
+    });
     let grid = document.getElementById('sandbox-dedicated-grid');
+
     
     let addBtn = document.createElement('button');
     addBtn.className = 'level-btn';
@@ -4042,7 +4050,10 @@ window.vkCheck = function() {
     
     // Save
     let customCount = REACTIONS.filter(r => r.name && r.name.startsWith("Custom Level")).length + 1;
-    REACTIONS.push({ name: "Custom Level " + customCount, left: lMols, right: rMols });
+    let newRx = { name: "Custom Level " + customCount, left: lMols, right: rMols };
+CUSTOM_REACTIONS.push(newRx);
+REACTIONS.push(newRx);
+localStorage.setItem('stoich_custom_levels', JSON.stringify(CUSTOM_REACTIONS));
     
     document.getElementById('sandbox-virtual-modal').style.display = 'none';
     if(window.goToSandbox) window.goToSandbox();
