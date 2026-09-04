@@ -411,7 +411,7 @@
     border-radius: 24px;
 }
 
-.level-btn {
+.level-btn { position: relative;
     background: #ffffff;
     border: 4px solid #cbd5e1;
     padding: 20px;
@@ -1006,7 +1006,7 @@ button:active {
 .level-grid {
     align-items: stretch;
 }
-.level-btn {
+.level-btn { position: relative;
     height: 100% !important;
     width: 100% !important;
     flex: 1;
@@ -1040,6 +1040,20 @@ button:active {
 }
 .master-card .seesaw-beam {
     bottom: 80px !important;
+}
+
+.level-grid {
+    grid-template-columns: 1fr !important;
+}
+.level-btn { position: relative;
+    min-height: 120px !important;
+    flex-direction: row !important;
+    padding: 15px 30px !important;
+}
+.level-btn .eq-preview {
+    font-size: 20px !important;
+    width: auto !important;
+    padding: 10px 20px !important;
 }
 </style>
 </head>
@@ -1093,7 +1107,7 @@ button:active {
         </div>
 
         <!-- Step 2: Level Select Screen -->
-        <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; display:none;">
+        <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; display:none; flex-direction:column;">
                           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                   <button onclick="if(typeof playSound !== 'undefined') playSound('back'); window.goBackToLogin()" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
                   <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
@@ -1148,10 +1162,10 @@ button:active {
     </div>
 
     <div id="game-container" style="display:none; opacity:0; flex-direction:column; height:100vh; overflow:hidden;">
-    <header class="header" style="padding: 15px 30px; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-bottom: none; z-index: 100; margin-bottom: 0;">
+    <header class="header" style="padding: 15px 30px; background: #0f172a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-bottom: none; z-index: 100; margin-bottom: 0;">
         <!-- Left Side: Title & Counters -->
         <div style="display:flex; align-items:center; gap:15px; flex:1;">
-            <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!" style="margin:0; font-size: 28px; line-height: 1;">
+            <h1 data-tooltip="Welcome to STOICHBALANCE! Let's learn chemistry!" style="margin:0; font-size: 28px; line-height: 1; color: white;">
                 STOICHBALANCE
             </h1>
             <div id="puzzle-counter" style="background:#10b981; color:white; padding:6px 14px; border-radius:12px; font-weight:900; font-size:16px; border:none; box-shadow:0 3px 0 #059669; cursor:help;" data-tooltip="0 out of 5 completed! Solve more!">0 / 15</div>
@@ -1160,7 +1174,7 @@ button:active {
         
         <!-- Center: Toggle View -->
         <div style="display:flex; justify-content:center; flex:1;">
-            <div style="display:flex; background: #f1f5f9; padding:4px; border-radius:14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="display:flex; background: #1e293b; padding:4px; border-radius:14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
                 <button id="btn-view-scale" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.currentView='scale'; updateUI();" style="display:flex; align-items:center; gap:6px; background:#3b82f6; color:white; border:none; padding:8px 20px; border-radius:10px; font-weight:900; cursor:pointer; font-size:14px; box-shadow:0 2px 4px rgba(59,130,246,0.3); transition:all 0.2s;">
                     <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg> 
                     Scale
@@ -1174,18 +1188,18 @@ button:active {
 
         <!-- Right Side: Menu & Settings -->
         <div style="display: flex; gap: 12px; align-items:center; position: relative; justify-content:flex-end; flex:1;">
-            <button class="menu-special-btn dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('back'); returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:6px; background:#f8fafc; color:#475569; border:none; box-shadow:0 3px 0 #cbd5e1; padding:10px 20px; border-radius:12px; font-weight:900; font-size:16px; cursor:pointer; transition:all 0.1s;" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #cbd5e1';">
+            <button class="menu-special-btn dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('back'); returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:6px; background:#334155; color:#f8fafc; border:none; box-shadow:0 3px 0 #1e293b; padding:10px 20px; border-radius:12px; font-weight:900; font-size:16px; cursor:pointer; transition:all 0.1s;" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #1e293b';">
                 <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Menu
             </button>
             <div class="dropdown">
-                <button class="dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('settings-dropdown').classList.toggle('show')" style="display:flex; align-items:center; justify-content:center; gap:6px; background:#f8fafc; color:#475569; border:none; box-shadow:0 3px 0 #cbd5e1; padding:10px 20px; border-radius:12px; font-weight:900; font-size:16px; cursor:pointer; transition:all 0.1s;" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #cbd5e1';">
+                <button class="dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('settings-dropdown').classList.toggle('show')" style="display:flex; align-items:center; justify-content:center; gap:6px; background:#334155; color:#f8fafc; border:none; box-shadow:0 3px 0 #1e293b; padding:10px 20px; border-radius:12px; font-weight:900; font-size:16px; cursor:pointer; transition:all 0.1s;" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #1e293b';">
                     <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Settings
                 </button>
                 <div id="settings-dropdown" class="dropdown-content">
-                    <a href="#" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = false; updateUI();">Auto Zoom</a>
-                    <a href="#" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = true; updateUI();">Zoom In (+)</a>
-                    <a href="#" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = true; state.jarWidth = Math.max(100, state.jarWidth - 20); updateUI();">Zoom Out (-)</a>
-                    <a href="#" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.isMuted = !window.isMuted; this.innerText = window.isMuted ? 'Unmute Sound' : 'Mute Sound';">Mute Sound</a>
+                    <button class="dropdown-item" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = false; updateUI();">Auto Zoom</button>
+                    <button class="dropdown-item" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = true; updateUI();">Zoom In (+)</button>
+                    <button class="dropdown-item" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.manualZoom = true; state.jarWidth = Math.max(100, state.jarWidth - 20); updateUI();">Zoom Out (-)</button>
+                    <button class="dropdown-item" onclick="if(typeof playSound !== 'undefined') playSound('click'); window.isMuted = !window.isMuted; this.innerText = window.isMuted ? 'Unmute Sound' : 'Mute Sound';">Mute Sound</button>
                 </div>
             </div>
         </div>
@@ -2732,7 +2746,7 @@ function loadReaction(idx) {
                             </div>
     </div>
 </div>
-<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #f1f5f9; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
+<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #1e293b; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#334155'};">${l}</span><span style="color:${r>l?'#ef4444':'#334155'};">${r}</span></div>
                     </div>
                 `;
             });
@@ -3322,19 +3336,6 @@ window.onclick = function(event) {
             err.style.display = 'none';
             document.getElementById('sandbox-input-modal').style.display = 'none';
             renderSandboxGrid();
-            
-            let menu = document.getElementById('main-menu');
-            let app = document.getElementById('game-container');
-            menu.style.transition = 'opacity 0.4s ease';
-            menu.style.opacity = '0';
-            setTimeout(() => {
-                menu.classList.add('hidden');
-                app.style.display = 'flex';
-                app.style.opacity = '1';
-                state.rxIdx = newIndex;
-                loadReaction(newIndex);
-                menu.style.opacity = '1'; 
-            }, 400);
         };
 
         // --- Periodic Table ---
@@ -3459,10 +3460,10 @@ window.currentView = 'scale';
             if(btnScale && btnBar) {
                 if(window.currentView === 'scale') {
                     btnScale.style.background = '#3b82f6'; btnScale.style.color = 'white'; btnScale.style.boxShadow = '0 2px 0 #1d4ed8';
-                    btnBar.style.background = 'transparent'; btnBar.style.color = '#64748b'; btnBar.style.boxShadow = 'none';
+                    btnBar.style.background = 'transparent'; btnBar.style.color = '#94a3b8'; btnBar.style.boxShadow = 'none';
                 } else {
                     btnBar.style.background = '#3b82f6'; btnBar.style.color = 'white'; btnBar.style.boxShadow = '0 2px 0 #1d4ed8';
-                    btnScale.style.background = 'transparent'; btnScale.style.color = '#64748b'; btnScale.style.boxShadow = 'none';
+                    btnScale.style.background = 'transparent'; btnScale.style.color = '#94a3b8'; btnScale.style.boxShadow = 'none';
                 }
             }
 
@@ -3562,7 +3563,7 @@ window.currentView = 'scale';
             addBtn.className = 'level-btn';
             addBtn.style.border = '4px dashed #94a3b8';
             addBtn.style.background = '#f8fafc';
-            addBtn.style.color = '#64748b';
+            addBtn.style.color = '#94a3b8';
             addBtn.innerHTML = '<div style="font-size:60px; margin-bottom:10px;">+</div><div style="font-size:24px; font-weight:900;">Create New</div>';
             addBtn.onclick = () => {
                 if(typeof playSound !== 'undefined') playSound('click');
