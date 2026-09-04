@@ -2799,7 +2799,7 @@ function goToLevels(selectedForm) {
 
 function startGame(index) {
     let menu = document.getElementById('main-menu');
-    let app = document.getElementById('app-body');
+    let app = document.querySelector('.app-body');
     menu.style.transition = 'opacity 0.4s ease';
     menu.style.opacity = '0';
     if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
@@ -2816,7 +2816,7 @@ function startGame(index) {
 
 function returnToMenu() {
     document.getElementById('win-modal').style.display = 'none';
-    let app = document.getElementById('app-body');
+    let app = document.querySelector('.app-body');
     let menu = document.getElementById('main-menu');
     let level = document.getElementById('level-screen');
     let login = document.getElementById('login-screen');
