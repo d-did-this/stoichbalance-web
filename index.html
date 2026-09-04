@@ -1112,49 +1112,58 @@ button:active {
 <body>
     <div id="main-menu" class="menu-overlay"> <canvas id="physics-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: auto;"></canvas>
         <!-- Step 1: Login Screen -->
-                <div class="menu-card card" id="login-screen" style="z-index: 10; position: relative; overflow: hidden; border: none; box-shadow: 0 25px 60px rgba(14, 165, 233, 0.4); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 50px; text-align: center; width:90vw; max-width:900px; border-radius:32px;">
-    <h1 style="font-size:48px; font-weight:900; color:#0f172a; margin-bottom:10px; letter-spacing:-1px;">STOICHBALANCE</h1>
-    <p style="font-size:18px; color:#475569; font-weight:700; margin-bottom:30px;">Master Chemical Equations Interactively!</p>
+                <div class="menu-card card" id="login-screen" style="z-index: 10; position: relative; overflow: hidden; border: none; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.2); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); padding: 50px; text-align: center; width:95vw; max-width:1100px; border-radius:40px; display:flex; flex-direction:row; gap:40px; align-items:center;">
     
-    <div style="display:flex; flex-direction:column; gap:15px; margin-bottom:30px; background:white; padding:25px; border-radius:24px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
-        <input type="text" id="student-name" placeholder="Enter your Name to start..." style="font-size: 20px; font-weight: 900; padding: 15px 25px; border: 4px solid #e2e8f0; border-radius: 16px; outline: none; width:100%; box-sizing:border-box; color:#1e293b; text-align:center;">
+    <div style="flex:1; display:flex; flex-direction:column; justify-content:center; text-align:left; border-right:3px dashed #e2e8f0; padding-right:40px; height:100%;">
+        <div style="font-size:70px; margin-bottom:10px; animation: float 6s ease-in-out infinite;">⚛️</div>
+        <h1 style="font-size:64px; font-weight:900; color:#0f172a; line-height:1; letter-spacing:-2px; margin-bottom:20px;">STOICH<br/><span style="color:#3b82f6;">BALANCE</span></h1>
+        <p style="font-size:20px; color:#64748b; font-weight:800; line-height:1.4;">Master Chemical Equations with interactive physical marbles.</p>
+        <div style="margin-top:40px;">
+            <div style="font-size:16px; font-weight:900; color:#94a3b8; margin-bottom:10px; text-transform:uppercase; letter-spacing:2px;">Player Profile</div>
+            <input type="text" id="student-name" placeholder="Enter your name..." style="font-size: 24px; font-weight: 900; padding: 20px 25px; border: 4px solid #e2e8f0; background:#f8fafc; border-radius: 20px; outline: none; width:100%; box-sizing:border-box; color:#1e293b; transition:all 0.2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
     </div>
     
-    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px; width:100%;">
-        <!-- Form 4 -->
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 4')" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffffff; color:#1e293b; border:4px solid #3b82f6; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #3b82f6; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #3b82f6';">
-            <div style="font-size:40px; margin-bottom:10px;">📘</div>
-            <div style="font-size:24px; font-weight:900;">Form 4</div>
-            <div style="font-size:14px; font-weight:bold; color:#64748b;">Basic equations</div>
-        </button>
-        <!-- Form 5 -->
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 5')" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffffff; color:#1e293b; border:4px solid #3b82f6; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #3b82f6; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #3b82f6';">
-            <div style="font-size:40px; margin-bottom:10px;">📕</div>
-            <div style="font-size:24px; font-weight:900;">Form 5</div>
-            <div style="font-size:14px; font-weight:bold; color:#64748b;">Advanced equations</div>
-        </button>
-        <!-- Sandbox -->
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); window.goToSandbox();" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffffff; color:#1e293b; border:4px solid #10b981; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #10b981; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #10b981';">
-            <div style="font-size:40px; margin-bottom:10px;">🧪</div>
-            <div style="font-size:24px; font-weight:900;">Sandbox</div>
-            <div style="font-size:14px; font-weight:bold; color:#64748b;">Create custom puzzles</div>
-        </button>
-        <!-- Challenge -->
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('challenge-screen').style.display='flex';" style="display:flex; flex-direction:column; align-items:center; justify-content:center; background:#ffffff; color:#1e293b; border:4px solid #f59e0b; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #f59e0b; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #f59e0b';">
-            <div style="font-size:40px; margin-bottom:10px;">🏆</div>
-            <div style="font-size:24px; font-weight:900;">Challenge</div>
-            <div style="font-size:14px; font-weight:bold; color:#64748b;">Test your skills</div>
-        </button>
-        <!-- Periodic Table -->
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('periodic-screen').style.display='flex'; renderPeriodicTable();" style="grid-column: 1 / -1; display:flex; flex-direction:row; gap:20px; align-items:center; justify-content:center; background:#ffffff; color:#1e293b; border:4px solid #8b5cf6; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #8b5cf6; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #8b5cf6';">
-            <div style="font-size:40px;">📊</div>
-            <div style="text-align:left;">
-                <div style="font-size:24px; font-weight:900;">Periodic Table</div>
-                <div style="font-size:14px; font-weight:bold; color:#64748b;">Explore all elements</div>
+    <div style="flex:1.2; display:flex; flex-direction:column; gap:20px;">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 4')" class="menu-btn" style="display:flex; align-items:center; gap:20px; background:#eff6ff; color:#1e3a8a; border:4px solid #bfdbfe; padding:20px 30px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #bfdbfe; transition:all 0.1s; text-align:left;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #bfdbfe';">
+            <div style="font-size:48px;">📘</div>
+            <div>
+                <div style="font-size:32px; font-weight:900;">Form 4</div>
+                <div style="font-size:18px; font-weight:bold; color:#60a5fa;">Play Foundation Levels</div>
             </div>
         </button>
+        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); goToLevels('Form 5')" class="menu-btn" style="display:flex; align-items:center; gap:20px; background:#eff6ff; color:#1e3a8a; border:4px solid #bfdbfe; padding:20px 30px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #bfdbfe; transition:all 0.1s; text-align:left;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #bfdbfe';">
+            <div style="font-size:48px;">📕</div>
+            <div>
+                <div style="font-size:32px; font-weight:900;">Form 5</div>
+                <div style="font-size:18px; font-weight:bold; color:#60a5fa;">Play Advanced Levels</div>
+            </div>
+        </button>
+        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); window.goToSandbox();" class="menu-btn" style="display:flex; align-items:center; gap:20px; background:#ecfdf5; color:#064e3b; border:4px solid #6ee7b7; padding:20px 30px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #6ee7b7; transition:all 0.1s; text-align:left;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #6ee7b7';">
+            <div style="font-size:48px;">🧪</div>
+            <div>
+                <div style="font-size:32px; font-weight:900;">Sandbox</div>
+                <div style="font-size:18px; font-weight:bold; color:#34d399;">Create Custom Equations</div>
+            </div>
+        </button>
+        <div style="display:flex; gap:20px;">
+            <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('challenge-screen').style.display='flex';" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#fffbeb; color:#92400e; border:4px solid #fcd34d; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #fcd34d; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #fcd34d';">
+                <div style="font-size:36px; margin-bottom:5px;">🏆</div>
+                <div style="font-size:24px; font-weight:900;">Challenge</div>
+            </button>
+            <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('periodic-screen').style.display='flex'; renderPeriodicTable();" style="flex:1; display:flex; flex-direction:column; align-items:center; background:#faf5ff; color:#4c1d95; border:4px solid #d8b4fe; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #d8b4fe; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d8b4fe';">
+                <div style="font-size:36px; margin-bottom:5px;">📊</div>
+                <div style="font-size:24px; font-weight:900;">Elements</div>
+            </button>
+        </div>
     </div>
 </div>
+<style>
+@media (max-width: 900px) {
+    #login-screen { flex-direction: column !important; padding:30px !important; }
+    #login-screen > div:first-child { border-right: none !important; border-bottom: 3px dashed #e2e8f0 !important; padding-right: 0 !important; padding-bottom: 30px !important; margin-bottom: 10px !important; text-align:center !important; }
+}
+</style>
 
         <!-- Step 2: Level Select Screen -->
         <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; display:none; flex-direction:column;">
@@ -1203,36 +1212,72 @@ button:active {
         </div>
         
         <!-- Sandbox Input Modal (Overlay) -->
-        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
-    <div class="card" style="width:100%; max-width:800px; display:flex; flex-direction:column; gap:20px; background:#fffbeb; border:4px solid #fcd34d; padding:40px; border-radius:32px; box-shadow: 0 10px 40px rgba(245,158,11,0.5); position:relative;">
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f8fafc; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:12px; cursor:pointer; font-size:20px; padding:8px 16px;">X</button>
-        <h3 style="margin:0; font-size:36px; color:#92400e; text-align:center; font-weight:900;">Build Custom Equation</h3>
-        <p style="text-align:center; font-size:18px; color:#b45309; font-weight:bold; margin-top:-10px;">Separate molecules with a plus sign (e.g., CH4 + O2)</p>
+        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.8); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(8px);">
+    <div class="card" style="width:100%; max-width:1100px; display:flex; flex-direction:column; gap:30px; background:#ffffff; border:4px solid #10b981; padding:40px; border-radius:32px; box-shadow: 0 20px 60px rgba(16,185,129,0.3); position:relative;">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
         
-        <div style="display:flex; gap:20px; align-items:center;">
-            <div style="flex:1;">
-                <label style="font-size:20px; font-weight:900; color:#d97706; margin-bottom:10px; display:block;">Reactants (Left Side)</label>
-                <input type="text" id="sandbox-reactants" placeholder="e.g. H2 + O2" style="width:100%; box-sizing:border-box; text-align:center; font-size: 28px; font-weight: 900; padding: 20px; border: 4px solid #f59e0b; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; color:#92400e;" />
+        <div style="text-align:center;">
+            <h3 style="margin:0; font-size:42px; color:#064e3b; font-weight:900; letter-spacing:-1px;">Visual Equation Builder</h3>
+            <p style="font-size:20px; color:#10b981; font-weight:800; margin-top:5px;">Type elements or click the Table icon to insert them!</p>
+        </div>
+        
+        <div style="display:flex; align-items:stretch; gap:20px; width:100%;">
+            <!-- Reactants -->
+            <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <label style="font-size:24px; font-weight:900; color:#334155;">Reactants</label>
+                    <button onclick="window.builderAddBox('reactants')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
+                </div>
+                <div id="builder-reactants-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
             </div>
-            <div style="font-size:48px; font-weight:900; color:#f59e0b; margin-top:35px;">&rarr;</div>
-            <div style="flex:1;">
-                <label style="font-size:20px; font-weight:900; color:#d97706; margin-bottom:10px; display:block;">Products (Right Side)</label>
-                <input type="text" id="sandbox-products" placeholder="e.g. H2O" style="width:100%; box-sizing:border-box; text-align:center; font-size: 28px; font-weight: 900; padding: 20px; border: 4px solid #f59e0b; border-radius: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); outline: none; color:#92400e;" />
+            
+            <div style="display:flex; align-items:center; justify-content:center; font-size:60px; font-weight:900; color:#94a3b8;">&rarr;</div>
+            
+            <!-- Products -->
+            <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <label style="font-size:24px; font-weight:900; color:#334155;">Products</label>
+                    <button onclick="window.builderAddBox('products')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
+                </div>
+                <div id="builder-products-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
             </div>
         </div>
         
-        <button onclick="submitSandbox()" style="width:100%; margin-top:20px; background: linear-gradient(135deg, #f59e0b, #d97706); color:white; border:none; padding:20px; font-size:28px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 8px 0 #b45309; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #b45309';">💾 Save & Play!</button>
-        <div id="sandbox-error" style="color:#ef4444; font-size:20px; font-weight:bold; text-align:center; display:none; background:#fee2e2; padding:15px; border-radius:12px; border:3px solid #f87171;"></div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <button onclick="window.openPeriodicPicker()" style="flex:0.5; background: #8b5cf6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #6d28d9;">📊 Insert Element</button>
+            <button onclick="window.builderCheck()" style="flex:1; background: #3b82f6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #2563eb;">🔍 Check Equation</button>
+            <button id="builder-save-btn" onclick="window.builderSaveAndPlay()" style="flex:1; display:none; background: #10b981; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #059669; animation: pulse 1s infinite;">✅ Save & Play!</button>
+        </div>
+        
+        <div id="builder-feedback" style="font-size:22px; font-weight:900; text-align:center; padding:15px; border-radius:16px; display:none;"></div>
     </div>
 </div>
+
+<!-- Mini Periodic Table Picker Modal -->
+<div id="periodic-picker-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999999; justify-content:center; align-items:center;">
+    <div class="card" style="width:90%; max-width:900px; max-height:90vh; overflow-y:auto; background:white; border-radius:24px; padding:30px; position:relative;">
+        <button onclick="document.getElementById('periodic-picker-modal').style.display='none'" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:none; border-radius:12px; padding:10px 20px; font-weight:bold; cursor:pointer;">Close</button>
+        <h3 style="margin-top:0; font-size:28px;">Pick an Element</h3>
+        <div id="picker-grid" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px;"></div>
+    </div>
+</div>
+
+<style>
+.builder-box { width: 80px; height: 80px; font-size: 32px; font-weight: 900; text-align: center; border: 4px solid #cbd5e1; border-radius: 16px; outline: none; background: white; color: #0f172a; transition: all 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+.builder-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.3); }
+.builder-plus { font-size: 32px; font-weight: 900; color: #cbd5e1; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+</style>
+
 
         <!-- Step 4: Periodic Table Screen -->
         <div class="menu-card massive-card card" id="periodic-screen" style="z-index: 9999; display:none; flex-direction:column; align-items:center; max-width:95vw; max-height:95vh; overflow-y:auto; background:white; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:40px; border-radius:24px; box-shadow:0 25px 50px rgba(0,0,0,0.5);">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                 <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('periodic-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                    <h2 class="menu-title" style="font-size:32px; margin:0; color:#5b21b6;">Periodic Table of Elements</h2>
-                </div>
+                    <h2 class="menu-title" style="font-size:42px; margin:0; color:#5b21b6; font-weight:900; letter-spacing:-1px;">Periodic Table of Elements</h2>
+<div id="periodic-header-info" style="font-size:22px; font-weight:800; color:#64748b; margin-top:10px; min-height:35px; background:#f1f5f9; padding:8px 24px; border-radius:20px; border:2px solid #e2e8f0;">Hover an element to explore!</div>
+</div>
                 <div style="width:85px;"></div>
             </div>
             
@@ -2994,11 +3039,18 @@ function loadReaction(idx) {
                     addChatMessage(`You did it! But wait... we can make it simpler! Try taking away the exact same amount of molecules from BOTH sides!`, 'system');
                 } else {
                     if (!state.completed.has(state.rxIdx)) {
-                        state.completed.add(state.rxIdx);
-                        updateCounter();
-                        
-                        
-                    }
+    state.completed.add(state.rxIdx);
+    updateCounter();
+    
+    if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
+        currentStreak++;
+        puzzlesSolvedCount++;
+        localStorage.setItem('stoich_streak', currentStreak);
+        localStorage.setItem('stoich_solved', puzzlesSolvedCount);
+        updateCountersDOM();
+        localStorage.setItem('solved_' + REACTIONS[state.rxIdx].name, 'true');
+    }
+}
                                         playSound('ding');
                     triggerConfetti();
                     const winModal = document.getElementById('win-modal'); 
@@ -3013,14 +3065,7 @@ function loadReaction(idx) {
                             efEl.innerText = '⭐'.repeat(stars) + '❌'.repeat(3-stars);
                         }
                     }
-    if (!localStorage.getItem('solved_' + REACTIONS[state.rxIdx].name)) {
-        currentStreak++;
-        puzzlesSolvedCount++;
-        localStorage.setItem('stoich_streak', currentStreak);
-        localStorage.setItem('stoich_solved', puzzlesSolvedCount);
-        updateCountersDOM();
-        localStorage.setItem('solved_' + REACTIONS[state.rxIdx].name, 'true');
-    }
+    
                     
                     let optimalMoves = (rx.left.length + rx.right.length) * 2; // rough estimate
                     let stars = state.moves <= optimalMoves ? 3 : (state.moves <= optimalMoves * 2 ? 2 : 1);
@@ -3392,49 +3437,158 @@ window.onclick = function(event) {
 }
 
         // --- Sandbox Mode ---
-        window.submitSandbox = function() {
-            let reactants = document.getElementById('sandbox-reactants').value;
-            let products = document.getElementById('sandbox-products').value;
-            let err = document.getElementById('sandbox-error');
-            
-            if(!reactants.trim() || !products.trim()) {
-                err.innerText = "Please fill in both Reactants and Products!";
-                err.style.display = 'block';
-                return;
-            }
-            
-            let leftStr = reactants.replace(/\s+/g,'').split('+');
-            let rightStr = products.replace(/\s+/g,'').split('+');
-            
-            let leftMols = [], rightMols = [];
-            let valid = true;
-            
-            try {
-                leftStr.forEach(m => { if(m) { parseFormula(m); leftMols.push(m); } });
-                rightStr.forEach(m => { if(m) { parseFormula(m); rightMols.push(m); } });
-            } catch(e) {
-                valid = false;
-            }
-            
-            if(!valid || leftMols.length===0 || rightMols.length===0) {
-                err.innerText = "Invalid formula! Please check elements (e.g. use proper capitalization like Na, Cl).";
-                err.style.display = 'block';
-                return;
-            }
-            
-            let customCount = REACTIONS.filter(r => r.name && r.name.startsWith("Custom Level")).length + 1;
-            let customRx = {
-                name: "Custom Level " + customCount,
-                left: leftMols,
-                right: rightMols
+        
+window.builderActiveInput = null;
+window.builderReactantCount = 0;
+window.builderProductCount = 0;
+
+window.builderAddBox = function(side) {
+    let cont = document.getElementById('builder-' + side + '-container');
+    if(cont.children.length > 0) {
+        let plus = document.createElement('div');
+        plus.className = 'builder-plus';
+        plus.innerText = '+';
+        cont.appendChild(plus);
+    }
+    
+    let inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'builder-box';
+    inp.placeholder = '?';
+    inp.onfocus = () => { window.builderActiveInput = inp; };
+    inp.oninput = () => { window.builderFormatSubscripts(inp); window.builderHideSave(); };
+    cont.appendChild(inp);
+    inp.focus();
+};
+
+window.builderFormatSubscripts = function(inp) {
+    const subs = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+    let formatted = inp.value.replace(/\d/g, m => subs[m] || m);
+    if(inp.value !== formatted) inp.value = formatted;
+};
+
+window.builderParseUnicode = function(str) {
+    const unsubs = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+    return str.replace(/[₀-₉]/g, m => unsubs[m]);
+};
+
+window.builderHideSave = function() {
+    document.getElementById('builder-save-btn').style.display = 'none';
+    document.getElementById('builder-feedback').style.display = 'none';
+};
+
+window.builderCheck = function() {
+    let feedback = document.getElementById('builder-feedback');
+    let saveBtn = document.getElementById('builder-save-btn');
+    
+    let rBoxes = Array.from(document.getElementById('builder-reactants-container').querySelectorAll('input'));
+    let pBoxes = Array.from(document.getElementById('builder-products-container').querySelectorAll('input'));
+    
+    let rVals = rBoxes.map(b => window.builderParseUnicode(b.value.trim())).filter(v => v !== '');
+    let pVals = pBoxes.map(b => window.builderParseUnicode(b.value.trim())).filter(v => v !== '');
+    
+    if(rVals.length === 0 || pVals.length === 0) {
+        feedback.style.display = 'block'; feedback.style.background = '#fee2e2'; feedback.style.color = '#dc2626'; feedback.style.border = '3px solid #f87171';
+        feedback.innerText = "🚨 You need at least one molecule on both sides!";
+        saveBtn.style.display = 'none'; return;
+    }
+    
+    let valid = true, lMols = [], rMols = [];
+    let allEls = new Set(), lEls = new Set(), rEls = new Set();
+    
+    try {
+        rVals.forEach(m => { let parsed = parseFormula(m); lMols.push(m); Object.keys(parsed).forEach(e => { lEls.add(e); allEls.add(e); }); });
+        pVals.forEach(m => { let parsed = parseFormula(m); rMols.push(m); Object.keys(parsed).forEach(e => { rEls.add(e); allEls.add(e); }); });
+    } catch(e) {
+        valid = false;
+    }
+    
+    if(!valid) {
+        feedback.style.display = 'block'; feedback.style.background = '#fee2e2'; feedback.style.color = '#dc2626'; feedback.style.border = '3px solid #f87171';
+        feedback.innerText = "🚨 Invalid element format! Use proper capital letters (e.g., 'Na', 'Cl').";
+        saveBtn.style.display = 'none'; return;
+    }
+    
+    // Check if reactants elements match products elements
+    let missingRight = Array.from(lEls).filter(e => !rEls.has(e));
+    let missingLeft = Array.from(rEls).filter(e => !lEls.has(e));
+    
+    if(missingRight.length > 0 || missingLeft.length > 0) {
+        feedback.style.display = 'block'; feedback.style.background = '#fef08a'; feedback.style.color = '#a16207'; feedback.style.border = '3px solid #eab308';
+        feedback.innerText = `⚠️ Conservation of Mass Alert! Elements must match on both sides! Missing: ${missingRight.concat(missingLeft).join(', ')}`;
+        saveBtn.style.display = 'none'; return;
+    }
+    
+    // Success
+    feedback.style.display = 'block'; feedback.style.background = '#d1fae5'; feedback.style.color = '#047857'; feedback.style.border = '3px solid #34d399';
+    feedback.innerText = "✅ Equation is valid and ready to play!";
+    saveBtn.style.display = 'block';
+    
+    window.builderValidatedEquation = { left: lMols, right: rMols };
+};
+
+window.builderSaveAndPlay = function() {
+    if(!window.builderValidatedEquation) return;
+    
+    let customCount = REACTIONS.filter(r => r.name && r.name.startsWith("Custom Level")).length + 1;
+    REACTIONS.push({
+        name: "Custom Level " + customCount,
+        left: window.builderValidatedEquation.left,
+        right: window.builderValidatedEquation.right
+    });
+    
+    document.getElementById('sandbox-input-modal').style.display = 'none';
+    if(window.goToSandbox) window.goToSandbox();
+};
+
+window.openPeriodicPicker = function() {
+    let modal = document.getElementById('periodic-picker-modal');
+    modal.style.display = 'flex';
+    let grid = document.getElementById('picker-grid');
+    if(grid.innerHTML === '') {
+        // Populate with common elements
+        const commonEls = ['H','He','Li','Be','B','C','N','O','F','Ne','Na','Mg','Al','Si','P','S','Cl','Ar','K','Ca','Fe','Cu','Zn','Ag','I','Ba','Au','Pb'];
+        commonEls.forEach(el => {
+            let btn = document.createElement('button');
+            btn.innerText = el;
+            btn.style.cssText = 'font-size:24px; font-weight:900; width:60px; height:60px; border-radius:12px; border:3px solid #cbd5e1; background:white; cursor:pointer;';
+            btn.onclick = () => {
+                if(!window.builderActiveInput) {
+                    // Try to pick the last input in reactants if none active
+                    let rBoxes = document.getElementById('builder-reactants-container').querySelectorAll('input');
+                    if(rBoxes.length > 0) window.builderActiveInput = rBoxes[rBoxes.length-1];
+                }
+                if(window.builderActiveInput) {
+                    window.builderActiveInput.value += el;
+                    window.builderFormatSubscripts(window.builderActiveInput);
+                    window.builderHideSave();
+                }
+                modal.style.display = 'none';
             };
-            REACTIONS.push(customRx);
-            
-            document.getElementById('sandbox-input-modal').style.display = 'none';
-            if(window.goToSandbox) {
-                window.goToSandbox(); // Refresh the grid!
-            }
+            grid.appendChild(btn);
+        });
+    }
+};
+
+// Override Sandbox click to initialize builder
+let oldGoToSandbox = window.goToSandbox;
+window.goToSandbox = function() {
+    if(oldGoToSandbox) oldGoToSandbox();
+    // Rebind the Create Custom button to reset the builder
+    let btn = document.querySelector('#sandbox-dedicated-grid .level-btn:first-child');
+    if(btn) {
+        btn.onclick = () => {
+            if(typeof playSound !== 'undefined') playSound('click');
+            document.getElementById('sandbox-input-modal').style.display = 'flex';
+            document.getElementById('builder-reactants-container').innerHTML = '';
+            document.getElementById('builder-products-container').innerHTML = '';
+            window.builderHideSave();
+            window.builderAddBox('reactants');
+            window.builderAddBox('products');
         };
+    }
+};
+
 
         // --- Periodic Table ---
         
