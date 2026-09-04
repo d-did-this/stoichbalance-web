@@ -1108,6 +1108,15 @@ button:active {
     margin-bottom: 15px !important;
 }
 </style>
+
+<style>
+.menu-btn:hover, .chal-lvl-btn:hover {
+    border-color: inherit !important;
+    color: inherit !important;
+    filter: brightness(0.95);
+}
+</style>
+
 </head>
 <body>
     <div id="main-menu" class="menu-overlay"> <canvas id="physics-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 0; pointer-events: auto;"></canvas>
@@ -3040,6 +3049,15 @@ function loadReaction(idx) {
                     addChatMessage(`You did it! But wait... we can make it simpler! Try taking away the exact same amount of molecules from BOTH sides!`, 'system');
                 } else {
                     if (!state.completed.has(state.rxIdx)) {
+    if(window.challengeTimerInterval) {
+        clearInterval(window.challengeTimerInterval);
+        window.challengeTimerInterval = null;
+        let hud = document.getElementById('challenge-timer-hud');
+        if(hud) {
+            hud.style.color = '#10b981';
+            hud.style.borderColor = '#10b981';
+        }
+    }
     state.completed.add(state.rxIdx);
     updateCounter();
     
@@ -3131,7 +3149,7 @@ function loadReaction(idx) {
 
             let hintData = getBestHintData();
             if(!hintData) {
-                if (Object.keys(state.leftBlocks).length === 0 && Object.keys(state.rightBlocks).length === 0) {
+                if (state.left.length === 0 && state.right.length === 0) {
                     addChatMessage(`You haven't put anything in the trays yet! Start dragging molecules in from the bottom!`, 'agent');
                 } else {
                     addChatMessage(`Looks perfectly balanced to me! You're doing great!`, 'agent');
@@ -3618,7 +3636,7 @@ window.openPeriodicPicker = function() {
             groupLabel.style.color = '#cbd5e1';
             groupLabel.style.transition = 'color 0.2s';
             groupLabel.id = 'periodic-group-label';
-            groupLabel.innerText = 'Hover an element';
+            groupLabel.innerHTML = '<div style="font-size:24px; font-weight:900; color:#cbd5e1; text-align:center;">Select an element<br/>to see details</div>';
             grid.appendChild(groupLabel);
             
             // Create cells
@@ -3654,12 +3672,15 @@ window.openPeriodicPicker = function() {
                     let groupNum = data[4];
                     if(data[0] >= 57 && data[0] <= 71) { period = 6; groupNum = 3; }
                     if(data[0] >= 89 && data[0] <= 103) { period = 7; groupNum = 3; }
-                    document.getElementById('periodic-group-label').innerHTML = `
-<div style="display:flex; justify-content:center; gap:10px; margin-bottom: 5px;">
-    <div style="font-size:16px; background:#334155; color:white; padding:4px 12px; border-radius:20px; font-weight:bold;">Group ${groupNum}</div>
-    <div style="font-size:16px; background:#334155; color:white; padding:4px 12px; border-radius:20px; font-weight:bold;">Period ${period}</div>
-</div>
-<div>${groupName}</div>`;
+                    
+document.getElementById('periodic-header-info').innerHTML = `<span style="color:${bg}; font-weight:900;">${groupName}</span>`;
+document.getElementById('periodic-group-label').innerHTML = `
+<div style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:20px; border-radius:24px; background:${bg}11; border:4px dashed ${bg};">
+    <div style="font-size:72px; font-weight:900; color:${bg}; line-height:1;">${data[1]}</div>
+    <div style="font-size:24px; font-weight:900; color:#334155;">${data[2]}</div>
+    <div style="font-size:20px; font-weight:bold; color:#64748b; background:white; padding:4px 12px; border-radius:10px;">Atomic No. ${data[0]}</div>
+</div>`;
+
 
                     document.getElementById('periodic-group-label').style.color = bg;
                     
@@ -3675,7 +3696,10 @@ window.openPeriodicPicker = function() {
                 cell.onmouseout = () => {
                     cell.style.transform = 'scale(1)';
                     cell.style.zIndex = '1';
-                    document.getElementById('periodic-group-label').innerHTML = 'Hover an element';
+                    
+document.getElementById('periodic-header-info').innerHTML = 'Hover an element to explore!';
+document.getElementById('periodic-group-label').innerHTML = '<div style="font-size:24px; font-weight:900; color:#cbd5e1; text-align:center;">Select an element<br/>to see details</div>';
+
                     document.getElementById('periodic-group-label').style.color = '#cbd5e1';
                     
                     let allCells = document.querySelectorAll('.pt-cell');
@@ -4111,6 +4135,55 @@ localStorage.setItem('stoich_custom_levels', JSON.stringify(CUSTOM_REACTIONS));
         </div>
     </div>
 
+
+<!-- Challenge Menu Modal -->
+<div class="menu-card massive-card card" id="challenge-screen" style="z-index: 10000; display: none; flex-direction: column; align-items: center; width: 95vw; max-width: 800px; max-height: 95vh; overflow-y: auto; background: white; padding: 40px; border-radius: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.5); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:25px; width: 100%; box-sizing: border-box;">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('challenge-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:10px 20px; font-size:18px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;">
+            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back
+        </button>
+        <h2 style="font-size:48px; margin:0; font-weight:900; color:#1e293b;">🏆 Challenge</h2>
+        <div style="width:105px;"></div>
+    </div>
+    
+    <div style="width:100%; display:flex; gap:20px; margin-bottom:30px;">
+        <button onclick="window.selectChalLevel('easy')" class="chal-lvl-btn" id="chal-btn-easy" style="flex:1; padding:20px; font-size:24px; font-weight:900; border-radius:16px; border:4px solid #10b981; background:#d1fae5; color:#064e3b; cursor:pointer; box-shadow:0 6px 0 #10b981; transition:all 0.1s;">Easy</button>
+        <button onclick="window.selectChalLevel('medium')" class="chal-lvl-btn" id="chal-btn-medium" style="flex:1; padding:20px; font-size:24px; font-weight:900; border-radius:16px; border:4px solid #f59e0b; background:#fef3c7; color:#78350f; cursor:pointer; box-shadow:0 6px 0 #f59e0b; transition:all 0.1s;">Medium</button>
+        <button onclick="window.selectChalLevel('hard')" class="chal-lvl-btn" id="chal-btn-hard" style="flex:1; padding:20px; font-size:24px; font-weight:900; border-radius:16px; border:4px solid #ef4444; background:#fee2e2; color:#7f1d1d; cursor:pointer; box-shadow:0 6px 0 #ef4444; transition:all 0.1s;">Hard</button>
+    </div>
+    
+    <div style="width:100%; text-align:left; background:#f8fafc; padding:30px; border-radius:24px; border:4px solid #e2e8f0; box-sizing: border-box;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; font-size:28px; color:#334155;">Modifiers</h3>
+            <div style="display:flex; gap:10px;">
+                <button onclick="window.setChalMods(true)" style="background:#3b82f6; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">Show All</button>
+                <button onclick="window.setChalMods(false)" style="background:#ef4444; color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:bold; cursor:pointer;">Hard Mode</button>
+            </div>
+        </div>
+        
+        <label style="display:flex; align-items:center; gap:15px; font-size:22px; font-weight:900; margin-bottom:20px; cursor:pointer; color:#1e293b;">
+            <input type="checkbox" id="chal-opt-timer" style="width:28px; height:28px; cursor:pointer;"> ⏱️ Enable Stopwatch Timer
+        </label>
+        
+        <div style="height:2px; background:#e2e8f0; margin-bottom:20px;"></div>
+        
+        <label style="display:flex; align-items:center; gap:15px; font-size:22px; margin-bottom:15px; cursor:pointer; color:#475569;">
+            <input type="checkbox" id="chal-opt-tiny" class="chal-mod-cb" style="width:24px; height:24px; cursor:pointer;"> Hide Tiny Scales
+        </label>
+        <label style="display:flex; align-items:center; gap:15px; font-size:22px; margin-bottom:15px; cursor:pointer; color:#475569;">
+            <input type="checkbox" id="chal-opt-giant" class="chal-mod-cb" style="width:24px; height:24px; cursor:pointer;"> Hide Bar Chart
+        </label>
+        <label style="display:flex; align-items:center; gap:15px; font-size:22px; margin-bottom:15px; cursor:pointer; color:#475569;">
+            <input type="checkbox" id="chal-opt-beaker" class="chal-mod-cb" style="width:24px; height:24px; cursor:pointer;"> Hide Prof. Beaker Hint
+        </label>
+    </div>
+    
+    <button onclick="window.startChallenge()" style="background:#8b5cf6; color:white; border:none; padding:25px; font-size:32px; font-weight:900; border-radius:24px; margin-top:30px; cursor:pointer; width:100%; box-shadow:0 8px 0 #6d28d9; transition:all 0.1s;" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #6d28d9';">🚀 Start Challenge!</button>
+</div>
+
+<!-- Challenge Timer HUD -->
+<div id="challenge-timer-hud" style="display:none; position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(15, 23, 42, 0.9); color:white; font-size:36px; font-weight:900; font-family:monospace; padding:15px 30px; border-radius:20px; z-index:9999999; border:4px solid #3b82f6; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">00:00.0</div>
+
 <!-- Sandbox Choice Modal -->
 <div id="sandbox-choice-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.8); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(8px);">
     <div class="card" style="width:100%; max-width:800px; display:flex; flex-direction:column; gap:30px; background:#ffffff; border:4px solid #3b82f6; padding:40px; border-radius:32px; box-shadow: 0 20px 60px rgba(59,130,246,0.3); position:relative; text-align:center;">
@@ -4255,6 +4328,143 @@ window.goToSandbox = function() {
         }
     });
 };
+
+
+window.chalSelectedLevel = 'easy';
+
+window.selectChalLevel = function(lvl) {
+    if(typeof playSound !== 'undefined') playSound('click');
+    window.chalSelectedLevel = lvl;
+    
+    document.getElementById('chal-btn-easy').style.opacity = '0.5';
+    document.getElementById('chal-btn-medium').style.opacity = '0.5';
+    document.getElementById('chal-btn-hard').style.opacity = '0.5';
+    
+    document.getElementById('chal-btn-' + lvl).style.opacity = '1';
+};
+
+window.setChalMods = function(showAll) {
+    if(typeof playSound !== 'undefined') playSound('click');
+    document.getElementById('chal-opt-tiny').checked = !showAll;
+    document.getElementById('chal-opt-giant').checked = !showAll;
+    document.getElementById('chal-opt-beaker').checked = !showAll;
+};
+
+// Default selection setup
+setTimeout(() => { if(window.selectChalLevel) window.selectChalLevel('easy'); }, 1000);
+
+window.challengeTimerInterval = null;
+window.challengeStartTime = 0;
+
+window.startChallenge = function() {
+    if(typeof playSound !== 'undefined') playSound('click');
+    
+    // Equations
+    const equations = {
+        'easy': [
+            { name: "Challenge (Easy)", left: ["H2", "Cl2"], right: ["HCl"] },
+            { name: "Challenge (Easy)", left: ["N2", "H2"], right: ["NH3"] },
+            { name: "Challenge (Easy)", left: ["Na", "Cl2"], right: ["NaCl"] },
+            { name: "Challenge (Easy)", left: ["C", "O2"], right: ["CO2"] },
+            { name: "Challenge (Easy)", left: ["Mg", "O2"], right: ["MgO"] }
+        ],
+        'medium': [
+            { name: "Challenge (Medium)", left: ["CH4", "O2"], right: ["CO2", "H2O"] },
+            { name: "Challenge (Medium)", left: ["C2H6", "O2"], right: ["CO2", "H2O"] },
+            { name: "Challenge (Medium)", left: ["Al", "HCl"], right: ["AlCl3", "H2"] },
+            { name: "Challenge (Medium)", left: ["Fe", "O2"], right: ["Fe2O3"] },
+            { name: "Challenge (Medium)", left: ["KClO3"], right: ["KCl", "O2"] }
+        ],
+        'hard': [
+            { name: "Challenge (Hard)", left: ["C6H12O6", "O2"], right: ["CO2", "H2O"] },
+            { name: "Challenge (Hard)", left: ["C3H8", "O2"], right: ["CO2", "H2O"] },
+            { name: "Challenge (Hard)", left: ["Fe2O3", "C"], right: ["Fe", "CO2"] },
+            { name: "Challenge (Hard)", left: ["NH3", "O2"], right: ["NO", "H2O"] },
+            { name: "Challenge (Hard)", left: ["CuO", "NH3"], right: ["Cu", "N2", "H2O"] }
+        ]
+    };
+    
+    let list = equations[window.chalSelectedLevel];
+    let eq = list[Math.floor(Math.random() * list.length)];
+    
+    // Push temporary equation to REACTIONS and start
+    REACTIONS.push(eq);
+    let rxIdx = REACTIONS.length - 1;
+    
+    document.getElementById('challenge-screen').style.display = 'none';
+    if (typeof engine === 'undefined' || !engine) { init(); }
+    startGame(rxIdx);
+    
+    // Apply Modifiers AFTER startGame resets UI
+    setTimeout(() => {
+        if(document.getElementById('chal-opt-tiny').checked) {
+            document.getElementById('element-scales-container').style.display = 'none';
+        }
+        if(document.getElementById('chal-opt-giant').checked) {
+            document.getElementById('bar-chart-container').style.display = 'none';
+        }
+        if(document.getElementById('chal-opt-beaker').checked) {
+            document.getElementById('teacher-guide').style.display = 'none';
+        }
+        
+        // Timer
+        if(document.getElementById('chal-opt-timer').checked) {
+            document.getElementById('challenge-timer-hud').style.display = 'block';
+            window.challengeStartTime = Date.now();
+            if(window.challengeTimerInterval) clearInterval(window.challengeTimerInterval);
+            window.challengeTimerInterval = setInterval(() => {
+                let ms = Date.now() - window.challengeStartTime;
+                let s = Math.floor(ms / 1000);
+                let m = Math.floor(s / 60);
+                s = s % 60;
+                let dec = Math.floor((ms % 1000) / 100);
+                document.getElementById('challenge-timer-hud').innerText = 
+                    String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + dec;
+            }, 100);
+        } else {
+            document.getElementById('challenge-timer-hud').style.display = 'none';
+        }
+    }, 100);
+};
+
+// We must stop the timer when they win
+const oldCheckWinStateChal = window.checkWinState;
+window.checkWinState = function(lTotals, rTotals) {
+    if (oldCheckWinStateChal) oldCheckWinStateChal(lTotals, rTotals);
+    // If completed has the state, they won
+    if (state && state.completed && state.completed.has(state.rxIdx)) {
+        if(window.challengeTimerInterval) {
+            clearInterval(window.challengeTimerInterval);
+            window.challengeTimerInterval = null;
+            document.getElementById('challenge-timer-hud').style.color = '#10b981'; // Green on win
+            document.getElementById('challenge-timer-hud').style.borderColor = '#10b981';
+        }
+    }
+};
+
+// Make sure exiting level cleans up timer and UI
+const oldGoToMainMenuChal = window.goToMainMenu;
+window.goToMainMenu = function() {
+    if(oldGoToMainMenuChal) oldGoToMainMenuChal();
+    if(window.challengeTimerInterval) {
+        clearInterval(window.challengeTimerInterval);
+        window.challengeTimerInterval = null;
+    }
+    let hud = document.getElementById('challenge-timer-hud');
+    if(hud) {
+        hud.style.display = 'none';
+        hud.style.color = 'white';
+        hud.style.borderColor = '#3b82f6';
+    }
+    // Restore UI for normal play
+    let scales = document.getElementById('element-scales-container');
+    if(scales) scales.style.display = 'flex';
+    let charts = document.getElementById('bar-chart-container');
+    if(charts) charts.style.display = 'flex';
+    let beaker = document.getElementById('teacher-guide');
+    if(beaker) beaker.style.display = 'flex';
+};
+
 </script>
 
 </body>
