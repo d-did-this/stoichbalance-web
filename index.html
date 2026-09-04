@@ -1147,6 +1147,11 @@ button:active {
             <div style="font-size:24px; font-weight:900;">Sandbox</div>
             <div style="font-size:14px; font-weight:bold; color:#64748b; margin-top:5px;">Create custom puzzles</div>
         </button>
+<button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('challenge-screen').style.display='flex';" style="display:flex; flex-direction:column; align-items:center; background: #ffffff; color:#1e293b; border:4px solid #cbd5e1; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #cbd5e1; transition:all 0.1s; transform: translateY(0);" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#1e293b';" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 #cbd5e1';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #cbd5e1';">
+            <div style="font-size:40px; margin-bottom:10px;">🏆</div>
+            <div style="font-size:24px; font-weight:900;">Challenge</div>
+            <div style="font-size:14px; font-weight:bold; color:#64748b; margin-top:5px;">Work in progress</div>
+        </button>
 
         <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('login-screen').style.display='none'; document.getElementById('periodic-screen').style.display='flex'; renderPeriodicTable();" style="display:flex; flex-direction:column; align-items:center; background: #ffffff; color:#1e293b; border:4px solid #cbd5e1; padding:20px; border-radius:24px; cursor:pointer; box-shadow:0 8px 0 #cbd5e1; transition:all 0.1s; transform: translateY(0);" onmouseover="this.style.borderColor='#8b5cf6'; this.style.color='#8b5cf6';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.color='#1e293b';" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 #cbd5e1';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #cbd5e1';">
             <div style="font-size:40px; margin-bottom:10px;">📊</div>
@@ -1163,8 +1168,10 @@ button:active {
                           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                   <button onclick="if(typeof playSound !== 'undefined') playSound('back'); window.goBackToLogin()" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
                   <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
-                      <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
-                      <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
+                      <div style="display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <h2 class="menu-title" style="font-size:42px; margin:0; font-weight:900; color:#1e293b; letter-spacing:-1px;" id="puzzle-menu-title">Choose Your Challenge</h2>
+        <div id="user-greeting" style="background:#f1f5f9; padding:8px 20px; border-radius:20px; font-size:18px; color:#334155; font-weight:800; border:2px solid #e2e8f0; box-shadow:0 4px 0 #e2e8f0;"></div>
+    </div>
                   </div>
                   <div style="width:85px;"></div> <!-- Spacer to keep title perfectly centered -->
               </div>
@@ -1172,7 +1179,21 @@ button:active {
             <div class="level-grid" id="level-grid"></div>
         </div>
     </div>
-        <!-- Step 3: Sandbox Screen -->
+        <!-- Challenge Screen -->
+<div class="menu-card massive-card card" id="challenge-screen" style="z-index: 10; display:none; flex-direction:column; align-items:center; width:90vw; max-width:1000px; max-height:85vh; overflow-y:auto;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('challenge-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
+            <h2 class="menu-title" style="font-size:32px; margin:0; color:#ef4444;">Challenge Mode</h2>
+        </div>
+        <div style="width:85px;"></div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; min-height:400px;">
+        <div style="font-size:60px; margin-bottom:20px;">🚧</div>
+        <div style="font-size:36px; font-weight:900; color:#cbd5e1;">Work in progress</div>
+    </div>
+</div>
+<!-- Step 3: Sandbox Screen -->
         <div class="menu-card massive-card card" id="sandbox-screen" style="z-index: 10; display:none; flex-direction:column; align-items:center; width:90vw; max-width:1000px; max-height:85vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
                 <button onclick="if(typeof playSound !== 'undefined') playSound('back'); document.getElementById('sandbox-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1; display:flex; align-items:center; gap:8px;"><svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back</button>
@@ -1189,7 +1210,7 @@ button:active {
         </div>
         
         <!-- Sandbox Input Modal (Overlay) -->
-        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
+        <div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:99999; justify-content:center; align-items:center; backdrop-filter:blur(5px);">
             <div class="card" style="width:100%; max-width:600px; display:flex; flex-direction:column; gap:20px; background:#fffbeb; border:4px solid #fcd34d; padding:30px; border-radius:24px; box-shadow: 0 10px 25px rgba(245,158,11,0.5); position:relative;">
                 <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:15px; right:15px; background:#f8fafc; border:3px solid #cbd5e1; color:#64748b; font-weight:bold; border-radius:10px; cursor:pointer; font-size:16px; padding:5px 10px;">X</button>
                 <h3 style="margin:0; font-size:24px; color:#92400e; text-align:center;">Build Custom Equation</h3>
@@ -1526,8 +1547,8 @@ function initPhysics() {
         Matter.Composite.allBodies(engine.world).forEach(body => {
             if(!body.isStatic) {
                 Matter.Body.applyForce(body, body.position, {
-                    x: (Math.random() - 0.5) * 0.02,
-                    y: (Math.random() - 0.5) * 0.02
+                    x: (Math.random() - 0.5) * 0.002,
+                    y: (Math.random() - 0.5) * 0.002
                 });
                 // Keep them somewhat near the center/visible bounds if they drift too far
                 if (body.position.x < -100) Matter.Body.setPosition(body, { x: window.innerWidth + 100, y: body.position.y });
@@ -2343,14 +2364,14 @@ function init() {
                     
                     let diffColor = rx.name.includes('[Easy]') ? '#10b981' : (rx.name.includes('[Med]') ? '#f59e0b' : '#ef4444');
                     let cleanName = rx.name;
-                    let tag = "";
-                    let match = rx.name.match(/\[(.*?)\]/);
-                    if(match) {
-                        tag = match[0];
-                        cleanName = rx.name.replace(tag + ' ', '').trim();
-                    }
+let tag = "";
+let match = rx.name.match(/\[(.*?)\]/);
+if(match) { tag = match[1]; cleanName = rx.name.replace(match[0] + ' ', '').trim(); }
                     
-                    let tagHtml = `<div class="level-tag" style="background:${diffColor}22; color:${diffColor}; border: 3px solid ${diffColor};">Level ${actualIdx + 1}</div>`;
+                    let tagHtml = `<div style="display:flex; gap:10px; margin-bottom:15px; width:100%; justify-content:center;">
+        <div style="background:#334155; color:white; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; box-shadow:0 3px 0 #1e293b;">Level ${actualIdx + 1}</div>
+        <div style="background:${diffColor}22; color:${diffColor}; font-size:14px; font-weight:900; padding:4px 12px; border-radius:10px; border:2px solid ${diffColor};">${tag || 'Normal'}</div>
+    </div>`;
                     let leftFormatted = rx.left.map(f => getFormulaHTML(f)).join(' + ');
                     let rightFormatted = rx.right.map(f => getFormulaHTML(f)).join(' + ');
                     btn.innerHTML = `${tagHtml}<div class="level-btn-title">${cleanName}</div><div class="eq-preview">${leftFormatted} &rarr; ${rightFormatted}</div>`;
@@ -2823,7 +2844,7 @@ function loadReaction(idx) {
                             </div>
     </div>
 </div>
-<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #1e293b; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#ffffff'};">${l}</span><span style="color:${r>l?'#ef4444':'#ffffff'};">${r}</span></div>
+<div class="scale-footer" style="margin-top: 10px; display: flex; justify-content: space-around; font-size: 20px; font-weight: 900; background: #1e293b; padding: 8px 10px; border-radius: 12px; border: 2px solid #cbd5e1;"><span style="color:${l>r?'#ef4444':'#ffffff'};">${l}</span> <span style="font-size:18px; font-weight:900; color:${l===r?'#22c55e':'#ef4444'}; margin:0 5px;">${l===r?'=':'&ne;'}</span> <span style="color:${r>l?'#ef4444':'#ffffff'};">${r}</span></div>
                     </div>
                 `;
             });
