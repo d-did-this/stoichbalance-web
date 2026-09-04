@@ -1026,7 +1026,7 @@ button:active {
         <!-- Step 2: Level Select Screen -->
         <div class="menu-card massive-card card" id="level-screen" style="z-index: 10; display:none;">
                           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; width: 100%; box-sizing: border-box;">
-                  <button onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('level-screen').style.display='none'; document.getElementById('login-screen').style.display='flex';" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
+                  <button onclick="if(typeof playSound !== 'undefined') playSound('back'); window.goBackToLogin()" style="background:#f8fafc; color:#475569; border:3px solid #cbd5e1; padding:8px 15px; font-size:16px; font-weight:900; border-radius:12px; cursor:pointer; box-shadow:0 4px 0 #cbd5e1;">⬅️ Back</button>
                   <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center;">
                       <h2 class="menu-title" style="font-size:32px; margin:0;" id="puzzle-menu-title">Select a Puzzle</h2>
                       <div id="user-greeting" style="font-size:16px; color:#64748b; font-weight:800; margin-top:5px;"></div>
@@ -1048,7 +1048,7 @@ button:active {
             <div id="streak-counter" style="background:#f59e0b; color:white; padding:4px 12px; border-radius:12px; font-weight:900; font-size:18px; border:3px solid #b45309; box-shadow:0 4px 0 #b45309; cursor:help;" data-tooltip="Your current streak! Don't use hints!">🔥 0</div>
         </div>
         <div style="display: flex; gap: 12px; align-items:center; position: relative;">
-            <button class="menu-special-btn dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('click'); returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:5px;"><svg style="width:20px;height:20px;margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Menu</button>
+            <button class="menu-special-btn dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('back'); returnToMenu()" data-tooltip="Go back to the Main Menu" style="display:flex; align-items:center; justify-content:center; gap:5px;"><svg style="width:20px;height:20px;margin-right:4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Menu</button>
             <div class="dropdown">
                 <button class="dropbtn" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('settings-dropdown').classList.toggle('show')">⋮ Settings</button>
                 <div id="settings-dropdown" class="dropdown-content">
@@ -1144,7 +1144,7 @@ button:active {
 
         <!-- Right Sidebar: Teacher Guide -->
         <div class="right-sidebar" id="teacher-guide">
-            <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; width:100%; display:flex; justify-content:center; white-space:nowrap; padding-bottom:4px;" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('teacher-guide').classList.toggle('collapsed')">
+            <div class="sidebar-title-wrapper" data-tooltip="Click to toggle!" style="cursor:pointer; width:100%; display:flex; justify-content:center; white-space:nowrap; padding-bottom:4px;" onclick="if(typeof playSound !== 'undefined') { let g = document.getElementById('teacher-guide'); if(g.classList.contains('collapsed')) playSound('expand'); else playSound('collapse'); } document.getElementById('teacher-guide').classList.toggle('collapsed')">
                 <div class="sidebar-title" style="display:flex; align-items:center; justify-content:center; padding: 5px 10px; width: 100%;"><svg class="title-svg" style="width:36px;height:36px;color:#ffffff;margin-right:8px;" fill="none" stroke="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> <span class="full-text" style="font-size:24px;font-weight:900;margin-left:5px;">PROF. BEAKER</span></div>
             </div>
             <div class="chat-wrapper">
@@ -1650,6 +1650,46 @@ let REACTIONS = FORM_4_REACTIONS;
                 gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.15);
                 osc.start(window.audioCtx.currentTime);
                 osc.stop(window.audioCtx.currentTime + 0.15);
+            } else if (type === 'back') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, window.audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.1, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.2);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.2);
+            } else if (type === 'expand') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, window.audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.15);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.15);
+            } else if (type === 'collapse') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, window.audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.15);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.15);
+            } else if (type === 'startover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, window.audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.1, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.3);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.3);
+            } else if (type === 'undo') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, window.audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, window.audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.2, window.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.1);
+                osc.start(window.audioCtx.currentTime);
+                osc.stop(window.audioCtx.currentTime + 0.1);
             } else if (type === 'ding') {
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, window.audioCtx.currentTime);
@@ -1914,8 +1954,70 @@ let REACTIONS = FORM_4_REACTIONS;
         }
 
         function openTutorial() {
-            document.getElementById('tutorial-modal').style.display = 'flex';
-            showTutSlide(1);
+            if (typeof Shepherd !== 'undefined') {
+                const tour = new Shepherd.Tour({
+                    useModalOverlay: true,
+                    defaultStepOptions: {
+                        cancelIcon: { enabled: true },
+                        classes: 'shadow-md bg-purple-dark',
+                        scrollTo: { behavior: 'smooth', block: 'center' }
+                    }
+                });
+
+                tour.addStep({
+                    title: 'Welcome to Stoichbalance!',
+                    text: 'This is the main puzzle area where you balance chemical equations!',
+                    attachTo: { element: '.app-body', on: 'bottom' },
+                    buttons: [{ text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'Here is the Menu button. Click this to return to the puzzle selection screen.',
+                    attachTo: { element: '.menu-special-btn', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+                
+                tour.addStep({
+                    text: 'Need to adjust size or sound? Use the Settings dropdown.',
+                    attachTo: { element: '.dropdown', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'These are the Master Scales. They show the overall balance of the entire equation!',
+                    attachTo: { element: '#master-scale', on: 'bottom' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'These are the supply trays. Drag molecule blocks from here...',
+                    attachTo: { element: '#tray-left', on: 'right' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: '...and drop them into these big work panels to add them to the equation!',
+                    attachTo: { element: '#area-left', on: 'right' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'These tiny scales appear for each individual element. They tell you exactly which element is unbalanced!',
+                    attachTo: { element: '#element-scales-container', on: 'right' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
+                });
+
+                tour.addStep({
+                    text: 'I am Prof. Beaker! If you are stuck, just click "Give me a Hint!" and I will help you out.',
+                    attachTo: { element: '#teacher-guide', on: 'left' },
+                    buttons: [{ text: 'Back', action: tour.back }, { text: 'Finish', action: tour.complete }]
+                });
+
+                tour.start();
+            } else {
+                document.getElementById('tutorial-modal').style.display = 'flex';
+                showTutSlide(1);
+            }
         }
 
         function closeTutorial() {
@@ -2096,36 +2198,6 @@ function loadReaction(idx) {
             }
             if(isExcess) {
                 addChatMessage(`Careful! You already have too much <strong>${FULL_ELEMENT_NAMES[excessEl] || excessEl}</strong> on the ${side==='left'?'Reactants':'Products'} side! Adding this block tips the scale even further!`, 'system');
-                
-                if (typeof Shepherd !== 'undefined') {
-                    const mistakeTour = new Shepherd.Tour({
-                        useModalOverlay: true,
-                        defaultStepOptions: {
-                            cancelIcon: { enabled: true },
-                            classes: 'shadow-md bg-purple-dark',
-                            scrollTo: { behavior: 'smooth', block: 'center' }
-                        }
-                    });
-                    
-                    let targetScale = '#scale-card-' + excessEl;
-                    if(document.querySelector(targetScale)) {
-                        mistakeTour.addStep({
-                            id: 'mistake-scale',
-                            text: 'Professor Beaker here! Look at the ' + (FULL_ELEMENT_NAMES[excessEl] || excessEl) + ' scale! You added too much on the ' + (side==='left'?'Reactants':'Products') + ' side.',
-                            attachTo: { element: targetScale, on: 'right' },
-                            buttons: [{ text: 'Next', action: mistakeTour.next }]
-                        });
-                        
-                        mistakeTour.addStep({
-                            id: 'mistake-undo',
-                            text: 'Click here to undo your last move and try a different molecule!',
-                            attachTo: { element: '[data-tooltip="Undo Last Move"]', on: 'top' },
-                            buttons: [{ text: 'Got it', action: mistakeTour.complete }]
-                        });
-                        
-                        mistakeTour.start();
-                    }
-                }
             }
 
             if (state.expectedMove) {
@@ -2684,7 +2756,7 @@ function loadReaction(idx) {
                 state.lastHintElement = hintData.element;
             } else {
                 state.hintLevel++;
-                if(state.hintLevel > 3) state.hintLevel = 3; // Cap at 3
+                if(state.hintLevel > 4) state.hintLevel = 4; // Cap at 4
             }
 
             let isLeft = hintData.sideNeeds === 'left';
@@ -2729,6 +2801,44 @@ function loadReaction(idx) {
                         btn.style.boxShadow = "0 0 0 5px var(--st-yellow), 0 10px 20px rgba(0,0,0,0.2)";
                         setTimeout(() => { btn.style.transform = ""; btn.style.boxShadow = "0 4px 0 var(--primary)"; }, 5000);
                         break;
+                    }
+                }
+            }
+            if (state.hintLevel === 4) {
+                if (typeof Shepherd !== 'undefined') {
+                    const hintTour = new Shepherd.Tour({
+                        useModalOverlay: true,
+                        defaultStepOptions: {
+                            cancelIcon: { enabled: true },
+                            classes: 'shadow-md bg-purple-dark',
+                            scrollTo: { behavior: 'smooth', block: 'center' }
+                        }
+                    });
+                    
+                    let targetTray = null;
+                    let trays = document.getElementById('tray-' + hintData.sideNeeds).children;
+                    for(let btn of trays) {
+                        if(btn.innerHTML.includes(hintData.bestMolecule)) {
+                            targetTray = btn; break;
+                        }
+                    }
+
+                    if (targetTray) {
+                        hintTour.addStep({
+                            id: 'hint-tray',
+                            text: 'Professor Beaker here! Click and drag EXACTLY this block...',
+                            attachTo: { element: targetTray, on: 'top' },
+                            buttons: [{ text: 'Next', action: hintTour.next }]
+                        });
+                        
+                        hintTour.addStep({
+                            id: 'hint-drop',
+                            text: '...and drop it into this box right here to balance the ' + FULL_ELEMENT_NAMES[hintData.element] + '!',
+                            attachTo: { element: '#area-' + hintData.sideNeeds, on: 'top' },
+                            buttons: [{ text: 'Got it', action: hintTour.complete }]
+                        });
+                        
+                        hintTour.start();
                     }
                 }
             }
@@ -2851,6 +2961,20 @@ function returnToMenu() {
     }, 300);
 }
 
+window.goBackToLogin = function() {
+    let login = document.getElementById('login-screen');
+    let level = document.getElementById('level-screen');
+    level.style.transition = 'opacity 0.3s ease';
+    level.style.opacity = '0';
+    setTimeout(() => {
+        level.style.display = 'none';
+        login.style.display = 'flex';
+        login.style.opacity = '0';
+        login.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => login.style.opacity = '1', 10);
+    }, 300);
+};
+
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
         if (document.documentElement.requestFullscreen) {
@@ -2935,10 +3059,10 @@ window.onclick = function(event) {
         
 
         <button onclick="if(typeof playSound !== 'undefined') playSound('click'); openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8; width:60px; height:60px; border-radius:50%; font-weight:900; font-size:32px; font-family:'Nunito', Arial, sans-serif; cursor:pointer; display:flex; justify-content:center; align-items:center; transition:transform 0.2s;" data-tooltip="Need a tour? Click here!" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">?</button>
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('undo'); undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Undo Last Move">
             <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
         </button>
-        <button onclick="if(typeof playSound !== 'undefined') playSound('click'); resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Start Over">
+        <button onclick="if(typeof playSound !== 'undefined') playSound('startover'); resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c; width:60px; height:60px; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" data-tooltip="Start Over">
             <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
         </button>
     </div>
