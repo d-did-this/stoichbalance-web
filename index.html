@@ -1122,7 +1122,6 @@ button:active {
 </div></div>
                     <div class="eq-right-container"><div class="eq-right" id="eq-right-content"></div></div>
                 </div>
-            </div>
 
               <!-- Workspace Boxes -->
             <div class="workspace-grid">
@@ -1140,10 +1139,7 @@ button:active {
                     <div class="panel-tally" id="tally-right"></div>
                 </div>
             
-                </div>
-
-
-                </div>
+            </div>
         </div>
 
         <!-- Right Sidebar: Teacher Guide -->
@@ -1353,24 +1349,34 @@ function initPhysics() {
     const colors = ['#3b82f6', '#f97316', '#10b981', '#facc15', '#ec4899', '#8b5cf6'];
     const bodies = [];
     
-    for (let i = 0; i < 40; i++) {
-        let radius = 20 + Math.random() * 15;
-        let x = Math.random() * window.innerWidth;
-        let y = -Math.random() * 2000; // Drop from sky
-        
-        let circle = Bodies.circle(x, y, radius, {
-            restitution: 0.8, // Bouncy
-            friction: 0.05,
+    function spawnMolecule(x, y) {
+        let size = 20 + Math.random() * 15;
+        let isCircle = Math.random() > 0.5;
+        let body;
+        let options = {
+            restitution: 0.9, 
+            friction: 0.01,
             render: {
                 fillStyle: colors[Math.floor(Math.random() * colors.length)],
                 strokeStyle: '#ffffff',
                 lineWidth: 3
             }
-        });
-        bodies.push(circle);
+        };
+        if (isCircle) {
+            body = Bodies.circle(x, y, size, options);
+        } else {
+            let sides = Math.floor(Math.random() * 3) + 3; // 3 to 5 sides
+            body = Bodies.polygon(x, y, sides, size * 1.2, options);
+        }
+        body.atomLabel = ['H', 'O', 'C', 'N', 'Fe', 'Na', 'Cl'][Math.floor(Math.random()*7)];
+        Composite.add(engine.world, body);
     }
-    
-    Composite.add(engine.world, bodies);
+
+    for (let i = 0; i < 40; i++) {
+        let x = Math.random() * window.innerWidth;
+        let y = -Math.random() * 2000;
+        spawnMolecule(x, y);
+    }
 
     // Add mouse interaction
     const mouse = Mouse.create(render.canvas);
@@ -1382,12 +1388,33 @@ function initPhysics() {
         }
     });
     
-    // Important: Let mouse events pass through to the canvas without breaking underlying HTML
-    // But since canvas is z-index 0, the menu cards (z-index 10) will capture clicks on themselves.
-    // The canvas will only capture clicks in the empty background!
-    
     Composite.add(engine.world, mouseConstraint);
     render.mouse = mouse;
+
+    if (!window.physicsClickListenerAdded) {
+        window.physicsClickListenerAdded = true;
+        Matter.Events.on(mouseConstraint, 'mousedown', function(event) {
+            let mousePos = event.mouse.position;
+            let bodiesUnderMouse = Matter.Query.point(Composite.allBodies(engine.world), mousePos);
+            if (bodiesUnderMouse.length === 0) {
+                spawnMolecule(mousePos.x, mousePos.y);
+                if(typeof playSound !== 'undefined') playSound('clink');
+            }
+        });
+    }
+
+    Matter.Events.on(render, 'afterRender', function() {
+        let ctx = render.context;
+        ctx.font = "bold 20px 'Nunito', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "white";
+        Composite.allBodies(engine.world).forEach((b) => {
+            if(b.atomLabel) {
+                ctx.fillText(b.atomLabel, b.position.x, b.position.y);
+            }
+        });
+    });
 
     // Run engine and renderer
     Render.run(render);
@@ -2772,11 +2799,14 @@ function goToLevels(selectedForm) {
 
 function startGame(index) {
     let menu = document.getElementById('main-menu');
+    let app = document.getElementById('app-body');
     menu.style.transition = 'opacity 0.4s ease';
     menu.style.opacity = '0';
     if(typeof isMuted !== 'undefined' && !isMuted) playSound('whoosh');
     setTimeout(() => {
         menu.classList.add('hidden');
+        app.style.display = 'flex';
+        app.style.opacity = '1';
         state.rxIdx = index;
         loadReaction(index);
         menu.style.opacity = '1'; // reset for later
@@ -2785,25 +2815,40 @@ function startGame(index) {
 
 
 function returnToMenu() {
-    document.getElementById('main-menu').classList.remove('hidden');
-    // If they already entered their name, take them straight to the level grid
-    let savedName = document.getElementById('student-name').value.trim();
-    if(savedName !== '') {
-        currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
-        if (currentForm === 'Form 5') {
-            REACTIONS = FORM_5_REACTIONS;
-        } else if (currentForm === 'Developer') {
-            REACTIONS = FORM_DEV_REACTIONS;
+    document.getElementById('win-modal').style.display = 'none';
+    let app = document.getElementById('app-body');
+    let menu = document.getElementById('main-menu');
+    let level = document.getElementById('level-screen');
+    let login = document.getElementById('login-screen');
+    
+    app.style.transition = 'opacity 0.3s ease';
+    app.style.opacity = '0';
+    
+    setTimeout(() => {
+        app.style.display = 'none';
+        menu.classList.remove('hidden');
+        menu.style.opacity = '0';
+        menu.style.transition = 'opacity 0.3s ease';
+        
+        let savedName = document.getElementById('student-name').value.trim();
+        if(savedName !== '') {
+            currentForm = localStorage.getItem('stoich_student_form') || 'Form 4';
+            if (currentForm === 'Form 5') {
+                REACTIONS = FORM_5_REACTIONS;
+            } else if (currentForm === 'Developer') {
+                REACTIONS = FORM_DEV_REACTIONS;
+            } else {
+                REACTIONS = FORM_4_REACTIONS;
+            }
+            login.style.display = 'none';
+            level.style.display = 'flex';
         } else {
-            REACTIONS = FORM_4_REACTIONS;
+            login.style.display = 'flex';
+            level.style.display = 'none';
         }
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('level-screen').style.display = 'flex';
-    } else {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('level-screen').style.display = 'none';
-    }
-    init();
+        init();
+        setTimeout(() => { menu.style.opacity = '1'; }, 10);
+    }, 300);
 }
 
 function toggleFullScreen() {
