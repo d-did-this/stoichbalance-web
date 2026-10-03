@@ -864,36 +864,6 @@
         flex: 1; min-height: 0; display: flex; flex-direction: column; 
     }
 
-
-/* Custom Tooltip Styling Restored */
-[data-tooltip] { position: relative; }
-[data-tooltip]:hover::after {
-    content: attr(data-tooltip);
-    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px);
-    background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700;
-    white-space: nowrap; pointer-events: none; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-[data-tooltip]:hover::before {
-    content: '';
-    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0);
-    border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent;
-    pointer-events: none; z-index: 9999;
-}
-
-[data-info] { position: relative; }
-[data-info]:hover::after {
-    content: attr(data-info);
-    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px);
-    background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700;
-    white-space: nowrap; pointer-events: none; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-[data-info]:hover::before {
-    content: '';
-    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0);
-    border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent;
-    pointer-events: none; z-index: 9999;
-}
-
 </style>
 
 
@@ -1077,6 +1047,32 @@
     }
 </style>
 
+
+<style id="essential-restored-css">
+    .book-block { width: 40px; height: 12px; border-radius: 6px; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.1); flex-shrink: 0; }
+    .book-block.blue { background: #3b82f6; border: 2px solid #1d4ed8; }
+    .book-block.orange { background: #f97316; border: 2px solid #c2410c; }
+    
+    @keyframes pulseWarning {
+        0% { transform: scale(1) translateY(0); opacity: 1; }
+        50% { transform: scale(1.2) translateY(-2px); opacity: 0.8; }
+    }
+    
+    [data-tooltip] { position: relative; }
+    [data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px);
+        background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+        white-space: nowrap; pointer-events: none; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    [data-tooltip]:hover::before {
+        content: '';
+        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0);
+        border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+        pointer-events: none; z-index: 9999;
+    }
+</style>
+
 </head>
 <body>
     <!-- Floating Action Button (FAB) Menu -->
@@ -1252,22 +1248,10 @@
                 <div class="header-react" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">REACTANTS</div>
                 
                 <!-- GRID 1: Molecule Buttons -->
-                <div id="react-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
-    <button class="mol-btn btn-react" draggable="true" ondragstart="event.preventDefault();" onclick="addMolecule('react', 'Zn')" data-info="Click/drag to Add 1 x Zinc Solid">Zn <span style="font-size: 0.7em; margin-left: 2px;">(s)</span></button>
-    <button class="mol-btn btn-react" draggable="true" ondragstart="event.preventDefault();" onclick="addMolecule('react', 'AgNO3')" data-info="Click/drag to Add 1 x Silver Nitrate">AgNO<span style="font-size: 0.7em; vertical-align: sub;">3</span> <span style="font-size: 0.7em; margin-left: 2px;">(aq)</span></button>
-</div>
+                <div id="react-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;"></div>
                 
                 <!-- GRID 2: Blocks Drop Zone -->
-                <div style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;">
-                    <!-- Zn Row -->
-                    <div style="flex: 1; border: 4px dashed transparent; border-radius: 20px; background: transparent; overflow: hidden; position: relative;">
-                        <div id="row-react-zn" class="drop-row" data-accept="Zn" style="border-radius: 16px; min-height: 70px; display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px; padding: 5px;"></div>
-                    </div>
-                    <!-- AgNO3 Row -->
-                    <div style="flex: 1; border: 4px dashed transparent; border-radius: 20px; background: transparent; overflow: hidden; position: relative;">
-                        <div id="row-react-agno3" class="drop-row" data-accept="AgNO3" style="border-radius: 16px; min-height: 70px; display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px; padding: 5px;"></div>
-                    </div>
-                </div>
+                <div id="react-drop-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"></div>
                 
                 <!-- Footer Counters with 2D Marbles -->
                 <div id="footer-react" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
@@ -1282,22 +1266,10 @@
                 <div class="header-prod" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">PRODUCTS</div>
                 
                 <!-- GRID 1: Molecule Buttons -->
-                <div id="prod-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
-    <button class="mol-btn btn-prod" draggable="true" ondragstart="event.preventDefault();" onclick="addMolecule('prod', 'ZnNO3_2')" data-info="Click/drag to Add 1 x Zinc Nitrate">Zn(NO<span style="font-size: 0.7em; vertical-align: sub;">3</span>)<span style="font-size: 0.7em; vertical-align: sub;">2</span> <span style="font-size: 0.7em; margin-left: 2px;">(aq)</span></button>
-    <button class="mol-btn btn-prod" draggable="true" ondragstart="event.preventDefault();" onclick="addMolecule('prod', 'Ag')" data-info="Click/drag to Add 1 x Silver Solid">Ag <span style="font-size: 0.7em; margin-left: 2px;">(s)</span></button>
-</div>
+                <div id="prod-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;"></div>
                 
                 <!-- GRID 2: Blocks Drop Zone -->
-                <div style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;">
-                    <!-- Zn(NO3)2 Row -->
-                    <div style="flex: 1; border: 4px dashed transparent; border-radius: 20px; background: transparent; overflow: hidden; position: relative;">
-                        <div id="row-prod-znno3_2" class="drop-row" data-accept="ZnNO3_2" style="border-radius: 16px; min-height: 70px; display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px; padding: 5px;"></div>
-                    </div>
-                    <!-- Ag Row -->
-                    <div style="flex: 1; border: 4px dashed transparent; border-radius: 20px; background: transparent; overflow: hidden; position: relative;">
-                        <div id="row-prod-ag" class="drop-row" data-accept="Ag" style="border-radius: 16px; min-height: 70px; display: flex; flex-direction: row-reverse; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 10px; padding: 5px;"></div>
-                    </div>
-                </div>
+                <div id="prod-drop-container" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"></div>
                 
                 <!-- Footer Counters with 2D Marbles -->
                 <div id="footer-prod" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
@@ -1365,503 +1337,6 @@
 
 
 
-<script>
-
-
-
-
-
-
-
-    // --- REAL AUDIO SYSTEM ---
-    let audioCtx;
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    let isMuted = false;
-    function playSound(type) {
-        if (isMuted) return;
-        initAudio();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        if (type === 'undo') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.15);
-        } else if (type === 'startover') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.25);
-            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.25);
-        } else {
-            // Click
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        }
-    }
-
-    // --- MUTE TOGGLE ---
-    function toggleMute() {
-        isMuted = !isMuted;
-        if (!isMuted) playSound('click');
-        
-        const onIcon = document.getElementById('icon-sound-on');
-        const offIcon = document.getElementById('icon-sound-off');
-        const btn = document.getElementById('btn-mute');
-        if(!btn) return;
-        
-        if (isMuted) {
-            if(onIcon) onIcon.style.display = 'none';
-            if(offIcon) offIcon.style.display = 'block';
-            btn.style.background = '#94a3b8';
-            btn.style.borderColor = '#64748b';
-            btn.style.boxShadow = '0 4px 0 #64748b';
-            btn.setAttribute('data-tooltip', 'Unmute Sounds');
-        } else {
-            if(onIcon) onIcon.style.display = 'block';
-            if(offIcon) offIcon.style.display = 'none';
-            btn.style.background = '#14b8a6';
-            btn.style.borderColor = '#0d9488';
-            btn.style.boxShadow = '0 4px 0 #0d9488';
-            btn.setAttribute('data-tooltip', 'Mute Sounds');
-        }
-        
-        const activeTooltip = document.querySelector('.js-tooltip');
-        if (activeTooltip) {
-            activeTooltip.innerHTML = btn.getAttribute('data-tooltip');
-        }
-    }
-
-    // --- LEGACY JS TOOLTIP LOGIC ---
-    let activeTooltip = null;
-    
-    document.addEventListener('mouseover', function(e) {
-        let target = e.target.closest('[data-tooltip], [data-html-tooltip]');
-        if(target) {
-            if(activeTooltip) activeTooltip.remove();
-            
-            let content = target.getAttribute('data-tooltip') || target.getAttribute('data-html-tooltip');
-            activeTooltip = document.createElement('div');
-            activeTooltip.className = 'js-tooltip';
-            activeTooltip.innerHTML = content;
-            document.body.appendChild(activeTooltip);
-            
-            let rect = target.getBoundingClientRect();
-            let tipRect = activeTooltip.getBoundingClientRect();
-            
-            let top = rect.top - tipRect.height - 10;
-            let left = rect.left + (rect.width/2) - (tipRect.width/2);
-            
-            if(top < 10) top = rect.bottom + 10;
-            if(left < 10) left = 10;
-            
-            // Fix tooltip overflow on the right edge (Settings buttons)
-            if(left + tipRect.width > window.innerWidth - 10) {
-                left = rect.left - tipRect.width - 10;
-                top = rect.top + (rect.height/2) - (tipRect.height/2);
-                if(left < 10) left = 10;
-            }
-            
-            activeTooltip.style.top = top + 'px';
-            activeTooltip.style.left = left + 'px';
-            activeTooltip.style.opacity = '1';
-            activeTooltip.style.zIndex = '99999';
-        }
-    });
-
-    document.addEventListener('mouseout', function(e) {
-        let target = e.target.closest('[data-tooltip], [data-html-tooltip]');
-        if(target && activeTooltip) {
-            activeTooltip.remove();
-            activeTooltip = null;
-        }
-    });
-
-    // --- MOCK PLACEHOLDERS ---
-    function undo() { playSound('undo'); }
-    function toggleFullscreen() { playSound('click'); alert("Toggle Fullscreen!"); }
-
-    let hintLevel = 0;
-    let lastHintElement = null;
-
-    
-    
-    function addChatMessage(msg) {
-        let container = document.querySelector('.beaker-message');
-        if(!container) return;
-        
-        let newMsg = document.createElement('div');
-        newMsg.style.marginTop = '15px';
-        newMsg.style.background = '#f0f9ff';
-        newMsg.style.border = '3px solid #38bdf8';
-        newMsg.style.borderRadius = '16px';
-        newMsg.style.padding = '12px 16px';
-        newMsg.style.color = '#0f172a';
-        newMsg.style.fontWeight = '900';
-        newMsg.style.fontSize = '1.1rem';
-        newMsg.style.lineHeight = '1.6';
-        newMsg.style.boxShadow = '0 4px 0 rgba(56, 189, 248, 0.2)';
-        newMsg.style.boxSizing = 'border-box';
-        newMsg.style.maxWidth = '100%';
-        newMsg.style.overflowWrap = 'break-word';
-        newMsg.innerHTML = msg;
-        
-        container.appendChild(newMsg);
-        container.scrollTop = container.scrollHeight;
-    }
-
-
-
-    
-    function openTutorial() { 
-        playSound('click'); 
-        
-        let countReactZn = document.getElementById('row-react-zn') ? document.getElementById('row-react-zn').children.length : 0;
-        let countReactAgNO3 = document.getElementById('row-react-agno3') ? document.getElementById('row-react-agno3').children.length : 0;
-        let countProdZnNO3_2 = document.getElementById('row-prod-znno3_2') ? document.getElementById('row-prod-znno3_2').children.length : 0;
-        let countProdAg = document.getElementById('row-prod-ag') ? document.getElementById('row-prod-ag').children.length : 0;
-        
-        let cZn = Math.max(0, countReactZn);
-        let cAgNO3 = Math.max(0, countReactAgNO3);
-        let cZnNO3_2 = Math.max(0, countProdZnNO3_2);
-        let cAg = Math.max(0, countProdAg);
-
-        let totals = {
-            Zn: { r: cZn * 1, p: cZnNO3_2 * 1 },
-            Ag: { r: cAgNO3 * 1, p: cAg * 1 },
-            N:  { r: cAgNO3 * 1, p: cZnNO3_2 * 2 },
-            O:  { r: cAgNO3 * 3, p: cZnNO3_2 * 6 }
-        };
-        
-        let imbalances = [];
-        for(let el in totals) {
-            let diff = Math.abs(totals[el].r - totals[el].p);
-            if(diff > 0) {
-                let sideNeeds = totals[el].r < totals[el].p ? 'left' : 'right';
-                let bestMolecule = '';
-                
-                if(sideNeeds === 'left') {
-                    if(el === 'Zn') bestMolecule = 'Zn';
-                    else bestMolecule = 'AgNO3';
-                } else {
-                    if(el === 'Ag') bestMolecule = 'Ag';
-                    else bestMolecule = 'ZnNO3_2';
-                }
-                
-                imbalances.push({ element: el, diff: diff, sideNeeds: sideNeeds, bestMolecule: bestMolecule });
-            }
-        }
-        
-        
-        if(cZn === 0 && cAgNO3 === 0 && cZnNO3_2 === 0 && cAg === 0) {
-            addChatMessage("The board is empty! Click the buttons to add some molecules first.");
-            return;
-        }
-        
-        if(imbalances.length === 0) {
-            addChatMessage("🎉 Looks perfectly balanced to me! You're doing great!");
-            return;
-        }
-        
-        let hintData = imbalances[0]; 
-        
-        if(lastHintElement !== hintData.element) {
-            hintLevel = 1;
-            lastHintElement = hintData.element;
-        } else {
-            hintLevel++;
-            if(hintLevel > 3) hintLevel = 3;
-        }
-        
-        function badge(text, type) {
-            if(type === 'side') return '<span style="background: #10b981; color: white; border: 2px solid #059669; border-radius: 8px; padding: 2px 8px; box-shadow: 0 2px 0 #059669; font-weight: 900; display: inline-block; margin: 0 4px;">' + text + '</span>';
-            if(type === 'mol') return '<span style="background: #e2e8f0; color: #0f172a; border: 2px solid #94a3b8; border-radius: 8px; padding: 2px 8px; box-shadow: 0 2px 0 #94a3b8; font-weight: 900; display: inline-block; margin: 0 4px;">' + text + '</span>';
-            if(type === 'el') return '<span style="background: #d97706; color: white; border: 2px solid #b45309; border-radius: 8px; padding: 2px 8px; box-shadow: 0 2px 0 #b45309; font-weight: 900; display: inline-block; margin: 0 4px;">' + text + '</span>';
-            return text;
-        }
-
-        let sideName = hintData.sideNeeds === 'left' ? "REACTANTS (left side)" : "PRODUCTS (right side)";
-        
-        let elName = hintData.element;
-        if(elName === 'Zn') elName = 'Zinc';
-        if(elName === 'Ag') elName = 'Silver';
-        if(elName === 'N') elName = 'Nitrogen';
-        if(elName === 'O') elName = 'Oxygen';
-        
-        let molName = hintData.bestMolecule;
-        if(molName === 'AgNO3') molName = 'Silver Nitrate';
-        if(molName === 'ZnNO3_2') molName = 'Zinc Nitrate';
-        if(molName === 'Zn') molName = 'Zinc Solid';
-        if(molName === 'Ag') molName = 'Silver Solid';
-        
-        if(hintLevel === 1) {
-            addChatMessage("🔍 Let's focus on " + badge(elName, 'el') + "!<br><br>Check its tiny scale to the left... it looks like it's tipping! We have too few on the " + badge(sideName, 'side') + ".");
-        } else if (hintLevel === 2) {
-            addChatMessage("👉 To fix the " + badge(elName, 'el') + " imbalance, we need to add more molecules to the " + badge(sideName, 'side') + " box!");
-        } else {
-            addChatMessage("💡 Try this exact move:<br><br>Click the " + badge(molName, 'mol') + " block to add it into the " + badge(sideName, 'side') + " box!");
-        }
-    }
-
-    
-    function clearChat() {
-        playSound('startover');
-        let container = document.querySelector('.beaker-message');
-        if(container) {
-            container.innerHTML = '<div style="margin-top: 5px; background: #f0f9ff; border: 3px solid #38bdf8; border-radius: 16px; padding: 12px 16px; color: #0f172a; font-weight: 900; font-size: 1.1rem; line-height: 1.6; box-shadow: 0 4px 0 rgba(56, 189, 248, 0.2); box-sizing: border-box; max-width: 100%; overflow-wrap: break-word;">👋 Welcome to Level 1!<br><br>Let\'s balance the reaction between <span style="background: #e2e8f0; color: #0f172a; border: 2px solid #94a3b8; border-radius: 8px; padding: 2px 8px; box-shadow: 0 2px 0 #94a3b8; display: inline-block;">Zinc</span> and <span style="background: #e2e8f0; color: #0f172a; border: 2px solid #94a3b8; border-radius: 8px; padding: 2px 8px; box-shadow: 0 2px 0 #94a3b8; display: inline-block;">Silver Nitrate</span>!</div>'.replace(/\'/g, "'");
-        }
-    }
-
-
-
-
-    // --- INTERACTIVE SIMULATION LOGIC ---
-    function addMolecule(side, type) {
-        playSound('click');
-        let rowId = 'row-' + side + '-' + type.toLowerCase();
-        let row = document.getElementById(rowId);
-        if (!row) return;
-        
-        const mZn = "<div class='hyper-marble hm-Zn'>Zn</div>";
-        const mAg = "<div class='hyper-marble hm-Ag'>Ag</div>";
-        const mN  = "<div class='hyper-marble hm-N'>N</div>";
-        const mO  = "<div class='hyper-marble hm-O'>O</div>";
-        
-        let label = '';
-        let marbles = '';
-        
-        if (type === 'Zn') {
-            label = 'Zn';
-            marbles = mZn;
-        } else if (type === 'AgNO3') {
-            label = 'AgNO<span style="font-size: 0.6em;">3</span>';
-            marbles = mAg + mN + mO.repeat(3);
-        } else if (type === 'ZnNO3_2') {
-            label = 'Zn(NO<span style="font-size: 0.6em;">3</span>)<span style="font-size: 0.6em;">2</span>';
-            marbles = mZn + mN.repeat(2) + mO.repeat(6);
-        } else if (type === 'Ag') {
-            label = 'Ag';
-            marbles = mAg;
-        }
-
-        let newBlock = document.createElement('div');
-        newBlock.className = 'mol-block';
-        newBlock.setAttribute('data-tooltip', 'Click to remove');
-        newBlock.onclick = function() {
-            playSound('undo');
-            this.remove();
-            updateSimulation();
-            
-            if(activeTooltip) { activeTooltip.remove(); activeTooltip = null; }
-        };
-        newBlock.innerHTML = `<div style="font-weight: 900; font-size: 1.1rem; color: #1e293b;">${label}</div><div style="display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; max-width: 140px;">${marbles}</div>`;
-        
-        row.appendChild(newBlock);
-        updateSimulation();
-    }
-
-    function updateSimulation() {
-        // Count blocks in grid 2
-        let countReactZn = document.getElementById('row-react-zn') ? document.getElementById('row-react-zn').children.length : 0;
-        let countReactAgNO3 = document.getElementById('row-react-agno3') ? document.getElementById('row-react-agno3').children.length : 0;
-        let countProdZnNO3_2 = document.getElementById('row-prod-znno3_2') ? document.getElementById('row-prod-znno3_2').children.length : 0;
-        let countProdAg = document.getElementById('row-prod-ag') ? document.getElementById('row-prod-ag').children.length : 0;
-
-        let cZn = Math.max(0, countReactZn);
-        let cAgNO3 = Math.max(0, countReactAgNO3);
-        let cZnNO3_2 = Math.max(0, countProdZnNO3_2);
-        let cAg = Math.max(0, countProdAg);
-
-        // Update Equation Tooltips
-        function buildCoeffTooltip(type, coeff) {
-            let name = '';
-            let formulaHtml = '';
-            let marbleHtml = '';
-            
-            const mZn = "<div style='width: 24px; height: 24px; border-radius: 50%; background: #94a3b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 900; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.2);'>Zn</div>";
-            const mAg = "<div style='width: 24px; height: 24px; border-radius: 50%; background: #cbd5e1; display: inline-flex; align-items: center; justify-content: center; color: #0f172a; font-size: 11px; font-weight: 900; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.2);'>Ag</div>";
-            const mN = "<div style='width: 24px; height: 24px; border-radius: 50%; background: #8b5cf6; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 900; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.2);'>N</div>";
-            const mO = "<div style='width: 24px; height: 24px; border-radius: 50%; background: #ef4444; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 900; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2), inset 2px 2px 4px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.2);'>O</div>";
-            
-            if(type === 'zn') {
-                name = 'Zinc Solid';
-                formulaHtml = "<div style='display:flex; align-items:center; gap:10px;'>" + mZn + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 1 = " + (coeff * 1) + "</span></div>";
-                let group = "<div style='display:flex; gap:3px; border: 1px solid #cbd5e1; padding: 6px; border-radius: 10px; background: transparent;'>" + mZn + "</div>";
-                for(let i=0; i<coeff; i++) marbleHtml += group;
-            } else if(type === 'ag') {
-                name = 'Silver Solid';
-                formulaHtml = "<div style='display:flex; align-items:center; gap:10px;'>" + mAg + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 1 = " + (coeff * 1) + "</span></div>";
-                let group = "<div style='display:flex; gap:3px; border: 1px solid #cbd5e1; padding: 6px; border-radius: 10px; background: transparent;'>" + mAg + "</div>";
-                for(let i=0; i<coeff; i++) marbleHtml += group;
-            } else if(type === 'agno3') {
-                name = 'Silver Nitrate';
-                formulaHtml = "<div style='display:flex; align-items:center; gap:10px;'>" + mAg + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 1 = " + (coeff * 1) + "</span></div><div style='display:flex; align-items:center; gap:10px;'>" + mN + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 1 = " + (coeff * 1) + "</span></div><div style='display:flex; align-items:center; gap:10px;'>" + mO + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 3 = " + (coeff * 3) + "</span></div>";
-                let group = "<div style='display:flex; gap:2px; flex-wrap: wrap; justify-content:center; max-width: 90px; border: 1px solid #cbd5e1; padding: 6px; border-radius: 10px; background: transparent;'>" + mAg + mN + mO + mO + mO + "</div>";
-                for(let i=0; i<coeff; i++) marbleHtml += group;
-            } else if(type === 'znno3_2') {
-                name = 'Zinc Nitrate';
-                formulaHtml = "<div style='display:flex; align-items:center; gap:10px;'>" + mZn + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 1 = " + (coeff * 1) + "</span></div><div style='display:flex; align-items:center; gap:10px;'>" + mN + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 2 = " + (coeff * 2) + "</span></div><div style='display:flex; align-items:center; gap:10px;'>" + mO + " <span style='font-weight:bold; color:#0f172a;'>= " + coeff + " x 6 = " + (coeff * 6) + "</span></div>";
-                let group = "<div style='display:flex; gap:2px; flex-wrap: wrap; justify-content:center; max-width: 140px; border: 1px solid #cbd5e1; padding: 6px; border-radius: 10px; background: transparent;'>" + mZn + mN + mN + mO + mO + mO + mO + mO + mO + "</div>";
-                for(let i=0; i<coeff; i++) marbleHtml += group;
-            }
-
-            return "<div style='padding: 5px;'><div style='text-align:center; margin-bottom: 10px; font-weight: 900; font-size: 18px; color: #0f172a; border-bottom: 2px solid #94a3b8; padding-bottom: 6px;'>" + coeff + " x " + name + "</div><div style='font-family: Consolas, monospace; font-size: 15px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;'>" + formulaHtml + "</div><div style='display:flex; flex-direction:column; gap:8px; align-items:center;'>" + marbleHtml + "</div></div>";
-        }
-        
-        if(document.getElementById('coeff-zn')) { document.getElementById('coeff-zn').innerText = cZn; document.getElementById('coeff-zn').setAttribute('data-html-tooltip', buildCoeffTooltip('zn', cZn)); }
-        if(document.getElementById('coeff-agno3')) { document.getElementById('coeff-agno3').innerText = cAgNO3; document.getElementById('coeff-agno3').setAttribute('data-html-tooltip', buildCoeffTooltip('agno3', cAgNO3)); }
-        if(document.getElementById('coeff-znno3_2')) { document.getElementById('coeff-znno3_2').innerText = cZnNO3_2; document.getElementById('coeff-znno3_2').setAttribute('data-html-tooltip', buildCoeffTooltip('znno3_2', cZnNO3_2)); }
-        if(document.getElementById('coeff-ag')) { document.getElementById('coeff-ag').innerText = cAg; document.getElementById('coeff-ag').setAttribute('data-html-tooltip', buildCoeffTooltip('ag', cAg)); }
-
-        // Tally elements
-        let rZn = cZn * 1;
-        let rAg = cAgNO3 * 1;
-        let rN = cAgNO3 * 1;
-        let rO = cAgNO3 * 3;
-
-        let pZn = cZnNO3_2 * 1;
-        let pAg = cAg * 1;
-        let pN = cZnNO3_2 * 2;
-        let pO = cZnNO3_2 * 6;
-
-        // SIDEBAR CARDS
-        
-        function makeSidebarCard(elName, symbol, rCount, pCount) {
-            let isEmpty = (rCount === 0 && pCount === 0);
-            let isBalanced = (rCount === pCount && !isEmpty);
-            
-            let colorClass = isBalanced ? 'matched' : '';
-            let msg = isEmpty ? "Add some " + symbol + " molecules to start balancing!" : (isBalanced ? "Yay! " + symbol + " atoms are perfectly balanced!" : "Oh no, " + symbol + " atoms are unbalanced!");
-
-            let leftBooks = '';
-            let rBookCount = 0;
-            while (rBookCount < rCount) {
-                leftBooks += '<div class="book-col" style="display:flex; flex-direction:column-reverse; gap:5px; margin:0 2px;">';
-                for(let i=0; i<5 && rBookCount < rCount; i++, rBookCount++) {
-                    leftBooks += '<div class="book-block blue"></div>';
-                }
-                leftBooks += '</div>';
-            }
-            if (rCount < pCount) {
-                leftBooks += '<div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; line-height: 1; text-align: center; margin-bottom: 2px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); animation: pulseWarning 1s infinite;">!</div>';
-            }
-            
-            let rightBooks = '';
-            let pBookCount = 0;
-            while (pBookCount < pCount) {
-                rightBooks += '<div class="book-col" style="display:flex; flex-direction:column-reverse; gap:5px; margin:0 2px;">';
-                for(let i=0; i<5 && pBookCount < pCount; i++, pBookCount++) {
-                    rightBooks += '<div class="book-block orange"></div>';
-                }
-                rightBooks += '</div>';
-            }
-            if (pCount < rCount) {
-                rightBooks += '<div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; line-height: 1; text-align: center; margin-bottom: 2px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); animation: pulseWarning 1s infinite;">!</div>';
-            }
-
-            let diff = rCount - pCount;
-            let angle = 0;
-            if(diff > 0) angle = -6;
-            if(diff < 0) angle = 6;
-            
-            let eqSymbol = (rCount === pCount) ? '=' : '≠';
-            let tallyClass = isEmpty ? 'empty' : (isBalanced ? 'balanced' : 'unbalanced');
-
-            return '<div class="pro-scale-card ' + colorClass + '" data-tooltip="' + msg + '"><h3>' + elName + ' (' + symbol + ')</h3><div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div><div class="mini-seesaw"><div class="mini-plank" style="transform: rotate(' + angle + 'deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);"><div class="mini-stack-zone left" style="display:flex; align-items:flex-end;">' + leftBooks + '</div><div class="mini-stack-zone right" style="display:flex; align-items:flex-end;">' + rightBooks + '</div></div><div class="mini-fulcrum"></div></div><div class="scale-tally"><div class="tally-box ' + tallyClass + '">' + rCount + '</div><div class="tally-eq ' + tallyClass + '" style="font-family: monospace;">' + eqSymbol + '</div><div class="tally-box ' + tallyClass + '">' + pCount + '</div></div></div>';
-        }
-
-
-        let leftSidebar = document.querySelector('.block-left .sidebar-grid');
-        if(leftSidebar) {
-            leftSidebar.innerHTML = 
-                makeSidebarCard('Zinc', 'Zn', rZn, pZn) +
-                makeSidebarCard('Silver', 'Ag', rAg, pAg) +
-                makeSidebarCard('Nitrogen', 'N', rN, pN) +
-                makeSidebarCard('Oxygen', 'O', rO, pO);
-        }
-
-        // Update Footers (No left/right comparison, just literal side count)
-        
-        function makeFooterStat(el, sideCount, rCount, pCount) {
-            let isEmpty = (rCount === 0 && pCount === 0);
-            let isBalanced = (rCount === pCount && !isEmpty);
-            
-            let colorClass = isEmpty ? 'f-empty' : (isBalanced ? 'f-green' : 'f-red');
-            let msg = isEmpty ? "Add some " + el + " atoms to start!" : (isBalanced ? "Yay! " + el + " atoms are perfectly balanced!" : "Oh no, " + el + " atoms are unbalanced!");
-            
-            let bg, color;
-            if(el==='Zn') { bg = '#94a3b8'; color='#1e293b'; }
-            if(el==='Ag') { bg = '#cbd5e1'; color='#0f172a'; }
-            if(el==='N') { bg = '#8b5cf6'; color='white'; }
-            if(el==='O') { bg = '#ef4444'; color='white'; }
-
-            let textStyle = isEmpty ? 'color:#94a3b8;' : 'color:white;';
-
-            return '<div class="footer-stat ' + colorClass + '" data-tooltip="' + msg + '" style="flex:1; display:flex; justify-content:center; align-items:center; ' + textStyle + ' font-weight:900; gap:8px; font-size:1.1rem; padding: 5px; border-left: 1px solid rgba(255,255,255,0.2);"><div style="width:20px; height:20px; border-radius:50%; background:' + bg + '; display:flex; align-items:center; justify-content:center; color:' + color + '; font-size:10px; font-weight:900; box-shadow: inset -1px -1px 3px rgba(0,0,0,0.3);">' + el + '</div><span>= ' + sideCount + '</span></div>';
-        }
-
-
-        let footerReact = document.getElementById('footer-react');
-        if (footerReact) footerReact.innerHTML = 
-            makeFooterStat('Zn', rZn, rZn, pZn) + 
-            makeFooterStat('Ag', rAg, rAg, pAg) + 
-            makeFooterStat('N', rN, rN, pN) + 
-            makeFooterStat('O', rO, rO, pO);
-        
-        let footerProd = document.getElementById('footer-prod');
-        if (footerProd) footerProd.innerHTML = 
-            makeFooterStat('Zn', pZn, rZn, pZn) + 
-            makeFooterStat('Ag', pAg, rAg, pAg) + 
-            makeFooterStat('N', pN, rN, pN) + 
-            makeFooterStat('O', pO, rO, pO);
-
-        // Update Beakers
-        function fillBeaker(beakerId, Zn, Ag, N, O) {
-            let b = document.getElementById(beakerId);
-            if(!b) return;
-            b.innerHTML = '';
-            let bHtml = '';
-            for(let i=0; i<Zn; i++) bHtml += "<div class='hyper-marble hm-Zn'>Zn</div>";
-            for(let i=0; i<Ag; i++) bHtml += "<div class='hyper-marble hm-Ag'>Ag</div>";
-            for(let i=0; i<N; i++) bHtml += "<div class='hyper-marble hm-N'>N</div>";
-            for(let i=0; i<O; i++) bHtml += "<div class='hyper-marble hm-O'>O</div>";
-            b.innerHTML = bHtml;
-        }
-
-        fillBeaker('adv-beaker-react', rZn, rAg, rN, rO);
-        fillBeaker('adv-beaker-prod', pZn, pAg, pN, pO);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        if(typeof updateSimulation === 'function') updateSimulation();
-    });
-    if(typeof updateSimulation === 'function') updateSimulation();
-
-
-
-
-
-
-
-</script>
 </body>
 
 
