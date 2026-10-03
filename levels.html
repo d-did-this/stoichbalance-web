@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stoichbalance - Level Selection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/levels.css">
+    <script src="levels.js?v=1791068844909"></script>
+</head>
+<body>
+
+    <div class="bg-layer bg-blue active-bg" id="bg-levels"></div>
+    <div id="particle-canvas"></div>
+
+    <div class="levels-container">
+        
+        <!-- HEADER -->
+        <header class="levels-header">
+            <div class="header-left">
+                <button class="btn-back interactive" onclick="goBack()">
+                    <span class="back-icon">◀</span> Back
+                </button>
+            </div>
+            
+            <div class="header-titles">
+                <div class="user-greeting">Welcome, <span id="display-name">Player</span>!</div>
+                <h1 class="levels-title" id="form-title">Form 4</h1>
+                <p class="levels-subtitle">Chemical Equations</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="score-widget">
+                    <span class="score-icon">🏆</span>
+                    <span class="score-text">3 / 15</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN GRID AREA -->
+        <div class="grid-wrapper">
+              <!-- Dynamically populated by JS -->
+          </div>
+      </div>
+  </div>
+
+  <script src="js/levels.js?v=1791068844909"></script>
+<script>
+let myCurrentPage = 1;
+const ITEMS_PER_PAGE = 6;
+let myTotalPages = 1;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const formParam = params.get('form') || 'Form 4';
+    const formNumber = formParam.includes('5') ? '5' : '4';
+    
+    // Update titles
+    const titleEl = document.getElementById('form-title');
+    if(titleEl) titleEl.innerText = formParam;
+    
+    // Filter keys by form
+    let keys = Object.keys(LEVELS).filter(k => k.startsWith('F' + formNumber));
+    keys.sort((a,b) => {
+        let aMatch = a.match(/L(\d+)/);
+        let bMatch = b.match(/L(\d+)/);
+        if(!aMatch || !bMatch) return a.localeCompare(b);
+        return parseInt(aMatch[1]) - parseInt(bMatch[1]);
+    });
+    
+    myTotalPages = Math.ceil(keys.length / ITEMS_PER_PAGE);
+    if(myTotalPages === 0) myTotalPages = 1;
+    
+    let gridContainer = document.querySelector('.grid-wrapper');
+    if(!gridContainer) return;
+    
+    const existingGrids = gridContainer.querySelectorAll('.levels-grid');
+    existingGrids.forEach(g => g.remove());
+    const existingPag = gridContainer.querySelector('.pagination');
+    if(existingPag) existingPag.remove();
+
+    for(let p=1; p<=myTotalPages; p++) {
+        let pageDiv = document.createElement('div');
+        pageDiv.className = 'levels-grid';
+        pageDiv.id = 'page-' + p;
+        pageDiv.style.display = p === 1 ? '' : 'none';
+        
+        let startIdx = (p - 1) * ITEMS_PER_PAGE;
+        let endIdx = Math.min(startIdx + ITEMS_PER_PAGE, keys.length);
+        
+        for(let i=startIdx; i<endIdx; i++) {
+            let k = keys[i];
+            let L = LEVELS[k];
+            
+            let diff = 'easy';
+            let diffLabel = 'Easy';
+            if (L.elements.length === 3) { diff = 'medium'; diffLabel = 'Medium'; }
+            if (L.elements.length >= 4) { diff = 'hard'; diffLabel = 'Hard'; }
+            
+            // Extract the level number, e.g. F4L1 -> 1
+            let niceNum = k.replace(/F\d+L/, '');
+            
+            let card = document.createElement('div');
+            card.className = 'level-card interactive';
+            card.onclick = () => window.location.href = 'game.html?level=' + k;
+            
+            card.innerHTML = `
+                <div class="card-top">
+                    <span class="lvl-num">${niceNum}</span>
+                    <span class="lvl-diff diff-${diff}">${diffLabel}</span>
+                </div>
+                <div class="card-icon">🧪</div>
+                <div class="card-body">
+                    <h3 class="lvl-name">${L.title}</h3>
+                    <p class="lvl-equation">${L.equation}</p>
+                </div>
+                <div class="status-banner banner-blue">PLAY</div>
+            `;
+            pageDiv.appendChild(card);
+        }
+        gridContainer.appendChild(pageDiv);
+    }
+    
+    let pagDiv = document.createElement('div');
+    pagDiv.className = 'pagination';
+    
+    let prevBtn = document.createElement('button');
+    prevBtn.className = 'btn-page interactive';
+    prevBtn.id = 'btn-prev';
+    prevBtn.innerHTML = '◀ Prev';
+    prevBtn.disabled = true;
+    prevBtn.onclick = () => window.changePage(myCurrentPage - 1);
+    
+    let dotsDiv = document.createElement('div');
+    dotsDiv.className = 'page-dots';
+    for(let p=1; p<=myTotalPages; p++) {
+        let dot = document.createElement('span');
+        dot.className = 'dot' + (p === 1 ? ' active' : '');
+        dot.id = 'dot-' + p;
+        dotsDiv.appendChild(dot);
+    }
+    
+    let nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-page interactive';
+    nextBtn.id = 'btn-next';
+    nextBtn.innerHTML = 'Next ▶';
+    nextBtn.disabled = myTotalPages <= 1;
+    nextBtn.onclick = () => window.changePage(myCurrentPage + 1);
+    
+    pagDiv.appendChild(prevBtn);
+    pagDiv.appendChild(dotsDiv);
+    pagDiv.appendChild(nextBtn);
+    
+    gridContainer.appendChild(pagDiv);
+});
+
+window.changePage = function(newPage) {
+    if(newPage < 1 || newPage > myTotalPages) return;
+    document.getElementById('page-' + myCurrentPage).style.display = 'none';
+    document.getElementById('dot-' + myCurrentPage).classList.remove('active');
+    myCurrentPage = newPage;
+    document.getElementById('page-' + myCurrentPage).style.display = '';
+    document.getElementById('dot-' + myCurrentPage).classList.add('active');
+    document.getElementById('btn-prev').disabled = (myCurrentPage === 1);
+    document.getElementById('btn-next').disabled = (myCurrentPage === myTotalPages);
+};
+</script>
+</body>
+</html>
