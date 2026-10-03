@@ -1,0 +1,330 @@
+:root {
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    --blue: #3b82f6;
+    --blue-shadow: #1d4ed8;
+    
+    --purple: #8b5cf6;
+    --purple-shadow: #6d28d9;
+    
+    --orange: #f59e0b;
+    --orange-shadow: #b45309;
+    
+    --green: #10b981;
+    --green-shadow: #059669;
+    
+    --gray-bg: #f8fafc;
+    --gray-border: #cbd5e1;
+    --dark-border: #1e293b; 
+    
+    font-family: 'Nunito', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    color: var(--text-main);
+    width: 100vw; height: 100vh; height: 100dvh; 
+    overflow: hidden; 
+    display: flex; justify-content: center; align-items: center;
+    position: relative;
+    cursor: crosshair; 
+}
+
+/* =========================================
+   FULL-SCREEN DYNAMIC BACKGROUNDS
+========================================= */
+.bg-layer {
+    position: absolute; inset: 0; z-index: 0;
+    opacity: 0; transition: opacity 0.6s ease-in-out;
+    pointer-events: none;
+}
+.bg-layer.active-bg { opacity: 1; }
+
+.bg-blue { background: var(--blue); }
+.bg-purple { background: var(--purple); }
+.bg-orange { background: var(--orange); }
+
+.bg-layer::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.2) 3px, transparent 3px);
+    background-size: 40px 40px;
+}
+
+/* =========================================
+   INTERACTIVE CHEMISTRY CANVAS
+========================================= */
+#particle-canvas { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+
+.molecule {
+    position: absolute; display: flex; justify-content: center; align-items: center;
+    pointer-events: auto; cursor: grab;
+    /* Removed CSS animation to allow JS physics dragging */
+}
+.molecule:active { cursor: grabbing; }
+
+/* Marbles */
+.atom {
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    color: white; font-weight: 900; position: relative;
+    box-shadow: inset -6px -6px 12px rgba(0,0,0,0.2), 0 8px 12px rgba(0,0,0,0.2);
+    border: 3px solid rgba(255,255,255,0.5); 
+    flex-shrink: 0; aspect-ratio: 1 / 1; 
+}
+.atom .glare {
+    position: absolute; top: 12%; left: 18%; width: 35%; height: 25%;
+    background: rgba(255,255,255,0.8); border-radius: 50%; transform: rotate(-30deg);
+}
+
+.a-O { width: 60px; height: 60px; background: #ef4444; font-size: 1.5rem; } 
+.a-H { width: 40px; height: 40px; background: #f8fafc; color: var(--text-main); font-size: 1rem; } 
+.a-C { width: 70px; height: 70px; background: #475569; font-size: 1.8rem; } 
+.a-Na { width: 65px; height: 65px; background: #60a5fa; font-size: 1.5rem; } 
+.a-Cl { width: 75px; height: 75px; background: #34d399; font-size: 1.6rem; } 
+
+.comp-h2o { position: relative; width: 100px; height: 80px; }
+.comp-h2o .a-O { position: absolute; left: 20px; top: 0; z-index: 2; }
+.comp-h2o .a-H:nth-child(2) { position: absolute; left: 0; bottom: 0; z-index: 1; }
+.comp-h2o .a-H:nth-child(3) { position: absolute; right: 0; bottom: 0; z-index: 1; }
+.comp-co2 { position: relative; width: 130px; height: 70px; display: flex; align-items: center; }
+.comp-co2 .a-C { z-index: 2; margin: 0 -10px; }
+.comp-co2 .a-O { z-index: 1; }
+.comp-nacl { position: relative; display: flex; align-items: center; }
+.comp-nacl .a-Na { z-index: 2; margin-right: -15px; }
+.comp-nacl .a-Cl { z-index: 1; }
+.comp-single { position: relative; }
+
+
+/* =========================================
+   FUN WIDGETS
+========================================= */
+.fun-widget {
+    position: absolute; top: clamp(1.5rem, 4vh, 2.5rem); z-index: 100;
+    background: #fde047; border: 4px solid var(--dark-border); border-radius: 50%;
+    width: clamp(4rem, 7vw, 5rem); height: clamp(4rem, 7vw, 5rem);
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+    box-shadow: 0 6px 0 var(--dark-border); 
+}
+.fun-widget:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--dark-border); filter: brightness(1.05); }
+.fun-widget:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+
+.widget-left { left: clamp(1.5rem, 4vw, 3rem); }
+.widget-right { right: clamp(1.5rem, 4vw, 3rem); }
+.widget-icon { font-size: clamp(2rem, 3.5vw, 2.5rem); line-height: 1; filter: drop-shadow(0 2px 0px rgba(0,0,0,0.2)); }
+
+
+/* =========================================
+   FRIENDLY PLAYFUL MAIN CONTAINER
+========================================= */
+.main-container {
+    position: relative; z-index: 10;
+    width: 92vw; height: 86vh; max-width: 1200px; max-height: 820px;
+    
+    background: #ffffff;
+    border: 6px solid var(--dark-border); 
+    border-radius: clamp(32px, 4vw, 48px);
+    box-shadow: 0 20px 0 rgba(0,0,0,0.2); 
+    
+    display: flex; flex-direction: row; overflow: hidden;
+    
+    opacity: 0; transform: translateY(40px);
+    animation: fadeUpContainer 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes fadeUpContainer { to { opacity: 1; transform: translateY(0); } }
+
+/* WIDENED LEFT PANEL */
+.panel { padding: clamp(2rem, 5%, 4rem); display: flex; flex-direction: column; min-height: 0; position: relative; }
+.left-panel { flex: 1.35; border-right: 6px solid var(--dark-border); align-items: center; justify-content: center; background: #ffffff; }
+.right-panel { flex: 1; justify-content: center; background: #f8fafc; }
+
+
+/* =========================================
+   LEFT: BRANDING & START
+========================================= */
+.brand-wrapper { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 450px; gap: 0.5rem; margin-bottom: clamp(2rem, 5vh, 4rem); }
+
+.bounce-anim { animation: funBounce 2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite; }
+@keyframes funBounce { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.1) translateY(-15px); } }
+
+.logo-icon { font-size: clamp(5rem, 12vh, 8rem); line-height: 1; margin-bottom: 0.5rem; filter: drop-shadow(0 10px 0px rgba(0,0,0,0.1)); }
+.logo-title { font-size: clamp(2.8rem, 4.5vw, 4.5rem); font-weight: 900; letter-spacing: -2px; color: var(--text-main); line-height: 1.1; }
+.logo-subtitle { font-size: clamp(1.1rem, 1.5vw, 1.4rem); font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+
+/* Launch Input & Button */
+.launch-wrapper { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: clamp(1rem, 3vh, 2rem); }
+
+.input-group { display: flex; flex-direction: column; gap: 0.5rem; text-align: left; }
+.input-group label { font-size: clamp(0.9rem, 1.2vw, 1.1rem); font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+
+.name-input {
+    width: 100%; padding: clamp(1.2rem, 2.5vh, 1.5rem);
+    background: #f1f5f9; border: 4px solid var(--dark-border); border-radius: 20px;
+    color: var(--text-main); font-family: inherit; font-size: clamp(1.2rem, 1.8vw, 1.5rem); font-weight: 900;
+    outline: none; transition: all 0.2s; text-align: center;
+    box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+}
+.name-input::placeholder { color: #94a3b8; font-weight: 800; }
+.name-input:focus { background: white; border-color: var(--blue); box-shadow: 0 0 0 6px var(--blue-light); transform: scale(1.02); }
+
+/* Play Button */
+.btn-play {
+    width: 100%; padding: clamp(1.2rem, 3vh, 1.8rem);
+    background: var(--green); border: 4px solid var(--dark-border); border-radius: 24px;
+    color: white; font-family: inherit; font-size: clamp(1.5rem, 2.2vw, 1.8rem); font-weight: 900; cursor: pointer;
+    display: flex; justify-content: center; align-items: center; gap: 1rem;
+    box-shadow: 0 8px 0 var(--dark-border);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-play:hover { transform: translateY(-4px); box-shadow: 0 12px 0 var(--dark-border); filter: brightness(1.05); }
+.btn-play:active { transform: translateY(8px); box-shadow: 0 0 0 transparent; }
+
+
+/* =========================================
+   RIGHT: MODE SELECTION
+========================================= */
+.panel-title { font-size: clamp(1.2rem, 1.8vw, 1.5rem); font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: clamp(1.5rem, 3vh, 2rem); }
+
+.modes-list { display: flex; flex-direction: column; gap: clamp(1.5rem, 2.5vh, 2rem); }
+
+/* Unselected Cards */
+.mode-card {
+    background: white; border: 4px solid var(--gray-border); border-radius: 28px;
+    padding: clamp(1.2rem, 2vh, 1.5rem); cursor: pointer;
+    box-shadow: 0 6px 0 var(--gray-border);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; flex-direction: column;
+    transform: scale(0.95); opacity: 0.7;
+}
+.mode-card:hover:not(.active-mode) { transform: scale(0.98) translateY(-4px); box-shadow: 0 10px 0 var(--gray-border); opacity: 0.95; }
+
+/* Active States */
+.mode-card.active-mode { 
+    transform: scale(1.05) translateY(-2px); 
+    opacity: 1; z-index: 5;
+    border-color: var(--dark-border);
+    box-shadow: 0 10px 0 var(--dark-border);
+}
+
+.card-blue.active-mode { background: var(--blue); }
+.card-blue.active-mode .mode-name, .card-purple.active-mode .mode-name, .card-orange.active-mode .mode-name { color: white; }
+.card-blue.active-mode .mode-desc, .card-purple.active-mode .mode-desc, .card-orange.active-mode .mode-desc { color: rgba(255,255,255,0.9); }
+.card-blue.active-mode .mode-icon { background: white; color: var(--blue); transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 0 var(--dark-border); border: 3px solid var(--dark-border); }
+
+.card-purple.active-mode { background: var(--purple); }
+.card-purple.active-mode .mode-icon { background: white; color: var(--purple); transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 0 var(--dark-border); border: 3px solid var(--dark-border); }
+
+.card-orange.active-mode { background: var(--orange); }
+.card-orange.active-mode .mode-icon { background: white; color: var(--orange); transform: scale(1.1) rotate(-5deg); box-shadow: 0 6px 0 var(--dark-border); border: 3px solid var(--dark-border); }
+
+.mode-header { display: flex; align-items: center; gap: 1.25rem; }
+.mode-icon { width: 65px; height: 65px; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2rem; background: var(--gray-border); border: 3px solid transparent; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mode-info { display: flex; flex-direction: column; gap: 0.2rem; }
+.mode-name { font-size: clamp(1.4rem, 2vw, 1.6rem); font-weight: 900; color: var(--text-main); }
+.mode-desc { font-size: clamp(0.95rem, 1.2vw, 1.1rem); font-weight: 800; color: var(--text-muted); }
+
+/* Accordion Fixes for Clipping */
+.mode-options-wrapper { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.mode-card.active-mode .mode-options-wrapper { grid-template-rows: 1fr; }
+.mode-options-inner { overflow: hidden; }
+/* Added padding bottom so shadows don't clip inside the hidden overflow */
+.mode-options-content { display: flex; gap: clamp(0.5rem, 1vw, 1rem); padding: clamp(1rem, 2vh, 1.5rem) 4px 10px 4px; }
+
+/* Thick Shadow Sub Buttons */
+.sub-btn {
+    flex: 1; padding: clamp(0.8rem, 1.5vh, 1.2rem);
+    background: rgba(0,0,0,0.15); border: 3px solid var(--dark-border); border-radius: 16px;
+    font-family: inherit; font-weight: 900; font-size: clamp(1rem, 1.2vw, 1.2rem); color: white;
+    cursor: pointer; transition: all 0.1s; 
+    box-shadow: 0 4px 0 var(--dark-border);
+}
+.sub-btn:hover { background: rgba(0,0,0,0.25); transform: translateY(-2px); box-shadow: 0 6px 0 var(--dark-border); }
+.sub-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+.sub-btn.active-sub { background: white; color: var(--text-main); transform: translateY(0); box-shadow: 0 4px 0 var(--dark-border); }
+
+/* =========================================
+   ASPECT RATIO RESPONSIVENESS (MOBILE PERFECTED)
+========================================= */
+@media (max-aspect-ratio: 1/1) {
+    /* 1. Move Corner Widgets out of the way */
+    .fun-widget { width: 3.5rem; height: 3.5rem; top: 1rem; }
+    .widget-left { left: 1rem; }
+    .widget-right { right: 1rem; }
+    .widget-icon { font-size: 1.8rem; }
+
+    /* 2. Main Container fits mobile perfectly */
+    .main-container { 
+        flex-direction: column; 
+        height: 94svh; /* Using svh to prevent browser address bar clipping */
+        width: 94vw; 
+        border-width: 5px; 
+        box-shadow: 0 8px 0 rgba(0,0,0,0.2); 
+    }
+    .panel { padding: 1.5rem 1.25rem; }
+
+    /* 3. Compress the Left Panel to save vertical space */
+    .left-panel { 
+        flex: none; /* Only take required height */
+        padding-top: 2.5rem; /* Room for corner widgets */
+        border-right: none; 
+        border-bottom: 5px solid var(--dark-border); 
+        border-radius: clamp(24px, 4vw, 32px) clamp(24px, 4vw, 32px) 0 0; 
+    }
+    
+    /* Flip Brand to Horizontal layout! Huge vertical space saver */
+    .brand-wrapper { 
+        flex-direction: row; 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        align-items: center; 
+        gap: 0.5rem; 
+        margin-bottom: 1.25rem; 
+    }
+    .logo-icon { font-size: 2.5rem; margin-bottom: 0; filter: drop-shadow(0 4px 0 rgba(0,0,0,0.1)); }
+    .logo-title { font-size: 2.2rem; line-height: 1; }
+    .logo-subtitle { flex-basis: 100%; font-size: 0.9rem; margin-top: -0.25rem; letter-spacing: 1px; }
+    .bounce-anim { animation: funBounceMobile 2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite; }
+    @keyframes funBounceMobile { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.1) translateY(-8px); } }
+
+    /* Shrink Launch Inputs slightly */
+    .launch-wrapper { gap: 1rem; }
+    .input-group label { font-size: 0.8rem; }
+    .name-input { padding: 1rem; font-size: 1.1rem; border-width: 3px; }
+    .btn-play { padding: 1rem; font-size: 1.3rem; border-width: 3px; box-shadow: 0 6px 0 var(--dark-border); }
+    .btn-play:hover { box-shadow: 0 8px 0 var(--dark-border); }
+
+    /* 4. Right Panel (Modes) - Scrollable & Readable */
+    .right-panel { 
+        flex: 1; 
+        overflow-y: auto; /* CRITICAL: Allows scrolling through modes on small phones */
+        padding-bottom: 2rem; 
+        border-radius: 0 0 clamp(24px, 4vw, 32px) clamp(24px, 4vw, 32px); 
+        /* Custom Mobile Scrollbar */
+        scrollbar-width: thin; scrollbar-color: var(--gray-border) transparent;
+    }
+    .right-panel::-webkit-scrollbar { width: 6px; }
+    .right-panel::-webkit-scrollbar-thumb { background-color: var(--gray-border); border-radius: 10px; }
+
+    .panel-title { font-size: 1.1rem; margin-bottom: 1rem; text-align: center; }
+
+    /* Compress Mode Cards for Mobile */
+    .modes-list { gap: 1rem; }
+    .mode-card { 
+        padding: 1rem; border-width: 3px; border-radius: 20px; 
+        box-shadow: 0 4px 0 var(--gray-border); 
+        transform: scale(0.98); opacity: 0.85; 
+    }
+    .mode-card:hover:not(.active-mode) { transform: scale(0.98) translateY(-2px); box-shadow: 0 6px 0 var(--gray-border); }
+    .mode-card.active-mode { transform: scale(1) translateY(-2px); box-shadow: 0 6px 0 var(--dark-border); }
+    
+    .mode-header { gap: 1rem; }
+    .mode-icon { width: 50px; height: 50px; border-radius: 14px; font-size: 1.5rem; }
+    .mode-name { font-size: 1.25rem; }
+    .mode-desc { font-size: 0.85rem; line-height: 1.3; }
+
+    .mode-options-content { padding: 1rem 0.25rem 0.5rem; gap: 0.5rem; flex-wrap: wrap; }
+    .sub-btn { padding: 0.8rem; font-size: 0.95rem; border-width: 2px; box-shadow: 0 3px 0 rgba(0,0,0,0.3); }
+    .sub-btn.active-sub { box-shadow: 0 3px 0 var(--dark-border); }
+}
