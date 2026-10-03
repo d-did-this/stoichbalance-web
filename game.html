@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Puzzle - Stoichbalance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game.css">
+    <link rel="stylesheet" href="css/original.css">
+    <script src="levels.js?v=1791068822196"></script>
+</head>
+<body>
+    <!-- DYNAMIC BACKGROUND -->
+    <div class="bg-layer bg-blue active-bg" id="bg-game"></div>
+
+    <!-- VIEW TOGGLE WIDGET (LEFT SIDE) -->
+    <div class="view-toggle-widget">
+        <button id="btn-simple" class="toggle-sq active" onclick="setViewMode('simple')">
+            <span class="icon">🧠</span>
+            <span class="lbl">Hard</span>
+        </button>
+        
+        
+            
+        
+          <button id="btn-good" class="toggle-sq" onclick="setViewMode('good')">
+            <div class="icon">💡</div>
+            <div class="lbl">Easy</div>
+        </button>
+    
+
+    </div>
+
+    <!-- SIMPLE VIEW (V2 STYLE) -->
+    <div id="view-simple" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2vh 0;">
+        <div class="game-container">
+            <!-- HEADER -->
+            <div class="pro-header" style="margin-bottom: 20px;">
+                <div class="pro-header-left">
+                    <button class="btn-back interactive" onclick="window.location.href='levels.html'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button>
+                    <h1 style="color: var(--text-main); font-size: 1.5rem; font-weight: 900; margin: 0;">Level 1: Water Synthesis</h1>
+                </div>
+                <div class="pro-header-right">
+                    <div class="pro-pill green" id="level-difficulty">EASY</div>
+                </div>
+            </div>
+
+            <!-- MAIN PUZZLE STAGE -->
+            <main class="puzzle-stage">
+                
+                <!-- THE EQUATION ROW -->
+                <div class="equation-row">
+                    
+                    <!-- Reactants -->
+                    <div class="equation-side reactants">
+                        <!-- Term 1: H2 -->
+                        <div class="term-block interactive">
+                            <div class="coeff-control">
+                                <button class="coeff-btn minus" onclick="changeCoeff('r1', -1)">-</button>
+                                <div class="coeff-value" id="val-r1">1</div>
+                                <button class="coeff-btn plus" onclick="changeCoeff('r1', 1)">+</button>
+                            </div>
+                            <div class="molecule-formula">H<span class="sub">2</span></div>
+                        </div>
+                        
+                        <div class="math-sign">+</div>
+                        
+                        <!-- Term 2: O2 -->
+                        <div class="term-block interactive">
+                            <div class="coeff-control">
+                                <button class="coeff-btn minus" onclick="changeCoeff('r2', -1)">-</button>
+                                <div class="coeff-value" id="val-r2">1</div>
+                                <button class="coeff-btn plus" onclick="changeCoeff('r2', 1)">+</button>
+                            </div>
+                            <div class="molecule-formula">O<span class="sub">2</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Arrow -->
+                    <div class="reaction-arrow">
+                        <div class="arrow-body"></div>
+                        <div class="arrow-head"></div>
+                    </div>
+
+                    <!-- Products -->
+                    <div class="equation-side products">
+                        <!-- Term 3: H2O -->
+                        <div class="term-block interactive">
+                            <div class="coeff-control">
+                                <button class="coeff-btn minus" onclick="changeCoeff('p1', -1)">-</button>
+                                <div class="coeff-value" id="val-p1">1</div>
+                                <button class="coeff-btn plus" onclick="changeCoeff('p1', 1)">+</button>
+                            </div>
+                            <div class="molecule-formula">H<span class="sub">2</span>O</div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- VISUALIZATION ROW (MOLECULES) -->
+                <div class="visual-row">
+                    <!-- Reactants Visuals -->
+                    <div class="visual-side">
+                        <div class="model-box" id="vis-r1">
+                            <!-- H2 Molecule generated by JS -->
+                        </div>
+                        <div class="model-box" id="vis-r2">
+                            <!-- O2 Molecule generated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Divider matches arrow -->
+                    <div class="visual-divider" style="width:100px;"></div>
+                    
+                    <!-- Products Visuals -->
+                    <div class="visual-side">
+                        <div class="model-box" id="vis-p1">
+                            <!-- H2O Molecule generated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- FOOTER: BALANCE SCALES & ACTION BUTTON -->
+            <footer class="game-footer">
+                <div class="balance-board" id="balance-board">
+                    <!-- Tally generated by JS -->
+                </div>
+                
+                <div class="action-board">
+                    <button class="btn-check interactive" id="btn-check" disabled>
+                        <span class="check-text">LOCKED</span>
+                        <span class="check-icon">🔒</span>
+                    </button>
+                </div>
+            </footer>
+
+        </div>
+    </div>
+    </div>
+
+    <!-- PRO VIEW (MODULAR RESPONSIVE DESIGN BUILT FROM SCRATCH) -->
+    <div id="view-original" style="display: none;">
+        <header class="pro-header">
+            <div class="pro-header-left">
+                <button class="pro-btn gray-btn" onclick="window.location.href='levels.html'">← Back</button>
+                <h1>Level 1: Water Synthesis</h1>
+            </div>
+            <div class="pro-header-right">
+                <button class="pro-btn blue-btn" onclick="checkBalance()">Check Answer ✨</button>
+            </div>
+        </header>
+
+        <div class="pro-grid">
+            <!-- Left sidebar: Tiny Scales -->
+            <div class="pro-panel pro-left">
+                <div class="blue-title" onclick="toggleProPanel(this)" data-tooltip="Click to collapse/expand"><svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M4 6h16M4 12h16m-7 6h7"/></svg><span class="title-text">ELEMENT INVENTORY</span></div>
+                
+                <!-- H Scale -->
+                <div class="pro-scale-card" id="card-H">
+                    <h3>Hydrogen (H)</h3>
+                    <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+                    <div class="mini-seesaw">
+                        <div class="mini-plank" id="mini-plank-H">
+                            <div class="mini-stack-zone left" id="mini-H-left"></div>
+                            <div class="mini-stack-zone right" id="mini-H-right"></div>
+                        </div>
+                        <div class="mini-fulcrum"></div>
+                    </div>
+                    <div class="scale-tally">
+                        <div class="tally-box" id="tally-H-left">2</div>
+                        <div class="tally-eq" id="tally-H-eq">≠</div>
+                        <div class="tally-box" id="tally-H-right">2</div>
+                    </div>
+                </div>
+
+                <!-- O Scale -->
+                <div class="pro-scale-card" id="card-O">
+                    <h3>Oxygen (O)</h3>
+                    <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+                    <div class="mini-seesaw">
+                        <div class="mini-plank" id="mini-plank-O">
+                            <div class="mini-stack-zone left" id="mini-O-left"></div>
+                            <div class="mini-stack-zone right" id="mini-O-right"></div>
+                        </div>
+                        <div class="mini-fulcrum"></div>
+                    </div>
+                    <div class="scale-tally">
+                        <div class="tally-box" id="tally-O-left">2</div>
+                        <div class="tally-eq" id="tally-O-eq">≠</div>
+                        <div class="tally-box" id="tally-O-right">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Stage: Giant Scale & Drop Zones -->
+            <div class="pro-center pro-panel">
+                <div class="pro-status-banner" style="display:none;"></div>
+<div id="pro-legacy-equation" class="state-red">
+    <span style="color: #94a3b8; font-size: 18px;">THE CHEMICAL EQUATION IS :</span>
+    <span id="adv-legacy-status-text" style="color: #ef4444; margin-left:10px;">UNBALANCED</span>
+</div>
+                
+                <!-- GIANT SEESAW (Moved to Top) -->
+                <div class="giant-seesaw-wrapper">
+                    <div class="giant-seesaw">
+                        <div class="giant-plank" id="adv-giant-plank">
+                            <div class="beaker left-beaker" id="adv-beaker-react"></div>
+                            <div class="beaker right-beaker" id="adv-beaker-prod"></div>
+                        </div>
+                        <div class="giant-fulcrum"></div>
+                        <div class="seesaw-base-line"></div>
+                    </div>
+                </div>
+
+                <!-- EQUATION BOX -->
+                
+                  
+                  <!-- PRISTINE PRO EQUATION BOX -->
+                  <div class="pro-equation-box">
+                      <div class="pro-equation-left">
+                          <div class="pro-term">
+                              <span class="pro-coeff" id="adv-coeff-r1" onclick="changeCoeff('r1', 1)" oncontextmenu="event.preventDefault(); changeCoeff('r1', -1)">0</span>
+                              <div class="pro-formula">H<span class="sub">2</span><span class="state">(g)</span></div>
+                          </div>
+                          <div class="pro-plus">+</div>
+                          <div class="pro-term">
+                              <span class="pro-coeff" id="adv-coeff-r2" onclick="changeCoeff('r2', 1)" oncontextmenu="event.preventDefault(); changeCoeff('r2', -1)">0</span>
+                              <div class="pro-formula">O<span class="sub">2</span><span class="state">(g)</span></div>
+                          </div>
+                      </div>
+                      <div class="pro-arrow">→</div>
+                      <div class="pro-equation-right">
+                          <div class="pro-term">
+                              <span class="pro-coeff" id="adv-coeff-p1" onclick="changeCoeff('p1', 1)" oncontextmenu="event.preventDefault(); changeCoeff('p1', -1)">0</span>
+                              <div class="pro-formula">H<span class="sub">2</span>O<span class="state">(l)</span></div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- PRISTINE PRO TRAYS -->
+                  <div class="pro-trays">
+                      <div class="pro-tray">
+                          <div class="pro-tray-btn" onclick="changeCoeff('r1', 1)">+ H2</div>
+                          <div class="pro-tray-btn" onclick="changeCoeff('r2', 1)">+ O2</div>
+                      </div>
+                      <div class="pro-tray">
+                          <div class="pro-tray-btn" onclick="changeCoeff('p1', 1)">+ H2O</div>
+                      </div>
+                  </div>
+
+                  <!-- PRISTINE PRO ZONES -->
+                  <div class="pro-zones">
+                      <div class="pro-zone blue-zone">
+                          <div class="zone-header">REACTANTS</div>
+                          <div class="zone-source" style="display:none;"></div>
+                          <div class="zone-drop" id="adv-drop-reactants"></div>
+                          <div class="zone-footer" id="adv-foot-react-bg">
+                              <span><span class="tiny-atom blue-a">H</span><span id="adv-tally-react-H">0</span></span>
+                              <span><span class="tiny-atom red-a">O</span><span id="adv-tally-react-O">0</span></span>
+                          </div>
+                      </div>
+                      <div class="pro-zone orange-zone">
+                          <div class="zone-header">PRODUCTS</div>
+                          <div class="zone-source" style="display:none;"></div>
+                          <div class="zone-drop" id="adv-drop-products"></div>
+                          <div class="zone-footer" id="adv-foot-prod-bg">
+                              <span><span class="tiny-atom blue-a">H</span><span id="adv-tally-prod-H">0</span></span>
+                              <span><span class="tiny-atom red-a">O</span><span id="adv-tally-prod-O">0</span></span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Right Sidebar: Chat/Hints -->
+            <div class="pro-right pro-panel">
+                <h2 class="blue-title" onclick="toggleProPanel(this)" data-info="Click to collapse/expand"><svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg><span class="title-text">Prof. Beaker</span></h2>
+                <div class="chat-bubble">
+                    <p>Welcome to the Pro View!</p>
+                    <p>Add molecules using the pill buttons in the drag zones. Watch the giant scale tip and the tiny scales balance!</p>
+                </div>
+                <div class="prof-footer">
+                    <div class="prof-actions" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+                        <button class="pro-btn yellow-btn" data-info="Need a clue?">💡 Get Hint</button>
+                        <button class="pro-btn red-btn trash-btn" onclick="window.location.reload()" data-info="Reset Puzzle">🗑️ Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEST VIEW (CLONED V1) -->
+    <div id="view-test" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;">
+        <iframe id="test-frame" src="" style="width: 100%; height: 100%; border: none; background: #cbd5e1;"></iframe>
+    </div>
+    
+    <!-- GOOD VIEW (IFRAME) -->
+    <div id="view-good" style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:50;">
+        <iframe id="good-frame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+
+
+    <!-- LEGACY VIEW (RAW V1 CODE IN IFRAME) -->
+    <div id="view-legacy" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;">
+        <iframe id="legacy-frame" src="" style="width: 100%; height: 100%; border: none; background: #cbd5e1;"></iframe>
+    </div>
+
+    <!-- V2 CORE ENGINE -->
+    <script src="js/game.js?v=1791068822196"></script>
+</body>
+</html>
