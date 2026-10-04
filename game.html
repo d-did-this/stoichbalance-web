@@ -2,313 +2,1484 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Puzzle - Stoichbalance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good View</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/game.css">
-    <link rel="stylesheet" href="css/original.css">
-    <script src="levels.js?v=1791068822196"></script>
+    <style>
+        :root {
+            --dark-border: #1e293b;
+            --bg-color: #3b82f6; /* Classic blue */
+            --block-bg: #ffffff;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(rgba(255,255,255,0.2) 3px, transparent 3px);
+            background-size: 20px 20px;
+            margin: 0;
+            padding: clamp(10px, 2vw, 20px);
+            font-family: 'Nunito', sans-serif;
+            height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
+        
+        /* Main Layout Grid */
+        .good-layout {
+            display: grid;
+            grid-template-rows: 90px minmax(0, 1fr);
+            grid-template-columns: var(--left-w, 280px) minmax(0, 1fr) var(--right-w, 280px);
+            transition: grid-template-columns 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            gap: clamp(10px, 2vw, 20px);
+            width: 100%;
+            height: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Common Block Style */
+        .good-block {
+            background: var(--block-bg);
+            border: 5px solid var(--dark-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 0 var(--dark-border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            
+            min-width: 0;
+            min-height: 0;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            
+            box-sizing: border-box;
+            color: var(--dark-border);
+        }
+
+        /* The Top Bar - NEVER SCROLLS */
+        .block-top {
+            grid-column: 1 / -1;
+            overflow: hidden !important;
+            flex-direction: row; 
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Beautiful internal scrollbars */
+        .good-block::-webkit-scrollbar { width: 8px; }
+        .good-block::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; margin: 10px; }
+        .good-block::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        .good-block::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Puzzle Selection Menu Back Button (Red Pill) */
+        /* Puzzle Selection Menu Back Button (EXACT MATCH) */
+        .btn-back {
+            padding: 0.4rem 1rem;
+            background: #ef4444; 
+            border: 2px solid var(--dark-border); 
+            border-radius: 12px;
+            color: white; 
+            font-family: 'Nunito', sans-serif; 
+            font-size: 1.1rem; 
+            font-weight: 900; 
+            cursor: pointer;
+            box-shadow: 0 3px 0 var(--dark-border);
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-back:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--dark-border); filter: brightness(1.1); }
+        .btn-back:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; }
+        
+        /* Legacy Round Buttons */
+        .legacy-btn {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: transform 0.2s;
+            font-weight: 900; font-size: 32px; font-family: 'Nunito', Arial, sans-serif;
+        }
+        .legacy-btn:hover { transform: scale(1.1); }
+
+        /* Legacy JS Tooltip */
+        .html-tip { font-weight: normal; }
+        .js-tooltip {
+            position: fixed; background: #ffffff; color: #1e293b;
+            padding: 10px 14px; border-radius: 12px; font-size: 16px; font-weight: 800;
+            white-space: nowrap; z-index: 2147483647; 
+            border: 3px solid #334155; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            pointer-events: none; opacity: 0; transition: opacity 0.15s ease-out;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* Inner Content Styling */
+        .block-title {
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            flex-shrink: 0; 
+        }
+
+        /* 2x2 Grid for Middle Block */
+        .middle-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            flex: 1; /* Expand to fill */
+        }
+        .grid-section {
+            border: 4px dashed #cbd5e1;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            background: #f8fafc;
+            font-weight: 800;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .good-layout { grid-template-columns: 1fr 1fr; grid-template-rows: 80px minmax(0, 1fr) minmax(0, 1fr); }
+            .block-top { grid-column: 1 / -1; grid-row: 1; }
+            .block-left { grid-column: 1; grid-row: 2; }
+            .block-right { grid-column: 2; grid-row: 2; }
+            .block-middle { grid-column: 1 / -1; grid-row: 3; }
+        }
+        @media (max-width: 768px) {
+            body { overflow-y: auto; }
+            .good-layout { display: flex; flex-direction: column; height: auto; }
+            .good-block { min-height: 250px; flex-shrink: 0; }
+            .block-top { min-height: 100px; flex-wrap: wrap; justify-content: center; gap: 5px; }
+        }
+    
+        /* New Rectangular Buttons */
+        .rect-btn {
+            background: #facc15;
+            color: #1e293b;
+            border: 4px solid #1e293b;
+            border-radius: 16px;
+            padding: 12px 20px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1e293b;
+            transition: all 0.1s;
+            font-family: 'Nunito', sans-serif;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .rect-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 0 #1e293b; 
+            filter: brightness(1.1); 
+        }
+        .rect-btn:active { 
+            transform: translateY(6px); 
+            box-shadow: 0 0 0 transparent; 
+        }
+        
+        /* FAB Speed Dial Menu */
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+        
+        .fab-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.8);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom center;
+        }
+        
+        .fab-container:hover .fab-menu {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        
+        .fab-main {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+        
+        .fab-container:hover .fab-main {
+            transform: rotate(180deg) scale(1.1) !important;
+            background: #cbd5e1 !important;
+            color: #1e293b !important;
+            border-color: #94a3b8 !important;
+            box-shadow: 0 4px 0 #94a3b8 !important;
+        }
+    
+        /* Collapse Logic */
+        .good-block { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .good-block.collapsed { 
+            background: transparent !important; 
+            border-color: transparent !important; 
+            box-shadow: none !important; 
+            padding: 0; 
+            overflow: visible !important; /* PREVENTS CLIPPING OF BUTTON SHADOWS */
+        }
+        
+        .good-block.collapsed .rect-btn {
+            width: 60px;
+            height: 60px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 16px;
+            margin: 0 auto;
+        }
+        
+        /* Toggle Text Spans */
+        .good-block.collapsed .btn-text-full { display: none !important; }
+        .good-block.collapsed .btn-text-short { display: block; }
+        .good-block:not(.collapsed) .btn-text-full { display: inline; }
+        .good-block:not(.collapsed) .btn-text-short { display: none; }
+    
+        /* Top Bar Additions */
+        .diff-badge {
+            padding: 5px 15px; border-radius: 20px; font-weight: 900;
+            font-size: 1.1rem; color: white; border: 2px solid rgba(0,0,0,0.2);
+            text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        }
+        .diff-easy { background: #22c55e; }
+        .diff-med { background: #f97316; }
+        .diff-hard { background: #ef4444; }
+        
+        .mini-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Sidebar layout additions */
+        .sidebar-content {
+            flex:1; display:flex; flex-direction:column; justify-content:flex-start; align-items:center; gap: 8px; width: 100%;
+        }
+        .sidebar-grid {
+            display: flex; flex-direction: column; gap: 8px; width: 100%;
+        }
+        /* Hide sidebar grids when collapsed */
+        .good-block.collapsed .sidebar-grid { display: none !important; }
+    
+        /* Compact Element Trays Component */
+        .mini-scale-box {
+            background: #ffffff;
+            border: 3px solid #1e293b;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 0 #1e293b;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Nunito', sans-serif;
+        }
+        .mini-scale-box.unbalanced {
+            border-color: #ef4444;
+            box-shadow: 0 4px 0 #ef4444;
+        }
+        .mini-scale-title {
+            text-align: center; font-size: 1.1rem; font-weight: 900; color: #1e293b; margin-bottom: 8px;
+        }
+        .mini-scale-display {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            height: 60px;
+            display: grid;
+            grid-template-columns: 1fr 30px 1fr;
+            align-items: center;
+            text-align: center;
+            position: relative; /* CRITICAL FIX: anchors the absolute floor! */
+            overflow: hidden; /* Ensures the bottom radius isn't broken by the floor */
+        }
+        .mini-scale-half {
+            font-weight: 900;
+            color: #94a3b8;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .mini-scale-divider {
+            height: 80%;
+            border-left: 2px dotted #94a3b8;
+            margin: 0 auto;
+        }
+        .mini-scale-bar {
+            background: #1e293b;
+            border-radius: 8px;
+            display: grid; 
+            grid-template-columns: 1fr 30px 1fr;
+            align-items: center;
+            padding: 6px 0;
+            margin-top: 0px;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+    
+        /* Floor and Fulcrum inside the Display */
+        .mini-floor-container {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            display: flex;
+            height: 4px;
+            align-items: flex-end;
+        }
+        .mini-floor-left {
+            flex: 1; height: 4px; background: #3b82f6; border-bottom-left-radius: 6px;
+        }
+        .mini-floor-right {
+            flex: 1; height: 4px; background: #f97316; border-bottom-right-radius: 6px;
+        }
+        .mini-floor-triangle {
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 10px solid #1e293b;
+            z-index: 2;
+        }
+
+    
+        
+
+    
+        /* --- EXACT PRO VIEW ELEMENT TRAY CSS (POLISHED) --- */
+        .pro-scale-card {
+            background: white; border: 4px solid #ef4444; border-radius: 20px;
+            padding: 10px 15px 15px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            box-shadow: 0 6px 0 #b91c1c; position: relative; transition: all 0.3s;
+            font-family: 'Nunito', sans-serif;
+            box-sizing: border-box; width: calc(100% - 5px); margin: 0 auto 15px auto;
+        }
+        .pro-scale-card.matched { border-color: #22c55e; box-shadow: 0 6px 0 #15803d; }
+        
+        .pro-scale-card h3 { margin: 0; font-size: 1.4rem; color: #1e293b; font-weight: 900; font-family: 'Nunito', sans-serif; }
+        .scale-labels { display: flex; justify-content: space-between; width: 100%; font-size: 0.65rem; font-weight: 900; color: #94a3b8; padding: 0 5px; box-sizing: border-box; }
+        
+        .mini-seesaw { width: 100%; height: 90px; position: relative; display: flex; justify-content: center; }
+        
+        .mini-plank { width: 90%; height: 2px; background: linear-gradient(90deg, #3b82f6 50%, #f97316 50%); position: absolute; bottom: 12px; border-radius: 2px; border: 1px solid #1e293b; display: flex; justify-content: center; z-index: 3; }
+        .mini-fulcrum { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 12px solid #1e293b; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); z-index: 4; }
+        
+        .mini-stack-zone { width: 50%; height: 80px; position: absolute; bottom: 6px; display: flex; align-items: flex-end; padding: 0 5px; box-sizing: border-box; }
+        .mini-stack-zone.left { left: 0; justify-content: flex-end; border-right: 2px dashed rgba(0,0,0,0.15); }
+        .mini-stack-zone.right { right: 0; justify-content: flex-start; }
+        
+        
+        
+        .scale-tally { 
+            display: flex; gap: 5px; align-items: center; font-weight: 900; 
+            width: 100%; box-sizing: border-box; 
+            justify-content: space-between; 
+            background: #f1f5f9; border-radius: 16px; padding: 8px 12px; 
+            border: 3px solid #cbd5e1; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); 
+            margin-top: -2px; position: relative; z-index: 5;
+        }
+        .tally-box { background: #1e293b; color: white; border-radius: 12px; padding: 6px 0; width: 45px; text-align: center; font-size: 1.2rem; transition: background 0.2s; }
+        .tally-box.balanced { background: #22c55e; }
+        .tally-eq { color: #94a3b8; font-size: 1.5rem; transition: color 0.2s; font-weight: 900; margin: 0 5px; }
+        .tally-eq.balanced { color: #22c55e; }
+
+    
+        /* New Block Styles */
+        .section-status { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; font-weight: 900; background: #fff; border: 4px solid #1e293b !important; border-radius: 16px; box-shadow: 0 4px 0 #1e293b; }
+        .status-block { padding: 6px 15px; border-radius: 10px; color: white; border: 3px solid rgba(0,0,0,0.2); letter-spacing: 1px; }
+        .status-block.unbalanced { background: #ef4444; }
+        .status-block.balanced { background: #22c55e; }
+        .status-text { color: #64748b; font-size: 1.1rem; }
+        
+        .section-scale { height: 110px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #94a3b8; font-size: 1.5rem; border: 4px dashed #cbd5e1; background: #f8fafc; }
+        .section-equation { height: 90px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #94a3b8; font-size: 1.5rem; border: 4px dashed #cbd5e1; background: #f8fafc; }
+        
+        .section-container { display: flex; flex-direction: column; gap: 5px; width: 100%; }
+        .section-title { font-weight: 900; color: #1e293b; font-size: 1.2rem; padding-left: 5px; }
+        
+        .beaker-message { background: white; border: 4px solid #1e293b; border-radius: 16px; padding: 20px; font-weight: 800; color: #1e293b; box-shadow: 0 6px 0 #1e293b; position: relative; }
+        
+        
+        .beaker-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 100%; }
+        .blue-btn { background: #3b82f6; color: white; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; }
+        .blue-btn:hover { box-shadow: 0 6px 0 #1e293b; background: #60a5fa; color: #1e293b; }
+
+    
+        .vertical-mini-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+        }
+
+    
+        /* New Block Styles for Recent Tweaks */
+        .status-bar-shared {
+            display: flex; width: 100%; height: 35px;
+            border: 4px solid #1e293b; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 4px 0 #1e293b;
+        }
+        .status-half {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.1rem; color: white; letter-spacing: 1px;
+        }
+        .status-left { background: #ef4444; border-right: 4px solid #1e293b; }
+        .status-right { background: #f97316; }
+        
+        .section-box {
+            border: 4px solid #1e293b;
+            border-radius: 16px;
+            padding: 6px;
+            background: #ffffff;
+            box-shadow: 0 4px 0 #1e293b;
+        }
+
+    
+        /* Legacy Equation Styles */
+        .eq-mol { display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 14px; background: #ffffff; border: 4px solid #cbd5e1; box-shadow: 0 4px 0 #94a3b8; }
+        .eq-coeff { color: #ffffff; background: #ef4444; font-size: clamp(20px, 2.5vw, 28px); font-weight: 900; padding: 2px 12px; border-radius: 10px; border: 3px solid #b91c1c; box-shadow: 0 4px 0 #b91c1c; cursor: help; text-shadow: 1px 1px 0px #7f1d1d; display: inline-block; }
+        .eq-formula { font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; color: #1e293b; letter-spacing: 2px; display: inline-block; cursor: help; }
+        .eq-arrow { color: #ffffff; background: #3b82f6; font-size: clamp(24px, 3.5vw, 36px); font-weight: 900; cursor: help; padding: 6px 14px; border-radius: 14px; border: 4px solid #1d4ed8; box-shadow: 0 4px 0 #1d4ed8; }
+        .eq-plus { color: #64748b; font-size: clamp(28px, 4vw, 40px); font-weight: 900; text-shadow: 2px 2px 0 #cbd5e1; }
+        .subscript { font-size: 0.6em; vertical-align: sub; font-weight: 900; color: #64748b; }
+
+    
+        /* Sleek Equation Design */
+        .sleek-equation-wrapper {
+            display: flex; justify-content: space-between; align-items: center; 
+            width: 100%; padding: 10px 0; box-sizing: border-box;
+            background: transparent;
+        }
+        .sleek-side {
+            display: flex; align-items: center; gap: clamp(10px, 2vw, 20px);
+            flex-wrap: nowrap; white-space: nowrap;
+        }
+        .sleek-mol {
+            display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px);
+            background: #ffffff; border: 2px solid #e2e8f0; border-radius: 100px;
+            padding: 8px 24px 8px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
+        }
+        .sleek-mol:hover {
+            transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+        .sleek-coeff {
+            background: #ef4444; color: white; font-size: clamp(1.2rem, 2vw, 1.5rem); font-weight: 900;
+            width: clamp(35px, 4vw, 45px); height: clamp(35px, 4vw, 45px); 
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            flex-shrink: 0;
+        }
+        .sleek-formula {
+            font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 900; color: #1e293b; letter-spacing: 1px;
+            font-family: 'Nunito', sans-serif;
+        }
+        .sleek-sub {
+            font-size: 0.6em; vertical-align: sub; color: #64748b; font-weight: 900;
+        }
+        .sleek-plus {
+            font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 900; color: #cbd5e1;
+            text-shadow: 1px 1px 0 #f8fafc;
+        }
+        .sleek-arrow {
+            display: flex; align-items: center; justify-content: center;
+            width: clamp(40px, 6vw, 60px); height: clamp(40px, 6vw, 60px);
+            margin: 0 clamp(10px, 2vw, 30px);
+        }
+        .sleek-arrow svg {
+            width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.2s;
+        }
+        .sleek-arrow:hover svg {
+            transform: scale(1.1) translateX(4px); stroke: #3b82f6;
+        }
+
+        /* 3D Glassy Marbles */
+        .marble-3d {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 14px; font-family: 'Nunito', sans-serif;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.8), 0 5px 8px rgba(0,0,0,0.3);
+            color: white; text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+            margin: 1px;
+        }
+        .m-Zn { background: radial-gradient(circle at 35% 35%, #94a3b8, #334155); }
+        .m-Ag { background: radial-gradient(circle at 35% 35%, #f1f5f9, #94a3b8); color: #0f172a; text-shadow: none; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), inset 3px 3px 6px rgba(255,255,255,0.9), 0 5px 8px rgba(0,0,0,0.2); }
+        .m-N  { background: radial-gradient(circle at 35% 35%, #a855f7, #4c1d95); }
+        .m-O  { background: radial-gradient(circle at 35% 35%, #f87171, #991b1b); }
+
+    
+        /* Responsive Equation Container */
+        .eq-resize-container {
+            container-type: inline-size;
+            container-name: eq;
+        }
+
+        /* Flat Scientific Equation Design */
+        .sci-mol {
+            display: flex; align-items: center; gap: clamp(2px, 1cqw, 8px);
+            cursor: pointer; transition: transform 0.1s;
+            white-space: nowrap;
+        }
+        .sci-mol:hover { transform: scale(1.02); }
+        .sci-coeff {
+            background: #ef4444; color: white;
+            font-size: clamp(0.9rem, 3cqw, 1.6rem); font-weight: 900; font-family: 'Nunito', sans-serif;
+            padding: 2px clamp(6px, 1cqw, 12px); border-radius: 12px; border: 4px solid #b91c1c;
+            box-shadow: 0 4px 0 #b91c1c; cursor: help; flex-shrink: 0;
+        }
+        .sci-formula {
+            font-size: clamp(1rem, 3.8cqw, 1.8rem); font-weight: 900; color: #1e293b;
+            font-family: 'Nunito', sans-serif; letter-spacing: 1px;
+            cursor: help; flex-shrink: 0;
+        }
+        .sci-sub { font-size: 0.6em; vertical-align: -0.25em; font-weight: 900; color: #475569; border-bottom: 2px dotted #94a3b8; padding-bottom: 1px; cursor: help; }
+        .state-label { font-size: 0.5em; color: #64748b; margin-left: 2px; }
+        
+        .sci-plus { 
+            font-size: clamp(1.2rem, 4cqw, 3rem); font-weight: 900; color: #475569; margin: 0 clamp(2px, 1cqw, 8px); flex-shrink: 0;
+        }
+        .sci-arrow-box {
+            background: #3b82f6; color: white;
+            padding: 4px clamp(8px, 2cqw, 14px); border-radius: 8px;
+            border: 2px solid #1d4ed8; box-shadow: 0 4px 0 #1d4ed8;
+            font-size: clamp(1rem, 3cqw, 1.5rem); font-weight: 900; cursor: help; z-index: 10;
+        }
+
+        /* Minimal Soft Premium Marbles */
+        .marble-soft {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 14px; font-family: 'Nunito', sans-serif;
+            border: none;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+            margin: 2px;
+        }
+        .s-Zn { background: #64748b; color: white; }
+        .s-Ag { background: #cbd5e1; color: #1e293b; }
+        .s-N  { background: #8b5cf6; color: white; }
+        .s-O  { background: #ef4444; color: white; }
+
+    
+        /* Interactive Elements for Grid 2 & 3 */
+        .el-btn {
+            background: #ffffff; border: 2px solid #cbd5e1; border-radius: 8px;
+            padding: 4px 10px; font-weight: 900; font-family: 'Nunito', sans-serif;
+            color: #475569; cursor: grab; box-shadow: 0 2px 0 #cbd5e1;
+            transition: all 0.1s; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .el-btn:active { transform: translateY(2px); box-shadow: none; cursor: grabbing; }
+        
+        /* Grid 4 Counters */
+        .count-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 4px 0;
+        }
+        .count-lbl { font-size: 0.75rem; color: #64748b; font-weight: 800; text-transform: uppercase; }
+        .count-val { font-size: 1.2rem; color: #0f172a; font-weight: 900; }
+        .count-val.balanced { color: #10b981; } /* Green if matched */
+
+    
+        /* Hyper-Realistic 3D Glass Marbles */
+        .hyper-marble {
+            position: relative; width: 34px; height: 34px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 14px; font-family: 'Nunito', sans-serif;
+            color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            box-shadow: inset -5px -5px 8px rgba(0,0,0,0.6), inset 4px 4px 6px rgba(255,255,255,0.5), 0 4px 6px rgba(0,0,0,0.4);
+            margin: 1px; z-index: 1;
+        }
+        /* Specular Highlight (The Glass Reflection) */
+        .hyper-marble::before {
+            content: ''; position: absolute; top: 2px; left: 15%; width: 70%; height: 35%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0));
+            border-radius: 50% 50% 20% 20%; pointer-events: none; z-index: 2;
+        }
+        .hm-Zn { background: radial-gradient(circle at 30% 30%, #94a3b8, #334155); }
+        .hm-Ag { background: radial-gradient(circle at 30% 30%, #f1f5f9, #64748b); color: #0f172a; text-shadow: none; box-shadow: inset -5px -5px 8px rgba(0,0,0,0.4), inset 4px 4px 6px rgba(255,255,255,0.9), 0 4px 6px rgba(0,0,0,0.3); }
+        .hm-N  { background: radial-gradient(circle at 30% 30%, #a855f7, #4c1d95); }
+        .hm-O  { background: radial-gradient(circle at 30% 30%, #ef4444, #7f1d1d); }
+
+        /* Image-Inspired Panels */
+        .panel-card {
+            display: flex; flex-direction: column; height: 100%;
+            background: #ffffff; border: 4px solid #94a3b8; border-radius: 16px;
+            overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        .panel-header-r { background: #2563eb; color: white; padding: 12px; font-size: 1.2rem; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        .panel-header-p { background: #d97706; color: white; padding: 12px; font-size: 1.2rem; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .mol-btn {
+            background: #ffffff; border: 3px solid #3b82f6; border-radius: 12px;
+            padding: 4px 16px; font-weight: 900; font-family: 'Nunito', sans-serif;
+            color: #1d4ed8; cursor: grab; box-shadow: 0 4px 0 #bfdbfe; font-size: 1.1rem;
+            display: inline-flex; align-items: center; justify-content: center; transition: all 0.1s;
+        }
+        .mol-btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        .mol-block {
+            background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 12px;
+            padding: 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .panel-footer { display: flex; width: 100%; height: 40px; }
+        .footer-stat { flex: 1; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; gap: 8px; font-size: 1.1rem; }
+        .f-green { background: #10b981; }
+        .f-red { background: #ef4444; }
+        
+        /* Equation tweaks to match image */
+        .img-eq-wrapper { background: #ffffff; border: 4px solid #cbd5e1; border-radius: 20px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.5); }
+        .img-coeff { background: #b91c1c; border: 2px solid #7f1d1d; border-radius: 8px; color: white; padding: 4px 12px; box-shadow: 0 4px 0 #7f1d1d; }
+
+    
+        .block-middle { padding: 0px !important; display: flex; flex-direction: column; }
+        .middle-grid { display: flex !important; flex-direction: column !important; gap: 0px !important; margin: 0; padding: 0; justify-content: flex-start; }
+    
+    /* Prevent Flexbox from crushing elements into each other */
+    .block-middle > * { flex-shrink: 0 !important; }
+    .middle-grid > * { flex-shrink: 0 !important; }
+    
+    /* Ensure the middle block can scroll gracefully if it absolutely must */
+    .block-middle { overflow-y: auto !important; overflow-x: hidden !important; }
+
+    
+    /* Sidebars Spacing Fix */
+    
+    
+    .pro-scale-card { margin-bottom: 15px; } /* Legacy spacing if needed */
+
+    
+    /* Move sidebar buttons higher */
+    
+    .block-right { padding-top: 5px !important; }
+
+    
+    /* Shrink the molecules inside Grid 2 */
+    .mol-block { zoom: 0.8; }
+    
+    /* Redo Molecule Buttons */
+    .mol-btn {
+        background: linear-gradient(135deg, #f8fafc, #e2e8f0) !important;
+        border: 3px solid #1e293b !important;
+        color: #1e293b !important;
+        border-radius: 20px !important;
+        padding: 8px 16px !important;
+        font-size: 1.1rem !important;
+        font-weight: 900 !important;
+        box-shadow: 0 4px 0 #1e293b !important;
+        cursor: pointer;
+        transition: all 0.1s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .mol-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 0 0 #1e293b !important;
+    }
+    .mol-btn::before {
+        content: '+';
+        display: inline-flex;
+        background: #1e293b;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    
+    /* Make state labels italic and grey */
+    .state-label {
+        font-style: italic !important;
+        color: #94a3b8 !important;
+        font-weight: normal !important;
+    }
+
+    /* Redesign Mol-Btn */
+    .mol-btn {
+        background: #ffffff !important;
+        border: 2px solid #334155 !important;
+        color: #334155 !important;
+        border-radius: 8px !important;
+        padding: 6px 16px !important;
+        font-size: 1.1rem !important;
+        font-weight: 900 !important;
+        box-shadow: 2px 2px 0 #334155 !important;
+        cursor: pointer;
+        transition: all 0.1s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .mol-btn::before { content: none !important; display: none !important; } /* Kill old pseudo element */
+    .mol-btn:hover {
+        background: #f8fafc !important;
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0 #334155 !important;
+    }
+    .mol-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0 0 0 #334155 !important;
+    }
+
+    
+    
+    
+    /* Draggable Molecule Buttons */
+    .mol-btn {
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 10px 24px !important;
+        font-size: 1.4rem !important;
+        font-weight: 900 !important;
+        cursor: grab !important;
+        transition: all 0.1s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .btn-react {
+        background: #3b82f6 !important;
+        color: white !important;
+        box-shadow: 0 5px 0 #1e3a8a !important;
+    }
+    .btn-react:hover { background: #60a5fa !important; transform: translateY(-2px); box-shadow: 0 7px 0 #1e3a8a !important; }
+    .btn-react:active { transform: translateY(5px); box-shadow: 0 0 0 transparent !important; }
+
+    .btn-prod {
+        background: #f97316 !important;
+        color: white !important;
+        box-shadow: 0 5px 0 #9a3412 !important;
+    }
+    .btn-prod:hover { background: #fb923c !important; transform: translateY(-2px); box-shadow: 0 7px 0 #9a3412 !important; }
+    .btn-prod:active { transform: translateY(5px); box-shadow: 0 0 0 transparent !important; }
+
+
+    /* Removable Drop Zone Blocks - Red Hover X Overlap */
+    .mol-block {
+        background: #e2e8f0;
+        border: 4px solid #cbd5e1 !important;
+        border-radius: 16px;
+        padding: 8px 12px;
+        box-shadow: 0 4px 0 #94a3b8;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.1s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        zoom: 0.8;
+    }
+    .mol-block:hover {
+        border-color: #ef4444 !important;
+        background: #fee2e2 !important;
+        transform: translateY(4px) scale(0.95);
+        box-shadow: 0 0 0 transparent !important;
+    }
+    .mol-block::after {
+        content: '❌';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 50px;
+        z-index: 10;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.1s;
+    }
+    .mol-block:hover::after {
+        opacity: 0.5;
+    }
+
+
+    
+    .sci-coeff.img-coeff {
+        background: #ef4444 !important;
+        border: 3px solid #b91c1c !important;
+        box-shadow: 0 4px 0 #b91c1c !important;
+        color: white !important;
+    }
+
+
+    .footer-stat { position: relative; transition: all 0.2s !important; cursor: help; overflow: hidden; }
+    .footer-stat.f-green:hover { box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.6) !important; background: #059669 !important; }
+    .footer-stat.f-red:hover { box-shadow: inset 0 0 25px rgba(255, 255, 255, 0.6) !important; background: #b91c1c !important; }
+
+
+    .tally-box.unbalanced { background: #ef4444 !important; }
+    .tally-eq.unbalanced { color: #ef4444 !important; }
+    @keyframes pulseWarning {
+        0% { transform: scale(1) translateY(0); opacity: 1; }
+        50% { transform: scale(1.2) translateY(-2px); opacity: 0.8; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    .tally-box.empty { background: #1e293b !important; }
+    .tally-eq.empty { color: #94a3b8 !important; }
+    .footer-stat.empty { color: #94a3b8 !important; }
+    
+    .block-right .sidebar-grid { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .beaker-message { flex: 1; min-height: 0; overflow-y: auto; margin-bottom: 0px !important; }
+
+
+    .block-left .sidebar-content, .block-right .sidebar-content { 
+        height: 100%; display: flex; flex-direction: column; overflow: hidden; 
+    }
+    .block-left .sidebar-grid { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; padding-right: 5px; padding-left: 5px; margin-top: 0px; }
+    .block-right .sidebar-grid { 
+        flex: 1; min-height: 0; display: flex; flex-direction: column; 
+    }
+
+
+    /* Trays & Buttons exactly from ZIP */
+    .header-react { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: #ffffff !important; border-bottom: 4px solid #1d4ed8 !important; text-shadow: 2px 2px 0px #1e3a8a !important; }
+    .header-prod { background: linear-gradient(135deg, #f97316, #c2410c) !important; color: #ffffff !important; border-bottom: 4px solid #9a3412 !important; text-shadow: 2px 2px 0px #7c2d12 !important; }
+    #react-drop-container, #react-btn-container { border-color: #3b82f6 !important; }
+    #prod-drop-container, #prod-btn-container { border-color: #f97316 !important; }
+
+    .btn-react { background: #ffffff !important; color: #3b82f6 !important; border: 3px solid #3b82f6 !important; box-shadow: 0 4px 0 #3b82f6 !important; }
+    .btn-react:hover { background: #3b82f6 !important; color: #ffffff !important; box-shadow: 0 8px 0 #1d4ed8 !important; transform: translateY(-4px); }
+    .btn-react:active { transform: translateY(4px) !important; box-shadow: 0 0 0 #3b82f6 !important; }
+
+    .btn-prod { background: #ffffff !important; color: #f97316 !important; border: 3px solid #f97316 !important; box-shadow: 0 4px 0 #f97316 !important; }
+    .btn-prod:hover { background: #f97316 !important; color: #ffffff !important; box-shadow: 0 8px 0 #c2410c !important; transform: translateY(-4px); }
+    .btn-prod:active { transform: translateY(4px) !important; box-shadow: 0 0 0 #f97316 !important; }
+
+    /* Drop block matches mol-card from ZIP */
+    .mol-block { 
+        border: 3px solid #cbd5e1; border-radius: 16px; padding: 12px; background: #f8fafc; 
+        display: flex; flex-direction: column; align-items: center; position: relative; 
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); min-width: 90px; 
+        box-shadow: 0 6px 0 #cbd5e1; overflow: visible; cursor: pointer; margin: 4px;
+    }
+    .mol-block:hover { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; border-color: #ef4444; }
+    .mol-block:hover .mol-remove-overlay { opacity: 1; }
+    .mol-remove-overlay {
+        position: absolute; inset: 0; background: rgba(255,255,255,0.7); border-radius: 12px;
+        color: rgba(239, 68, 68, 0.9); display: flex; align-items: center; justify-content: center;
+        font-size: 42px; opacity: 0; transition: opacity 0.2s; z-index: 50; pointer-events: none;
+    }
+    
+    .btn-hint {
+        background: linear-gradient(135deg, #fef08a, #eab308) !important;
+        color: #713f12 !important; border-color: #ca8a04 !important; box-shadow: 0 6px 0 #ca8a04 !important;
+    }
+    .btn-hint:hover { box-shadow: 0 10px 0 #a16207 !important; transform: translateY(-4px); }
+    .btn-hint:active { box-shadow: 0 0 0 transparent !important; transform: translateY(4px); }
+
+
+        .legacy-btn:active {
+            transform: translateY(4px) !important;
+            box-shadow: 0 0 0 transparent !important;
+        }
+        .btn-hint-clean {
+            flex: 1; height: 100%; background: #6366f1; color: #ffffff; 
+            border: 4px solid #3730a3; box-shadow: 0 4px 0 #3730a3; 
+            border-radius: 12px; font-weight: 900; font-size: 0.95rem; 
+            line-height: 1.1; cursor: pointer; transition: all 0.1s; 
+            display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center;
+        }
+        .btn-hint-clean:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #3730a3;
+            background: #4f46e5;
+        }
+        .btn-hint-clean:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 transparent;
+        }
+        .btn-hint-clean svg {
+            width: 26px; height: 26px; margin-right: 6px;
+        }
+        .mode-toggle {
+            background: #1e293b; color: white; border: 3px solid #0f172a; border-radius: 12px; padding: 5px 15px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #0f172a; transition: all 0.1s;
+        }
+        .mode-toggle:active {
+            transform: translateY(4px); box-shadow: 0 0 0 transparent;
+        }
+        .hard-mode-on .img-coeff {
+            display: none !important;
+        }
+        .hard-mode-on .sci-plus {
+            margin: 0 10px !important;
+        }
+        
+
+
+
+
+
+
+.tab-btn { background: transparent; color: #94a3b8; }
+.tab-btn.active-tab { background: #3b82f6; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+.btn-hint-clean {
+    background: #facc15 !important; color: #451a03 !important; 
+    border-color: #ca8a04 !important; box-shadow: 0 4px 0 #ca8a04 !important;
+}
+.btn-hint-clean:hover {
+    background: #fef08a !important;
+    box-shadow: 0 6px 0 #ca8a04 !important;
+}
+.btn-hint-clean:active {
+    box-shadow: 0 0 0 transparent !important;
+}
+
+.drop-placeholder {
+    display: none;
+    align-items: center; justify-content: center;
+    width: 100%; height: 100%; min-height: 80px;
+    color: #94a3b8; font-weight: 800; font-size: 1.2rem;
+    text-align: center; border: 2px dashed #cbd5e1; border-radius: 12px;
+}
+.empty-drop .drop-placeholder { display: flex; }
+
+.block-left:not(.collapsed), .block-right:not(.collapsed) { padding: 15px !important; }
+.block-left .sidebar-content, .block-right .sidebar-content { padding: 0 !important; height: 100%; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+
+</style>
+
+
+
+<style id="goal-fallback-css">
+    .btn-react { background: #3b82f6 !important; color: white !important; box-shadow: 0 5px 0 #1e3a8a !important; }
+    .btn-react:hover { background: #60a5fa !important; transform: translateY(-2px); box-shadow: 0 7px 0 #1e3a8a !important; }
+    .btn-react:active { transform: translateY(5px); box-shadow: 0 0 0 transparent !important; }
+
+    .btn-prod { background: #f97316 !important; color: white !important; box-shadow: 0 5px 0 #9a3412 !important; }
+    .btn-prod:hover { background: #fb923c !important; transform: translateY(-2px); box-shadow: 0 7px 0 #9a3412 !important; }
+    .btn-prod:active { transform: translateY(5px); box-shadow: 0 0 0 transparent !important; }
+    
+    .hyper-marble {
+        width: 34px !important; height: 34px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        font-size: 14px !important; font-weight: 900 !important;
+        box-shadow: inset -3px -3px 5px rgba(0,0,0,0.2), inset 3px 3px 5px rgba(255,255,255,0.9), 0 3px 5px rgba(0,0,0,0.15) !important;
+        border: 2px solid rgba(0,0,0,0.2) !important;
+        text-shadow: 1px 1px 0px rgba(255,255,255,0.5) !important;
+    }
+    .hyper-marble::before { content: none !important; display: none !important; }
+</style>
+
+
+
+<style id="goal-absolute-overrides">
+    /* Buttons (Add Elements) exactly like .tray-btn from repo */
+    .mol-btn {
+        padding: 8px 16px !important;
+        border-radius: 12px !important;
+        font-size: clamp(16px, 2vw, 20px) !important;
+        font-weight: 900 !important;
+        cursor: grab !important;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        
+    }
+    
+    /* Reactant Button (Blue) */
+    .btn-react { background: #ffffff !important; color: #3b82f6 !important; border: 3px solid #3b82f6 !important; box-shadow: 0 4px 0 #3b82f6 !important; }
+    .btn-react:hover { background: #3b82f6 !important; color: #ffffff !important; transform: translateY(-4px) !important; box-shadow: 0 8px 0 #1d4ed8 !important; }
+    .btn-react:hover span { color: #ffffff !important; }
+    .btn-react:active { transform: translateY(4px) !important; box-shadow: 0 0 0 transparent !important; }
+
+    /* Product Button (Orange) */
+    .btn-prod { background: #ffffff !important; color: #f97316 !important; border: 3px solid #f97316 !important; box-shadow: 0 4px 0 #f97316 !important; }
+    .btn-prod:hover { background: #f97316 !important; color: #ffffff !important; transform: translateY(-4px) !important; box-shadow: 0 8px 0 #c2410c !important; }
+    .btn-prod:hover span { color: #ffffff !important; }
+    .btn-prod:active { transform: translateY(4px) !important; box-shadow: 0 0 0 transparent !important; }
+    
+    /* Panel Headers */
+    .header-react {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+        border-bottom: 3px solid #1e3a8a !important;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        text-shadow: 1px 1px 0px rgba(0,0,0,0.3) !important;
+        padding: 8px !important;
+    }
+    .header-prod {
+        background: linear-gradient(135deg, #f97316, #c2410c) !important;
+        border-bottom: 3px solid #9a3412 !important;
+        border-top-left-radius: 12px !important;
+        border-top-right-radius: 12px !important;
+        text-shadow: 1px 1px 0px rgba(0,0,0,0.3) !important;
+        padding: 8px !important;
+    }
+    
+    /* Drop Zone Elements (.mol-block matching repo .mol-card exactly) */
+    .mol-block {
+        background: #f8fafc !important;
+        border: 3px solid #cbd5e1 !important;
+        border-radius: 16px !important;
+        padding: 12px !important;
+        box-shadow: 0 6px 0 #cbd5e1 !important;
+        position: relative !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 4px !important;
+        zoom: 0.75 !important;
+        overflow: visible !important; /* Ensure children don't clip */
+        /* Make sure it creates a new stacking context so the X goes in front of everything inside */
+        isolation: isolate !important; 
+    }
+    .mol-block:hover {
+        transform: translateY(4px) !important;
+        box-shadow: 0 0 0 transparent !important;
+        border-color: #ef4444 !important;
+    }
+    
+    /* The red overlay matching repo .mol-remove-overlay */
+    .mol-block::before {
+        content: '' !important;
+        position: absolute !important;
+        inset: 0 !important;
+        background: rgba(239, 68, 68, 0.15) !important;
+        border-radius: 13px !important;
+        opacity: 0;
+        transition: opacity 0.2s !important;
+        pointer-events: none !important;
+        z-index: 9998 !important;
+    }
+    .mol-block:hover::before { opacity: 1 !important; }
+    
+    /* The X Mark */
+    .mol-block::after {
+        content: '❌' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-size: 40px !important;
+        opacity: 0;
+        pointer-events: none !important;
+        transition: opacity 0.1s !important;
+        z-index: 9999 !important;
+    }
+    .mol-block:hover::after { opacity: 1 !important; }
+
+    /* Fix Marbles strictly to repo styling */
+    .hyper-marble {
+        width: 34px !important; height: 34px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        font-size: 14px !important; font-weight: 900 !important;
+        box-shadow: inset -3px -3px 5px rgba(0,0,0,0.2), inset 3px 3px 5px rgba(255,255,255,0.9), 0 3px 5px rgba(0,0,0,0.15) !important;
+        border: 2px solid rgba(0,0,0,0.2) !important;
+        text-shadow: 1px 1px 0px rgba(255,255,255,0.5) !important;
+    }
+    .hyper-marble::before { content: none !important; display: none !important; }
+    
+    .hm-Zn { background: #94a3b8 !important; color: #1e293b !important; }
+    .hm-Ag { background: #cbd5e1 !important; color: #0f172a !important; }
+    .hm-N  { background: #8b5cf6 !important; color: #ffffff !important; }
+    .hm-O  { background: #ef4444 !important; color: #ffffff !important; }
+</style>
+
+
+
+<style id="glow-css">
+    .pro-scale-card { transition: all 0.2s !important; cursor: help; }
+    .pro-scale-card:hover { box-shadow: inset 0 0 25px rgba(239,68,68,0.4), 0 6px 0 #b91c1c !important; }
+    .pro-scale-card.matched:hover { box-shadow: inset 0 0 25px rgba(34,197,94,0.4), 0 6px 0 #15803d !important; }
+</style>
+
+    <script src="js/levels.js"></script>
+    <script src="js/game.js"></script>
+
+<style id="tooltip-css">
+    .js-tooltip {
+        position: absolute;
+        background: #1e293b;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 900;
+        pointer-events: none;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        opacity: 0;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+    }
+    .js-tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #1e293b transparent transparent transparent;
+    }
+</style>
+
+
+<style id="essential-restored-css">
+    .book-block { width: 16px; height: 5px; border-radius: 6px; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2), 0 2px 2px rgba(0,0,0,0.1); flex-shrink: 0; }
+    .book-block.blue { background: #3b82f6; border: 2px solid #1d4ed8; }
+    .book-block.orange { background: #f97316; border: 2px solid #c2410c; }
+    
+    @keyframes pulseWarning {
+        0% { transform: scale(1) translateY(0); opacity: 1; }
+        50% { transform: scale(1.2) translateY(-2px); opacity: 0.8; }
+    }
+    
+    [data-tooltip] { position: relative; }
+    [data-tooltip]:hover::after {
+        content: attr(data-tooltip);
+        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(-8px);
+        background: #1e293b; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+        white-space: nowrap; pointer-events: none; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    [data-tooltip]:hover::before {
+        content: '';
+        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(0);
+        border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+        pointer-events: none; z-index: 9999;
+    }
+</style>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.1.1/dist/css/shepherd.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.1.1/dist/js/shepherd.min.js"></script>
+
+
+<script>
+window.onerror = function(message, source, lineno, colno, error) {
+    let errDiv = document.createElement("div");
+    errDiv.style.cssText = "position:fixed; top:0; left:0; width:100%; background:red; color:white; z-index:9999; padding:10px; font-weight:bold;";
+    errDiv.innerHTML = "ERROR: " + message + " at " + source + ":" + lineno + ":" + colno + "<br>" + (error && error.stack ? error.stack : "");
+    document.body.appendChild(errDiv);
+};
+</script>
 </head>
 <body>
-    <!-- DYNAMIC BACKGROUND -->
-    <div class="bg-layer bg-blue active-bg" id="bg-game"></div>
-
-    <!-- VIEW TOGGLE WIDGET (LEFT SIDE) -->
-    <div class="view-toggle-widget">
-        <button id="btn-simple" class="toggle-sq active" onclick="setViewMode('simple')">
-            <span class="icon">🧠</span>
-            <span class="lbl">Hard</span>
+    <!-- Floating Action Button (FAB) Menu -->
+    <div class="fab-container">
+        <div class="fab-menu">
+            <button id="btn-mute" class="legacy-btn" onclick="toggleMute()" style="background:#14b8a6; color:white; border:4px solid #0d9488; box-shadow:0 4px 0 #0d9488;">
+                <svg id="icon-sound-on" style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15.536 8.464a5 5 0 010 7.072M17.95 6.05a8 8 0 010 11.9M6.5 9L11 4.5v15L6.5 15H3V9h3.5z"></path></svg>
+                <svg id="icon-sound-off" style="width:36px;height:36px; display:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+            </button>
+            <button class="legacy-btn" onclick="toggleFullscreen()" style="background:#8b5cf6; color:white; border:4px solid #7c3aed; box-shadow:0 4px 0 #7c3aed;">
+                <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+            </button>
+            <button class="legacy-btn" onclick="window.revealHeuristicHint()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8;">?</button>
+            <button class="legacy-btn" onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c;">
+                <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+            </button>
+            <button class="legacy-btn" onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c;">
+                <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            </button>
+        </div>
+        <!-- Main Trigger Button -->
+        <button class="legacy-btn fab-main" style="background:#1e293b; color:#ffffff; border:4px solid #0f172a; box-shadow:0 4px 0 #0f172a;">
+            <svg style="width:32px;height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
+    </div>
+
+    <div class="good-layout">
+        <!-- Block 1: Top Bar -->
+        <div class="good-block block-top">
+            <button class="btn-back interactive" onclick="parent.window.location.href='levels.html'">
+                &#9664; Back
+            </button>
+            <div class="block-title" style="margin: 0; font-size: 2rem;">Level 1: Water Formation</div>
+            
+    <div style="display:flex; background: #1e293b; padding:4px; border-radius:14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);">
+        <button id="tab-easy" class="tab-btn active-tab" onclick="window.setMode('easy')" style="padding: 8px 24px; border-radius:10px; font-weight:900; cursor:pointer; border:none; transition:all 0.2s; font-size: 1.1rem;">Easy Mode</button>
+        <button id="tab-hard" class="tab-btn" onclick="window.setMode('hard')" style="padding: 8px 24px; border-radius:10px; font-weight:900; cursor:pointer; border:none; transition:all 0.2s; font-size: 1.1rem;">Hard Mode</button>
+    </div>
+        </div>
         
+        
+
+
+<!-- Block 2: Left Side -->
+        <div class="good-block block-left">
+            
+            <div class="sidebar-content">
+
+                <button class="rect-btn" onclick="toggleBlock('left')">
+                    <span class="btn-text-full" style="display:flex; align-items:center;">
+                        <svg style="width:24px;height:24px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        Element Trays
+                    </span>
+                    <span class="btn-text-short">
+                        <svg style="width:32px;height:32px;margin:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                </button>
+            
+                <!-- Added Grid Placeholders -->
+                
+<div class="sidebar-grid">
+    <div class="pro-scale-card matched">
+        <h3>Zinc (Zn)</h3>
+        <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+        <div class="mini-seesaw">
+            <div class="mini-plank" style="transform: rotate(0deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                <div class="mini-stack-zone left"><div class="book-col"><div class="book-block blue"></div></div></div>
+                <div class="mini-stack-zone right"><div class="book-col"><div class="book-block orange"></div></div></div>
+            </div>
+            <div class="mini-fulcrum"></div>
+        </div>
+        <div class="scale-tally">
+            <div class="tally-box balanced">1</div>
+            <div class="tally-eq balanced" style="font-family: monospace;">=</div>
+            <div class="tally-box balanced">1</div>
+        </div>
+    </div>
+    
+    <div class="pro-scale-card">
+        <h3>Silver (Ag)</h3>
+        <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+        <div class="mini-seesaw">
+            <div class="mini-plank" style="transform: rotate(6deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                <div class="mini-stack-zone left"><div class="book-col"><div class="book-block blue"></div></div></div>
+                <div class="mini-stack-zone right"><div class="book-col"><div class="book-block orange"></div><div class="book-block orange"></div></div></div>
+            </div>
+            <div class="mini-fulcrum"></div>
+        </div>
+        <div class="scale-tally">
+            <div class="tally-box unbalanced">1</div>
+            <div class="tally-eq unbalanced" style="font-family: monospace;">≠</div>
+            <div class="tally-box unbalanced">2</div>
+        </div>
+    </div>
+    
+    <div class="pro-scale-card">
+        <h3>Nitrogen (N)</h3>
+        <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+        <div class="mini-seesaw">
+            <div class="mini-plank" style="transform: rotate(6deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                <div class="mini-stack-zone left"><div class="book-col"><div class="book-block blue"></div></div></div>
+                <div class="mini-stack-zone right"><div class="book-col"><div class="book-block orange"></div><div class="book-block orange"></div></div></div>
+            </div>
+            <div class="mini-fulcrum"></div>
+        </div>
+        <div class="scale-tally">
+            <div class="tally-box unbalanced">1</div>
+            <div class="tally-eq unbalanced" style="font-family: monospace;">≠</div>
+            <div class="tally-box unbalanced">2</div>
+        </div>
+    </div>
+    
+    <div class="pro-scale-card">
+        <h3>Oxygen (O)</h3>
+        <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+        <div class="mini-seesaw">
+            <div class="mini-plank" style="transform: rotate(6deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                <div class="mini-stack-zone left"><div class="book-col"><div class="book-block blue"></div><div class="book-block blue"></div><div class="book-block blue"></div></div></div>
+                <div class="mini-stack-zone right"><div class="book-col"><div class="book-block orange"></div><div class="book-block orange"></div><div class="book-block orange"></div><div class="book-block orange"></div><div class="book-block orange"></div><div class="book-block orange"></div></div></div>
+            </div>
+            <div class="mini-fulcrum"></div>
+        </div>
+        <div class="scale-tally">
+            <div class="tally-box unbalanced">3</div>
+            <div class="tally-eq unbalanced" style="font-family: monospace;">≠</div>
+            <div class="tally-box unbalanced">6</div>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        
+        <!-- Block 3: Middle Area -->
+        <div class="good-block block-middle" style="display: flex; flex-direction: column; padding: 30px 20px 0 20px !important; gap: 0; overflow-y: auto; overflow-x: hidden; min-height: 0;">
+    
+    <!-- Section 1: Split Status Bar -->
+    <div class="status-bar-shared" style="height: 35px; margin-bottom: 85px; flex-shrink: 0; width: 100%;">
+        <div class="status-half status-left">UNBALANCED</div>
+        <div class="status-half status-right">NOT SIMPLIFIED</div>
+    </div>
+    
+    
+    
+    <!-- Section 2: 3D Scale -->
+    <div class="grid-section section-scale" style="background: transparent; border: none; box-shadow: none; display: flex; align-items: flex-end; justify-content: center; position: relative; height: 140px; margin: 0; margin-bottom: 12px; z-index: 5; flex-shrink: 0; width: 100%; ">
+        <div class="giant-seesaw-wrapper" style="width: 100%; height: 100%; margin: 0; display: flex; justify-content: center; position: relative;">
+            <div class="giant-seesaw" style="width: 100%; max-width: 100%; margin: 0 auto; height: 100%; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
+                <div class="giant-plank" id="adv-giant-plank" style="width: 100%; height: 10px; background: #cbd5e1; border-radius: 5px; border: 3px solid #94a3b8; position: absolute; bottom: 40px; transform-origin: center; transition: transform 0.3s; transform: rotate(-3deg);">
+                    <div class="beaker left-beaker" id="adv-beaker-react" style="transform-origin: bottom right; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; left: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
+                        <!-- engine.js populates this -->
+                    </div>
+                    <div class="beaker right-beaker" id="adv-beaker-prod" style="transform-origin: bottom left; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; right: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
+                        <!-- engine.js populates this -->
+                    </div>
+                </div>
+                <div class="giant-fulcrum" style="width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; border-bottom: 40px solid #334155; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);"></div>
+                <div class="seesaw-base-line" style="width: 100%; height: 6px; background: #64748b; position: absolute; bottom: -2px; border-radius: 4px; left: 0;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Section 3: Tooltipped Equation Box -->
+    <div class="grid-section section-equation eq-resize-container img-eq-wrapper" style="padding: 15px 15px; width: 100%; position: relative; box-sizing: border-box; margin: 0; margin-bottom: 12px; z-index: 10; flex-shrink: 0; background: #ffffff;">
         
             
-        
-          <button id="btn-good" class="toggle-sq" onclick="setViewMode('good')">
-            <div class="icon">💡</div>
-            <div class="lbl">Easy</div>
-        </button>
+        <div class="eq-grid" id="dynamic-sleek-equation" style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; width: 100%; gap: 1cqw;"><div style="display: flex; justify-content: flex-start; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">
+    <div class="sci-mol"><div id="coeff-eq-react-Zn" class="sci-coeff img-coeff">1</div><div class="sci-formula">Zn<span class="state-label">(s)</span></div></div>
+    <div class="sci-plus">+</div>
+    <div class="sci-mol"><div id="coeff-eq-react-AgNO3" class="sci-coeff img-coeff">1</div><div class="sci-formula">AgNO<span class="sci-sub">3</span><span class="state-label">(aq)</span></div></div>
+</div><div style="display: flex; justify-content: center;"><div class="sci-arrow-box" style="border-radius: 12px;">&#10142;</div></div><div style="display: flex; justify-content: flex-end; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">
+    <div class="sci-mol"><div id="coeff-eq-prod-ZnNO32" class="sci-coeff img-coeff">1</div><div class="sci-formula">Zn(NO<span class="sci-sub">3</span>)<span class="sci-sub">2</span><span class="state-label">(aq)</span></div></div>
+    <div class="sci-plus">+</div>
+    <div class="sci-mol"><div id="coeff-eq-prod-Ag" class="sci-coeff img-coeff">1</div><div class="sci-formula">Ag<span class="state-label">(s)</span></div></div>
+</div></div>
+    </div>
     
-
-    </div>
-
-    <!-- SIMPLE VIEW (V2 STYLE) -->
-    <div id="view-simple" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2vh 0;">
-        <div class="game-container">
-            <!-- HEADER -->
-            <div class="pro-header" style="margin-bottom: 20px;">
-                <div class="pro-header-left">
-                    <button class="btn-back interactive" onclick="window.location.href='levels.html'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button>
-                    <h1 style="color: var(--text-main); font-size: 1.5rem; font-weight: 900; margin: 0;">Level 1: Water Synthesis</h1>
-                </div>
-                <div class="pro-header-right">
-                    <div class="pro-pill green" id="level-difficulty">EASY</div>
-                </div>
-            </div>
-
-            <!-- MAIN PUZZLE STAGE -->
-            <main class="puzzle-stage">
+    <!-- Sections 4 and 5: Panels -->
+    <div style="display: flex; gap: 15px; width: 100%; margin: 0; padding: 0; padding-bottom: 15px; flex: 1; flex-shrink: 0; z-index: 1; min-height: 0;">
+        
+        <!-- Reactants Panel -->
+        <div class="section-container" style="flex: 1; z-index: 1; display: flex; flex-direction: column; min-height: 0;">
+            <div class="panel-card" style="border: 4px solid #000000; border-radius: 16px; background: #ffffff; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0;">
                 
-                <!-- THE EQUATION ROW -->
-                <div class="equation-row">
-                    
-                    <!-- Reactants -->
-                    <div class="equation-side reactants">
-                        <!-- Term 1: H2 -->
-                        <div class="term-block interactive">
-                            <div class="coeff-control">
-                                <button class="coeff-btn minus" onclick="changeCoeff('r1', -1)">-</button>
-                                <div class="coeff-value" id="val-r1">1</div>
-                                <button class="coeff-btn plus" onclick="changeCoeff('r1', 1)">+</button>
-                            </div>
-                            <div class="molecule-formula">H<span class="sub">2</span></div>
-                        </div>
-                        
-                        <div class="math-sign">+</div>
-                        
-                        <!-- Term 2: O2 -->
-                        <div class="term-block interactive">
-                            <div class="coeff-control">
-                                <button class="coeff-btn minus" onclick="changeCoeff('r2', -1)">-</button>
-                                <div class="coeff-value" id="val-r2">1</div>
-                                <button class="coeff-btn plus" onclick="changeCoeff('r2', 1)">+</button>
-                            </div>
-                            <div class="molecule-formula">O<span class="sub">2</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Arrow -->
-                    <div class="reaction-arrow">
-                        <div class="arrow-body"></div>
-                        <div class="arrow-head"></div>
-                    </div>
-
-                    <!-- Products -->
-                    <div class="equation-side products">
-                        <!-- Term 3: H2O -->
-                        <div class="term-block interactive">
-                            <div class="coeff-control">
-                                <button class="coeff-btn minus" onclick="changeCoeff('p1', -1)">-</button>
-                                <div class="coeff-value" id="val-p1">1</div>
-                                <button class="coeff-btn plus" onclick="changeCoeff('p1', 1)">+</button>
-                            </div>
-                            <div class="molecule-formula">H<span class="sub">2</span>O</div>
-                        </div>
-                    </div>
-                    
-                </div>
-
-                <!-- VISUALIZATION ROW (MOLECULES) -->
-                <div class="visual-row">
-                    <!-- Reactants Visuals -->
-                    <div class="visual-side">
-                        <div class="model-box" id="vis-r1">
-                            <!-- H2 Molecule generated by JS -->
-                        </div>
-                        <div class="model-box" id="vis-r2">
-                            <!-- O2 Molecule generated by JS -->
-                        </div>
-                    </div>
-                    
-                    <!-- Divider matches arrow -->
-                    <div class="visual-divider" style="width:100px;"></div>
-                    
-                    <!-- Products Visuals -->
-                    <div class="visual-side">
-                        <div class="model-box" id="vis-p1">
-                            <!-- H2O Molecule generated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-            </main>
-
-            <!-- FOOTER: BALANCE SCALES & ACTION BUTTON -->
-            <footer class="game-footer">
-                <div class="balance-board" id="balance-board">
-                    <!-- Tally generated by JS -->
-                </div>
+                <!-- FULL WIDTH HEADER -->
+                <div class="header-react" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">REACTANTS</div>
                 
-                <div class="action-board">
-                    <button class="btn-check interactive" id="btn-check" disabled>
-                        <span class="check-text">LOCKED</span>
-                        <span class="check-icon">🔒</span>
-                    </button>
-                </div>
-            </footer>
-
-        </div>
-    </div>
-    </div>
-
-    <!-- PRO VIEW (MODULAR RESPONSIVE DESIGN BUILT FROM SCRATCH) -->
-    <div id="view-original" style="display: none;">
-        <header class="pro-header">
-            <div class="pro-header-left">
-                <button class="pro-btn gray-btn" onclick="window.location.href='levels.html'">← Back</button>
-                <h1>Level 1: Water Synthesis</h1>
-            </div>
-            <div class="pro-header-right">
-                <button class="pro-btn blue-btn" onclick="checkBalance()">Check Answer ✨</button>
-            </div>
-        </header>
-
-        <div class="pro-grid">
-            <!-- Left sidebar: Tiny Scales -->
-            <div class="pro-panel pro-left">
-                <div class="blue-title" onclick="toggleProPanel(this)" data-tooltip="Click to collapse/expand"><svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M4 6h16M4 12h16m-7 6h7"/></svg><span class="title-text">ELEMENT INVENTORY</span></div>
-                
-                <!-- H Scale -->
-                <div class="pro-scale-card" id="card-H">
-                    <h3>Hydrogen (H)</h3>
-                    <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
-                    <div class="mini-seesaw">
-                        <div class="mini-plank" id="mini-plank-H">
-                            <div class="mini-stack-zone left" id="mini-H-left"></div>
-                            <div class="mini-stack-zone right" id="mini-H-right"></div>
-                        </div>
-                        <div class="mini-fulcrum"></div>
-                    </div>
-                    <div class="scale-tally">
-                        <div class="tally-box" id="tally-H-left">2</div>
-                        <div class="tally-eq" id="tally-H-eq">≠</div>
-                        <div class="tally-box" id="tally-H-right">2</div>
-                    </div>
-                </div>
-
-                <!-- O Scale -->
-                <div class="pro-scale-card" id="card-O">
-                    <h3>Oxygen (O)</h3>
-                    <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
-                    <div class="mini-seesaw">
-                        <div class="mini-plank" id="mini-plank-O">
-                            <div class="mini-stack-zone left" id="mini-O-left"></div>
-                            <div class="mini-stack-zone right" id="mini-O-right"></div>
-                        </div>
-                        <div class="mini-fulcrum"></div>
-                    </div>
-                    <div class="scale-tally">
-                        <div class="tally-box" id="tally-O-left">2</div>
-                        <div class="tally-eq" id="tally-O-eq">≠</div>
-                        <div class="tally-box" id="tally-O-right">1</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Center Stage: Giant Scale & Drop Zones -->
-            <div class="pro-center pro-panel">
-                <div class="pro-status-banner" style="display:none;"></div>
-<div id="pro-legacy-equation" class="state-red">
-    <span style="color: #94a3b8; font-size: 18px;">THE CHEMICAL EQUATION IS :</span>
-    <span id="adv-legacy-status-text" style="color: #ef4444; margin-left:10px;">UNBALANCED</span>
+                <!-- GRID 1: Molecule Buttons -->
+                <div id="react-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
+    <div class="mol-btn btn-react" onclick="window.addMolecule('react', 'Zn')" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'react,Zn')"><span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>Zn</span></div>
+    <div class="mol-btn btn-react" onclick="window.addMolecule('react', 'AgNO3')" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'react,AgNO3')"><span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>AgNO<span style='font-size:0.6em'>3</span></span></div>
 </div>
                 
-                <!-- GIANT SEESAW (Moved to Top) -->
-                <div class="giant-seesaw-wrapper">
-                    <div class="giant-seesaw">
-                        <div class="giant-plank" id="adv-giant-plank">
-                            <div class="beaker left-beaker" id="adv-beaker-react"></div>
-                            <div class="beaker right-beaker" id="adv-beaker-prod"></div>
-                        </div>
-                        <div class="giant-fulcrum"></div>
-                        <div class="seesaw-base-line"></div>
-                    </div>
-                </div>
-
-                <!-- EQUATION BOX -->
+                <!-- GRID 2: Blocks Drop Zone -->
+                <div id="react-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='react') window.addMolecule('react', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-react">Drop Reactants Here</div></div>
                 
-                  
-                  <!-- PRISTINE PRO EQUATION BOX -->
-                  <div class="pro-equation-box">
-                      <div class="pro-equation-left">
-                          <div class="pro-term">
-                              <span class="pro-coeff" id="adv-coeff-r1" onclick="changeCoeff('r1', 1)" oncontextmenu="event.preventDefault(); changeCoeff('r1', -1)">0</span>
-                              <div class="pro-formula">H<span class="sub">2</span><span class="state">(g)</span></div>
-                          </div>
-                          <div class="pro-plus">+</div>
-                          <div class="pro-term">
-                              <span class="pro-coeff" id="adv-coeff-r2" onclick="changeCoeff('r2', 1)" oncontextmenu="event.preventDefault(); changeCoeff('r2', -1)">0</span>
-                              <div class="pro-formula">O<span class="sub">2</span><span class="state">(g)</span></div>
-                          </div>
-                      </div>
-                      <div class="pro-arrow">→</div>
-                      <div class="pro-equation-right">
-                          <div class="pro-term">
-                              <span class="pro-coeff" id="adv-coeff-p1" onclick="changeCoeff('p1', 1)" oncontextmenu="event.preventDefault(); changeCoeff('p1', -1)">0</span>
-                              <div class="pro-formula">H<span class="sub">2</span>O<span class="state">(l)</span></div>
-                          </div>
-                      </div>
-                  </div>
+                <!-- Footer Counters with 2D Marbles -->
+                <div id="footer-react" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
+            </div>
+        </div>
+        
+        <!-- Products Panel -->
+        <div class="section-container" style="flex: 1; z-index: 1; display: flex; flex-direction: column; min-height: 0;">
+            <div class="panel-card" style="border: 4px solid #000000; border-radius: 16px; background: #ffffff; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0;">
+                
+                <!-- FULL WIDTH HEADER -->
+                <div class="header-prod" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">PRODUCTS</div>
+                
+                <!-- GRID 1: Molecule Buttons -->
+                <div id="prod-btn-container" style="padding: 15px; display: flex; justify-content: center; gap: 10px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
+    <div class="mol-btn btn-prod" onclick="window.addMolecule('prod', 'ZnNO32')" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'prod,ZnNO32')"><span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>Zn(NO<span style='font-size:0.6em'>3</span>)<span style='font-size:0.6em'>2</span></span></div>
+    <div class="mol-btn btn-prod" onclick="window.addMolecule('prod', 'Ag')" draggable="true" ondragstart="event.dataTransfer.setData('text/plain', 'prod,Ag')"><span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>Ag</span></div>
+</div>
+                
+                <!-- GRID 2: Blocks Drop Zone -->
+                <div id="prod-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='prod') window.addMolecule('prod', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-prod">Drop Products Here</div></div>
+                
+                <!-- Footer Counters with 2D Marbles -->
+                <div id="footer-prod" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
+            </div>
+        </div>
+        
+    </div>
+</div>
 
-                  <!-- PRISTINE PRO TRAYS -->
-                  <div class="pro-trays">
-                      <div class="pro-tray">
-                          <div class="pro-tray-btn" onclick="changeCoeff('r1', 1)">+ H2</div>
-                          <div class="pro-tray-btn" onclick="changeCoeff('r2', 1)">+ O2</div>
-                      </div>
-                      <div class="pro-tray">
-                          <div class="pro-tray-btn" onclick="changeCoeff('p1', 1)">+ H2O</div>
-                      </div>
-                  </div>
+<!-- Block 4: Right Side -->
 
-                  <!-- PRISTINE PRO ZONES -->
-                  <div class="pro-zones">
-                      <div class="pro-zone blue-zone">
-                          <div class="zone-header">REACTANTS</div>
-                          <div class="zone-source" style="display:none;"></div>
-                          <div class="zone-drop" id="adv-drop-reactants"></div>
-                          <div class="zone-footer" id="adv-foot-react-bg">
-                              <span><span class="tiny-atom blue-a">H</span><span id="adv-tally-react-H">0</span></span>
-                              <span><span class="tiny-atom red-a">O</span><span id="adv-tally-react-O">0</span></span>
-                          </div>
-                      </div>
-                      <div class="pro-zone orange-zone">
-                          <div class="zone-header">PRODUCTS</div>
-                          <div class="zone-source" style="display:none;"></div>
-                          <div class="zone-drop" id="adv-drop-products"></div>
-                          <div class="zone-footer" id="adv-foot-prod-bg">
-                              <span><span class="tiny-atom blue-a">H</span><span id="adv-tally-prod-H">0</span></span>
-                              <span><span class="tiny-atom red-a">O</span><span id="adv-tally-prod-O">0</span></span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
+<!-- Block 4: Right Side -->
 
-              <!-- Right Sidebar: Chat/Hints -->
-            <div class="pro-right pro-panel">
-                <h2 class="blue-title" onclick="toggleProPanel(this)" data-info="Click to collapse/expand"><svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg><span class="title-text">Prof. Beaker</span></h2>
-                <div class="chat-bubble">
-                    <p>Welcome to the Pro View!</p>
-                    <p>Add molecules using the pill buttons in the drag zones. Watch the giant scale tip and the tiny scales balance!</p>
-                </div>
-                <div class="prof-footer">
-                    <div class="prof-actions" style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
-                        <button class="pro-btn yellow-btn" data-info="Need a clue?">💡 Get Hint</button>
-                        <button class="pro-btn red-btn trash-btn" onclick="window.location.reload()" data-info="Reset Puzzle">🗑️ Reset</button>
+<!-- Block 4: Right Side -->
+
+                <!-- Block 4: Right Side -->
+
+
+
+
+
+
+        <div class="good-block block-right">
+            
+            <div class="sidebar-content">
+
+                <button class="rect-btn" onclick="toggleBlock('right')">
+                    <span class="btn-text-full" style="display:flex; align-items:center;">
+                        <svg style="width:24px;height:24px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Prof. Beaker
+                    </span>
+                    <span class="btn-text-short">
+                        <svg style="width:32px;height:32px;margin:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </span>
+                </button>
+            
+                <!-- Added Grid Placeholders -->
+                <div class="sidebar-grid" style="display: flex; flex-direction: column; flex: 1; height: 100%;">
+                    <div class="beaker-message" style="flex: 1; overflow-y: auto; margin-bottom: 20px;">
+                        <div class="msg-tail"></div><div style="margin-top: 5px; display: flex; flex-direction: column; align-items: flex-start;"><div style="font-weight: 900; font-size: 0.9rem; color: #64748b; margin-bottom: 4px; margin-left: 12px;">💡 Professor Beaker</div><div style="background: #f1f5f9; border: 2px solid #cbd5e1; border-radius: 18px; border-top-left-radius: 4px; padding: 12px 16px; font-size: 1.1rem; color: #1e293b; box-shadow: 0 4px 0 rgba(0,0,0,0.05); max-width: 95%;">Welcome to Level 1! Let\'s balance the reaction between <b>Zinc</b> and <b>Silver Nitrate</b>!</div></div>
                     </div>
-                </div>
+                    
+
+
+<div class="beaker-actions" style="margin-top: 0px; margin-bottom: 5px; flex-shrink: 0; display: flex; align-items: stretch; gap: 5px; width: 100%; min-height: 40px;">
+    <button class="btn-hint-clean" onclick="window.revealHeuristicHint()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+        Hint please!
+    </button>
+    <button class="rect-btn btn-trash" onclick="clearChat()" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
+        <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+    </button>
+</div>
+            </div>
             </div>
         </div>
     </div>
 
-    <!-- TEST VIEW (CLONED V1) -->
-    <div id="view-test" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;">
-        <iframe id="test-frame" src="" style="width: 100%; height: 100%; border: none; background: #cbd5e1;"></iframe>
-    </div>
+    <!-- JS Logic for tooltips and audio -->
     
-    <!-- GOOD VIEW (IFRAME) -->
-    <div id="view-good" style="display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; z-index:50;">
-        <iframe id="good-frame" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
-    </div>
 
 
 
-    <!-- LEGACY VIEW (RAW V1 CODE IN IFRAME) -->
-    <div id="view-legacy" style="display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 5;">
-        <iframe id="legacy-frame" src="" style="width: 100%; height: 100%; border: none; background: #cbd5e1;"></iframe>
-    </div>
 
-    <!-- V2 CORE ENGINE -->
-    <script src="js/game.js?v=1791074755083"></script>
+
+
+
+
+
+
 </body>
+
+
 </html>
