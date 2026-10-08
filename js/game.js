@@ -8,47 +8,6 @@ const ELEM_NAMES = {
 
 
 
-let audioCtx;
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-window.playSound = function(type) {
-    initAudio();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    
-    if (type === 'undo') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.15);
-        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-    } else if (type === 'startover') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-        osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.25);
-        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-    } else { // click
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
-    }
-};
 
 
 
@@ -57,19 +16,7 @@ window.playSound = function(type) {
 let currentLevelData = null;
 
 
-window.setMode = function(mode) {
-    let tabEasy = document.getElementById("tab-easy");
-    let tabHard = document.getElementById("tab-hard");
-    if(mode === "hard") {
-        document.body.classList.add("hard-mode-on");
-        if(tabHard) { tabHard.classList.add("active-tab"); }
-        if(tabEasy) { tabEasy.classList.remove("active-tab"); }
-    } else {
-        document.body.classList.remove("hard-mode-on");
-        if(tabEasy) { tabEasy.classList.add("active-tab"); }
-        if(tabHard) { tabHard.classList.remove("active-tab"); }
-    }
-};
+
 
 window.toggleFullscreen = function() {
     if (!document.fullscreenElement) {
@@ -118,18 +65,27 @@ let hintLevel = 1;
 let lastHintElement = null;
 
 function initEngine() {
+
     const params = new URLSearchParams(window.location.search);
     let levelId = params.get('level') || 'F4L6';
     // Remove quotes if present
     levelId = levelId.replace(/['"]/g, '');
     
     currentLevelData = LEVELS[levelId];
+    window.proEquationRendered = false;
+
     if (!currentLevelData) {
         currentLevelData = LEVELS['F4L6']; // Fallback
     }
     
     document.title = currentLevelData.title;
     renderBoard();
+    let titleEl = document.getElementById("level-title");
+    if(titleEl && currentLevelData) {
+        let match = levelId.match(/L(\d+)/);
+        let prefix = match ? "Level " + match[1] + " : " : "";
+        titleEl.innerText = prefix + currentLevelData.title;
+    }
     updateSimulation();
     
     // Welcome message
@@ -236,7 +192,7 @@ function renderBoard() {
             row.id = 'row-react-' + m.id;
             row.className = 'drop-row';
             row.setAttribute('data-accept', m.id);
-            row.style.cssText = 'display: none; flex-direction: row-reverse; flex-wrap: wrap; gap: 8px; width: 100%; background: transparent; border: none; padding: 5px;';
+            row.style.cssText = 'display: none; flex-direction: row; flex-wrap: wrap; gap: 8px; width: 100%; background: transparent; border: none; padding: 5px; justify-content: flex-start;';
             dropReactContainer.appendChild(row);
         });
     }
@@ -259,6 +215,8 @@ function renderBoard() {
 // Global Override for addMolecule
 window.actionHistory = window.actionHistory || [];
 window.addMolecule = function(side, typeId) {
+    window.activeVisualHint = null; // Clear hint on interaction
+
     if(typeof playSound === "function") playSound("click");
     let rowId = "row-" + side + "-" + typeId;
     let row = document.getElementById(rowId);
@@ -272,6 +230,8 @@ window.addMolecule = function(side, typeId) {
     block.className = "mol-block";
     
     block.onclick = function() {
+    window.activeVisualHint = null; // Clear hint on interaction
+
         if(typeof playSound === "function") playSound("undo");
         window.actionHistory.push({ action: "remove", side: side, block: block, parent: row });
         block.remove();
@@ -341,6 +301,34 @@ window.toggleMute = function() {
 
 
 window.updateSimulation = function() {
+    let dropReact = document.getElementById("react-drop-container");
+    let dropProd = document.getElementById("prod-drop-container");
+    if(dropReact && dropProd) {
+        if(window.activeVisualHint) {
+            if(window.activeVisualHint.side === "react") {
+                dropReact.style.boxShadow = "0 0 0 6px rgba(192, 38, 211, 0.4) inset, 0 0 20px rgba(192, 38, 211, 0.3)";
+                dropReact.style.background = "rgba(253, 244, 255, 0.8)";
+                dropReact.style.animation = "flashHintDrop 1s infinite";
+                dropProd.style.boxShadow = "none";
+                dropProd.style.background = "transparent";
+                dropProd.style.animation = "none";
+            } else {
+                dropProd.style.boxShadow = "0 0 0 6px rgba(192, 38, 211, 0.4) inset, 0 0 20px rgba(192, 38, 211, 0.3)";
+                dropProd.style.background = "rgba(253, 244, 255, 0.8)";
+                dropProd.style.animation = "flashHintDrop 1s infinite";
+                dropReact.style.boxShadow = "none";
+                dropReact.style.background = "transparent";
+                dropReact.style.animation = "none";
+            }
+        } else {
+            dropReact.style.boxShadow = "none";
+            dropReact.style.background = "transparent";
+            dropReact.style.animation = "none";
+            dropProd.style.boxShadow = "none";
+            dropProd.style.background = "transparent";
+            dropProd.style.animation = "none";
+        }
+    }
     if(!currentLevelData) return;
 
     let rCounts = {}; let pCounts = {};
@@ -378,6 +366,7 @@ window.updateSimulation = function() {
     });
 
     window.counts = { rCounts, pCounts, isEmpty, molCounts };
+    window.syncProBoxes();
 
     let leftSidebar = document.querySelector(".block-left .sidebar-grid");
     if(leftSidebar) {
@@ -398,9 +387,7 @@ window.updateSimulation = function() {
                 for(let i=0; i<5 && rBookCount < rCount; i++, rBookCount++) { leftBooks += "<div class=\"book-block blue\"></div>"; }
                 leftBooks += "</div>";
             }
-            if (rCount < pCount) {
-                leftBooks += "<div style=\"color: #ef4444; font-weight: 900; font-size: 1.2rem; line-height: 1; text-align: center; margin-bottom: 2px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); animation: pulseWarning 1s infinite;\">!</div>";
-            }
+            
             
             let pBookCount = 0; let rightBooks = "";
             while (pBookCount < pCount) {
@@ -408,9 +395,7 @@ window.updateSimulation = function() {
                 for(let i=0; i<5 && pBookCount < pCount; i++, pBookCount++) { rightBooks += "<div class=\"book-block orange\"></div>"; }
                 rightBooks += "</div>";
             }
-            if (pCount < rCount) {
-                rightBooks += "<div style=\"color: #ef4444; font-weight: 900; font-size: 1.2rem; line-height: 1; text-align: center; margin-bottom: 2px; text-shadow: 0 1px 0 rgba(255,255,255,0.8); animation: pulseWarning 1s infinite;\">!</div>";
-            }
+            
 
             let angle = 0;
             if(diff > 0) angle = -3;
@@ -418,11 +403,26 @@ window.updateSimulation = function() {
             
             let eqSymbol = (rCount === pCount) ? "=" : "&#8800;";
             let tallyClass = (rCount === 0 && pCount === 0) ? "empty" : (isBalanced ? "balanced" : "unbalanced");
+
             
+            let diffBadge = "";
+            if (rCount < pCount) {
+                diffBadge = `<div style="position: absolute; top: -5px; left: -5px; background: #ef4444; color: white; border-radius: 50%; min-width: 28px; height: 28px; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(239,68,68,0.5); animation: pulseWarning 1s infinite; z-index: 10;">-${pCount - rCount}</div>`;
+            } else if (pCount < rCount) {
+                diffBadge = `<div style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; min-width: 28px; height: 28px; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(239,68,68,0.5); animation: pulseWarning 1s infinite; z-index: 10;">-${rCount - pCount}</div>`;
+            }
+            
+            let visualGlow = "";
+            if (window.activeVisualHint && window.activeVisualHint.element === el) {
+                visualGlow = "animation: flashHintBox 1s infinite; z-index: 5;";
+            }
+
             html += `
-            <div class="pro-scale-card ${colorClass}">
+            <div class="pro-scale-card ${colorClass}" style="position: relative; ${visualGlow}">${diffBadge}
                 <h3>${ELEM_NAMES[el] || el} (${el})</h3>
                 <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
+
+
                 <div class="mini-seesaw">
                     <div class="mini-plank" style="transform: rotate(${angle}deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
                         <div class="mini-stack-zone left" style="display:flex; align-items:flex-end;">${leftBooks}</div>
@@ -544,8 +544,19 @@ window.updateSimulation = function() {
     if(statusLeft && statusRight) {
         let isBalanced = (!isEmpty && JSON.stringify(rCounts) === JSON.stringify(pCounts));
         let allCoeffs = [];
-        for(let id in molCounts.react) if(molCounts.react[id] > 0) allCoeffs.push(molCounts.react[id]);
-        for(let id in molCounts.prod) if(molCounts.prod[id] > 0) allCoeffs.push(molCounts.prod[id]);
+        let isComplete = true;
+        currentLevelData.reactants.forEach(m => {
+            let count = molCounts.react[m.id] || 0;
+            if (count === 0) isComplete = false;
+            allCoeffs.push(count);
+        });
+        currentLevelData.products.forEach(m => {
+            let count = molCounts.prod[m.id] || 0;
+            if (count === 0) isComplete = false;
+            allCoeffs.push(count);
+        });
+        
+        isBalanced = isBalanced && isComplete && !isEmpty;
         
         let gcd = getArrayGCD(allCoeffs);
         let isSimplified = (gcd === 1);
@@ -561,6 +572,22 @@ window.updateSimulation = function() {
         } else {
             statusRight.innerHTML = "NOT SIMPLIFIED"; statusRight.style.background = "#eab308";
         }
+        
+        // Handle Win State Detection
+        if (isBalanced && isSimplified) {
+            if (window.lastWinState !== "won") {
+                if(typeof playSound === "function") playSound("success");
+                window.lastWinState = "won";
+                setTimeout(showWinPopup, 300);
+            }
+        } else if (isBalanced && !isSimplified) {
+            if (window.lastWinState !== "balanced") {
+                if(typeof playSound === "function") playSound("sad");
+                window.lastWinState = "balanced";
+            }
+        } else {
+            window.lastWinState = "none";
+        }
         if (isEmpty) {
             statusLeft.innerHTML = "EMPTY"; statusLeft.style.background = "#94a3b8";
             statusRight.innerHTML = "NO ATOMS"; statusRight.style.background = "#94a3b8";
@@ -572,17 +599,36 @@ window.updateSimulation = function() {
 window.addChatMessage = function(msg, prefixLabel) {
     let container = document.querySelector(".beaker-message");
     if(!container) return;
+    
     let bubbleContainer = document.createElement("div");
-    bubbleContainer.style.cssText = "margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start;";
+    bubbleContainer.style.cssText = "margin-top: 15px; width: 100%; box-sizing: border-box;";
     
-    let labelHtml = "";
-    if (prefixLabel) {
-        labelHtml = "<div style=\"font-weight: 900; font-size: 0.85rem; color: #64748b; margin-bottom: 4px; margin-left: 12px;\">" + prefixLabel + "</div>";
-    }
-
-    let bubbleStyle = "background: #0ea5e9; border: none; border-radius: 20px; border-bottom-left-radius: 4px; padding: 10px 16px; font-size: 1.05rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 90%; line-height: 1.4;";
+    let isHint = prefixLabel && prefixLabel.includes("Hint");
+    let avatarIcon = isHint ? '💡' : '👨‍🔬';
+    let avatarBg = isHint ? '#fef08a' : '#bfdbfe';
+    let avatarColor = isHint ? '#a16207' : '#1e3a8a';
+    let borderColor = isHint ? '#fde047' : '#93c5fd';
     
-    bubbleContainer.innerHTML = labelHtml + "<div style=\"" + bubbleStyle + "\">" + msg + "</div>";
+    let bubbleStyle = `background: #ffffff; border: 3px solid ${borderColor}; border-radius: 20px; padding: 14px 18px; font-size: 1.1rem; color: #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex: 1; min-width: 0; line-height: 1.5; font-weight: 700; position: relative;`;
+    
+    let parsedLabel = prefixLabel ? prefixLabel.replace(/&#\d+;/g, "").trim() : (isHint ? "Hint" : "Prof. Beaker");
+    let finalHtml = `
+    <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 12px;">
+            <div style="width: 30px; height: 30px; border-radius: 50%; background: ${avatarBg}; border: 2px solid ${borderColor}; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: ${avatarColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                ${avatarIcon}
+            </div>
+            <div style="font-weight: 900; font-size: 0.9rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
+                ${parsedLabel}
+            </div>
+        </div>
+        <div style="${bubbleStyle}">
+            ${msg}
+        </div>
+    </div>`;
+    
+    bubbleContainer.innerHTML = finalHtml;
+    
     container.appendChild(bubbleContainer);
     container.scrollTop = container.scrollHeight;
 };
@@ -593,9 +639,9 @@ window.clearChat = function() {
 };
 
 window.revealHeuristicHint = function() {
+    if(typeof playSound === "function") playSound("hint");
     let rCounts = window.counts.rCounts;
     let pCounts = window.counts.pCounts;
-    let molCounts = window.counts.molCounts;
     
     let imbalancedEl = null;
     let needsMoreOn = null;
@@ -606,15 +652,15 @@ window.revealHeuristicHint = function() {
     }
     
     if (window.counts && window.counts.isEmpty) {
-        window.addChatMessage("Add some reactants or products to the scales to start balancing!", "&#128161; Hint #" + window.hintCounter++);
+        window.addChatMessage("Add some reactants or products to the scales to start balancing!", "Hint #" + window.hintCounter++);
         return;
     }
     if (!imbalancedEl) {
-        window.addChatMessage("Everything looks perfectly balanced! You are doing great!", "&#128161; Hint #" + window.hintCounter++);
+        window.addChatMessage("Everything looks perfectly balanced! You are doing great!", "Hint #" + window.hintCounter++);
         return;
     }
     
-    let sideName = needsMoreOn === "react" ? "REACTANTS (left side)" : "PRODUCTS (right side)";
+    let sideName = needsMoreOn === "react" ? "REACTANTS" : "PRODUCTS";
     let bestMol = null;
     let bestMolObj = null;
     let mols = needsMoreOn === "react" ? currentLevelData.reactants : currentLevelData.products;
@@ -622,11 +668,268 @@ window.revealHeuristicHint = function() {
         if (m.composition[imbalancedEl]) { bestMol = m.name || m.id; bestMolObj = m; }
     });
     
-    let elName = ELEM_NAMES[imbalancedEl] || imbalancedEl;
-    let msg = "Try adding more <span style=\"background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-weight:bold;\">" + bestMolObj.displayHtml + "</span> to the <span style=\"font-weight:bold;\">" + sideName + "</span> to balance the " + elName + " atoms!";
+    // Set visual hint
+    window.activeVisualHint = { element: imbalancedEl, side: needsMoreOn };
+    if(typeof playSound === "function") playSound("hint");
+    updateSimulation(); // Apply visual glow immediately
     
-    window.addChatMessage(msg, "&#128161; Hint #" + window.hintCounter++);
+    let elName = ELEM_NAMES[imbalancedEl] || imbalancedEl;
+    let molHtml = `<span style="background: #eff6ff; color: #2563eb; border: 2px solid #bfdbfe; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #bfdbfe;">${bestMolObj.displayHtml}</span>`;
+    let sideHtml = `<span style="background: #fdf4ff; color: #c026d3; border: 2px solid #f5d0fe; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #f5d0fe;">${sideName}</span>`;
+    let elHtml = `<span style="background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #fecaca;">${elName} atoms</span>`;
+    
+    let msg = `Add ${molHtml} to ${sideHtml} for ${elHtml}.`;
+    
+    window.addChatMessage(msg, "Hint #" + window.hintCounter++);
+};
+
+
+
+window.currentViewMode = "simple";
+window.switchViewMode = function(mode) {
+    if (mode === window.currentViewMode) return;
+    window.currentViewMode = mode;
+    if(typeof playSound === "function") playSound("switch");
+    
+    let btnSimple = document.getElementById("btn-side-simple");
+    let btnPro = document.getElementById("btn-side-pro");
+    if(mode === "simple") {
+        if(btnSimple) btnSimple.classList.add("active-tab");
+        if(btnPro) btnPro.classList.remove("active-tab");
+        
+        document.querySelector(".block-left").style.display = "flex";
+        document.querySelector(".block-right").style.display = "flex";
+        
+        let blockMiddle = document.querySelector(".block-middle");
+        if(blockMiddle) {
+            blockMiddle.style.display = "flex";
+            blockMiddle.style.gridColumn = "";
+            blockMiddle.style.gridRow = "";
+        }
+        
+        let blockPro = document.getElementById("block-pro");
+        if(blockPro) blockPro.style.display = "none";
+        
+        // Reset grid
+        let layout = document.querySelector(".good-layout");
+        if(layout) {
+            let leftCollapsed = document.querySelector(".block-left")?.classList.contains("collapsed");
+            let rightCollapsed = document.querySelector(".block-right")?.classList.contains("collapsed");
+            layout.style.setProperty("--left-w", leftCollapsed ? "80px" : "280px");
+            layout.style.setProperty("--right-w", rightCollapsed ? "80px" : "280px");
+            layout.style.gridTemplateRows = "";
+        }
+    } else if(mode === "pro") {
+        if(btnPro) btnPro.classList.add("active-tab");
+        if(btnSimple) btnSimple.classList.remove("active-tab");
+        
+        document.querySelector(".block-left").style.display = "none";
+        document.querySelector(".block-right").style.display = "none";
+        
+        let blockMiddle = document.querySelector(".block-middle");
+        if(blockMiddle) {
+            blockMiddle.style.display = "flex";
+            blockMiddle.style.gridColumn = "1 / -1";
+            blockMiddle.style.gridRow = "3";
+        }
+        
+        let blockPro = document.getElementById("block-pro");
+        if(blockPro) blockPro.style.setProperty("display", "flex", "important");
+        
+        // Collapse grid so pro block can span cleanly
+        let layout = document.querySelector(".good-layout");
+        if(layout) {
+            layout.style.setProperty("--left-w", "0px");
+            layout.style.setProperty("--right-w", "0px");
+            layout.style.gridTemplateRows = "90px auto minmax(0, 1fr)";
+        }
+        
+        if(!window.proEquationRendered) {
+            window.renderProModeEquation();
+            window.proEquationRendered = true;
+        }
+        window.syncProBoxes();
+    }
+};
+
+window.renderProModeEquation = function() {
+    let container = document.getElementById("pro-equation-container");
+    if (!container || !currentLevelData) return;
+    container.innerHTML = "";
+    
+    let createStepper = (m, side, isLast) => {
+        let group = document.createElement("div");
+        group.style.cssText = "display: flex; align-items: center; gap: 15px;";
+        
+        // Stepper
+        let stepper = document.createElement("div");
+        stepper.style.cssText = "display: flex; flex-direction: column; align-items: center; gap: 6px; background: transparent; width: 65px;";
+        
+        let btnUp = document.createElement("button");
+        btnUp.innerHTML = "&#9650;";
+        btnUp.style.cssText = "width: 44px; height: 26px; border: none; background: #475569; border-radius: 8px; cursor: pointer; color: white; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; transition: all 0.1s; box-shadow: 0 4px 0 #1e293b;";
+        btnUp.onmousedown = () => { btnUp.style.transform = 'translateY(4px)'; btnUp.style.boxShadow = 'none'; };
+        btnUp.onmouseup = () => { btnUp.style.transform = 'translateY(0)'; btnUp.style.boxShadow = '0 4px 0 #1e293b'; };
+        btnUp.onmouseleave = () => { btnUp.style.transform = 'translateY(0)'; btnUp.style.boxShadow = '0 4px 0 #1e293b'; };
+        btnUp.onclick = () => { window.addMolecule(side, m.id); updateSimulation(); };
+        
+        let val = document.createElement("div");
+        val.id = "pro-stepper-" + side + "-" + m.id;
+        val.innerText = "0";
+        val.style.cssText = "font-size: 2.2rem; font-weight: 900; color: #1e293b; background: white; border: 3px solid #94a3b8; border-radius: 12px; width: 100%; height: 60px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;";
+        
+        let btnDown = document.createElement("button");
+        btnDown.innerHTML = "&#9660;";
+        btnDown.style.cssText = "width: 44px; height: 26px; border: none; background: #475569; border-radius: 8px; cursor: pointer; color: white; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; transition: all 0.1s; box-shadow: 0 4px 0 #1e293b;";
+        btnDown.onmousedown = () => { btnDown.style.transform = 'translateY(4px)'; btnDown.style.boxShadow = 'none'; };
+        btnDown.onmouseup = () => { btnDown.style.transform = 'translateY(0)'; btnDown.style.boxShadow = '0 4px 0 #1e293b'; };
+        btnDown.onmouseleave = () => { btnDown.style.transform = 'translateY(0)'; btnDown.style.boxShadow = '0 4px 0 #1e293b'; };
+        btnDown.onclick = () => {
+            let row = document.getElementById("row-" + side + "-" + m.id);
+            if (row && row.children.length > 0) {
+                row.lastElementChild.click();
+            }
+        };
+        
+        stepper.appendChild(btnUp);
+        stepper.appendChild(val);
+        stepper.appendChild(btnDown);
+        
+        // Formula
+        let formula = document.createElement("div");
+        formula.innerHTML = m.displayHtml;
+        formula.style.cssText = "font-size: 3.5rem; font-weight: 800; color: #334155; margin-left: 5px;";
+        
+        group.appendChild(stepper);
+        group.appendChild(formula);
+        
+        container.appendChild(group);
+        
+        if (!isLast) {
+            let plus = document.createElement("div");
+            plus.innerText = "+";
+            plus.style.cssText = "font-size: 4rem; font-weight: 900; color: #94a3b8; margin: 0 15px;";
+            container.appendChild(plus);
+        }
+    };
+    
+    currentLevelData.reactants.forEach((m, idx) => {
+        createStepper(m, "react", idx === currentLevelData.reactants.length - 1);
+    });
+    
+    let arrow = document.createElement("div");
+    arrow.innerHTML = `<svg style="width: 60px; height: 60px; color: #1e40af;" fill="currentColor" viewBox="0 0 24 24"><path d="M4 12h12V7l7 7-7 7v-5H4z"></path></svg>`;
+    arrow.style.cssText = "margin: 0 25px; display: flex; align-items: center;";
+    container.appendChild(arrow);
+    
+    currentLevelData.products.forEach((m, idx) => {
+        createStepper(m, "prod", idx === currentLevelData.products.length - 1);
+    });
+};
+
+window.syncProBoxes = function() {
+    let proReact = document.getElementById("pro-box-react");
+    let proProd = document.getElementById("pro-box-prod");
+    if (!proReact || !proProd || !currentLevelData) return;
+    
+    proReact.innerHTML = "";
+    proProd.innerHTML = "";
+    
+    currentLevelData.reactants.forEach(m => {
+        let count = window.counts.molCounts.react[m.id] || 0;
+        let step = document.getElementById("pro-stepper-react-" + m.id);
+        if (step) step.innerText = count;
+        
+        let row = document.getElementById("row-react-" + m.id);
+        if (row) {
+            Array.from(row.children).forEach(child => {
+                let clone = child.cloneNode(true);
+                clone.style.position = "relative";
+                clone.style.margin = "10px";
+                clone.onclick = null;
+                clone.style.cursor = "default";
+                proReact.appendChild(clone);
+            });
+        }
+    });
+    
+    currentLevelData.products.forEach(m => {
+        let count = window.counts.molCounts.prod[m.id] || 0;
+        let step = document.getElementById("pro-stepper-prod-" + m.id);
+        if (step) step.innerText = count;
+        
+        let row = document.getElementById("row-prod-" + m.id);
+        if (row) {
+            Array.from(row.children).forEach(child => {
+                let clone = child.cloneNode(true);
+                clone.style.position = "relative";
+                clone.style.margin = "10px";
+                clone.onclick = null;
+                clone.style.cursor = "default";
+                proProd.appendChild(clone);
+            });
+        }
+    });
+
+    if (proReact.children.length === 0) {
+        proReact.innerHTML = `<div style="width:100%; text-align:center; color:#475569; font-weight:800; font-size:1.5rem; display:flex; align-items:center; justify-content:center; padding: 40px;">Use the arrows below to add molecules</div>`;
+    }
+    if (proProd.children.length === 0) {
+        proProd.innerHTML = `<div style="width:100%; text-align:center; color:#475569; font-weight:800; font-size:1.5rem; display:flex; align-items:center; justify-content:center; padding: 40px;">Use the arrows below to add molecules</div>`;
+    }
+
+    let arrow = document.getElementById("pro-arrow-svg");
+    if (arrow && window.counts && window.counts.rCounts) {
+        let isBalanced = (!window.counts.isEmpty && JSON.stringify(window.counts.rCounts) === JSON.stringify(window.counts.pCounts));
+        if (isBalanced) {
+            arrow.style.color = "#10b981";
+            arrow.style.filter = "drop-shadow(0 4px 0 #047857)";
+            arrow.style.transform = "scale(1.1)";
+        } else {
+            arrow.style.color = "#1e40af";
+            arrow.style.filter = "drop-shadow(0 4px 0 #1e3a8a)";
+            arrow.style.transform = "scale(1)";
+        }
+    }
 };
 
 
 window.onload = function() { initEngine(); };
+
+window.showWinPopup = function() {
+    if (document.getElementById("win-popup")) return;
+    let overlay = document.createElement("div");
+    overlay.id = "win-popup";
+    overlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);";
+    
+    let modal = document.createElement("div");
+    modal.style.cssText = "background: white; border: 4px solid #22c55e; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);";
+    
+    let levelId = new URLSearchParams(window.location.search).get('level');
+    
+    modal.innerHTML = `
+        <h1 style="font-size: 3.5rem; color: #16a34a; margin: 0 0 10px 0; text-shadow: 0 2px 0 #bbf7d0;">🎉 BALANCED! 🎉</h1>
+        <p style="font-size: 1.2rem; color: #475569; margin-bottom: 30px; font-weight: 700;">You successfully balanced the equation in its simplest form.</p>
+        <button onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style="background: #3b82f6; color: white; border: 4px solid #1d4ed8; padding: 15px 40px; font-size: 1.4rem; font-weight: 900; border-radius: 16px; cursor: pointer; box-shadow: 0 6px 0 #1e3a8a; transition: all 0.1s;" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #1e3a8a';">CONTINUE</button>
+    `;
+    
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    
+    // Create animation style if missing
+    if(!document.getElementById('win-anim-style')) {
+        let style = document.createElement('style');
+        style.id = 'win-anim-style';
+        style.innerHTML = `@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`;
+        document.head.appendChild(style);
+    }
+    
+    // Save to localStorage
+    if (levelId) {
+        let solved = JSON.parse(localStorage.getItem('solvedLevels') || '[]');
+        if (!solved.includes(levelId)) {
+            solved.push(levelId);
+            localStorage.setItem('solvedLevels', JSON.stringify(solved));
+        }
+    }
+};
