@@ -971,6 +971,23 @@
 .block-left:not(.collapsed), .block-right:not(.collapsed) { padding: 15px !important; }
 .block-left .sidebar-content, .block-right .sidebar-content { padding: 0 !important; height: 100%; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
 
+
+.side-tab-btn {
+    width: 65px; height: 65px; border-radius: 18px; background: #1e293b; color: #64748b; border: 4px solid #334155;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 0 #334155;
+}
+.side-tab-btn:hover { background: #334155; color: #cbd5e1; }
+.side-tab-btn.active-tab { background: #facc15; color: #1e293b; border-color: #ca8a04; box-shadow: 0 6px 0 #ca8a04; }
+.side-tab-btn:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+
+    @keyframes flashHintBox {
+        0%, 100% { box-shadow: 0 0 0 4px #fef08a, 0 0 10px #eab308; transform: scale(1); }
+        50% { box-shadow: 0 0 0 8px #fde047, 0 0 30px #ca8a04; transform: scale(1.05); }
+    }
+    @keyframes flashHintDrop {
+        0%, 100% { box-shadow: 0 0 0 4px rgba(192, 38, 211, 0.4) inset, 0 0 10px rgba(192, 38, 211, 0.3); background: rgba(253, 244, 255, 0.4); }
+        50% { box-shadow: 0 0 0 8px rgba(192, 38, 211, 0.8) inset, 0 0 30px rgba(192, 38, 211, 0.6); background: rgba(250, 232, 255, 0.9); }
+    }
 </style>
 
 
@@ -1193,8 +1210,173 @@ window.onerror = function(message, source, lineno, colno, error) {
     document.body.appendChild(errDiv);
 };
 </script>
+
+<script>
+// Unified Audio Engine and Page Transitions
+const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+window.initAudio = function() {
+    if (!audioCtx) audioCtx = new AudioCtxClass();
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+// Ensure audio context is started on first interaction anywhere
+document.addEventListener('click', () => {
+    if(!audioCtx) window.initAudio();
+    else if(audioCtx.state === 'suspended') audioCtx.resume();
+}, {once: false});
+
+window.playSound = async function(type) {
+    if (!audioCtx) window.initAudio();
+    if (audioCtx.state === 'suspended') {
+        try { await audioCtx.resume(); } catch(e) {}
+    }
+
+
+    
+    try {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        if (type === 'start') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        } else if (type === 'select') {
+            // "choosing btween activity cshould have a btter unique sound instead" -> Marimba/Woodblock pop
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'swoosh') {
+            // "expandinga nd collasping ethe element tray and teh prf beaker, it shoudl have a swoosh sound instead"
+            // Simulate swoosh with a fast filtered noise burst or a rapid low sine sweep
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        } else if (type === 'drop') {
+            // "change teh audio of adding stuff n to teh drop box" - plop sound
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'remove') {
+            // "removing them" - reverse plop
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        } else if (type === 'trash') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+            osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3); // C6
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.8);
+        } else if (type === 'sad') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        } else if (type === 'hint') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'back' || type === 'page') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } else if (type === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        } else {
+            // Default
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+    } catch(e) {
+        console.warn("Audio generation failed", e);
+    }
+};
+
+// PAGE TRANSITION LOGIC
+window.transitionTo = function(url) {
+    let overlay = document.getElementById('iris-wipe-overlay');
+    if(overlay) {
+        overlay.classList.remove('open');
+        setTimeout(() => { window.location.href = url; }, 550);
+    } else {
+        window.location.href = url;
+    }
+};
+
+window.addEventListener('load', () => {
+    let overlay = document.getElementById('iris-wipe-overlay');
+    if(overlay) {
+        overlay.classList.add('open');
+    }
+});
+
+</script>
 </head>
 <body>
+    <div id="iris-wipe-overlay"></div>
+
     <!-- Floating Action Button (FAB) Menu -->
     <div class="fab-container">
         <div class="fab-menu">
@@ -1219,18 +1401,30 @@ window.onerror = function(message, source, lineno, colno, error) {
         </button>
     </div>
 
+    
+    <!-- Side Mode Switcher -->
+    <div id="mode-switcher-sidebar" style="position: fixed; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 99999;">
+        <button id="btn-side-simple" class="side-tab-btn active-tab" onclick="window.switchViewMode('simple')" data-tooltip="Simple Mode">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+    <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+    <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">SIMPLE</span>
+</div>
+        </button>
+        <button id="btn-side-pro" class="side-tab-btn" onclick="window.switchViewMode('pro')" data-tooltip="Pro Mode">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+    <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+    <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">PRO</span>
+</div>
+        </button>
+    </div>
+
     <div class="good-layout">
         <!-- Block 1: Top Bar -->
-        <div class="good-block block-top">
-            <button class="btn-back interactive" onclick="parent.window.location.href='levels.html'">
+        <div class="good-block block-top" style="display: flex; justify-content: center; align-items: center; min-height: 80px; position: relative;">
+            <button class="btn-back interactive" onclick="window.transitionTo('levels.html')" style="position: absolute; left: 20px;">
                 &#9664; Back
             </button>
-            <div class="block-title" style="margin: 0; font-size: 2rem;">Level 1: Water Formation</div>
-            
-    <div style="display:flex; background: #1e293b; padding:4px; border-radius:14px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);">
-        <button id="tab-easy" class="tab-btn active-tab" onclick="window.setMode('easy')" style="padding: 8px 24px; border-radius:10px; font-weight:900; cursor:pointer; border:none; transition:all 0.2s; font-size: 1.1rem;">Easy Mode</button>
-        <button id="tab-hard" class="tab-btn" onclick="window.setMode('hard')" style="padding: 8px 24px; border-radius:10px; font-weight:900; cursor:pointer; border:none; transition:all 0.2s; font-size: 1.1rem;">Hard Mode</button>
-    </div>
+            <div id="level-title" class="block-title" style="margin: 0; font-size: 2rem; text-align: center;">Loading...</div>
         </div>
         
         
@@ -1453,18 +1647,45 @@ window.onerror = function(message, source, lineno, colno, error) {
                     
 
 
-<div class="beaker-actions" style="margin-top: 0px; margin-bottom: 5px; flex-shrink: 0; display: flex; align-items: stretch; gap: 5px; width: 100%; min-height: 40px;">
-    <button class="btn-hint-clean" onclick="window.revealHeuristicHint()">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-        Hint please!
-    </button>
+<div class="beaker-actions" style="margin-top: 15px; margin-bottom: 5px; flex-shrink: 0; display: flex; align-items: stretch; gap: 5px; width: 100%; min-height: 40px;">
+    <button class="btn-hint-clean" style="width: 100%; border-radius: 12px; padding: 8px 12px; background: linear-gradient(to bottom, #fde047, #facc15) !important; color: #713f12 !important; font-size: 1rem; font-weight: 900; border: 3px solid #ca8a04 !important; box-shadow: 0 6px 0 #a16207 !important; transition: all 0.1s; margin-bottom: 5px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;" onclick="if(typeof playSound==='function') playSound('click'); window.revealHeuristicHint();" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none !important';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';" onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';">
+    <svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C7.86 2 4.5 5.36 4.5 9.5c0 3.82 2.66 7.12 6.36 8.31V20c0 .55.45 1 1 1h.28c.11 0 .22-.03.32-.08l.1-.06.27-.19c.38-.28.84-.42 1.3-.42.45 0 .9.14 1.28.42l.27.19.1.06c.1.05.21.08.32.08h.28c.55 0 1-.45 1-1v-2.19c3.7-1.19 6.36-4.49 6.36-8.31C19.5 5.36 16.14 2 12 2z"></path></svg>
+    Hint please!
+</button>
     <button class="rect-btn btn-trash" onclick="clearChat()" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
         <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
     </button>
 </div>
             </div>
             </div>
+            
+        <!-- Block 4: Pro Mode View -->
+        <div id="block-pro" class="good-block block-pro" style="display: none; grid-column: 1 / -1; grid-row: 2; height: 100%; min-height: 400px; padding: 40px; background: #e2e8f0; border-color: #94a3b8; box-shadow: 0 8px 0 #94a3b8; flex-direction: column;">
+            
+            <!-- Main Content: Boxes + Arrow -->
+            <div style="display: flex; flex: 1; align-items: stretch; justify-content: center; gap: 30px; margin-bottom: 40px; min-height: 0;">
+                
+                <!-- Reactants Box -->
+                <div id="pro-box-react" style="flex: 1; background: #cbd5e1; border: 4px solid #475569; border-radius: 12px; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: flex-start; gap: 20px; padding: 30px; overflow-y: auto; box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);">
+                </div>
+                
+                <!-- Arrow -->
+                <div style="display: flex; align-items: center; justify-content: center; padding: 0 20px;">
+                    <svg id="pro-arrow-svg" style="width: 100px; height: 100px; color: #1e40af; filter: drop-shadow(0 4px 0 #1e3a8a); transition: all 0.3s;" fill="currentColor" viewBox="0 0 24 24"><path d="M4 12h12V7l7 7-7 7v-5H4z"></path></svg>
+                </div>
+                
+                <!-- Products Box -->
+                <div id="pro-box-prod" style="flex: 1; background: #cbd5e1; border: 4px solid #475569; border-radius: 12px; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: flex-start; gap: 20px; padding: 30px; overflow-y: auto; box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);">
+                </div>
+
+            </div>
+            
+            <!-- Bottom Equation Area -->
+            <div id="pro-equation-container" style="display: flex; justify-content: center; align-items: center; gap: 25px; flex-wrap: wrap; padding: 30px; background: transparent; min-height: 120px;">
+            </div>
+            
         </div>
+
     </div>
 
     <!-- JS Logic for tooltips and audio -->
