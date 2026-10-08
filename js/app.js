@@ -7,6 +7,7 @@ let currentMode = 'class';
 let currentSubOption = 'Form 4'; 
 
 function selectMode(mode) {
+    if(typeof window.playSound==="function") window.playSound("select");
     if (currentMode === mode) return; 
     currentMode = mode;
 
@@ -26,6 +27,7 @@ function selectMode(mode) {
 }
 
 function selectSubOption(event, mode, subValue) {
+    if(typeof window.playSound==="function") window.playSound("select");
     event.stopPropagation(); 
     if(currentMode !== mode) selectMode(mode);
 
@@ -51,6 +53,7 @@ function updatePlayButton() {
 }
 
 function startGame() {
+    if(typeof window.playSound==="function") window.playSound("start");
     const btn = document.getElementById('main-play-btn');
     const oldTransform = btn.style.transform;
     const oldBoxShadow = btn.style.boxShadow;
@@ -58,59 +61,21 @@ function startGame() {
     btn.style.transform = 'translateY(8px)';
     btn.style.boxShadow = '0 0 0 transparent';
     
-    setTimeout(() => {
-        const playerNameInput = document.getElementById('player-name').value.trim();
-        const finalName = playerNameInput !== '' ? playerNameInput : 'Student';
-        
-        // Redirect to Level Selection Screen
-        if (currentMode === 'sandbox') {
-            alert('Loading Sandbox Engine...');
-            // window.location.href = 'sandbox.html';
-        } else {
-            // Encode parameters
-            const formParam = encodeURIComponent(currentSubOption);
-            const nameParam = encodeURIComponent(finalName);
-            window.location.href = `levels.html?form=${formParam}&mode=${currentMode}&name=${nameParam}`;
-        }
-        
-        btn.style.transform = oldTransform;
-        btn.style.boxShadow = oldBoxShadow;
-    }, 150);
+    const playerNameInput = document.getElementById('player-name').value.trim();
+    const finalName = playerNameInput !== '' ? playerNameInput : 'Student';
+    
+    // Redirect to Level Selection Screen
+    if (currentMode === 'sandbox') {
+        alert('Loading Sandbox Engine...');
+    } else {
+        const formParam = encodeURIComponent(currentSubOption);
+        const nameParam = encodeURIComponent(finalName);
+        window.transitionTo(`levels.html?form=${formParam}&mode=${currentMode}&name=${nameParam}`);
+    }
 }
 
 function openElements() {
     alert('Opening Periodic Table Database...');
-}
-
-// ==========================================
-// 2. AUDIO ENGINE (Soft Click)
-// ==========================================
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-
-function initAudio() {
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-
-function playSoftClick() {
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    
-    osc.type = 'sine';
-    // Very quick, soft, pleasant drop
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime); 
-    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-    
-    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); // Low volume
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-    
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.05);
 }
 
 // ==========================================
