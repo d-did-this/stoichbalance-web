@@ -25,10 +25,10 @@ document.addEventListener('click', () => {
     else if(audioCtx.state === 'suspended') audioCtx.resume();
 }, {once: false});
 
-window.playSound = async function(type) {
+window.playSound = function(type) {
     if (!audioCtx) window.initAudio();
     if (audioCtx.state === 'suspended') {
-        try { await audioCtx.resume(); } catch(e) {}
+        audioCtx.resume();
     }
 
 
