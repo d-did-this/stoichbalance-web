@@ -177,6 +177,7 @@ window.addEventListener('load', () => {
     <!-- HIGH-INTENSITY DYNAMIC BACKGROUNDS -->
     <div class="bg-layer bg-blue active-bg" id="bg-class"></div>
     <div class="bg-layer bg-purple" id="bg-challenge"></div>
+    <div class="bg-layer bg-green" id="bg-form5"></div>
     <div class="bg-layer bg-orange" id="bg-sandbox"></div>
 
     <!-- INTERACTIVE CHEMISTRY CANVAS -->
@@ -205,9 +206,14 @@ window.addEventListener('load', () => {
             </div>
             
             <div class="launch-wrapper">
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <label>PLAYER NAME</label>
-                    <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="">
+                    <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()">
+                    
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:white; border:4px solid #e2e8f0; border-top:none; border-radius:0 0 16px 16px; box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:100; max-height:200px; overflow-y:auto; flex-direction:column; padding: 5px;">
+                        <!-- JS injected profiles -->
+                    </div>
                 </div>
                 
                 <button class="btn-play interactive" id="main-play-btn" onclick="startGame()">
@@ -283,6 +289,248 @@ window.addEventListener('load', () => {
 
     </div>
 
-    <script src="js/app.js?v=1791074758316"></script>
+<div id="sandbox-choice-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.8); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(8px);">
+    <div class="card" style="width:100%; max-width:800px; display:flex; flex-direction:column; gap:30px; background:#ffffff; border:4px solid #3b82f6; padding:40px; border-radius:32px; box-shadow: 0 10px 0 rgba(0,0,0,0.1); position:relative; text-align:center;">
+        <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
+        <h3 style="font-size:42px; font-weight:900; color:#1e3a8a; margin:0; line-height:1.1;">How do you want to build?</h3>
+        <div style="display:flex; gap:20px; margin-top:10px;">
+            <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none'; document.getElementById('sandbox-input-modal').style.display='flex'; document.getElementById('builder-reactants-container').innerHTML=''; document.getElementById('builder-products-container').innerHTML=''; window.builderHideSave(); window.builderAddBox('reactants'); window.builderAddBox('products');" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px; padding:30px; background:#eff6ff; color:#1e3a8a; border:4px solid #bfdbfe; border-radius:24px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 8px 0 #bfdbfe; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #bfdbfe';">
+                <div style="font-size:64px;">⌨️</div>
+                Text Boxes
+            </button>
+            <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none'; window.openVirtualKeyboard();" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px; padding:30px; background:#faf5ff; color:#4c1d95; border:4px solid #d8b4fe; border-radius:24px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 8px 0 #d8b4fe; transition:all 0.1s;" onmousedown="this.style.transform='translateY(8px)'; this.style.boxShadow='0 0 0 transparent';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 0 #d8b4fe';">
+                <div style="font-size:64px;">📊</div>
+                Periodic Table Keyboard
+            </button>
+        </div>
+    </div>
+</div>
+<div id="sandbox-input-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.8); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(8px);">
+    <div class="card" style="width:100%; max-width:1100px; display:flex; flex-direction:column; gap:30px; background:#ffffff; border:4px solid #10b981; padding:40px; border-radius:32px; box-shadow: 0 10px 0 rgba(0,0,0,0.1); position:relative;">
+        <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
+        
+        <div style="text-align:center;">
+            <h3 style="margin:0; font-size:42px; color:#064e3b; font-weight:900; letter-spacing:-1px;">Visual Equation Builder</h3>
+            <p style="font-size:20px; color:#10b981; font-weight:800; margin-top:5px;">Type elements or click the Table icon to insert them!</p>
+        </div>
+        
+        <div style="display:flex; align-items:stretch; gap:20px; width:100%;">
+            <!-- Reactants -->
+            <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <label style="font-size:24px; font-weight:900; color:#334155;">Reactants</label>
+                    <button class="interactive" onclick="window.builderAddBox('reactants')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
+                </div>
+                <div id="builder-reactants-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
+            </div>
+            
+            <div style="display:flex; align-items:center; justify-content:center; font-size:60px; font-weight:900; color:#94a3b8;">&rarr;</div>
+            
+            <!-- Products -->
+            <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <label style="font-size:24px; font-weight:900; color:#334155;">Products</label>
+                    <button class="interactive" onclick="window.builderAddBox('products')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
+                </div>
+                <div id="builder-products-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:20px; align-items:center;">
+            <button class="interactive" onclick="window.openPeriodicPicker()" style="flex:0.5; background: #8b5cf6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #6d28d9;">📊 Insert Element</button>
+            <button class="interactive" onclick="window.builderCheck()" style="flex:1; background: #3b82f6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #2563eb;">🔍 Check Equation</button>
+            <button class="interactive" id="builder-save-btn" onclick="window.builderSaveAndPlay()" style="flex:1; display:none; background: #10b981; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #059669; animation: pulse 1s infinite;">✅ Save & Play!</button>
+        </div>
+        
+        <div id="builder-feedback" style="font-size:22px; font-weight:900; text-align:center; padding:15px; border-radius:16px; display:none;"></div>
+    </div>
+</div>
+<div id="sandbox-virtual-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.9); z-index:999999; justify-content:center; align-items:center;">
+    <div class="card" style="width:95%; max-width:1400px; height:90vh; display:flex; flex-direction:column; gap:20px; background:#ffffff; border:4px solid #8b5cf6; padding:30px; border-radius:32px; box-shadow: 0 10px 0 rgba(0,0,0,0.1); position:relative;">
+        <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-virtual-modal').style.display='none';" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
+        
+        <h3 style="margin:0; font-size:32px; color:#4c1d95; font-weight:900; text-align:center;">Chemistry Keyboard</h3>
+        
+        <div id="vk-display" style="font-size:48px; font-weight:900; text-align:center; padding:15px; border:4px solid #e2e8f0; border-radius:16px; min-height:80px; background:#f8fafc; color:#0f172a; display:flex; align-items:center; justify-content:center; letter-spacing:2px;"></div>
+        
+        <div id="vk-feedback" style="font-size:20px; font-weight:bold; text-align:center; padding:10px; border-radius:12px; display:none;"></div>
+        
+        <div style="display:flex; gap:20px; flex:1; min-height:0;">
+            <!-- PT Grid -->
+            <div id="vk-pt-grid" style="flex:3; display:grid; grid-template-columns: repeat(18, 1fr); grid-template-rows: repeat(9, 1fr); gap:4px; align-items:stretch; justify-items:stretch;"></div>
+            
+            <!-- Numpad & Signs -->
+            <div style="flex:1; display:flex; flex-direction:column; gap:10px; background:#f1f5f9; padding:20px; border-radius:24px; border:4px solid #e2e8f0;">
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; flex:1;">
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('1')">1</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('2')">2</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('3')">3</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('4')">4</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('5')">5</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('6')">6</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('7')">7</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('8')">8</button>
+                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('9')">9</button>
+                    <button class="interactive" class="vk-num-btn" style="grid-column: span 3;" onclick="window.vkType('0')">0</button>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="interactive" class="vk-action-btn" onclick="window.vkType('+')" style="background:#3b82f6; box-shadow:0 6px 0 #2563eb;">+</button>
+                    <button class="interactive" id="vk-arrow-btn" class="vk-action-btn" onclick="window.vkType('->')" style="background:#10b981; box-shadow:0 6px 0 #059669;">&rarr;</button>
+                </div>
+                <button class="interactive" class="vk-action-btn" onclick="window.vkBackspace()" style="background:#ef4444; box-shadow:0 6px 0 #dc2626;">⌫ Backspace</button>
+                <button class="interactive" class="vk-action-btn" onclick="window.vkCheck()" style="background:#f59e0b; box-shadow:0 6px 0 #d97706; padding:20px; font-size:24px; margin-top:10px;">✅ Check & Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+/* Responsive Periodic Table v2 */
+.pt-modal-wrapper {
+    width: 98vw; height: 96vh; max-width: 1920px; max-height: 1100px;
+    display: flex; gap: 20px; position: relative; padding: 20px;
+    box-sizing: border-box;
+}
+.pt-grid-panel {
+    flex: 3.5; /* Takes up much more space, 20%+ bigger */
+    min-width: 0; min-height: 0;
+    background: #ffffff; border-radius: 32px; border: 6px solid #cbd5e1;
+    box-shadow: 0 12px 0 #94a3b8; display: flex; flex-direction: column; padding: 20px;
+}
+.pt-details-panel {
+    flex: 1.2;
+    min-width: 380px; max-width: 500px; min-height: 0;
+    background: #ffffff; border-radius: 32px; border: 6px solid #cbd5e1;
+    box-shadow: 0 12px 0 #94a3b8; display: flex; flex-direction: column; padding: 25px;
+    overflow-y: auto; overflow-x: hidden;
+}
+#picker-grid {
+    display: grid;
+    grid-template-columns: repeat(18, minmax(0, 1fr));
+    grid-template-rows: repeat(9, minmax(0, 1fr));
+    gap: 6px; 
+    width: 100%;
+    aspect-ratio: 18/9;
+    margin: auto;
+    align-items: stretch; 
+    justify-items: stretch;
+}
+.vk-pt-btn { padding: 4px; }
+.vk-pt-btn .el-num { font-size: clamp(6px, 0.7vw, 10px); }
+.vk-pt-btn .el-symbol { font-size: clamp(14px, 1.6vw, 24px); text-transform: capitalize; }
+.vk-pt-btn .el-name { font-size: clamp(8px, 0.75vw, 11px); text-transform: capitalize; }
+
+@media (max-width: 1300px) {
+    .pt-modal-wrapper {
+        flex-direction: column; overflow-y: auto; max-height: none; height: auto;
+    }
+    .pt-details-panel {
+        max-width: 100%; flex: none; min-height: 700px;
+    }
+    .pt-grid-panel {
+        flex: none; min-height: 700px;
+    }
+}
+
+.vk-pt-btn:hover {
+    transform: scale(1.3) translateY(-6px) !important;
+    z-index: 100 !important;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5) !important;
+    border: 3px solid #ffffff !important;
+    filter: brightness(1.2) !important;
+}
+</style>
+
+<div id="periodic-picker-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.85); z-index:9999999; justify-content:center; align-items:center; backdrop-filter:blur(10px); box-sizing:border-box;">
+    
+    <div class="pt-modal-wrapper">
+        <button class="interactive" onclick="if(typeof window.playSound==='function') window.playSound('click'); document.getElementById('periodic-picker-modal').style.display='none'" style="position:absolute; top:-10px; right:-10px; background:#ef4444; border:4px solid #991b1b; color:#ffffff; font-weight:900; border-radius:50%; cursor:pointer; font-size:32px; width:55px; height:55px; display:flex; justify-content:center; align-items:center; box-shadow: 0 6px 0 #7f1d1d; z-index:100;">&times;</button>
+        
+        <!-- RIGHT PANEL: The Grid -->
+        <div class="good-block pt-grid-panel">
+            <h3 style="margin:0 0 15px 0; font-size:clamp(20px, 2.5vw, 36px); color:#1e293b; font-weight:900; text-align:center;">Interactive Periodic Table</h3>
+            <div id="picker-grid"></div>
+        </div>
+        
+        <!-- LEFT PANEL: Element Details -->
+        <div class="good-block pt-details-panel">
+            <div id="element-details-empty" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#94a3b8; text-align:center;">
+                <div style="font-size:70px; margin-bottom:15px;">🔬</div>
+                <h2 style="font-size:22px; font-weight:900; margin:0;">Awaiting Input</h2>
+                <p style="font-size:16px; font-weight:700;">Hover over any element on the periodic table to analyze its atomic structure.</p>
+            </div>
+            
+            <div id="element-details-content" style="display:none; flex-direction:column; gap:15px;">
+                
+                <!-- 1. Header: Name & Symbol -->
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h1 id="ed-name" style="font-size:clamp(28px, 2.5vw, 42px); font-weight:900; color:#1e293b; margin:0; line-height:1;">Lithium</h1>
+                    </div>
+                    <div id="ed-symbol-box" style="width:80px; height:80px; border-radius:16px; border:4px solid #e2e8f0; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#f8fafc; box-shadow: 0 4px 0 #e2e8f0; flex-shrink:0;">
+                        <span id="ed-num" style="font-size:16px; font-weight:900; color:#64748b; line-height:1;">3</span>
+                        <span id="ed-symbol" style="font-size:36px; font-weight:900; color:#0f172a; line-height:1;">Li</span>
+                    </div>
+                </div>
+                
+                <!-- 2. Bohr Model Visualization -->
+                <div style="display:flex; justify-content:center; align-items:center; background:#0f172a; border-radius:20px; padding:20px; box-shadow:inset 0 10px 30px rgba(0,0,0,0.5); min-height: 240px; position:relative; overflow:hidden;">
+                    <div id="ed-bohr-container" style="width:100%; max-width:320px; aspect-ratio:1/1; position:relative;"></div>
+                    <!-- Zoom Controls -->
+                    <div style="position:absolute; top:10px; right:10px; display:flex; gap:5px; z-index:10;">
+                        <button onclick="if(typeof playSound==='function') playSound('click'); zoomBohr(0.2)" style="width:30px; height:30px; border-radius:8px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:white; font-weight:900; cursor:pointer; display:flex; justify-content:center; align-items:center; font-size:18px; backdrop-filter:blur(4px);">+</button>
+                        <button onclick="if(typeof playSound==='function') playSound('click'); zoomBohr(-0.2)" style="width:30px; height:30px; border-radius:8px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:white; font-weight:900; cursor:pointer; display:flex; justify-content:center; align-items:center; font-size:18px; backdrop-filter:blur(4px);">-</button>
+                    </div>
+
+                </div>
+                <!-- Fun Fact -->
+                <div id="ed-fact" style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:12px; padding:12px; font-size:13px; font-weight:700; color:#475569; font-style:italic;">
+                    Although it is a metal, Lithium is soft enough to cut with a knife.
+                </div>
+                
+            
+                
+                <!-- 3. Primary Info: Group, Period, Type -->
+                <div style="display:grid; grid-template-columns:1fr 1fr 1.5fr; gap:8px;">
+                    <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center;">
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Group</div>
+                        <div id="ed-group-num" style="font-size:18px; font-weight:900; color:#1e3a8a; margin-top:2px;">1</div>
+                    </div>
+                    <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center;">
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Period</div>
+                        <div id="ed-period-num" style="font-size:18px; font-weight:900; color:#1e3a8a; margin-top:2px;">2</div>
+                    </div>
+                    <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Type</div>
+                        <div id="ed-group-badge" style="display:inline-block; padding:3px 6px; border-radius:6px; font-size:11px; font-weight:900; color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.2; margin-top:3px;">Alkali Metal</div>
+                    </div>
+                </div>
+                
+                <!-- 4. Nucleus & Electrons -->
+                <div id="ed-structure-text" style="font-size:13px; font-weight:600; color:#475569; line-height:1.4;"></div>
+                
+                <!-- 5. Physical Stats -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:12px; padding:10px;">
+                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;">Atomic Mass</div>
+                        <div id="ed-mass" style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;">6.941 u</div>
+                    </div>
+                    <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:12px; padding:10px;">
+                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;">Density</div>
+                        <div id="ed-density" style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;">0.512 g/cm³</div>
+                    </div>
+                    <div style="background:#fef2f2; border:3px solid #fecaca; border-radius:12px; padding:10px;">
+                        <div style="font-size:11px; font-weight:900; color:#dc2626; text-transform:uppercase;">Melting Point</div>
+                        <div id="ed-melt" style="font-size:16px; font-weight:900; color:#991b1b; margin-top:2px;">180.54 °C</div>
+                    </div>
+                    <div style="background:#fff7ed; border:3px solid #fed7aa; border-radius:12px; padding:10px;">
+                        <div style="font-size:11px; font-weight:900; color:#ea580c; text-transform:uppercase;">Boiling Point</div>
+                        <div id="ed-boil" style="font-size:16px; font-weight:900; color:#9a3412; margin-top:2px;">1342 &deg;C</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;">Discovered By</div><div id="ed-discoverer" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;">Discovery Year</div><div id="ed-year" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div></div>
+
+                </div>
+        </div>
+    </div>
+</div>
+    <script src="js/element_data.js?v=1791520267"></script>
+    <script src="js/app.js?v=1791520267"></script>
 </body>
 </html>
