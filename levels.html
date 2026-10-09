@@ -201,7 +201,24 @@ window.playSound = function(type) {
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.4);
-    } else if (type === 'page') {
+            } else if (type === 'tactile') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.05);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'retro-select') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        } else if (type === 'page') {
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(400, audioCtx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
@@ -220,6 +237,20 @@ window.playSound = function(type) {
     }
 }
 </script>
+
+<style>
+.level-card:hover, .level-card.kb-focus {
+    outline: 6px solid #f59e0b !important;
+    outline-offset: 4px;
+    box-shadow: 0 12px 0 var(--dark-border), 0 0 25px rgba(245, 158, 11, 0.6) !important;
+    transform: translateY(-6px) scale(1.03) !important;
+    filter: brightness(1.1) !important;
+    z-index: 10;
+}
+.level-card.solved-card:hover, .level-card.solved-card.kb-focus {
+    box-shadow: 0 10px 0 #16a34a, 0 0 20px rgba(255,255,255,0.8) !important;
+}
+</style>
 </head>
 <body>
     <div id="iris-wipe-overlay"></div>
@@ -265,9 +296,70 @@ let myCurrentPage = 1;
 const ITEMS_PER_PAGE = 6;
 let myTotalPages = 1;
 
+function getLevelIcon(title) {
+    let t = title.toLowerCase();
+    if(t.includes('haber')) return '🏭';
+    if(t.includes('contact')) return '⚗️';
+    if(t.includes('combust') || t.includes('burn')) return '🔥';
+    if(t.includes('acid') || t.includes('base') || t.includes('neutrali')) return '💧';
+    if(t.includes('rust') || t.includes('iron')) return '🔩';
+    if(t.includes('photo')) return '☀️';
+    if(t.includes('resp')) return '🫁';
+    if(t.includes('precip')) return '🌧️';
+    if(t.includes('metal')) return '🪙';
+    if(t.includes('decompose')) return '💥';
+    if(t.includes('ostwald')) return '🌩️';
+    if(t.includes('extract')) return '⛏️';
+    return '🧪';
+}
+
+let currentFocusIndex = -1;
+
+document.addEventListener('keydown', (e) => {
+    let cards = Array.from(document.querySelectorAll('#page-' + myCurrentPage + ' .level-card'));
+    if(cards.length === 0) return;
+    
+    let cols = window.innerWidth <= 768 ? 1 : 3;
+    
+    let handled = true;
+    if (e.key === 'ArrowRight') {
+        currentFocusIndex++;
+        if(currentFocusIndex >= cards.length) currentFocusIndex = 0;
+        window.playSound('tactile');
+    } else if (e.key === 'ArrowLeft') {
+        currentFocusIndex--;
+        if(currentFocusIndex < 0) currentFocusIndex = cards.length - 1;
+        window.playSound('tactile');
+    } else if (e.key === 'ArrowDown') {
+        currentFocusIndex += cols;
+        if(currentFocusIndex >= cards.length) currentFocusIndex = cards.length - 1;
+        window.playSound('tactile');
+    } else if (e.key === 'ArrowUp') {
+        currentFocusIndex -= cols;
+        if(currentFocusIndex < 0) currentFocusIndex = 0;
+        window.playSound('tactile');
+    } else if (e.key === 'Enter') {
+        if(currentFocusIndex >= 0 && currentFocusIndex < cards.length) {
+            cards[currentFocusIndex].click();
+        }
+    } else {
+        handled = false;
+    }
+    
+    if(handled) e.preventDefault();
+    
+    cards.forEach((c, i) => {
+        if(i === currentFocusIndex) c.classList.add('kb-focus');
+        else c.classList.remove('kb-focus');
+    });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const formParam = params.get('form') || 'Form 4';
+    const nameParam = params.get('name') || 'Player';
+    const nameEl = document.getElementById('display-name');
+    if (nameEl) nameEl.innerText = nameParam;
     const formNumber = formParam.includes('5') ? '5' : '4';
     
     // Update titles
@@ -287,6 +379,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if(myTotalPages === 0) myTotalPages = 1;
     
     let gridContainer = document.querySelector('.grid-wrapper');
+    
+    // Calculate Score
+    let solvedData = JSON.parse(localStorage.getItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player')) || '{}');
+    // Legacy support: if it's an array, convert it to an object temporarily for counting
+    let legacySolved = JSON.parse(localStorage.getItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player')) || '[]');
+    let solvedCount = 0;
+    
+    keys.forEach(k => {
+        if (solvedData[k] || legacySolved.includes(k)) solvedCount++;
+    });
+    
+    let scoreText = document.querySelector('.score-text');
+    let scoreIcon = document.querySelector('.score-icon');
+    if(scoreText) scoreText.innerText = solvedCount + ' / ' + keys.length;
+    if(scoreIcon) scoreIcon.innerHTML = '🏆';
+
+
     if(!gridContainer) return;
     
     const existingGrids = gridContainer.querySelectorAll('.levels-grid');
@@ -316,24 +425,38 @@ document.addEventListener('DOMContentLoaded', () => {
             let niceNum = k.replace(/F\d+L/, '');
             
             let card = document.createElement('div');
-            let solvedLevels = JSON.parse(localStorage.getItem('solvedLevels') || '[]');
-            let isSolved = solvedLevels.includes(k);
+            let solvedLevels = JSON.parse(localStorage.getItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player')) || '[]');
+            let solvedData = JSON.parse(localStorage.getItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player')) || '{}');
+            let isSolved = solvedData[k] ? true : solvedLevels.includes(k);
+            let stars = solvedData[k] ? solvedData[k].stars : (isSolved ? 3 : 0); // Legacy defaults to 3
+            
             
             card.className = isSolved ? 'level-card interactive solved-card' : 'level-card interactive';
+            card.onmouseenter = () => { window.playSound('tactile'); currentFocusIndex = -1; Array.from(document.querySelectorAll('.level-card')).forEach(c => c.classList.remove('kb-focus')); };
             card.onclick = (e) => { 
                 e.currentTarget.style.transform = 'translateY(6px)';
                 e.currentTarget.style.setProperty('box-shadow', 'none', 'important');
-                window.playSound('start');
+                window.playSound('retro-select');
                 window.transitionTo('game.html?level=' + k);
             };
             
             let bannerClass = isSolved ? 'banner-green' : 'banner-blue';
             let bannerText = isSolved ? 'REVIEW (SOLVED)' : 'PLAY';
-            let iconText = isSolved ? '✅' : '🧪';
+            let iconText = isSolved ? '✅' : getLevelIcon(L.title);
             
+            let starHtml = '';
+            if (isSolved) {
+                let svgFull = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 1px; filter:drop-shadow(0 1px 0 rgba(0,0,0,0.15));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+                let svgHalf = `<svg width="14" height="14" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 1px; filter:drop-shadow(0 1px 0 rgba(0,0,0,0.15));"><defs><linearGradient id="hgPopup" x1="0" x2="1" y1="0" y2="0"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#e2e8f0"/></linearGradient></defs><polygon fill="url(#hgPopup)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+                
+                if (stars === 3) starHtml = `<span style="display:flex; align-items:center; margin-left:4px;">${svgFull}${svgFull}${svgFull}</span>`;
+                else if (stars === 1.5) starHtml = `<span style="display:flex; align-items:center; margin-left:4px;">${svgFull}${svgHalf}</span>`;
+            }
+
             card.innerHTML = `
-                <div class="card-top">
+                <div class="card-top" style="display:flex; justify-content:space-between; align-items:center; position:relative;">
                     <span class="lvl-num">${niceNum}</span>
+                    <span class="lvl-stars" style="position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; background:rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); padding: 3px 8px; border-radius:12px;">${starHtml}</span>
                     <span class="lvl-diff diff-${diff}">${diffLabel}</span>
                 </div>
                 <div class="card-icon">${iconText}</div>
