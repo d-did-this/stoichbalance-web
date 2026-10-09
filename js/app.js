@@ -92,7 +92,10 @@ window.renderProfiles = function(filterText = "") {
 
 window.showProfileDropdown = function() {
     let inp = document.getElementById('player-name');
-    if(inp) window.renderProfiles(inp.value);
+    if(inp) {
+        inp.select(); // Highlight the current name so typing replaces it instantly
+        window.renderProfiles(""); // ALWAYS show all profiles when first clicking the box!
+    }
 };
 
 window.filterProfiles = function() {
