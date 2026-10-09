@@ -43,6 +43,7 @@ body {
 .bg-layer.active-bg { opacity: 1; }
 
 .bg-blue { background: var(--blue); }
+.bg-green { background: var(--green); }
 .bg-purple { background: var(--purple); }
 .bg-orange { background: var(--orange); }
 
