@@ -90,7 +90,7 @@ function initEngine() {
     
     // Welcome message
 
-        setTimeout(() => { window.clearChat(); window.addChatMessage("Welcome to <b>" + currentLevelData.title + "</b>!<br><br>Let us balance the reaction.", "&#128075; Prof. Beaker"); }, 100);
+        setTimeout(() => { window.clearChat(); window.addChatMessage("Welcome to <b>" + currentLevelData.title + "</b>!<br><br>Let us balance the reaction.", "Prof. Beaker"); }, 100);
 }
 
 function getAtomMarble(element) {
@@ -558,8 +558,11 @@ window.updateSimulation = function() {
         
         isBalanced = isBalanced && isComplete && !isEmpty;
         
-        let gcd = getArrayGCD(allCoeffs);
-        let isSimplified = (gcd === 1);
+        let isSimplified = false;
+        if (isComplete && allCoeffs.length > 0) {
+            let gcd = getArrayGCD(allCoeffs);
+            isSimplified = (gcd === 1);
+        }
 
         if (isBalanced) {
             statusLeft.innerHTML = "BALANCED"; statusLeft.style.background = "#22c55e";
@@ -567,8 +570,13 @@ window.updateSimulation = function() {
             statusLeft.innerHTML = "UNBALANCED"; statusLeft.style.background = "#ef4444";
         }
 
-        if (isSimplified || isEmpty) {
-            statusRight.innerHTML = "SIMPLIFIED"; statusRight.style.background = isEmpty ? "#94a3b8" : "#22c55e";
+        if (isEmpty) {
+            statusRight.innerHTML = "NO ATOMS"; statusRight.style.background = "#94a3b8";
+            statusLeft.innerHTML = "EMPTY"; statusLeft.style.background = "#94a3b8";
+        } else if (!isComplete) {
+            statusRight.innerHTML = "INCOMPLETE"; statusRight.style.background = "#ef4444";
+        } else if (isSimplified) {
+            statusRight.innerHTML = "SIMPLIFIED"; statusRight.style.background = "#22c55e";
         } else {
             statusRight.innerHTML = "NOT SIMPLIFIED"; statusRight.style.background = "#eab308";
         }
@@ -576,21 +584,18 @@ window.updateSimulation = function() {
         // Handle Win State Detection
         if (isBalanced && isSimplified) {
             if (window.lastWinState !== "won") {
-                if(typeof playSound === "function") playSound("success");
+                if(typeof window.playSound === "function") window.playSound("success");
                 window.lastWinState = "won";
-                setTimeout(showWinPopup, 300);
+                setTimeout(() => window.showWinPopup(true), 300);
             }
         } else if (isBalanced && !isSimplified) {
             if (window.lastWinState !== "balanced") {
-                if(typeof playSound === "function") playSound("sad");
+                if(typeof window.playSound === "function") window.playSound("success");
                 window.lastWinState = "balanced";
+                setTimeout(() => window.showWinPopup(false), 300);
             }
         } else {
             window.lastWinState = "none";
-        }
-        if (isEmpty) {
-            statusLeft.innerHTML = "EMPTY"; statusLeft.style.background = "#94a3b8";
-            statusRight.innerHTML = "NO ATOMS"; statusRight.style.background = "#94a3b8";
         }
     }
 };
@@ -604,23 +609,19 @@ window.addChatMessage = function(msg, prefixLabel) {
     bubbleContainer.style.cssText = "margin-top: 15px; width: 100%; box-sizing: border-box;";
     
     let isHint = prefixLabel && prefixLabel.includes("Hint");
-    let avatarIcon = isHint ? '💡' : '👨‍🔬';
-    let avatarBg = isHint ? '#fef08a' : '#bfdbfe';
-    let avatarColor = isHint ? '#a16207' : '#1e3a8a';
-    let borderColor = isHint ? '#fde047' : '#93c5fd';
     
-    let bubbleStyle = `background: #ffffff; border: 3px solid ${borderColor}; border-radius: 20px; padding: 14px 18px; font-size: 1.1rem; color: #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex: 1; min-width: 0; line-height: 1.5; font-weight: 700; position: relative;`;
+    let avatarBg = isHint ? '#fffbeb' : '#f0f9ff';
+    let avatarColor = isHint ? '#d97706' : '#0369a1';
+    let borderColor = isHint ? '#fde68a' : '#bae6fd';
+    let badgeText = prefixLabel || 'BEAKER';
+    let bubbleBg = isHint ? '#fefce8' : '#f1f5f9';
     
-    let parsedLabel = prefixLabel ? prefixLabel.replace(/&#\d+;/g, "").trim() : (isHint ? "Hint" : "Prof. Beaker");
+    let bubbleStyle = `background: ${bubbleBg}; border: 2px solid ${borderColor}; border-radius: 12px; padding: 14px 18px; font-size: 1.05rem; color: #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.02); line-height: 1.5; font-weight: 600;`;
+    
     let finalHtml = `
     <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 12px;">
-            <div style="width: 30px; height: 30px; border-radius: 50%; background: ${avatarBg}; border: 2px solid ${borderColor}; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: ${avatarColor}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                ${avatarIcon}
-            </div>
-            <div style="font-weight: 900; font-size: 0.9rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">
-                ${parsedLabel}
-            </div>
+        <div style="background: ${avatarBg}; color: ${avatarColor}; font-weight: 900; font-size: 0.8rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px; margin-bottom: 6px; margin-left: 12px; border: 1px solid ${borderColor};">
+            ${badgeText}
         </div>
         <div style="${bubbleStyle}">
             ${msg}
@@ -628,9 +629,9 @@ window.addChatMessage = function(msg, prefixLabel) {
     </div>`;
     
     bubbleContainer.innerHTML = finalHtml;
-    
     container.appendChild(bubbleContainer);
     container.scrollTop = container.scrollHeight;
+    return;
 };
 
 window.clearChat = function() {
@@ -674,9 +675,9 @@ window.revealHeuristicHint = function() {
     updateSimulation(); // Apply visual glow immediately
     
     let elName = ELEM_NAMES[imbalancedEl] || imbalancedEl;
-    let molHtml = `<span style="background: #eff6ff; color: #2563eb; border: 2px solid #bfdbfe; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #bfdbfe;">${bestMolObj.displayHtml}</span>`;
-    let sideHtml = `<span style="background: #fdf4ff; color: #c026d3; border: 2px solid #f5d0fe; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #f5d0fe;">${sideName}</span>`;
-    let elHtml = `<span style="background: #fef2f2; color: #dc2626; border: 2px solid #fecaca; padding: 1px 6px; border-radius: 6px; font-weight: 800; font-size: 0.85em; box-shadow: 0 1px 0 #fecaca;">${elName} atoms</span>`;
+    let molHtml = `<span style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${bestMolObj.displayHtml}</span>`;
+    let sideHtml = `<span style="background: #fdf4ff; color: #c026d3; border: 1px solid #f5d0fe; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${sideName}</span>`;
+    let elHtml = `<span style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${elName} atoms</span>`;
     
     let msg = `Add ${molHtml} to ${sideHtml} for ${elHtml}.`;
     
@@ -741,7 +742,7 @@ window.switchViewMode = function(mode) {
         if(layout) {
             layout.style.setProperty("--left-w", "0px");
             layout.style.setProperty("--right-w", "0px");
-            layout.style.gridTemplateRows = "90px auto minmax(0, 1fr)";
+            layout.style.gridTemplateRows = "90px minmax(0, 1fr) auto";
         }
         
         if(!window.proEquationRendered) {
@@ -896,40 +897,103 @@ window.syncProBoxes = function() {
 
 window.onload = function() { initEngine(); };
 
-window.showWinPopup = function() {
-    if (document.getElementById("win-popup")) return;
-    let overlay = document.createElement("div");
-    overlay.id = "win-popup";
-    overlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(5px);";
-    
-    let modal = document.createElement("div");
-    modal.style.cssText = "background: white; border: 4px solid #22c55e; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);";
+window.showWinPopup = function(isPerfect) {
+    if (document.getElementById("win-popup")) document.getElementById("win-popup").remove();
     
     let levelId = new URLSearchParams(window.location.search).get('level');
     
+    // Save state
+    let solvedLevels = JSON.parse(localStorage.getItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player')) || '[]');
+    if (!solvedLevels.includes(levelId)) {
+        solvedLevels.push(levelId);
+        localStorage.setItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player'), JSON.stringify(solvedLevels));
+    }
+    
+    let solvedData = JSON.parse(localStorage.getItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player')) || '{}');
+    let currentStars = solvedData[levelId] ? solvedData[levelId].stars : 0;
+    let newStars = isPerfect ? 3 : 1.5;
+    if (newStars > currentStars) {
+        solvedData[levelId] = { stars: newStars };
+        localStorage.setItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player'), JSON.stringify(solvedData));
+    }
+
+    let overlay = document.createElement("div");
+    overlay.id = "win-popup";
+    overlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.85); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(12px);";
+    
+    let borderColor = isPerfect ? "#10b981" : "#f59e0b"; // Modern emerald or amber
+    let shadowColor = isPerfect ? "#047857" : "#b45309";
+    let titleColor = isPerfect ? "#059669" : "#d97706";
+    let titleText = isPerfect ? "PERFECT BALANCE!" : "BALANCED!";
+    let subText = isPerfect ? "Flawless work! The equation is in its simplest form." : "Nice job! The equation is balanced, but the coefficients can be simplified further.";
+    let badgeText = isPerfect ? "3 STARS" : "1.5 STARS";
+    
+    let svgFull = `<svg width="40" height="40" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 4px; filter:drop-shadow(0 4px 0 rgba(0,0,0,0.15));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+    let svgHalf = `<svg width="40" height="40" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 4px; filter:drop-shadow(0 4px 0 rgba(0,0,0,0.15));"><defs><linearGradient id="hgPopupRedesign" x1="0" x2="1" y1="0" y2="0"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#e2e8f0"/></linearGradient></defs><polygon fill="url(#hgPopupRedesign)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+    
+    let starsHtml = isPerfect ? 
+        `<div style="display:flex; justify-content:center; align-items:center; margin: 20px 0;">${svgFull}${svgFull}${svgFull}</div>` :
+        `<div style="display:flex; justify-content:center; align-items:center; margin: 20px 0;">${svgFull}${svgHalf}</div>`;
+
+    // Find next level
+    let nextLevel = null;
+    if (typeof LEVELS !== 'undefined') {
+        let keys = Object.keys(LEVELS);
+        let idx = keys.indexOf(levelId);
+        if(idx !== -1 && idx < keys.length - 1) {
+            nextLevel = keys[idx+1];
+        }
+    }
+    
+    if(!document.getElementById('popup-style')) {
+        let style = document.createElement('style');
+        style.id = 'popup-style';
+        style.innerHTML = `
+            .win-btn { flex: 1; min-width: 140px; padding: 18px 24px; font-size: 1.15rem; font-weight: 900; border-radius: 20px; cursor: pointer; transition: all 0.15s cubic-bezier(0.25, 1, 0.5, 1); display: flex; justify-content: center; align-items: center; letter-spacing: 0.5px; }
+            .win-btn:hover { transform: scale(1.05) translateY(-6px); filter: brightness(1.15); box-shadow: 0 12px 0 rgba(0,0,0,0.2) !important; z-index: 10; }
+            .win-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent !important; }
+            @keyframes slideUpFade { 0% { transform: translateY(60px) scale(0.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+            @keyframes pulseBadge { 0% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } 100% { transform: translateX(-50%) scale(1); } }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    window.slideTransitionTo = function(url) {
+        let slideOverlay = document.createElement('div');
+        slideOverlay.style.cssText = "position: fixed; top: 0; left: 100vw; width: 100vw; height: 100vh; background: #2563eb; z-index: 9999999; transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; align-items: center;";
+        slideOverlay.innerHTML = `<h1 style="color: white; font-size: 4rem; font-weight: 900; text-shadow: 0 6px 0 #1e3a8a; font-family: system-ui, sans-serif;">NEXT LEVEL</h1>`;
+        document.body.appendChild(slideOverlay);
+        if(typeof playSound==='function') playSound('start');
+        setTimeout(() => { slideOverlay.style.left = "0"; }, 10);
+        setTimeout(() => { window.location.href = url; }, 550);
+    }
+
+    let buttonsHtml = `<div style="display: flex; gap: 16px; margin-top: 35px; flex-wrap: wrap; justify-content:center;">`;
+    
+    if (!isPerfect) {
+        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #f59e0b; color: white; border: 4px solid #b45309; box-shadow: 0 8px 0 #92400e;">RETRY</button>`;
+    }
+    
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">REVIEW</button>`;
+    
+    if (nextLevel) {
+        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">NEXT LEVEL</button>`;
+    }
+    
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">MAIN MENU</button>`;
+    buttonsHtml += `</div>`;
+
+    let modal = document.createElement("div");
+    modal.style.cssText = `background: #ffffff; border: 8px solid ${borderColor}; border-radius: 40px; padding: 50px 40px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 -10px 0 rgba(0,0,0,0.05); max-width: 650px; width: 90%; animation: slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; font-family: system-ui, -apple-system, sans-serif;`;
+    
     modal.innerHTML = `
-        <h1 style="font-size: 3.5rem; color: #16a34a; margin: 0 0 10px 0; text-shadow: 0 2px 0 #bbf7d0;">🎉 BALANCED! 🎉</h1>
-        <p style="font-size: 1.2rem; color: #475569; margin-bottom: 30px; font-weight: 700;">You successfully balanced the equation in its simplest form.</p>
-        <button onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style="background: #3b82f6; color: white; border: 4px solid #1d4ed8; padding: 15px 40px; font-size: 1.4rem; font-weight: 900; border-radius: 16px; cursor: pointer; box-shadow: 0 6px 0 #1e3a8a; transition: all 0.1s;" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #1e3a8a';">CONTINUE</button>
+        <div style="position:absolute; top:-25px; left:50%; transform:translateX(-50%); background:${borderColor}; color:white; padding:10px 24px; border-radius:24px; font-weight:900; font-size:1.1rem; letter-spacing:1px; border:4px solid white; box-shadow:0 8px 0 ${shadowColor}; animation: pulseBadge 2s infinite;">${badgeText}</div>
+        <h1 style="font-size: 3rem; color: ${titleColor}; margin: 20px 0 10px 0; line-height: 1; font-weight:900; text-transform:uppercase; letter-spacing:-1px;">${titleText}</h1>
+        ${starsHtml}
+        <p style="font-size: 1.3rem; color: #475569; margin: 0 20px; font-weight: 700; line-height:1.5;">${subText}</p>
+        ${buttonsHtml}
     `;
     
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
-    
-    // Create animation style if missing
-    if(!document.getElementById('win-anim-style')) {
-        let style = document.createElement('style');
-        style.id = 'win-anim-style';
-        style.innerHTML = `@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }`;
-        document.head.appendChild(style);
-    }
-    
-    // Save to localStorage
-    if (levelId) {
-        let solved = JSON.parse(localStorage.getItem('solvedLevels') || '[]');
-        if (!solved.includes(levelId)) {
-            solved.push(levelId);
-            localStorage.setItem('solvedLevels', JSON.stringify(solved));
-        }
-    }
-};
+}
