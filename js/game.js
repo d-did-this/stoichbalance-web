@@ -1,4 +1,14 @@
 
+window.handleGameBackClick = function() {
+    if (window.isChallengeMode) {
+        if (window.challengeInterval) clearInterval(window.challengeInterval);
+        window.transitionTo('index.html');
+    } else {
+        window.transitionTo('levels.html');
+    }
+};
+
+
 const ELEM_NAMES = { 
     H: "Hydrogen", O: "Oxygen", N: "Nitrogen", Na: "Sodium", K: "Potassium", 
     I: "Iodine", Zn: "Zinc", S: "Sulfur", Ag: "Silver", C: "Carbon", 
@@ -67,6 +77,11 @@ let lastHintElement = null;
 function initEngine() {
 
     const params = new URLSearchParams(window.location.search);
+    let mode = params.get('mode');
+    if (mode === 'challenge') {
+        window.initChallengeMode(params);
+        return;
+    }
     let levelId = params.get('level') || 'F4L6';
     // Remove quotes if present
     levelId = levelId.replace(/['"]/g, '');
@@ -898,6 +913,10 @@ window.syncProBoxes = function() {
 window.onload = function() { initEngine(); };
 
 window.showWinPopup = function(isPerfect) {
+    if (window.isChallengeMode) {
+        window.handleChallengeRoundComplete(isPerfect);
+        return;
+    }
     if (document.getElementById("win-popup")) document.getElementById("win-popup").remove();
     
     let levelId = new URLSearchParams(window.location.search).get('level');
@@ -997,3 +1016,342 @@ window.showWinPopup = function(isPerfect) {
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 }
+
+
+
+// ==========================================
+// CHALLENGE GAUNTLET ENGINE EXTENSION
+// ==========================================
+window.initChallengeMode = function(params) {
+    window.isChallengeMode = true;
+    window.challengeTier = (params.get('tier') || 'easy').toLowerCase();
+    window.challengeScaleSetting = params.get('scale') || 'on';
+    window.challengeHintsSetting = params.get('hints') || '1';
+    window.challengeTimerSetting = params.get('timer') || 'stopwatch';
+    window.challengePlayer = params.get('name') || localStorage.getItem('currentPlayer') || 'Student';
+    
+    window.challengeCurrentRound = 0;
+    window.challengeTotalRounds = 5;
+    window.challengeHintsRemaining = window.challengeHintsSetting === '1' ? 1 : 0;
+    window.challengeHintsUsed = false;
+    window.challengeScalePeeked = false;
+    window.challengeResetsCount = 0;
+    window.challengeStartTime = Date.now();
+    window.challengeElapsedSec = 0;
+    window.challengeCountdownRemaining = 90;
+    
+    // Pick 5 random equations from pool
+    let pool = window.CHALLENGE_POOLS ? (window.CHALLENGE_POOLS[window.challengeTier] || window.CHALLENGE_POOLS['easy']) : [];
+    if (!pool || pool.length === 0) {
+        pool = Object.values(LEVELS).slice(0, 5);
+    }
+    let shuffled = [...pool];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    window.challengeRounds = shuffled.slice(0, 5);
+    
+    // Show Challenge HUD
+    let hudPills = document.getElementById('challenge-hud-pills');
+    if (hudPills) hudPills.style.display = 'flex';
+    
+    // Start Timer
+    if (window.challengeInterval) clearInterval(window.challengeInterval);
+    window.challengeInterval = setInterval(() => {
+        if (window.challengeTimerSetting === 'countdown') {
+            window.challengeCountdownRemaining--;
+            let timerEl = document.getElementById('challenge-timer-badge');
+            if (timerEl) {
+                let m = Math.floor(window.challengeCountdownRemaining / 60);
+                let s = window.challengeCountdownRemaining % 60;
+                timerEl.innerText = `⏳ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                if (window.challengeCountdownRemaining <= 10) {
+                    timerEl.style.color = '#ef4444';
+                    timerEl.style.borderColor = '#ef4444';
+                }
+            }
+            if (window.challengeCountdownRemaining <= 0) {
+                clearInterval(window.challengeInterval);
+                window.handleChallengeTimeout();
+            }
+        } else {
+            window.challengeElapsedSec = Math.floor((Date.now() - window.challengeStartTime) / 1000);
+            let timerEl = document.getElementById('challenge-timer-badge');
+            if (timerEl) {
+                let m = Math.floor(window.challengeElapsedSec / 60);
+                let s = window.challengeElapsedSec % 60;
+                timerEl.innerText = `⏱️ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }
+    }, 1000);
+    
+    window.loadChallengeRound(0);
+};
+
+window.loadChallengeRound = function(roundIndex) {
+    window.challengeCurrentRound = roundIndex;
+    currentLevelData = window.challengeRounds[roundIndex];
+    window.proEquationRendered = false;
+    
+    document.title = `Challenge: Round ${roundIndex + 1}/5 - ${currentLevelData.title}`;
+    renderBoard();
+    
+    let titleEl = document.getElementById("level-title");
+    if (titleEl) {
+        titleEl.innerHTML = `<span style="color:#9333ea; font-size:0.85em; text-transform:uppercase; font-weight:900;">${window.challengeTier} Challenge</span> • Round ${roundIndex + 1}/5 : ${currentLevelData.title}`;
+    }
+    
+    let roundBadge = document.getElementById('challenge-round-badge');
+    if (roundBadge) roundBadge.innerText = `ROUND ${roundIndex + 1}/5`;
+    
+    window.applyChallengeScaleSettings();
+    window.updateChallengeHintButton();
+    updateSimulation();
+    
+    setTimeout(() => {
+        window.clearChat();
+        if (window.challengeHintsSetting === '0') {
+            window.addChatMessage(`<b>Round ${roundIndex + 1} of 5</b><br><br>Solo mode active (No hints). Balance purely with your stoichiometry skills!`, "Prof. Beaker");
+        } else if (window.challengeHintsRemaining > 0) {
+            window.addChatMessage(`<b>Round ${roundIndex + 1} of 5</b><br><br>You have <b>1 hint token</b> remaining for this run. Balance as fast as you can!`, "Prof. Beaker");
+        } else {
+            window.addChatMessage(`<b>Round ${roundIndex + 1} of 5</b><br><br>Hint token already used. Keep pushing forward!`, "Prof. Beaker");
+        }
+    }, 100);
+};
+
+window.applyChallengeScaleSettings = function() {
+    let scaleSection = document.querySelector('.section-scale');
+    let scaleCards = document.querySelectorAll('.pro-scale-card');
+    
+    if (window.challengeScaleSetting === 'off' && !window.challengeScalePeeked) {
+        if (scaleSection) {
+            scaleSection.style.filter = 'blur(14px)';
+            scaleSection.style.pointerEvents = 'none';
+        }
+        scaleCards.forEach(c => {
+            c.style.filter = 'blur(10px)';
+            c.style.pointerEvents = 'none';
+        });
+    } else {
+        if (scaleSection) {
+            scaleSection.style.filter = 'none';
+            scaleSection.style.pointerEvents = 'auto';
+        }
+        scaleCards.forEach(c => {
+            c.style.filter = 'none';
+            c.style.pointerEvents = 'auto';
+        });
+    }
+};
+
+window.updateChallengeHintButton = function() {
+    let hintBtn = document.querySelector('.btn-hint-clean');
+    if (!hintBtn) return;
+    
+    if (window.challengeHintsSetting === '0') {
+        hintBtn.innerText = 'Hints Disabled (Solo)';
+        hintBtn.style.opacity = '0.5';
+        hintBtn.style.pointerEvents = 'none';
+    } else if (window.challengeHintsRemaining <= 0) {
+        hintBtn.innerText = '0 Hints Left';
+        hintBtn.style.opacity = '0.5';
+        hintBtn.style.pointerEvents = 'none';
+    } else {
+        hintBtn.innerHTML = `💡 1 Hint Left!`;
+        hintBtn.style.opacity = '1';
+        hintBtn.style.pointerEvents = 'auto';
+    }
+};
+
+// Hook into hint revealing
+let origRevealHint = window.revealHeuristicHint;
+window.revealHeuristicHint = function() {
+    if (window.isChallengeMode) {
+        if (window.challengeHintsSetting === '0') {
+            window.addChatMessage("Hints are disabled for this solo challenge run!", "Prof. Beaker");
+            return;
+        }
+        if (window.challengeHintsRemaining <= 0) {
+            window.addChatMessage("You have no hints left for this challenge run! You can do it!", "Prof. Beaker");
+            return;
+        }
+        window.challengeHintsRemaining--;
+        window.challengeHintsUsed = true;
+        window.updateChallengeHintButton();
+    }
+    if (typeof origRevealHint === 'function') origRevealHint();
+};
+
+window.handleChallengeRoundComplete = function(isPerfect) {
+    if (typeof playSound === 'function') playSound('win');
+    
+    let isFinalRound = window.challengeCurrentRound >= (window.challengeTotalRounds - 1);
+    
+    if (!isFinalRound) {
+        let overlay = document.createElement("div");
+        overlay.id = "challenge-round-popup";
+        overlay.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.8); display:flex; justify-content:center; align-items:center; z-index:10000; backdrop-filter:blur(6px);";
+        
+        let card = document.createElement("div");
+        card.style.cssText = "background:white; border:6px solid #10b981; border-radius:28px; padding:35px 40px; text-align:center; box-shadow:0 20px 40px rgba(0,0,0,0.4); max-width:480px; width:90%; animation:slideUpFade 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);";
+        
+        let timeStr = "";
+        if (window.challengeTimerSetting === 'countdown') {
+            timeStr = `${window.challengeCountdownRemaining}s left`;
+        } else {
+            let m = Math.floor(window.challengeElapsedSec / 60);
+            let s = window.challengeElapsedSec % 60;
+            timeStr = `${m}m ${s}s`;
+        }
+        
+        card.innerHTML = `
+            <div style="font-size:3rem; margin-bottom:8px;">⚡</div>
+            <h2 style="margin:0; font-size:2rem; font-weight:900; color:#065f46;">ROUND ${window.challengeCurrentRound + 1} BALANCED!</h2>
+            <p style="margin:8px 0 20px; font-weight:800; color:#475569; font-size:1.1rem;">Clock: <span style="color:#059669;">${timeStr}</span></p>
+            <button id="next-challenge-btn" class="interactive" style="width:100%; padding:16px; background:#10b981; color:white; border:4px solid #047857; border-radius:18px; font-weight:900; font-size:1.2rem; cursor:pointer; box-shadow:0 6px 0 #064e3b; transition:all 0.1s;" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #064e3b';">
+                NEXT REACTION ➔
+            </button>
+        `;
+        
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+        
+        let nextBtn = document.getElementById('next-challenge-btn');
+        let autoAdvance = setTimeout(() => {
+            if (overlay.parentNode) overlay.remove();
+            window.loadChallengeRound(window.challengeCurrentRound + 1);
+        }, 2200);
+        
+        nextBtn.onclick = () => {
+            clearTimeout(autoAdvance);
+            overlay.remove();
+            window.loadChallengeRound(window.challengeCurrentRound + 1);
+        };
+        return;
+    }
+    
+    // FINAL ROUND
+    if (window.challengeInterval) clearInterval(window.challengeInterval);
+    let totalSec = window.challengeElapsedSec;
+    if (window.challengeTimerSetting === 'countdown') {
+        totalSec = 90 - window.challengeCountdownRemaining;
+    }
+    
+    let m = Math.floor(totalSec / 60);
+    let s = totalSec % 60;
+    let timeStr = `${m > 0 ? m + 'm ' : ''}${s}s`;
+    
+    let stars = 3;
+    if (totalSec > 90) stars = 2;
+    if (totalSec > 150) stars = 1;
+    
+    let player = window.challengePlayer || 'Student';
+    let unlockedBadges = JSON.parse(localStorage.getItem('challengeBadges_' + player) || '[]');
+    let newlyEarnedBadges = [];
+    
+    function awardBadge(id) {
+        if (!unlockedBadges.includes(id)) {
+            unlockedBadges.push(id);
+            newlyEarnedBadges.push(id);
+        }
+    }
+    
+    if (window.challengeScaleSetting === 'off' && !window.challengeScalePeeked) awardBadge('mental_math');
+    if (window.challengeHintsRemaining > 0 && !window.challengeHintsUsed) awardBadge('solo_chemist');
+    if (window.challengeScaleSetting === 'off' && !window.challengeScalePeeked && window.challengeHintsSetting === '0') awardBadge('blindfold');
+    if (totalSec <= 60) awardBadge('lightning');
+    if (stars === 3) {
+        if (window.challengeTier === 'easy') awardBadge('apprentice');
+        if (window.challengeTier === 'medium') awardBadge('specialist');
+        if (window.challengeTier === 'hard') awardBadge('grandmaster');
+    }
+    if (unlockedBadges.includes('apprentice') && unlockedBadges.includes('specialist') && unlockedBadges.includes('grandmaster')) {
+        awardBadge('grand_slam');
+    }
+    
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + player) || '[]');
+    let today = new Date();
+    let dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    history.push({
+        tier: window.challengeTier,
+        timeSec: totalSec,
+        timeStr: timeStr,
+        stars: stars,
+        scale: window.challengeScaleSetting,
+        hints: (window.challengeHintsSetting === '0' || !window.challengeHintsUsed) ? (window.challengeHintsSetting === '0' ? '0' : '1') : '1',
+        timer: window.challengeTimerSetting || 'stopwatch',
+        date: dateStr
+    });
+    
+    if (history.length >= 10) awardBadge('veteran');
+    
+    localStorage.setItem('challengeHistory_' + player, JSON.stringify(history));
+    localStorage.setItem('challengeBadges_' + player, JSON.stringify(unlockedBadges));
+    
+    let overlay = document.createElement("div");
+    overlay.id = "challenge-final-popup";
+    overlay.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); display:flex; justify-content:center; align-items:center; z-index:10000; backdrop-filter:blur(12px);";
+    
+    let starSVGs = '';
+    for (let i = 0; i < 3; i++) {
+        let fill = i < stars ? "#facc15" : "#e2e8f0";
+        let stroke = i < stars ? "#ca8a04" : "#94a3b8";
+        starSVGs += `<svg width="48" height="48" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" style="margin:0 4px;"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+    }
+    
+    let badgesSection = '';
+    if (newlyEarnedBadges.length > 0) {
+        let badgeItems = newlyEarnedBadges.map(bid => {
+            let b = (window.CHALLENGE_BADGES || []).find(x => x.id === bid);
+            return b ? `<span style="background:#f3e8ff; border:2px solid #c084fc; border-radius:12px; padding:6px 12px; font-weight:900; color:#581c87; font-size:0.95rem;">${b.icon} ${b.name}</span>` : '';
+        }).join(' ');
+        badgesSection = `
+            <div style="margin-top:16px; background:#faf5ff; border:2px dashed #d8b4fe; border-radius:18px; padding:14px;">
+                <div style="font-weight:900; color:#7e22ce; font-size:0.85rem; text-transform:uppercase; margin-bottom:8px;">New Badges Unlocked!</div>
+                <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">${badgeItems}</div>
+            </div>
+        `;
+    }
+    
+    let card = document.createElement("div");
+    card.style.cssText = "background:white; border:8px solid #8b5cf6; border-radius:36px; padding:45px 35px; text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.5); max-width:620px; width:92%; animation:slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative;";
+    
+    card.innerHTML = `
+        <div style="font-size:3.5rem; margin-bottom:4px;">🏆</div>
+        <h1 style="margin:0; font-size:2.4rem; font-weight:900; color:#581c87; letter-spacing:-1px;">CHALLENGE COMPLETE!</h1>
+        <p style="margin:6px 0 15px; font-weight:800; color:#64748b; font-size:1.1rem; text-transform:uppercase;">${window.challengeTier} Tier • 5/5 Reactions Balanced</p>
+        
+        <div style="display:flex; justify-content:center; margin-bottom:15px;">${starSVGs}</div>
+        
+        <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:20px; padding:16px; display:flex; justify-content:space-around; align-items:center;">
+            <div>
+                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">Total Time</div>
+                <div style="font-size:1.8rem; font-weight:900; color:#1e293b;">${timeStr}</div>
+            </div>
+            <div style="width:2px; height:40px; background:#e2e8f0;"></div>
+            <div>
+                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">Solved By</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#8b5cf6;">${player}</div>
+            </div>
+        </div>
+
+        ${badgesSection}
+
+        <div style="display:flex; gap:12px; margin-top:28px;">
+            <button class="interactive" onclick="window.location.reload()" style="flex:1; padding:14px; background:#8b5cf6; color:white; border:4px solid #6d28d9; border-radius:16px; font-weight:900; font-size:1.1rem; cursor:pointer; box-shadow:0 6px 0 #5b21b6;">🔁 PLAY AGAIN</button>
+            <button class="interactive" onclick="window.transitionTo('index.html')" style="flex:1; padding:14px; background:#ec4899; color:white; border:4px solid #be185d; border-radius:16px; font-weight:900; font-size:1.1rem; cursor:pointer; box-shadow:0 6px 0 #9d174d;">🏠 MAIN MENU</button>
+        </div>
+    `;
+    
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
+};
+
+window.handleChallengeTimeout = function() {
+    if (typeof playSound === 'function') playSound('error');
+    alert("Time has run out! The chemical reaction overheated. Try again!");
+    window.location.reload();
+};
