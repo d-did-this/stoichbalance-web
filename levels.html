@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stoichbalance - Level Selection</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/levels.css">
-    <script src="levels.js?v=1791068844909"></script>
+    <link rel="stylesheet" href="css/style.css?v=1792982023">
+    <link rel="stylesheet" href="css/levels.css?v=1792985600">
+    <script src="levels.js?v=1792981377"></script>
 
 <script>
 // Unified Audio Engine and Page Transitions
@@ -251,6 +251,11 @@ window.playSound = function(type) {
     box-shadow: 0 10px 0 #16a34a, 0 0 20px rgba(255,255,255,0.8) !important;
 }
 </style>
+    <script>
+        if (new URLSearchParams(window.location.search).get('mode') === 'challenge') {
+            document.documentElement.classList.add('is-challenge-mode');
+        }
+    </script>
 </head>
 <body>
     <div id="iris-wipe-overlay"></div>
@@ -290,7 +295,7 @@ window.playSound = function(type) {
       </div>
   </div>
 
-  <script src="js/levels.js?v=1791068844909"></script>
+  <script src="js/levels.js?v=1792981377"></script>
 <script>
 let myCurrentPage = 1;
 const ITEMS_PER_PAGE = 6;
@@ -354,8 +359,535 @@ document.addEventListener('keydown', (e) => {
     });
 });
 
+
+window.renderChallengeScreen = function(params) {
+    const tier = (params.get('tier') || 'easy').toLowerCase();
+    const tierUpper = tier.toUpperCase();
+    const playerName = params.get('name') || localStorage.getItem('currentPlayer') || 'Player';
+    
+    // Switch background layer from blue to purple
+    const bgEl = document.getElementById('bg-levels');
+    if (bgEl) {
+        bgEl.className = 'bg-layer bg-purple active-bg';
+    }
+    document.body.classList.add('is-challenge-mode');
+
+    // 1. Header elements
+    const nameEl = document.getElementById('display-name');
+    if (nameEl) nameEl.innerText = playerName;
+    
+    const titleEl = document.getElementById('form-title');
+    if (titleEl) titleEl.innerText = `${tierUpper} CHALLENGE`;
+    
+    const subTitleEl = document.querySelector('.levels-subtitle');
+    if (subTitleEl) subTitleEl.innerText = '5 Sequential Mystery Reactions';
+    
+    // Personal best lookup
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + playerName) || '[]');
+    let tierHistory = history.filter(h => h.tier && h.tier.toLowerCase() === tier);
+    let bestStr = 'None yet';
+    if (tierHistory.length > 0) {
+        let fastest = tierHistory.reduce((prev, curr) => (prev.timeSec < curr.timeSec ? prev : curr));
+        bestStr = `${fastest.timeStr || (fastest.timeSec + 's')} (${'⭐'.repeat(fastest.stars || 3)})`;
+    }
+    const scoreText = document.querySelector('.score-text');
+    if (scoreText) scoreText.innerText = bestStr;
+    const scoreIcon = document.querySelector('.score-icon');
+    if (scoreIcon) scoreIcon.innerHTML = '🏆';
+    
+    // 2. Modifiers state (Standard Baseline: Scale ON, Hints ON, Timer Stopwatch)
+    // Toggles represent CHALLENGES: Hide Scale (OFF), No Hints (OFF), 90s Rush (OFF)
+    let challenges = {
+        hideScale: false,
+        noHints: false,
+        speedRush: false
+    };
+
+    let config = {
+        tier: tier,
+        scale: 'on',
+        hints: '1',
+        timer: 'stopwatch',
+        player: playerName
+    };
+    
+    // Function returning the exact dynamic summary sentence for all 8 variations
+    function getSummarySentence() {
+        if (!challenges.speedRush) {
+            // STOPWATCH MODE: Always emphasizes "fastest possible time"
+            if (!challenges.hideScale && !challenges.noHints) {
+                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> with the 3D scale and 1 hint token.';
+            } else if (challenges.hideScale && !challenges.noHints) {
+                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> using <b style="color:#7e22ce;">mental math</b>, with 1 hint token.';
+            } else if (!challenges.hideScale && challenges.noHints) {
+                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> with the 3D scale and <b style="color:#2563eb;">zero hints</b>.';
+            } else {
+                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> using pure <b style="color:#7e22ce;">mental math</b> with <b style="color:#2563eb;">zero hints</b>.';
+            }
+        } else {
+            // 90S COUNTDOWN RUSH MODE
+            if (!challenges.hideScale && !challenges.noHints) {
+                return 'Race against the clock to balance 5 equations in <b style="color:#d97706;">90 seconds</b>, with the 3D scale and 1 hint token.';
+            } else if (challenges.hideScale && !challenges.noHints) {
+                return 'Race against the clock to balance 5 equations in <b style="color:#d97706;">90 seconds</b> using <b style="color:#7e22ce;">mental math</b>, with 1 hint token.';
+            } else if (!challenges.hideScale && challenges.noHints) {
+                return 'Race against the clock to balance 5 equations in <b style="color:#d97706;">90 seconds</b> with the 3D scale and <b style="color:#2563eb;">zero hints</b>.';
+            } else {
+                return 'The ultimate run: balance 5 equations in <b style="color:#d97706;">90 seconds</b> using pure <b style="color:#7e22ce;">mental math</b> with <b style="color:#2563eb;">zero hints</b>.';
+            }
+        }
+    }
+    
+    const gridWrapper = document.querySelector('.grid-wrapper');
+    if (!gridWrapper) return;
+    gridWrapper.innerHTML = '';
+    
+    const challengeHtml = `
+        <div class="challenge-main-container">
+            
+            <!-- MIDDLE AREA: SPLIT INTO LEFT (CHALLENGE MODIFIERS) AND RIGHT (OVERVIEW) -->
+            <div class="challenge-split-deck">
+                
+                <!-- LEFT COLUMN: CHALLENGE MODIFIERS -->
+                <div class="deck-left-col">
+                    <div class="deck-header-wrap">
+                        <div class="deck-title-group">
+                            <span class="deck-kicker">CUSTOMIZE RUN</span>
+                            <h2 class="deck-main-title">Challenge Modifiers</h2>
+                        </div>
+                        <span class="deck-status-pill" id="deck-status-pill">0 / 3 ACTIVE</span>
+                    </div>
+                    
+                    <div class="modifiers-list">
+                        
+                        <!-- CHALLENGE 1: HIDE 3D SCALE -->
+                        <div class="mod-card is-neutral interactive" id="row-hide-scale" tabindex="0" role="button" aria-label="Toggle Hide 3D Scale">
+                            <div class="mod-icon-box">
+                                <span>🧠</span>
+                            </div>
+                            <div class="mod-content">
+                                <div class="mod-title">Hide 3D Scale</div>
+                                <div id="desc-hide-scale" class="mod-desc">
+                                    Turn on to hide the visual balance beam and solve with mental math (+0.5x).
+                                </div>
+                            </div>
+                            <div class="tactile-switch" id="switch-hide-scale">
+                                <div class="tactile-switch-knob">
+                                    <span class="knob-groove"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CHALLENGE 2: DISABLE HINTS -->
+                        <div class="mod-card is-neutral interactive" id="row-no-hints" tabindex="0" role="button" aria-label="Toggle Disable Hints">
+                            <div class="mod-icon-box">
+                                <span>🎓</span>
+                            </div>
+                            <div class="mod-content">
+                                <div class="mod-title">Disable Hints</div>
+                                <div id="desc-no-hints" class="mod-desc">
+                                    Turn on to play without any emergency hints from Prof. Beaker (+0.5x).
+                                </div>
+                            </div>
+                            <div class="tactile-switch" id="switch-no-hints">
+                                <div class="tactile-switch-knob">
+                                    <span class="knob-groove"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CHALLENGE 3: 90S SPEED RUSH -->
+                        <div class="mod-card is-neutral interactive" id="row-rush-mode" tabindex="0" role="button" aria-label="Toggle 90s Speed Rush">
+                            <div class="mod-icon-box">
+                                <span>⏳</span>
+                            </div>
+                            <div class="mod-content">
+                                <div class="mod-title">90s Speed Rush</div>
+                                <div id="desc-rush-mode" class="mod-desc">
+                                    Turn on to race against an intense 90-second countdown clock (+0.5x).
+                                </div>
+                            </div>
+                            <div class="tactile-switch" id="switch-rush-mode">
+                                <div class="tactile-switch-knob">
+                                    <span class="knob-groove"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="deck-tip-box">
+                        <span>💡</span>
+                        <span><b>Pro Tip:</b> Turn on challenge modifiers to boost your score multiplier and unlock badges!</span>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: CLEAN REFINED OVERVIEW -->
+                <div class="deck-right-col">
+                    <div class="lab-summary-card">
+                        
+                        <!-- Top Header -->
+                        <div class="summary-top-bar">
+                            <div>
+                                <span class="summary-kicker">CHALLENGE DETAILS</span>
+                                <h2 class="summary-main-title">Run Overview</h2>
+                            </div>
+                            <span class="summary-tier-badge" id="cfg-tier-pill">${tierUpper} MODE</span>
+                        </div>
+
+                        <!-- 1. PERSONAL BEST STRIP -->
+                        <div class="summary-pb-strip">
+                            <div class="pb-left">
+                                <span class="title-icon-badge yellow">🏆</span>
+                                <span class="pb-label">Personal Best</span>
+                            </div>
+                            <span class="pb-val" id="cfg-best-val">${bestStr}</span>
+                        </div>
+
+                        <!-- 2. SCORE MULTIPLIER (With Outside Rank Pill) -->
+                        <div class="summary-block">
+                            <div class="block-header">
+                                <div class="title-with-badge">
+                                    <span class="block-title">
+                                        <span class="title-icon-badge amber">⚡</span> Score Multiplier
+                                    </span>
+                                    <span class="outside-rank-badge" id="cfg-multiplier-tag">STANDARD</span>
+                                </div>
+                            </div>
+                            <div class="multiplier-meter-box">
+                                <div class="meter-number-row">
+                                    <span class="multiplier-giant-number" id="cfg-multiplier-val">1.0x</span>
+                                    <span class="multiplier-sublabel">Difficulty Multiplier</span>
+                                </div>
+                                <div class="multiplier-bar-track">
+                                    <div class="multiplier-bar-fill" id="cfg-multiplier-bar" style="width: 20%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. RUN OBJECTIVE -->
+                        <div class="summary-block">
+                            <div class="block-header">
+                                <span class="block-title">
+                                    <span class="title-icon-badge purple">🎯</span> Run Objective
+                                </span>
+                            </div>
+                            <div class="objective-text-box">
+                                <div class="objective-sentence" id="cfg-dynamic-sentence">
+                                    ${getSummarySentence()}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. QUALIFYING BADGES -->
+                        <div class="summary-block">
+                            <div class="block-header">
+                                <span class="block-title">
+                                    <span class="title-icon-badge blue">🏅</span> Qualifying Badges
+                                </span>
+                                <span class="badges-status-pill" id="cfg-badges-count">1 / 4 QUALIFIED</span>
+                            </div>
+                            <div class="badges-2x2-grid">
+                                <div class="lab-badge-chip locked" id="chip-badge-mental">
+                                    <span class="chip-emoji">🧠</span>
+                                    <div class="chip-text-group">
+                                        <span class="chip-name">Mental Math</span>
+                                        <span class="chip-bonus">Scale Hidden (+0.5x)</span>
+                                    </div>
+                                </div>
+                                <div class="lab-badge-chip locked" id="chip-badge-solo">
+                                    <span class="chip-emoji">🎓</span>
+                                    <div class="chip-text-group">
+                                        <span class="chip-name">Solo Chemist</span>
+                                        <span class="chip-bonus">Hints Disabled (+0.5x)</span>
+                                    </div>
+                                </div>
+                                <div class="lab-badge-chip locked" id="chip-badge-speed">
+                                    <span class="chip-emoji">⏳</span>
+                                    <div class="chip-text-group">
+                                        <span class="chip-name">Speed Demon</span>
+                                        <span class="chip-bonus">90s Rush (+0.5x)</span>
+                                    </div>
+                                </div>
+                                <div class="lab-badge-chip unlocked-master" id="chip-badge-master">
+                                    <span class="chip-emoji">⭐</span>
+                                    <div class="chip-text-group">
+                                        <span class="chip-name">3-Star Record</span>
+                                        <span class="chip-bonus">Flawless Accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BOTTOM AREA: RESTORED FULL-WIDTH GUCCI CHALLENGE FOOTER -->
+            <div class="challenge-footer">
+                <div class="footer-brief-block">
+                    <div class="footer-target-icon">🎯</div>
+                    <div class="footer-brief-texts">
+                        <div class="footer-brief-title">5 Mystery Reactions • Time Attack</div>
+                        <div class="footer-brief-desc">Balance all 5 equations in a row to set your fastest time.</div>
+                    </div>
+                </div>
+                
+                <button class="interactive btn-start-challenge" id="btn-launch-challenge">
+                    START CHALLENGE ➔
+                </button>
+            </div>
+
+        </div>
+    `;
+    
+    gridWrapper.innerHTML = challengeHtml;
+    
+    // Tier pill styling
+    const tierPill = document.getElementById('cfg-tier-pill');
+    if (tierPill) {
+        if (tier === 'hard') {
+            tierPill.style.background = '#ef4444';
+        } else if (tier === 'medium') {
+            tierPill.style.background = '#f59e0b';
+        } else {
+            tierPill.style.background = '#8b5cf6';
+        }
+    }
+
+    // Dynamic Multiplier & Badge Counter Logic
+    function updateLiveMultiplier() {
+        let mult = 1.0;
+        let activeCount = 0;
+        let unlockedBadges = 1; // 3-star record is eligible by default
+        
+        if (challenges.hideScale) {
+            mult += 0.5;
+            activeCount++;
+            unlockedBadges++;
+        }
+        if (challenges.noHints) {
+            mult += 0.5;
+            activeCount++;
+            unlockedBadges++;
+        }
+        if (challenges.speedRush) {
+            mult += 0.5;
+            activeCount++;
+            unlockedBadges++;
+        }
+        
+        // Update header pill
+        const statusPill = document.getElementById('deck-status-pill');
+        if (statusPill) {
+            statusPill.innerText = `${activeCount} / 3 ACTIVE`;
+            if (activeCount > 0) {
+                statusPill.style.background = '#f3e8ff';
+                statusPill.style.color = '#7e22ce';
+                statusPill.style.borderColor = '#7e22ce';
+            } else {
+                statusPill.style.background = '#f1f5f9';
+                statusPill.style.color = 'var(--dark-border)';
+                statusPill.style.borderColor = 'var(--dark-border)';
+            }
+        }
+        
+        const multValEl = document.getElementById('cfg-multiplier-val');
+        if (multValEl) multValEl.innerText = mult.toFixed(1) + 'x';
+        
+        const multTagEl = document.getElementById('cfg-multiplier-tag');
+        if (multTagEl) {
+            if (mult >= 2.5) {
+                multTagEl.innerText = 'LEGENDARY (+1.5x)';
+                multTagEl.style.background = '#fef3c7';
+                multTagEl.style.color = '#d97706';
+                multTagEl.style.borderColor = '#d97706';
+            } else if (mult >= 2.0) {
+                multTagEl.innerText = 'EXPERT (+1.0x)';
+                multTagEl.style.background = '#f3e8ff';
+                multTagEl.style.color = '#7e22ce';
+                multTagEl.style.borderColor = '#7e22ce';
+            } else if (mult >= 1.5) {
+                multTagEl.innerText = 'VETERAN (+0.5x)';
+                multTagEl.style.background = '#dbeafe';
+                multTagEl.style.color = '#2563eb';
+                multTagEl.style.borderColor = '#2563eb';
+            } else {
+                multTagEl.innerText = 'STANDARD';
+                multTagEl.style.background = '#f1f5f9';
+                multTagEl.style.color = '#64748b';
+                multTagEl.style.borderColor = '#cbd5e1';
+            }
+        }
+        
+        const barEl = document.getElementById('cfg-multiplier-bar');
+        if (barEl) {
+            let pct = Math.round(((mult - 1.0) / 1.5) * 80 + 20);
+            barEl.style.width = pct + '%';
+        }
+        
+        const countEl = document.getElementById('cfg-badges-count');
+        if (countEl) countEl.innerText = `${unlockedBadges} / 4 QUALIFIED`;
+
+        // Update the dynamic summary sentence live
+        const sentenceEl = document.getElementById('cfg-dynamic-sentence');
+        if (sentenceEl) {
+            sentenceEl.innerHTML = getSummarySentence();
+        }
+    }
+
+    // Toggle Challenge 1: Hide 3D Scale
+    function toggleHideScale() {
+        if (typeof window.playSound === 'function') window.playSound('tactile');
+        challenges.hideScale = !challenges.hideScale;
+        config.scale = challenges.hideScale ? 'off' : 'on';
+        
+        let card = document.getElementById('row-hide-scale');
+        let sw = document.getElementById('switch-hide-scale');
+        let desc = document.getElementById('desc-hide-scale');
+        
+        if (challenges.hideScale) {
+            if (card) {
+                card.classList.add('active-scale');
+                card.classList.remove('is-neutral');
+            }
+            if (sw) {
+                sw.classList.add('is-active', 'is-on-purple');
+            }
+            if (desc) {
+                desc.innerHTML = '<b style="color:#7e22ce;">Scale hidden!</b> Solve using mental math for +0.5x bonus.';
+            }
+        } else {
+            if (card) {
+                card.classList.remove('active-scale');
+                card.classList.add('is-neutral');
+            }
+            if (sw) {
+                sw.classList.remove('is-active', 'is-on-purple');
+            }
+            if (desc) {
+                desc.innerText = 'Turn on to hide the visual balance beam and solve with mental math (+0.5x).';
+            }
+        }
+        
+        let chip = document.getElementById('chip-badge-mental');
+        if (chip) {
+            chip.className = 'lab-badge-chip ' + (challenges.hideScale ? 'unlocked-mental' : 'locked');
+        }
+        updateLiveMultiplier();
+    }
+    
+    // Toggle Challenge 2: Disable Hints
+    function toggleNoHints() {
+        if (typeof window.playSound === 'function') window.playSound('tactile');
+        challenges.noHints = !challenges.noHints;
+        config.hints = challenges.noHints ? '0' : '1';
+        
+        let card = document.getElementById('row-no-hints');
+        let sw = document.getElementById('switch-no-hints');
+        let desc = document.getElementById('desc-no-hints');
+        
+        if (challenges.noHints) {
+            if (card) {
+                card.classList.add('active-hints');
+                card.classList.remove('is-neutral');
+            }
+            if (sw) {
+                sw.classList.add('is-active', 'is-on-blue');
+            }
+            if (desc) {
+                desc.innerHTML = '<b style="color:#2563eb;">Hints disabled!</b> Solve solo without hints for +0.5x bonus.';
+            }
+        } else {
+            if (card) {
+                card.classList.remove('active-hints');
+                card.classList.add('is-neutral');
+            }
+            if (sw) {
+                sw.classList.remove('is-active', 'is-on-blue');
+            }
+            if (desc) {
+                desc.innerText = 'Turn on to play without any emergency hints from Prof. Beaker (+0.5x).';
+            }
+        }
+        
+        let chip = document.getElementById('chip-badge-solo');
+        if (chip) {
+            chip.className = 'lab-badge-chip ' + (challenges.noHints ? 'unlocked-solo' : 'locked');
+        }
+        updateLiveMultiplier();
+    }
+    
+    // Toggle Challenge 3: 90s Speed Rush
+    function toggleSpeedRush() {
+        if (typeof window.playSound === 'function') window.playSound('tactile');
+        challenges.speedRush = !challenges.speedRush;
+        config.timer = challenges.speedRush ? 'countdown' : 'stopwatch';
+        
+        let card = document.getElementById('row-rush-mode');
+        let sw = document.getElementById('switch-rush-mode');
+        let desc = document.getElementById('desc-rush-mode');
+        
+        if (challenges.speedRush) {
+            if (card) {
+                card.classList.add('active-rush');
+                card.classList.remove('is-neutral');
+            }
+            if (sw) {
+                sw.classList.add('is-active', 'is-on-amber');
+            }
+            if (desc) {
+                desc.innerHTML = '<b style="color:#d97706;">90s Rush active!</b> Clear all 5 rounds before time expires (+0.5x bonus).';
+            }
+        } else {
+            if (card) {
+                card.classList.remove('active-rush');
+                card.classList.add('is-neutral');
+            }
+            if (sw) {
+                sw.classList.remove('is-active', 'is-on-amber');
+            }
+            if (desc) {
+                desc.innerText = 'Turn on to race against an intense 90-second countdown clock (+0.5x).';
+            }
+        }
+        
+        let chip = document.getElementById('chip-badge-speed');
+        if (chip) {
+            chip.className = 'lab-badge-chip ' + (challenges.speedRush ? 'unlocked-speed' : 'locked');
+        }
+        updateLiveMultiplier();
+    }
+    
+    // Wire up events
+    const rowScale = document.getElementById('row-hide-scale');
+    if (rowScale) rowScale.addEventListener('click', toggleHideScale);
+    
+    const rowHints = document.getElementById('row-no-hints');
+    if (rowHints) rowHints.addEventListener('click', toggleNoHints);
+    
+    const rowTimer = document.getElementById('row-rush-mode');
+    if (rowTimer) rowTimer.addEventListener('click', toggleSpeedRush);
+    
+    // Launch button
+    const btnLaunch = document.getElementById('btn-launch-challenge');
+    if (btnLaunch) {
+        btnLaunch.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (typeof window.playSound === 'function') window.playSound('start');
+            let url = `game.html?mode=challenge&tier=${encodeURIComponent(config.tier)}&scale=${config.scale}&hints=${config.hints}&timer=${config.timer}&name=${encodeURIComponent(config.player)}`;
+            window.transitionTo(url);
+        });
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'challenge') {
+        window.renderChallengeScreen(params);
+        return;
+    }
     const formParam = params.get('form') || 'Form 4';
     const nameParam = params.get('name') || 'Player';
     const nameEl = document.getElementById('display-name');
