@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stoichbalance - Fun Chemistry UI</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/levels.css?v=1792981377">
+    <link rel="stylesheet" href="css/style.css?v=1792986155">
 
 <script>
 // Unified Audio Engine and Page Transitions
@@ -208,7 +209,13 @@ window.addEventListener('load', () => {
             <div class="launch-wrapper">
                 <div class="input-group" style="position: relative;">
                     <label>PLAYER NAME</label>
-                    <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()">
+                    <div style="display: flex; gap: 10px; width: 100%; align-items: stretch;">
+                        <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()" style="flex: 1; text-align: left; padding: clamp(1rem, 2vh, 1.3rem) 1.2rem;">
+                        <button class="btn-stats interactive" id="challenge-stats-btn" onclick="openStatsModal()">
+                            <span>📊</span>
+                            <span>Stats</span>
+                        </button>
+                    </div>
                     
                     <!-- Profile Dropdown -->
                     <div id="profile-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:white; border:4px solid #e2e8f0; border-top:none; border-radius:0 0 16px 16px; box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:100; max-height:200px; overflow-y:auto; flex-direction:column; padding: 5px;">
@@ -530,7 +537,64 @@ window.addEventListener('load', () => {
         </div>
     </div>
 </div>
-    <script src="js/element_data.js?v=1791520606"></script>
-    <script src="js/app.js?v=1791520606"></script>
+    <script src="js/element_data.js?v=1792979335"></script>
+    <script src="levels.js"></script>
+    <script src="js/app.js?v=1792981377"></script>
+
+<!-- STATS & BADGES MODAL -->
+<div id="challenge-stats-modal" class="neo-modal-overlay" style="display:none;" onclick="if(event.target === this) closeStatsModal()">
+    <div class="neo-modal-card stats-modal-card">
+        
+        <!-- HEADER -->
+        <div class="stats-modal-header">
+            <div class="stats-header-left">
+                <div class="stats-header-icon-box">📊</div>
+                <div>
+                    <span class="stats-header-kicker">CAREER RECORD</span>
+                    <h2 class="stats-header-title">PLAYER STATS</h2>
+                </div>
+            </div>
+            
+            <div class="stats-header-right">
+                <div class="stats-player-badge">
+                    <span class="player-badge-label">Chemist</span>
+                    <span class="player-badge-name" id="stats-profile-name">Student</span>
+                </div>
+                <button class="neo-close-btn interactive" onclick="closeStatsModal()" aria-label="Close stats modal">&times;</button>
+            </div>
+        </div>
+
+        <!-- SEGMENTED TABS -->
+        <div class="stats-tabs-bar">
+            <button id="tab-btn-history" class="stats-tab-btn active interactive" onclick="switchStatsTab('history')">
+                <span class="tab-icon">📜</span>
+                <span>MATCH HISTORY</span>
+                <span class="tab-count-pill" id="history-count-pill">0</span>
+            </button>
+            <button id="tab-btn-badges" class="stats-tab-btn interactive" onclick="switchStatsTab('badges')">
+                <span class="tab-icon">🏅</span>
+                <span>BADGES & TROPHIES</span>
+                <span class="tab-count-pill" id="badges-count-text">0/10</span>
+            </button>
+        </div>
+
+        <!-- TAB CONTENT CONTAINER -->
+        <div class="stats-scroll-content">
+            <!-- Tab 1: Match History -->
+            <div id="stats-tab-history" style="display:block;">
+                <div id="history-list-container">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Badges Grid -->
+            <div id="stats-tab-badges" style="display:none;">
+                <div id="badges-grid-container">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
