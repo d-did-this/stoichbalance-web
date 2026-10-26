@@ -177,25 +177,36 @@ function selectSubOption(event, mode, subValue) {
 
 function updatePlayButton() {
     const playBtnText = document.getElementById('play-btn-text');
+    const statsBtn = document.getElementById('challenge-stats-btn');
     if (currentMode === 'class') {
         playBtnText.innerText = `Start ${currentSubOption}`;
+        if (statsBtn) statsBtn.style.display = 'none';
     } 
     else if (currentMode === 'challenge') {
-        playBtnText.innerText = `Start ${currentSubOption}`;
+        playBtnText.innerText = `Start ${currentSubOption} Challenge`;
+        if (statsBtn) statsBtn.style.display = 'inline-flex';
     } 
     else if (currentMode === 'sandbox') {
         playBtnText.innerText = 'Enter Sandbox';
+        if (statsBtn) statsBtn.style.display = 'none';
     }
 }
 
 function startGame() {
-    if(typeof window.playSound==="function") window.playSound("start");
+    if (currentMode !== 'challenge') {
+        if(typeof window.playSound==="function") window.playSound("start");
+    } else {
+        if(typeof window.playSound==="function") window.playSound("select");
+    }
     const btn = document.getElementById('main-play-btn');
-    const oldTransform = btn.style.transform;
-    const oldBoxShadow = btn.style.boxShadow;
-    
-    btn.style.transform = 'translateY(8px)';
-    btn.style.boxShadow = '0 0 0 transparent';
+    if (btn) {
+        btn.style.transform = 'translateY(8px)';
+        btn.style.boxShadow = '0 0 0 transparent';
+        setTimeout(() => {
+            btn.style.transform = '';
+            btn.style.boxShadow = '';
+        }, 180);
+    }
     
     const playerNameInput = document.getElementById('player-name').value.trim();
     const finalName = playerNameInput !== '' ? playerNameInput : 'Student';
@@ -215,7 +226,12 @@ function startGame() {
         }
         localStorage.setItem('currentPlayer', finalName);
         
-        window.transitionTo(`levels.html?form=${formParam}&mode=${currentMode}&name=${nameParam}`);
+        if (currentMode === 'challenge') {
+            const tierParam = encodeURIComponent(currentSubOption);
+            window.transitionTo(`levels.html?mode=challenge&tier=${tierParam}&name=${nameParam}`);
+        } else {
+            window.transitionTo(`levels.html?form=${formParam}&mode=${currentMode}&name=${nameParam}`);
+        }
 
     }
 }
@@ -1000,4 +1016,461 @@ window.zoomBohr = function(delta) {
     window.bohrZoom = Math.max(0.5, Math.min(3, window.bohrZoom + delta));
     let svg = document.querySelector('#ed-bohr-container svg');
     if(svg) svg.style.transform = `scale(${window.bohrZoom})`;
+};
+
+
+
+// ==========================================
+// CHALLENGE BRIEFING & STATS SYSTEM
+// ==========================================
+window.challengeBriefingConfig = {
+    tier: 'easy',
+    player: 'Student',
+    scale: 'on',
+    hints: '1',
+    timer: 'stopwatch'
+};
+
+window.openChallengeBriefingModal = function(tier, playerName) {
+    if (typeof playSound === 'function') playSound('pop');
+    let tierClean = (tier || 'Easy').toLowerCase();
+    window.challengeBriefingConfig.tier = tierClean;
+    window.challengeBriefingConfig.player = playerName || localStorage.getItem('currentPlayer') || 'Student';
+    
+    let titleEl = document.getElementById('briefing-tier-title');
+    if (titleEl) titleEl.innerText = `${tierClean.toUpperCase()} CHALLENGE`;
+    
+    // Look up personal best
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + window.challengeBriefingConfig.player) || '[]');
+    let tierHistory = history.filter(h => h.tier && h.tier.toLowerCase() === tierClean);
+    let bestEl = document.getElementById('briefing-best-record');
+    if (bestEl) {
+        if (tierHistory.length > 0) {
+            let fastest = tierHistory.reduce((prev, curr) => (prev.timeSec < curr.timeSec ? prev : curr));
+            bestEl.innerHTML = `🏆 Personal Best: <b>${fastest.timeStr || (fastest.timeSec + 's')}</b> (${'⭐'.repeat(fastest.stars || 3)})`;
+        } else {
+            bestEl.innerHTML = `🏆 Personal Best: None logged yet`;
+        }
+    }
+    
+    if (typeof window.switchChallengeDesign === 'function') {
+        window.switchChallengeDesign(window.activeChallengeDesign || 'puzzle', true);
+    } else {
+        window.updateBriefingToggleUI();
+    }
+    
+    let modal = document.getElementById('challenge-briefing-modal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeChallengeBriefingModal = function() {
+    if (typeof playSound === 'function') playSound('click');
+    let modal = document.getElementById('challenge-briefing-modal');
+    if (modal) modal.style.display = 'none';
+    const btn = document.getElementById('main-play-btn');
+    if (btn) {
+        btn.style.transform = '';
+        btn.style.boxShadow = '';
+    }
+};
+
+window.toggleBriefingSetting = function(type) {
+    if (typeof playSound === 'function') playSound('select');
+    if (type === 'scale') {
+        window.challengeBriefingConfig.scale = window.challengeBriefingConfig.scale === 'on' ? 'off' : 'on';
+    } else if (type === 'hints') {
+        window.challengeBriefingConfig.hints = window.challengeBriefingConfig.hints === '1' ? '0' : '1';
+    } else if (type === 'timer') {
+        window.challengeBriefingConfig.timer = window.challengeBriefingConfig.timer === 'stopwatch' ? 'countdown' : 'stopwatch';
+    }
+    window.updateBriefingToggleUI();
+};
+
+window.activeChallengeDesign = 'puzzle';
+
+window.switchChallengeDesign = function(letter, silent) {
+    window.activeChallengeDesign = letter;
+    if (!silent && typeof playSound === 'function') playSound('select');
+    
+    ['puzzle', 'hybrid', 'b', 'old', 'a', 'c'].forEach(l => {
+        let pill = document.getElementById('dpill-' + l);
+        let view = document.getElementById('design-view-' + l);
+        if (pill) {
+            if (l === letter) pill.classList.add('active');
+            else pill.classList.remove('active');
+        }
+        if (view) {
+            if (l === letter) {
+                view.style.display = (l === 'a') ? 'grid' : 'flex';
+            } else {
+                view.style.display = 'none';
+            }
+        }
+    });
+    
+    window.updateBriefingToggleUI();
+};
+
+window.updateBriefingToggleUI = function() {
+    let tierClean = (window.challengeBriefingConfig.tier || 'easy').toLowerCase();
+    let tierUpper = tierClean.toUpperCase();
+    
+    // Update Greeting Player Name
+    let currentPName = window.challengeBriefingConfig.player || localStorage.getItem('currentPlayer') || 'Student';
+    let puzPNameEl = document.getElementById('puz-player-name');
+    if (puzPNameEl) puzPNameEl.innerText = currentPName;
+
+    // 1. Update Tier Badges & Titles across all designs
+    document.querySelectorAll('.all-tier-pill').forEach(el => {
+        el.innerText = `${tierUpper} CHALLENGE`;
+        if (tierClean === 'hard') el.style.background = '#ef4444';
+        else if (tierClean === 'medium') el.style.background = '#f59e0b';
+        else el.style.background = '#8b5cf6';
+    });
+    
+    document.querySelectorAll('.all-tier-title').forEach(el => {
+        if (el.closest('#design-view-c')) {
+            el.innerText = `${tierUpper} CHALLENGE`;
+        } else if (el.closest('#design-view-puzzle')) {
+            el.innerText = `${tierUpper} CHALLENGE`;
+        } else {
+            el.innerText = tierClean === 'hard' ? 'Master Stoichiometry' : (tierClean === 'medium' ? 'Reaction Specialist' : 'Chemical Gauntlet');
+        }
+    });
+    
+    // 2. Update Personal Best
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + window.challengeBriefingConfig.player) || '[]');
+    let tierHistory = history.filter(h => h.tier && h.tier.toLowerCase() === tierClean);
+    let bestStr = 'None yet';
+    if (tierHistory.length > 0) {
+        let fastest = tierHistory.reduce((prev, curr) => (prev.timeSec < curr.timeSec ? prev : curr));
+        bestStr = `${fastest.timeStr || (fastest.timeSec + 's')} (${'⭐'.repeat(fastest.stars || 3)})`;
+    }
+    document.querySelectorAll('.all-best-record').forEach(el => {
+        el.innerText = bestStr;
+    });
+
+    let scaleOn = window.challengeBriefingConfig.scale === 'on';
+    let hintsOn = window.challengeBriefingConfig.hints === '1';
+    let isStopwatch = window.challengeBriefingConfig.timer === 'stopwatch';
+
+    // -------------------------------------------------------------
+    // SCALE SWITCHES (DESIGNS PUZZLE, HYBRID, B, OLD, A, C)
+    // -------------------------------------------------------------
+    ['.dpuz-scale-track', '.dhy-scale-track', '.db-scale-track', '.dold-scale-track', '.da-scale-track', '.dc-scale-track'].forEach(sel => {
+        let track = document.querySelector(sel);
+        if (track) track.style.background = scaleOn ? '#22c55e' : '#94a3b8';
+    });
+    ['.dpuz-scale-knob', '.dhy-scale-knob', '.db-scale-knob', '.dold-scale-knob', '.da-scale-knob', '.dc-scale-knob'].forEach(sel => {
+        let knob = document.querySelector(sel);
+        if (knob) knob.style.transform = scaleOn ? 'translateX(30px)' : 'translateX(0px)';
+    });
+    document.querySelectorAll('.all-scale-exp').forEach(el => {
+        el.innerHTML = scaleOn 
+            ? 'Live 3D balance scale active. Turn OFF for the <b>Mental Math</b> badge.' 
+            : '<b style="color:#7e22ce;">Scale hidden!</b> Mental Math mode enabled.';
+    });
+    // Puzzle badge & banner
+    let puzScaleBadge = document.getElementById('puz-scale-badge');
+    if (puzScaleBadge) {
+        puzScaleBadge.innerText = scaleOn ? 'ACTIVE' : 'MENTAL MATH 🧠';
+        puzScaleBadge.style.background = scaleOn ? '#16a34a' : '#7e22ce';
+    }
+    let puzScaleBanner = document.getElementById('puz-scale-banner');
+    if (puzScaleBanner) {
+        puzScaleBanner.innerText = scaleOn ? '✔ SCALE ACTIVE' : '🧠 MENTAL MATH (+BONUS)';
+        puzScaleBanner.style.background = scaleOn ? '#10b981' : '#7e22ce';
+        puzScaleBanner.style.color = 'white';
+    }
+    ['dhy-scale-tag', 'db-scale-tag'].forEach(id => {
+        let tag = document.getElementById(id);
+        if (tag) {
+            tag.innerText = scaleOn ? 'ACTIVE' : 'MENTAL MATH 🧠';
+            tag.style.background = scaleOn ? '#dcfce7' : '#f3e8ff';
+            tag.style.color = scaleOn ? '#16a34a' : '#7e22ce';
+            tag.style.borderColor = scaleOn ? '#16a34a' : '#7e22ce';
+        }
+    });
+
+    // -------------------------------------------------------------
+    // HINTS SWITCHES (DESIGNS PUZZLE, HYBRID, B, OLD, A, C)
+    // -------------------------------------------------------------
+    ['.dpuz-hints-track', '.dhy-hints-track', '.db-hints-track', '.dold-hints-track', '.da-hints-track', '.dc-hints-track'].forEach(sel => {
+        let track = document.querySelector(sel);
+        if (track) track.style.background = hintsOn ? '#3b82f6' : '#94a3b8';
+    });
+    ['.dpuz-hints-knob', '.dhy-hints-knob', '.db-hints-knob', '.dold-hints-knob', '.da-hints-knob', '.dc-hints-knob'].forEach(sel => {
+        let knob = document.querySelector(sel);
+        if (knob) knob.style.transform = hintsOn ? 'translateX(30px)' : 'translateX(0px)';
+    });
+    document.querySelectorAll('.all-hints-exp').forEach(el => {
+        el.innerHTML = hintsOn 
+            ? '1 emergency hint token allowed. Turn OFF for the <b>Solo Chemist</b> badge.' 
+            : '<b style="color:#2563eb;">Hints disabled!</b> Solo Chemist mode active.';
+    });
+    // Puzzle hints badge & banner
+    let puzHintsBadge = document.getElementById('puz-hints-badge');
+    if (puzHintsBadge) {
+        puzHintsBadge.innerText = hintsOn ? '1 TOKEN' : 'SOLO RUN 🎓';
+        puzHintsBadge.style.background = hintsOn ? '#3b82f6' : '#64748b';
+    }
+    let puzHintsBanner = document.getElementById('puz-hints-banner');
+    if (puzHintsBanner) {
+        puzHintsBanner.innerText = hintsOn ? '✔ 1 HINT READY' : '🎓 SOLO CHEMIST (+BONUS)';
+        puzHintsBanner.style.background = hintsOn ? '#3b82f6' : '#64748b';
+        puzHintsBanner.style.color = 'white';
+    }
+    ['dhy-hints-tag', 'db-hints-tag'].forEach(id => {
+        let tag = document.getElementById(id);
+        if (tag) {
+            tag.innerText = hintsOn ? '1 TOKEN' : 'SOLO RUN 🎓';
+            tag.style.background = hintsOn ? '#dbeafe' : '#f1f5f9';
+            tag.style.color = hintsOn ? '#2563eb' : '#64748b';
+            tag.style.borderColor = hintsOn ? '#2563eb' : '#64748b';
+        }
+    });
+
+    // -------------------------------------------------------------
+    // TIMER SWITCHES (DESIGNS PUZZLE, HYBRID, B, OLD, A, C)
+    // -------------------------------------------------------------
+    ['.dpuz-timer-track', '.dhy-timer-track', '.db-timer-track', '.dold-timer-track', '.da-timer-track', '.dc-timer-track'].forEach(sel => {
+        let track = document.querySelector(sel);
+        if (track) track.style.background = isStopwatch ? '#8b5cf6' : '#f59e0b';
+    });
+    ['.dpuz-timer-knob', '.dhy-timer-knob', '.db-timer-knob', '.dold-timer-knob', '.da-timer-knob', '.dc-timer-knob'].forEach(sel => {
+        let knob = document.querySelector(sel);
+        if (knob) knob.style.transform = isStopwatch ? 'translateX(0px)' : 'translateX(30px)';
+    });
+    document.querySelectorAll('.all-timer-title').forEach(el => {
+        el.innerText = isStopwatch ? 'Timer: Stopwatch' : 'Timer: 90s Countdown';
+    });
+    document.querySelectorAll('.all-timer-exp').forEach(el => {
+        el.innerHTML = isStopwatch 
+            ? 'Stopwatch tracks fastest time. Switch for <b>90s Arcade Rush</b>.' 
+            : '<b style="color:#d97706;">Arcade Rush!</b> 90 seconds to balance all 5.';
+    });
+    // Puzzle timer badge & banner
+    let puzTimerBadge = document.getElementById('puz-timer-badge');
+    if (puzTimerBadge) {
+        puzTimerBadge.innerText = isStopwatch ? 'STOPWATCH' : '90s RUSH ⏳';
+        puzTimerBadge.style.background = isStopwatch ? '#8b5cf6' : '#f59e0b';
+    }
+    let puzTimerBanner = document.getElementById('puz-timer-banner');
+    if (puzTimerBanner) {
+        puzTimerBanner.innerText = isStopwatch ? '⏱️ STOPWATCH SPEEDRUN' : '⏳ 90s COUNTDOWN RUSH';
+        puzTimerBanner.style.background = isStopwatch ? '#8b5cf6' : '#f59e0b';
+        puzTimerBanner.style.color = 'white';
+    }
+    ['dhy-timer-tag', 'db-timer-tag'].forEach(id => {
+        let tag = document.getElementById(id);
+        if (tag) {
+            tag.innerText = isStopwatch ? 'STOPWATCH' : '90s COUNTDOWN ⏳';
+            tag.style.background = isStopwatch ? '#f3e8ff' : '#fef3c7';
+            tag.style.color = isStopwatch ? '#7e22ce' : '#d97706';
+            tag.style.borderColor = isStopwatch ? '#7e22ce' : '#d97706';
+        }
+    });
+};
+
+window.launchChallengeFromBriefing = function() {
+    if (typeof playSound === 'function') playSound('start');
+    let c = window.challengeBriefingConfig;
+    let url = `game.html?mode=challenge&tier=${encodeURIComponent(c.tier)}&scale=${c.scale}&hints=${c.hints}&timer=${c.timer}&name=${encodeURIComponent(c.player)}`;
+    window.transitionTo(url);
+};
+
+// ==========================================
+// STATS & BADGES MODAL LOGIC (REDESIGNED)
+// ==========================================
+window.openStatsModal = function() {
+    if (typeof playSound === 'function') playSound('pop');
+    let currentPlayer = localStorage.getItem('currentPlayer') || (document.getElementById('player-name') ? document.getElementById('player-name').value.trim() : '') || 'Student';
+    let profileEl = document.getElementById('stats-profile-name');
+    if (profileEl) profileEl.innerText = currentPlayer;
+    
+    window.renderMatchHistory(currentPlayer);
+    window.renderBadges(currentPlayer);
+    window.switchStatsTab('history');
+    
+    let modal = document.getElementById('challenge-stats-modal');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.closeStatsModal = function() {
+    if (typeof playSound === 'function') playSound('click');
+    let modal = document.getElementById('challenge-stats-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.switchStatsTab = function(tab) {
+    if (typeof playSound === 'function') playSound('tactile');
+    let tabHist = document.getElementById('stats-tab-history');
+    let tabBadge = document.getElementById('stats-tab-badges');
+    let btnHist = document.getElementById('tab-btn-history');
+    let btnBadge = document.getElementById('tab-btn-badges');
+    
+    if (tab === 'history') {
+        if (tabHist) tabHist.style.display = 'block';
+        if (tabBadge) tabBadge.style.display = 'none';
+        if (btnHist) btnHist.classList.add('active');
+        if (btnBadge) btnBadge.classList.remove('active');
+    } else {
+        if (tabHist) tabHist.style.display = 'none';
+        if (tabBadge) tabBadge.style.display = 'block';
+        if (btnBadge) btnBadge.classList.add('active');
+        if (btnHist) btnHist.classList.remove('active');
+    }
+};
+
+window.renderMatchHistory = function(player) {
+    let container = document.getElementById('history-list-container');
+    let countPill = document.getElementById('history-count-pill');
+    if (!container) return;
+    
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + player) || '[]');
+    if (countPill) countPill.innerText = history.length;
+    
+    if (history.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; padding:45px 20px; background:#f8fafc; border:3px dashed #cbd5e1; border-radius:16px;">
+                <div style="font-size:3rem; margin-bottom:10px;">🧪</div>
+                <div style="font-weight:900; font-size:1.2rem; color:#1e293b;">No Challenge Attempts Logged Yet</div>
+                <div style="font-size:0.92rem; font-weight:700; color:#64748b; margin-top:6px; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.4;">
+                    Step into the Challenge Gauntlet to test your speed and chemical accuracy!
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    let totalRuns = history.length;
+    let bestTimeSec = Math.min(...history.map(h => h.timeSec || 9999));
+    let bestTimeStr = history.find(h => h.timeSec === bestTimeSec)?.timeStr || (bestTimeSec + 's');
+    let totalStars = history.reduce((acc, h) => acc + (h.stars || 3), 0);
+    
+    let summaryHtml = `
+        <div class="career-summary-grid">
+            <div class="career-stat-card">
+                <div class="career-stat-label">Total Runs</div>
+                <div class="career-stat-val">${totalRuns}</div>
+            </div>
+            <div class="career-stat-card">
+                <div class="career-stat-label">Fastest Clear</div>
+                <div class="career-stat-val" style="color:#7e22ce;">${bestTimeStr}</div>
+            </div>
+            <div class="career-stat-card">
+                <div class="career-stat-label">Stars Earned</div>
+                <div class="career-stat-val" style="color:#d97706;">⭐ ${totalStars}</div>
+            </div>
+        </div>
+    `;
+    
+    let sorted = [...history].reverse();
+    let rowsHtml = '<div class="match-history-list">';
+    
+    sorted.forEach((run) => {
+        let starsStr = '⭐'.repeat(run.stars || 3);
+        let tier = (run.tier || 'easy').toLowerCase();
+        let tierClass = tier === 'hard' ? 'tier-pill-hard' : (tier === 'medium' ? 'tier-pill-medium' : 'tier-pill-easy');
+        
+        // Calculate the modifier count to determine the exact rank pill
+        let modsCount = 0;
+        if (run.scale === 'off') modsCount++;
+        if (run.hints === '0') modsCount++;
+        if (run.timer === 'countdown') modsCount++;
+        
+        let rankLabel = 'STANDARD';
+        let rankClass = 'rank-pill-standard';
+        let rankBonus = '1.0x';
+        
+        if (modsCount >= 3) {
+            rankLabel = 'LEGENDARY';
+            rankClass = 'rank-pill-legendary';
+            rankBonus = '+1.5x';
+        } else if (modsCount === 2) {
+            rankLabel = 'EXPERT';
+            rankClass = 'rank-pill-expert';
+            rankBonus = '+1.0x';
+        } else if (modsCount === 1) {
+            rankLabel = 'VETERAN';
+            rankClass = 'rank-pill-veteran';
+            rankBonus = '+0.5x';
+        }
+        
+        rowsHtml += `
+            <div class="match-run-card">
+                <div class="match-left-group">
+                    <div class="match-icon-box">⏱️</div>
+                    <div>
+                        <div class="match-badges-row">
+                            <span class="match-tier-pill ${tierClass}">${tier}</span>
+                            <span class="match-rank-pill ${rankClass}">${rankLabel} <span style="opacity:0.8; font-size:0.68rem;">(${rankBonus})</span></span>
+                        </div>
+                        <div class="match-date-text">${run.date || 'Recent Attempt'}</div>
+                    </div>
+                </div>
+                <div class="match-right-group">
+                    <div class="match-time-val">${run.timeStr || (run.timeSec + 's')}</div>
+                    <div class="match-stars-row">${starsStr}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    rowsHtml += '</div>';
+    container.innerHTML = summaryHtml + rowsHtml;
+};
+
+window.renderBadges = function(player) {
+    let container = document.getElementById('badges-grid-container');
+    let countEl = document.getElementById('badges-count-text');
+    if (!container) return;
+    
+    let unlocked = JSON.parse(localStorage.getItem('challengeBadges_' + player) || '[]');
+    let allBadges = window.CHALLENGE_BADGES || [];
+    
+    if (countEl) countEl.innerText = `${unlocked.length}/${allBadges.length}`;
+    
+    let pct = allBadges.length > 0 ? Math.round((unlocked.length / allBadges.length) * 100) : 0;
+    
+    let bannerHtml = `
+        <div class="badges-progress-banner">
+            <div class="badges-banner-row">
+                <span>Achievements Unlocked: <b>${unlocked.length} of ${allBadges.length}</b></span>
+                <span><b>${pct}%</b></span>
+            </div>
+            <div class="badges-bar-track">
+                <div class="badges-bar-fill" style="width: ${pct}%;"></div>
+            </div>
+        </div>
+    `;
+    
+    let gridHtml = '<div class="badges-showcase-grid">';
+    allBadges.forEach(b => {
+        let isUnlocked = unlocked.includes(b.id);
+        let cardClass = isUnlocked ? 'badge-trophy-card is-unlocked' : 'badge-trophy-card is-locked';
+        let iconBg = isUnlocked ? (b.color ? b.color + '20' : '#f3e8ff') : '#f1f5f9';
+        let iconBorder = isUnlocked ? (b.color || '#1e293b') : '#cbd5e1';
+        let statusIndicator = isUnlocked 
+            ? `<span class="badge-check-icon" title="Unlocked">✓</span>` 
+            : `<span class="badge-lock-icon" title="Locked">🔒</span>`;
+        
+        gridHtml += `
+            <div class="${cardClass}">
+                <div class="badge-trophy-icon-box" style="background:${iconBg}; border-color:${iconBorder};">
+                    ${b.icon}
+                </div>
+                <div class="badge-trophy-content">
+                    <div class="badge-trophy-header">
+                        <span class="badge-trophy-title">${b.name}</span>
+                        ${statusIndicator}
+                    </div>
+                    <div class="badge-trophy-desc">${b.desc}</div>
+                </div>
+            </div>
+        `;
+    });
+    gridHtml += '</div>';
+    
+    container.innerHTML = bannerHtml + gridHtml;
 };
