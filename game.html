@@ -1140,8 +1140,8 @@
     .pro-scale-card.matched:hover { box-shadow: inset 0 0 25px rgba(34,197,94,0.4), 0 6px 0 #15803d !important; }
 </style>
 
-    <script src="js/levels.js"></script>
-    <script src="js/game.js"></script>
+    <script src="js/levels.js?v=1792976306"></script>
+    <script src="js/game.js?v=1792979790"></script>
 
 <style id="tooltip-css">
     .js-tooltip {
@@ -1421,9 +1421,13 @@ window.addEventListener('load', () => {
     <div class="good-layout">
         <!-- Block 1: Top Bar -->
         <div class="good-block block-top" style="display: flex; justify-content: center; align-items: center; min-height: 80px; position: relative;">
-            <button class="btn-back interactive" onclick="window.transitionTo('levels.html')" style="position: absolute; left: 20px;">
+            <button class="btn-back interactive" onclick="window.handleGameBackClick()" style="position: absolute; left: 20px;">
                 &#9664; Back
             </button>
+            <div id="challenge-hud-pills" style="display:none; position:absolute; right:20px; align-items:center; gap:10px;">
+                <div id="challenge-round-badge" style="background:#f3e8ff; color:#7e22ce; border:2px solid #d8b4fe; border-radius:12px; padding:6px 14px; font-weight:900; font-size:0.95rem;">ROUND 1/5</div>
+                <div id="challenge-timer-badge" style="background:#1e293b; color:#38bdf8; border:2px solid #0284c7; border-radius:12px; padding:6px 14px; font-weight:900; font-size:1.1rem; font-family:monospace; min-width:80px; text-align:center;">⏱️ 00:00</div>
+            </div>
             <div id="level-title" class="block-title" style="margin: 0; font-size: 2rem; text-align: center;">Loading...</div>
         </div>
         
