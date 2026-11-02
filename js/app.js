@@ -1,38 +1,82 @@
 
+window.checkPlayerDropdownVisibility = function() {
+    let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+    let btn = document.getElementById('player-dropdown-toggle-btn');
+    if (btn) {
+        btn.style.display = (profiles && profiles.length > 1) ? 'flex' : 'none';
+    }
+};
+
+window.togglePlayerDropdown = function(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    let dropdown = document.getElementById('profile-dropdown');
+    let inp = document.getElementById('player-name');
+    let btn = document.getElementById('player-dropdown-toggle-btn');
+    
+    if (dropdown && dropdown.style.display === 'flex') {
+        dropdown.style.display = 'none';
+        if (btn) btn.classList.remove('is-open');
+    } else {
+        if (typeof playSound === 'function') playSound('click');
+        window.renderProfiles("");
+        if (btn) btn.classList.add('is-open');
+        if (inp) inp.focus();
+    }
+};
+
 window.renderProfiles = function(filterText = "") {
     let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
     let dropdown = document.getElementById('profile-dropdown');
+    let toggleBtn = document.getElementById('player-dropdown-toggle-btn');
+    
+    // Dropdown chevron button appears ONLY if there are more than 1 player
+    if (toggleBtn) {
+        toggleBtn.style.display = profiles.length > 1 ? 'flex' : 'none';
+    }
+    
     if (!dropdown) return;
     
-    // Filter profiles based on input
     let filtered = profiles.filter(p => p.toLowerCase().includes(filterText.toLowerCase()));
+    
+    dropdown.innerHTML = '';
     
     if (filtered.length === 0) {
         dropdown.style.display = 'none';
+        if (toggleBtn) toggleBtn.classList.remove('is-open');
         return;
     }
     
-    dropdown.innerHTML = '';
     filtered.forEach(p => {
         let item = document.createElement('div');
-        item.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding: 12px 16px; cursor:pointer; border-radius: 8px; transition: background 0.1s; color: #334155; font-weight: 800; font-size: 1.1rem;";
-        item.onmouseenter = () => item.style.background = "#f1f5f9";
-        item.onmouseleave = () => item.style.background = "transparent";
+        item.className = 'profile-item-row interactive';
         
         let nameSpan = document.createElement('span');
+        nameSpan.className = 'profile-name-text';
         nameSpan.innerText = p;
-        nameSpan.style.flex = "1";
         nameSpan.onclick = () => {
             document.getElementById('player-name').value = p;
             dropdown.style.display = 'none';
+            if (toggleBtn) toggleBtn.classList.remove('is-open');
+            if (typeof playSound === 'function') playSound('click');
         };
         
-                let trashBtn = document.createElement('span');
-        trashBtn.innerHTML = "🗑️";
-        trashBtn.title = "Remove player?";
-        trashBtn.style.cssText = "font-size: 1.1rem; cursor:pointer; padding: 4px 6px; opacity: 0.7; transition: all 0.1s; border: 2px solid transparent; border-radius: 8px;";
-        trashBtn.onmouseenter = () => { trashBtn.style.opacity = "1"; trashBtn.style.transform = "scale(1.1)"; trashBtn.style.border = "2px solid #ef4444"; trashBtn.style.background = "#fef2f2"; };
-        trashBtn.onmouseleave = () => { trashBtn.style.opacity = "0.7"; trashBtn.style.transform = "scale(1)"; trashBtn.style.border = "2px solid transparent"; trashBtn.style.background = "transparent"; };
+        let trashBtn = document.createElement('button');
+        trashBtn.className = 'profile-trash-btn interactive';
+        trashBtn.type = 'button';
+        trashBtn.title = `Delete ${p}'s profile`;
+        trashBtn.setAttribute('aria-label', `Delete ${p}'s profile`);
+        trashBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <line x1="10" y1="11" x2="10" y2="17"/>
+                <line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+        `;
+        
         trashBtn.onclick = (e) => {
             e.stopPropagation();
             
@@ -73,11 +117,14 @@ window.renderProfiles = function(filterText = "") {
                 localStorage.setItem('profiles', JSON.stringify(profiles));
                 localStorage.removeItem('solvedLevels_' + p);
                 localStorage.removeItem('solvedLevelData_' + p);
+                localStorage.removeItem('challengeHistory_' + p);
+                localStorage.removeItem('challengeBadges_' + p);
                 if (localStorage.getItem('currentPlayer') === p) {
                     localStorage.removeItem('currentPlayer');
                     document.getElementById('player-name').value = '';
                 }
                 window.renderProfiles(document.getElementById('player-name').value);
+                window.checkPlayerDropdownVisibility();
                 overlay.remove();
             };
         };
@@ -107,19 +154,29 @@ window.filterProfiles = function() {
 document.addEventListener('click', function(e) {
     let input = document.getElementById('player-name');
     let dropdown = document.getElementById('profile-dropdown');
-    if (input && dropdown && e.target !== input && !dropdown.contains(e.target)) {
+    let toggleBtn = document.getElementById('player-dropdown-toggle-btn');
+    if (input && dropdown && e.target !== input && !dropdown.contains(e.target) && (!toggleBtn || !toggleBtn.contains(e.target))) {
         dropdown.style.display = 'none';
+        if (toggleBtn) toggleBtn.classList.remove('is-open');
     }
 });
 
-// Auto-fill last used name
-window.addEventListener('DOMContentLoaded', () => {
+// Auto-fill last used name & check dropdown button visibility
+function initPlayerState() {
     let lastPlayer = localStorage.getItem('currentPlayer');
     if (lastPlayer) {
         let nameInput = document.getElementById('player-name');
-        if(nameInput) nameInput.value = lastPlayer;
+        if (nameInput) nameInput.value = lastPlayer;
     }
-});
+    if (typeof window.checkPlayerDropdownVisibility === 'function') {
+        window.checkPlayerDropdownVisibility();
+    }
+}
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initPlayerState);
+} else {
+    initPlayerState();
+}
 
 // Stoichbalance V2 - Interactive Chemistry Engine
 
@@ -175,6 +232,66 @@ function selectSubOption(event, mode, subValue) {
     updatePlayButton();
 }
 
+// HOME CHALLENGE MODIFIERS STATE
+window.homeModifiers = {
+    scale: false,
+    hints: false,
+    rush: false
+};
+
+window.toggleHomeModifier = function(event, type) {
+    if (event) event.stopPropagation();
+    if (typeof playSound === 'function') playSound('tactile');
+    
+    window.homeModifiers[type] = !window.homeModifiers[type];
+    
+    const btn = document.getElementById(`home-mod-${type}`);
+    if (btn) {
+        if (window.homeModifiers[type]) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    }
+    
+    updateHomeMultiplier();
+};
+
+function updateHomeMultiplier() {
+    let mult = 1.0;
+    let count = 0;
+    if (window.homeModifiers.scale) { mult += 0.5; count++; }
+    if (window.homeModifiers.hints) { mult += 0.5; count++; }
+    if (window.homeModifiers.rush) { mult += 0.5; count++; }
+    
+    const tagEl = document.getElementById('home-multiplier-tag');
+    if (tagEl) {
+        if (mult >= 2.5) {
+            tagEl.innerText = '2.5x LEGENDARY';
+            tagEl.style.background = '#fef3c7';
+            tagEl.style.color = '#d97706';
+            tagEl.style.borderColor = '#d97706';
+        } else if (mult >= 2.0) {
+            tagEl.innerText = '2.0x EXPERT';
+            tagEl.style.background = '#f3e8ff';
+            tagEl.style.color = '#7e22ce';
+            tagEl.style.borderColor = '#7e22ce';
+        } else if (mult >= 1.5) {
+            tagEl.innerText = '1.5x VETERAN';
+            tagEl.style.background = '#dbeafe';
+            tagEl.style.color = '#2563eb';
+            tagEl.style.borderColor = '#2563eb';
+        } else {
+            tagEl.innerText = '1.0x STANDARD';
+            tagEl.style.background = 'rgba(255, 255, 255, 0.2)';
+            tagEl.style.color = 'white';
+            tagEl.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+        }
+    }
+    
+    updatePlayButton();
+}
+
 function updatePlayButton() {
     const playBtnText = document.getElementById('play-btn-text');
     const statsBtn = document.getElementById('challenge-stats-btn');
@@ -183,7 +300,14 @@ function updatePlayButton() {
         if (statsBtn) statsBtn.style.display = 'none';
     } 
     else if (currentMode === 'challenge') {
-        playBtnText.innerText = `Start ${currentSubOption} Challenge`;
+        let mult = 1.0;
+        if (window.homeModifiers) {
+            if (window.homeModifiers.scale) mult += 0.5;
+            if (window.homeModifiers.hints) mult += 0.5;
+            if (window.homeModifiers.rush) mult += 0.5;
+        }
+        let multStr = mult > 1.0 ? ` (${mult.toFixed(1)}x)` : '';
+        playBtnText.innerText = `Start ${currentSubOption} Challenge${multStr}`;
         if (statsBtn) statsBtn.style.display = 'inline-flex';
     } 
     else if (currentMode === 'sandbox') {
@@ -227,8 +351,11 @@ function startGame() {
         localStorage.setItem('currentPlayer', finalName);
         
         if (currentMode === 'challenge') {
-            const tierParam = encodeURIComponent(currentSubOption);
-            window.transitionTo(`levels.html?mode=challenge&tier=${tierParam}&name=${nameParam}`);
+            const tierParam = encodeURIComponent((currentSubOption || 'Easy').toLowerCase());
+            const scaleParam = (window.homeModifiers && window.homeModifiers.scale) ? 'off' : 'on';
+            const hintsParam = (window.homeModifiers && window.homeModifiers.hints) ? '0' : '1';
+            const timerParam = (window.homeModifiers && window.homeModifiers.rush) ? 'countdown' : 'stopwatch';
+            window.transitionTo(`game.html?mode=challenge&tier=${tierParam}&scale=${scaleParam}&hints=${hintsParam}&timer=${timerParam}&name=${nameParam}`);
         } else {
             window.transitionTo(`levels.html?form=${formParam}&mode=${currentMode}&name=${nameParam}`);
         }
@@ -1322,7 +1449,20 @@ window.switchStatsTab = function(tab) {
     }
 };
 
-window.renderMatchHistory = function(player) {
+window.activeHistoryFilter = 'all';
+
+window.setMatchHistoryFilter = function(filter) {
+    if (typeof playSound === 'function') playSound('click');
+    window.activeHistoryFilter = filter;
+    document.querySelectorAll('.stats-filter-btn').forEach(btn => btn.classList.remove('active'));
+    let activeBtn = document.getElementById('filter-btn-' + filter);
+    if (activeBtn) activeBtn.classList.add('active');
+    
+    let currentPlayer = localStorage.getItem('currentPlayer') || (document.getElementById('player-name') ? document.getElementById('player-name').value.trim() : '') || 'Student';
+    window.renderMatchHistory(currentPlayer, filter);
+};
+
+window.renderMatchHistory = function(player, filter = window.activeHistoryFilter || 'all') {
     let container = document.getElementById('history-list-container');
     let countPill = document.getElementById('history-count-pill');
     if (!container) return;
@@ -1332,48 +1472,148 @@ window.renderMatchHistory = function(player) {
     
     if (history.length === 0) {
         container.innerHTML = `
-            <div style="text-align:center; padding:45px 20px; background:#f8fafc; border:3px dashed #cbd5e1; border-radius:16px;">
-                <div style="font-size:3rem; margin-bottom:10px;">🧪</div>
-                <div style="font-weight:900; font-size:1.2rem; color:#1e293b;">No Challenge Attempts Logged Yet</div>
-                <div style="font-size:0.92rem; font-weight:700; color:#64748b; margin-top:6px; max-width:380px; margin-left:auto; margin-right:auto; line-height:1.4;">
-                    Step into the Challenge Gauntlet to test your speed and chemical accuracy!
+            <div class="stats-empty-state">
+                <div class="empty-state-icon">
+                    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
                 </div>
+                <div class="empty-state-title">No Challenge Attempts Yet</div>
+                <div class="empty-state-desc">Select a difficulty on the home screen and launch a run to log your best times and multiplier ranks here.</div>
             </div>
         `;
         return;
     }
+
+    // Apply Filter
+    let filteredHistory = filter === 'all' 
+        ? history 
+        : history.filter(h => (h.tier || 'easy').toLowerCase() === filter.toLowerCase());
+
+    // Compute Metrics based on filtered history (supporting both completed and timeout runs)
+    let totalRuns = filteredHistory.length;
+    let completedRuns = filteredHistory.filter(h => h.status !== 'timeout');
+    let failCount = filteredHistory.filter(h => h.status === 'timeout').length;
+    let clearRate = totalRuns > 0 ? Math.round((completedRuns.length / totalRuns) * 100) : 100;
+
+    let bestTimeSec = completedRuns.length > 0 ? Math.min(...completedRuns.map(h => h.timeSec || 9999)) : null;
+    let bestRun = bestTimeSec !== null ? completedRuns.find(h => h.timeSec === bestTimeSec) : null;
+    let bestTimeStr = bestRun ? (bestRun.timeStr || (bestRun.timeSec + 's')) : '--';
+    let bestTierLabel = bestRun ? (bestRun.tier || 'Easy').toUpperCase() : (filter !== 'all' ? filter.toUpperCase() : 'EASY');
     
-    let totalRuns = history.length;
-    let bestTimeSec = Math.min(...history.map(h => h.timeSec || 9999));
-    let bestTimeStr = history.find(h => h.timeSec === bestTimeSec)?.timeStr || (bestTimeSec + 's');
-    let totalStars = history.reduce((acc, h) => acc + (h.stars || 3), 0);
+    let totalStars = filteredHistory.reduce((acc, h) => acc + (h.stars !== undefined ? h.stars : 3), 0);
+    let maxStars = totalRuns * 3;
+    let avgStars = totalRuns > 0 ? (totalStars / totalRuns) : 0;
+    let rankTierName = avgStars >= 2.8 ? 'Gold Rank Tier' : (avgStars >= 2.0 ? 'Silver Rank Tier' : 'Bronze Rank Tier');
+    
+    let precisionRate = clearRate;
+    let equationsBalanced = filteredHistory.reduce((sum, h) => sum + (h.roundsCleared !== undefined ? h.roundsCleared : 5), 0);
     
     let summaryHtml = `
-        <div class="career-summary-grid">
-            <div class="career-stat-card">
-                <div class="career-stat-label">Total Runs</div>
-                <div class="career-stat-val">${totalRuns}</div>
+        <div class="career-kpi-grid-4">
+            <!-- 1. TOTAL RUNS -->
+            <div class="kpi-stat-card">
+                <div class="kpi-card-top">
+                    <span class="kpi-card-label">TOTAL RUNS</span>
+                    <div class="kpi-icon-pill kpi-icon-runs">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                            <line x1="4" y1="22" x2="4" y2="15"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-card-middle">
+                    <span class="kpi-val-number">${totalRuns}</span>
+                </div>
+                <div class="kpi-card-bottom">
+                    <span><span class="kpi-sub-dot" style="${clearRate < 100 ? 'background:#ef4444;' : ''}"></span>${clearRate}% Clear Rate</span>
+                </div>
             </div>
-            <div class="career-stat-card">
-                <div class="career-stat-label">Fastest Clear</div>
-                <div class="career-stat-val" style="color:#7e22ce;">${bestTimeStr}</div>
+
+            <!-- 2. FASTEST CLEAR -->
+            <div class="kpi-stat-card">
+                <div class="kpi-card-top">
+                    <span class="kpi-card-label">FASTEST CLEAR</span>
+                    <div class="kpi-icon-pill kpi-icon-time">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-card-middle">
+                    <span class="kpi-val-number kpi-val-purple">${bestTimeStr}</span>
+                </div>
+                <div class="kpi-card-bottom">
+                    <span><span class="kpi-sub-pill">${bestTierLabel}</span>Personal Best</span>
+                </div>
             </div>
-            <div class="career-stat-card">
-                <div class="career-stat-label">Stars Earned</div>
-                <div class="career-stat-val" style="color:#d97706;">⭐ ${totalStars}</div>
+
+            <!-- 3. STARS EARNED -->
+            <div class="kpi-stat-card">
+                <div class="kpi-card-top">
+                    <span class="kpi-card-label">STARS EARNED</span>
+                    <div class="kpi-icon-pill kpi-icon-stars">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-card-middle">
+                    <span class="kpi-val-number kpi-val-gold">★ ${totalStars}</span>
+                    <span class="kpi-val-denom">/${maxStars || 0}</span>
+                </div>
+                <div class="kpi-card-bottom">
+                    <span class="kpi-rank-badge">✨ ${rankTierName}</span>
+                </div>
             </div>
+
+            <!-- 4. PRECISION RATE -->
+            <div class="kpi-stat-card">
+                <div class="kpi-card-top">
+                    <span class="kpi-card-label">PRECISION RATE</span>
+                    <div class="kpi-icon-pill kpi-icon-precision">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <circle cx="12" cy="12" r="6"/>
+                            <circle cx="12" cy="12" r="2"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="kpi-card-middle">
+                    <span class="kpi-val-number kpi-val-emerald">${precisionRate}<span class="kpi-val-unit">%</span></span>
+                </div>
+                <div class="kpi-card-bottom">
+                    <span>${equationsBalanced} Eq Balanced</span>
+                    <span style="${failCount > 0 ? 'color:#ef4444; font-weight:900;' : 'color:#64748b;'}">${failCount} Fail${failCount === 1 ? '' : 's'}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="match-logs-header">
+            <span class="match-logs-title">Completed Match Logs</span>
+            <span class="match-logs-count-pill">${filteredHistory.length} Record${filteredHistory.length === 1 ? '' : 's'}</span>
         </div>
     `;
     
-    let sorted = [...history].reverse();
+    let sorted = [...filteredHistory].reverse();
     let rowsHtml = '<div class="match-history-list">';
     
     sorted.forEach((run) => {
-        let starsStr = '⭐'.repeat(run.stars || 3);
+        let isTimeout = run.status === 'timeout';
+        let starSvgs = '';
+        if (isTimeout) {
+            let emptyStar = '<svg viewBox="0 0 24 24" width="20" height="20" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+            starSvgs = Array(3).fill(emptyStar).join('');
+        } else {
+            let starsCount = run.stars !== undefined ? run.stars : 3;
+            let starSvg = '<svg viewBox="0 0 24 24" width="20" height="20" fill="#f59e0b"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+            starSvgs = Array(starsCount).fill(starSvg).join('');
+        }
+
         let tier = (run.tier || 'easy').toLowerCase();
         let tierClass = tier === 'hard' ? 'tier-pill-hard' : (tier === 'medium' ? 'tier-pill-medium' : 'tier-pill-easy');
         
-        // Calculate the modifier count to determine the exact rank pill
         let modsCount = 0;
         if (run.scale === 'off') modsCount++;
         if (run.hints === '0') modsCount++;
@@ -1383,7 +1623,11 @@ window.renderMatchHistory = function(player) {
         let rankClass = 'rank-pill-standard';
         let rankBonus = '1.0x';
         
-        if (modsCount >= 3) {
+        if (isTimeout) {
+            rankLabel = `OVERHEATED (${run.roundsCleared || 0}/5)`;
+            rankClass = 'rank-pill-overheated';
+            rankBonus = 'FAILED';
+        } else if (modsCount >= 3) {
             rankLabel = 'LEGENDARY';
             rankClass = 'rank-pill-legendary';
             rankBonus = '+1.5x';
@@ -1396,25 +1640,50 @@ window.renderMatchHistory = function(player) {
             rankClass = 'rank-pill-veteran';
             rankBonus = '+0.5x';
         }
+
+        let rankPillHtml = isTimeout
+            ? `<span class="match-rank-pill" style="background:#fee2e2 !important; color:#991b1b !important; border-color:#ef4444 !important;">${rankLabel}</span>`
+            : `<span class="match-rank-pill ${rankClass}">${rankLabel} <span class="rank-bonus-sub">(${rankBonus})</span></span>`;
+
+        let timeBadgeHtml = isTimeout
+            ? `<div class="match-time-badge" style="border-color:#ef4444 !important; color:#dc2626 !important; background:#fef2f2 !important; box-shadow:0 3px 0 #b91c1c !important;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <span class="match-time-number">${run.timeStr || '90s (Failed)'}</span>
+               </div>`
+            : `<div class="match-time-badge">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="13" r="8"/>
+                    <path d="M12 9v4l2 2"/>
+                    <path d="M10 2h4"/>
+                </svg>
+                <span class="match-time-number">${run.timeStr || (run.timeSec + 's')}</span>
+               </div>`;
         
         rowsHtml += `
-            <div class="match-run-card">
-                <div class="match-left-group">
-                    <div class="match-icon-box">⏱️</div>
-                    <div>
-                        <div class="match-badges-row">
-                            <span class="match-tier-pill ${tierClass}">${tier}</span>
-                            <span class="match-rank-pill ${rankClass}">${rankLabel} <span style="opacity:0.8; font-size:0.68rem;">(${rankBonus})</span></span>
-                        </div>
-                        <div class="match-date-text">${run.date || 'Recent Attempt'}</div>
-                    </div>
-                </div>
-                <div class="match-right-group">
-                    <div class="match-time-val">${run.timeStr || (run.timeSec + 's')}</div>
-                    <div class="match-stars-row">${starsStr}</div>
-                </div>
-            </div>
-        `;
+    <div class="match-run-card ${isTimeout ? 'match-card-timeout' : ''}">
+        <div class="match-left-group">
+            <span class="match-tier-pill ${tierClass}">${tier}</span>
+            ${rankPillHtml}
+        </div>
+        
+        <div class="match-center-date">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span>${run.date || 'Recent Attempt'}</span>
+        </div>
+        
+        <div class="match-right-group">
+            <div class="match-stars-display">${starSvgs}</div>
+            ${timeBadgeHtml}
+        </div>
+    </div>
+`;
     });
     
     rowsHtml += '</div>';
@@ -1452,8 +1721,8 @@ window.renderBadges = function(player) {
         let iconBg = isUnlocked ? (b.color ? b.color + '20' : '#f3e8ff') : '#f1f5f9';
         let iconBorder = isUnlocked ? (b.color || '#1e293b') : '#cbd5e1';
         let statusIndicator = isUnlocked 
-            ? `<span class="badge-check-icon" title="Unlocked">✓</span>` 
-            : `<span class="badge-lock-icon" title="Locked">🔒</span>`;
+            ? `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` 
+            : `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
         
         gridHtml += `
             <div class="${cardClass}">
