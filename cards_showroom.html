@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoichbalance — Info Cards Design Showroom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=JetBrains+Mono:wght@700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/info_cards.css">
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --navy-dark: #0f172a;
+            --navy-border: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px 20px 100px;
+            font-family: 'Nunito', Arial, sans-serif;
+            background-color: var(--bg-canvas);
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 22px 22px;
+            color: #0f172a;
+        }
+
+        .sr-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Top Bar */
+        .sr-topbar {
+            background: #ffffff;
+            border: 3.5px solid var(--navy-border);
+            border-radius: 20px;
+            padding: 24px 28px;
+            box-shadow: 0 6px 0 var(--navy-border);
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sr-topbar-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .sr-title h1 {
+            margin: 0;
+            font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sr-title p {
+            margin: 6px 0 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .sr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.12s ease;
+            box-shadow: 0 4px 0 var(--navy-border);
+            border: 2.5px solid var(--navy-border);
+        }
+        .sr-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--navy-border);
+        }
+        .sr-btn-primary { background: #3b82f6; color: #ffffff; }
+        .sr-btn-primary:hover { background: #2563eb; }
+        .sr-btn-white { background: #ffffff; color: #0f172a; }
+        .sr-btn-white:hover { background: #f8fafc; }
+
+        /* Filter & Design Selector Strip */
+        .sr-controls-strip {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .sr-control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sr-pill-tab {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 0.88rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.12s ease;
+        }
+        .sr-pill-tab:hover {
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+        .sr-pill-tab.active {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 3px 0 rgba(15, 23, 42, 0.35);
+        }
+
+        /* Interactive Live Hover Sandbox */
+        .sr-sandbox {
+            background: #ffffff;
+            border: 3.5px solid var(--navy-border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 0 var(--navy-border);
+            margin-bottom: 32px;
+        }
+
+        .sr-section-heading {
+            margin: 0 0 14px;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sr-mock-lab-panel {
+            background: #f8fafc;
+            border: 2.5px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .sr-mock-equation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: #ffffff;
+            border: 3px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 16px 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 0 #cbd5e1;
+        }
+
+        .sr-mock-hud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .sr-mock-hud-item {
+            background: #ffffff;
+            border: 2.5px solid #94a3b8;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: help;
+            transition: all 0.12s ease;
+            box-shadow: 0 3px 0 #94a3b8;
+        }
+        .sr-mock-hud-item:hover {
+            border-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #0284c7;
+        }
+
+        /* Cards Showcase Section */
+        .sr-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .sr-showcase-card {
+            background: #ffffff;
+            border: 3.5px solid var(--navy-border);
+            border-radius: 20px;
+            padding: 24px 26px;
+            box-shadow: 0 6px 0 var(--navy-border);
+        }
+
+        .sr-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 20px;
+            border-bottom: 2.5px solid #f1f5f9;
+            padding-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sr-card-head h3 {
+            margin: 0;
+            font-size: 1.28rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .sr-card-meta {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .sr-variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+            align-items: start;
+        }
+
+        .sr-var-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sr-var-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #475569;
+        }
+
+        .sr-badge-rec {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 900;
+            border: 1px solid #86efac;
+        }
+
+        /* ==========================================================================
+           SPECIFIC CARD DESIGNS (BASED ON SELECTED USER MODELS)
+           ========================================================================== */
+
+        /* Base Card Box Structure */
+        .sc-box {
+            font-family: 'Nunito', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-sizing: border-box;
+            transition: transform 0.12s ease;
+        }
+        .sc-box:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ----------------------------------------------------
+           STYLE 1: TACTILE LABORATORY (User's Pick - Refined)
+           Bold 3px dark navy border, tactile bottom shadow
+           ---------------------------------------------------- */
+        .sc-style-tactile {
+            background: #ffffff;
+            border: 3px solid #1e293b;
+            border-radius: 16px;
+            padding: 12px 14px;
+            box-shadow: 0 5px 0 #1e293b, 0 10px 20px rgba(15, 23, 42, 0.1);
+        }
+        .sc-style-tactile .sc-head {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 6px;
+        }
+        .sc-style-tactile .sc-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            border: 1.5px solid #1e293b;
+            box-shadow: 0 1.5px 0 #1e293b;
+        }
+        .sc-style-tactile .sc-title {
+            margin: 0;
+            font-size: 1.08rem;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        .sc-style-tactile .sc-body {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #334155;
+            line-height: 1.35;
+        }
+        .sc-style-tactile .sc-visual-amber {
+            background: #fffbeb;
+            border: 2px solid #fde68a;
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .sc-style-tactile .sc-visual-purple {
+            background: #f5f3ff;
+            border: 2px solid #ddd6fe;
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        /* ----------------------------------------------------
+           STYLE 2: FROSTED LAB GLASS (Apple-Style Material Depth)
+           Soft translucent glass, subtle gradient rim, pill glow
+           ---------------------------------------------------- */
+        .sc-style-glass {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(226, 232, 240, 0.9);
+            border-radius: 18px;
+            padding: 13px 15px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+        }
+        .sc-style-glass .sc-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .sc-style-glass .sc-pill {
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+        .sc-style-glass .sc-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+        .sc-style-glass .sc-body {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #475569;
+            line-height: 1.35;
+        }
+        .sc-style-glass .sc-visual-amber {
+            background: linear-gradient(180deg, #fffdf5 0%, #fef3c7 100%);
+            border: 1.5px solid #fcd34d;
+            border-radius: 12px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .sc-style-glass .sc-visual-purple {
+            background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
+            border: 1.5px solid #d8b4fe;
+            border-radius: 12px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        /* ----------------------------------------------------
+           STYLE 3: COMPACT BENTO HUD (Emil Kowalski Precision)
+           Micro-status dot, JetBrains Mono numbers, tight density
+           ---------------------------------------------------- */
+        .sc-style-bento {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 11px 13px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .sc-style-bento .sc-head {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .sc-style-bento .sc-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .sc-style-bento .sc-pill {
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .sc-style-bento .sc-title {
+            margin: 0;
+            font-size: 1.02rem;
+            font-weight: 900;
+            color: #0f172a;
+        }
+        .sc-style-bento .sc-body {
+            margin: 0;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #475569;
+            line-height: 1.35;
+        }
+        .sc-style-bento .sc-visual-amber {
+            background: #fefce8;
+            border: 1.5px dashed #ca8a04;
+            border-radius: 8px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+        .sc-style-bento .sc-visual-purple {
+            background: #faf5ff;
+            border: 1.5px dashed #9333ea;
+            border-radius: 8px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+
+        /* ----------------------------------------------------
+           STYLE 4: HIGH-CONTRAST ACCENT (Bold Top Bar Indicator)
+           Solid color top border line, crisp readability
+           ---------------------------------------------------- */
+        .sc-style-accent {
+            background: #ffffff;
+            border: 2.5px solid #0f172a;
+            border-top-width: 6px;
+            border-radius: 12px;
+            padding: 12px 14px;
+            box-shadow: 0 4px 0 #0f172a;
+        }
+        .sc-style-accent .sc-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .sc-style-accent .sc-pill {
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+        .sc-style-accent .sc-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #000000;
+        }
+        .sc-style-accent .sc-body {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.35;
+        }
+        .sc-style-accent .sc-visual-amber {
+            background: #fef3c7;
+            border: 2px solid #b45309;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+        .sc-style-accent .sc-visual-purple {
+            background: #f3e8ff;
+            border: 2px solid #7e22ce;
+            border-radius: 6px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+
+        /* Pill Badge Color Schemes */
+        .bg-red { background: #ef4444; color: #ffffff; }
+        .bg-blue { background: #3b82f6; color: #ffffff; }
+        .bg-amber { background: #f59e0b; color: #ffffff; }
+        .bg-purple { background: #8b5cf6; color: #ffffff; }
+        .bg-green { background: #10b981; color: #ffffff; }
+        .bg-slate { background: #475569; color: #ffffff; }
+
+        .text-red { color: #dc2626; }
+        .text-blue { color: #2563eb; }
+        .text-amber { color: #b45309; }
+        .text-purple { color: #7c3aed; }
+        .text-green { color: #059669; }
+
+        /* Toast notification */
+        #sr-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 99999;
+        }
+        #sr-toast.is-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="sr-wrapper">
+
+    <!-- Top Navigation Header -->
+    <header class="sr-topbar">
+        <div class="sr-topbar-row">
+            <div class="sr-title">
+                <h1>🧪 Stoichbalance — Chemistry Info Cards Showroom</h1>
+                <p>Evolving the user-selected cards across 4 refined styling directions.</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="game.html" class="sr-btn sr-btn-white">⬅️ Back to Game</a>
+                <button class="sr-btn sr-btn-primary" onclick="applySelectedStyleToGame()">💾 Set Active Game Style</button>
+            </div>
+        </div>
+
+        <!-- Design Theme Selector Strip -->
+        <div class="sr-controls-strip">
+            <div class="sr-control-group">
+                <span style="font-weight:900; font-size:0.92rem; color:#1e293b;">Active Playground Theme:</span>
+                <button class="sr-pill-tab" data-style="tactile" onclick="switchTheme('tactile')">1. Tactile Lab</button>
+                <button class="sr-pill-tab" data-style="glass" onclick="switchTheme('glass')">2. Frosted Lab Glass</button>
+                <button class="sr-pill-tab" data-style="bento" onclick="switchTheme('bento')">3. Compact Bento HUD</button>
+                <button class="sr-pill-tab active" data-style="accent" onclick="switchTheme('accent')">4. High-Contrast Accent (Selected Standard)</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Interactive Live Hover Sandbox -->
+    <section class="sr-sandbox">
+        <h2 class="sr-section-heading">✨ Live Interactive Hover Sandbox</h2>
+        <p style="margin: -6px 0 16px; color:#64748b; font-weight:700; font-size:0.95rem;">
+            Hover over any mock element below to see the exact selected copy pop up with live chemistry math!
+        </p>
+
+        <div class="sr-mock-lab-panel">
+            <!-- Mock Equation Bar -->
+            <div class="sr-mock-equation">
+                <!-- Coefficient 1 on N2 -->
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="Nitrogen Gas" data-mol-formula="N2" data-composition='{"N":2}' style="background:#1e293b; color:white; padding:4px 12px; border-radius:10px; font-weight:900; font-size:1.4rem;">1</div>
+                    <div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="Nitrogen Gas" data-mol-formula="N2" style="font-size:1.6rem; font-weight:900;">
+                        <span class="sci-elem-token">N</span><span class="sci-sub-token has-chem-info" data-info="subscript" data-element="N" data-count="2">2</span><span class="state-label sci-state-token has-chem-info" data-info="state" data-state="g">(g)</span>
+                    </div>
+                </div>
+
+                <div class="sci-plus has-chem-info" data-info="plus" style="font-size:1.6rem; font-weight:900; color:#64748b; cursor:help;">+</div>
+
+                <!-- Coefficient 3 on H2 -->
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="Hydrogen Gas" data-mol-formula="H2" data-composition='{"H":2}' style="background:#1e293b; color:white; padding:4px 12px; border-radius:10px; font-weight:900; font-size:1.4rem;">3</div>
+                    <div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="Hydrogen Gas" data-mol-formula="H2" style="font-size:1.6rem; font-weight:900;">
+                        <span class="sci-elem-token">H</span><span class="sci-sub-token has-chem-info" data-info="subscript" data-element="H" data-count="2">2</span><span class="state-label sci-state-token has-chem-info" data-info="state" data-state="g">(g)</span>
+                    </div>
+                </div>
+
+                <!-- Arrow -->
+                <div class="sci-arrow-box has-chem-info" data-info="arrow" style="background:#3b82f6; color:white; padding:6px 16px; border-radius:12px; font-size:1.5rem; font-weight:900; cursor:help;">➞</div>
+
+                <!-- Coefficient 2 on NH3 (Direct User Example) -->
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="Ammonia" data-mol-formula="NH3" data-composition='{"N":1,"H":3}' style="background:#ef4444; color:white; padding:4px 12px; border-radius:10px; font-weight:900; font-size:1.4rem; box-shadow:0 3px 0 #b91c1c;">2</div>
+                    <div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="Ammonia" data-mol-formula="NH3" style="font-size:1.6rem; font-weight:900;">
+                        <span class="sci-elem-token">N</span><span class="sci-elem-token">H</span><span class="sci-sub-token has-chem-info" data-info="subscript" data-element="H" data-count="3">3</span><span class="state-label sci-state-token has-chem-info" data-info="state" data-state="g">(g)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mock Strips: Element Tray & Beakers -->
+            <div class="sr-mock-hud-grid">
+                <div class="sr-mock-hud-item has-chem-info" data-info="tracker-card" data-element="N" data-rcount="0" data-pcount="2">
+                    <span style="background:#8b5cf6; color:white; padding:4px 8px; border-radius:6px; font-weight:900;">N</span>
+                    <div>
+                        <div style="font-weight:900; font-size:0.95rem;">Nitrogen Tray</div>
+                        <div style="font-size:0.8rem; color:#dc2626; font-weight:800;">Reactants: 0 ≠ Products: 2</div>
+                    </div>
+                </div>
+
+                <div class="sr-mock-hud-item has-chem-info" data-info="scale-bucket" data-side="left">
+                    <span style="font-size:1.4rem;">⚖️</span>
+                    <div>
+                        <div style="font-weight:900; font-size:0.95rem;">Reactants Scale</div>
+                        <div style="font-size:0.8rem; color:#64748b;">Left Side Beaker</div>
+                    </div>
+                </div>
+
+                <div class="sr-mock-hud-item has-chem-info" data-info="scale-bucket" data-side="right">
+                    <span style="font-size:1.4rem;">⚖️</span>
+                    <div>
+                        <div style="font-weight:900; font-size:0.95rem;">Products Scale</div>
+                        <div style="font-size:0.8rem; color:#64748b;">Right Side Beaker</div>
+                    </div>
+                </div>
+
+                <div class="sr-mock-hud-item has-chem-info" data-info="subscript" data-element="H" data-count="3">
+                    <span style="background:#8b5cf6; color:white; width:26px; height:26px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:0.85rem;">3</span>
+                    <div>
+                        <div style="font-weight:900; font-size:0.95rem;">Subscript 3</div>
+                        <div style="font-size:0.8rem; color:#64748b;">(H) — (H) — (H)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Side-by-Side Gallery of the Selected Models -->
+    <main class="sr-gallery">
+
+        <!-- 1. Coefficient: Big Number 2 in 2 NH3 -->
+        <article class="sr-showcase-card">
+            <div class="sr-card-head">
+                <h3>1. Coefficient: Big Number "2" (2 NH₃)</h3>
+                <span class="sr-card-meta">User Pick: 2 Groups of [NH₃] + (2 Nitrogen + 6 Hydrogen)</span>
+            </div>
+
+            <div class="sr-variations-grid">
+                <!-- Var 1: Tactile Laboratory -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">
+                        <span>1. Tactile Laboratory</span>
+                        <span class="sr-badge-rec">Selected Baseline</span>
+                    </div>
+                    <div class="sc-box sc-style-tactile">
+                        <div class="sc-head">
+                            <span class="sc-pill bg-amber">Coefficient</span>
+                            <h4 class="sc-title">Big Number "2"</h4>
+                        </div>
+                        <div class="sc-visual-amber">
+                            <div style="font-size:1.02rem; font-weight:900; color:#b45309; margin-bottom:2px;">2 Groups of [NH₃]</div>
+                            <div style="font-size:0.86rem; font-weight:800; color:#92400e;">(2 Nitrogen + 6 Hydrogen)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Var 2: Frosted Lab Glass -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">2. Frosted Lab Glass</div>
+                    <div class="sc-box sc-style-glass">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Big Number "2"</h4>
+                            <span class="sc-pill bg-amber">Multiplier</span>
+                        </div>
+                        <div class="sc-visual-amber">
+                            <div style="font-size:1.02rem; font-weight:900; color:#92400e;">2 Groups of [NH₃]</div>
+                            <div style="font-size:0.84rem; font-weight:800; color:#b45309;">(2 Nitrogen + 6 Hydrogen)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Var 3: Compact Bento HUD -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">3. Compact Bento HUD</div>
+                    <div class="sc-box sc-style-bento">
+                        <div class="sc-head">
+                            <span class="sc-dot bg-amber"></span>
+                            <span class="sc-pill text-amber">Coefficient 2×</span>
+                        </div>
+                        <h4 class="sc-title">Big Number "2"</h4>
+                        <div class="sc-visual-amber">
+                            <div style="font-family:'JetBrains Mono', monospace; font-size:0.92rem; font-weight:800; color:#b45309;">2× [NH₃] Groups</div>
+                            <div style="font-size:0.82rem; font-weight:700; color:#78350f;">2 Nitrogen + 6 Hydrogen</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Var 4: High-Contrast Accent -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header"><span>4. High-Contrast Accent</span><span class="sr-badge-rec">Selected Standard</span></div>
+                    <div class="sc-box sc-style-accent" style="border-top-color:#f59e0b;">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Big Number "2"</h4>
+                            <span class="sc-pill bg-amber">Coefficient</span>
+                        </div>
+                        <div style="margin-bottom:4px;">
+                            <div style="font-size:0.88rem; font-weight:900; color:#0f172a; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>2 Groups of [NH₃]</span>
+                                <span style="font-size:0.72rem; color:#b45309; background:#fef3c7; padding:1px 6px; border-radius:4px; border:1px solid #fde68a;">4 atoms / mol</span>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:4px 8px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1.5px 0 #cbd5e1;">
+                                    <span style="font-size:0.72rem; font-weight:900; color:#475569; text-transform:uppercase;">Group 1:</span>
+                                    <div style="display:flex; align-items:center; gap:3px;">
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#8b5cf6; color:white; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">N</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                    </div>
+                                </div>
+                                <div style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; padding:4px 8px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1.5px 0 #cbd5e1;">
+                                    <span style="font-size:0.72rem; font-weight:900; color:#475569; text-transform:uppercase;">Group 2:</span>
+                                    <div style="display:flex; align-items:center; gap:3px;">
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#8b5cf6; color:white; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">N</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                        <span style="color:#94a3b8; font-weight:900; margin:0 1px;">—</span>
+                                        <span style="width:20px; height:20px; border-radius:50%; background:#f8fafc; color:#0f172a; border:1px solid #94a3b8; font-size:10px; font-weight:900; display:inline-flex; align-items:center; justify-content:center;">H</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background:#fef3c7; border:2px solid #b45309; border-radius:8px; padding:7px 10px; text-align:left;">
+                            <div style="font-size:0.72rem; font-weight:900; color:#b45309; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
+                                📐 Math Calculation:
+                            </div>
+                            <div style="font-size:0.92rem; font-weight:900; color:#000000; margin-bottom:3px;">
+                                2 molecules × 4 atoms = 8 total atoms
+                            </div>
+                            <div style="font-size:0.8rem; font-weight:700; color:#451a03; line-height:1.4;">
+                                • 2 × 1 N = <strong>2 Nitrogen atoms</strong><br>• 2 × 3 H = <strong>6 Hydrogen atoms</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 2. Subscript: Small Number "3" in NH3 -->
+        <article class="sr-showcase-card">
+            <div class="sr-card-head">
+                <h3>2. Subscript: Small Number "3" (in NH₃)</h3>
+                <span class="sr-card-meta">User Pick: (H) — (H) — (H) + That means there are 3 hydrogen in this</span>
+            </div>
+
+            <div class="sr-variations-grid">
+                <!-- Var 1: Tactile Laboratory -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">
+                        <span>1. Tactile Laboratory</span>
+                        <span class="sr-badge-rec">Selected Baseline</span>
+                    </div>
+                    <div class="sc-box sc-style-tactile">
+                        <div class="sc-head">
+                            <span class="sc-pill bg-purple">Subscript</span>
+                            <h4 class="sc-title">Small Number "3"</h4>
+                        </div>
+                        <div class="sc-visual-purple">
+                            <div style="font-size:1.15rem; font-weight:900; color:#6d28d9; letter-spacing:1px;">
+                                (H) — (H) — (H)
+                            </div>
+                        </div>
+                        <p class="sc-body">That means there are 3 hydrogen in this</p>
+                    </div>
+                </div>
+
+                <!-- Var 2: Frosted Lab Glass -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">2. Frosted Lab Glass</div>
+                    <div class="sc-box sc-style-glass">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Small Number "3"</h4>
+                            <span class="sc-pill bg-purple">Bonded</span>
+                        </div>
+                        <div class="sc-visual-purple">
+                            <div style="font-size:1.15rem; font-weight:900; color:#7c3aed;">
+                                (H) — (H) — (H)
+                            </div>
+                        </div>
+                        <p class="sc-body">That means there are 3 hydrogen in this</p>
+                    </div>
+                </div>
+
+                <!-- Var 3: Compact Bento HUD -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">3. Compact Bento HUD</div>
+                    <div class="sc-box sc-style-bento">
+                        <div class="sc-head">
+                            <span class="sc-dot bg-purple"></span>
+                            <span class="sc-pill text-purple">Subscript 3</span>
+                        </div>
+                        <h4 class="sc-title">Small Number "3"</h4>
+                        <div class="sc-visual-purple">
+                            <div style="font-family:'JetBrains Mono', monospace; font-size:1.05rem; font-weight:900; color:#6b21a8;">
+                                (H) - (H) - (H)
+                            </div>
+                        </div>
+                        <p class="sc-body" style="font-size:0.85rem;">That means there are 3 hydrogen in this</p>
+                    </div>
+                </div>
+
+                <!-- Var 4: High-Contrast Accent -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">4. High-Contrast Accent</div>
+                    <div class="sc-box sc-style-accent" style="border-top-color:#8b5cf6;">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Small Number "3"</h4>
+                            <span class="sc-pill bg-purple">Sub</span>
+                        </div>
+                        <div class="sc-visual-purple">
+                            <div style="font-size:1.15rem; font-weight:900; color:#3b0764;">
+                                (H) — (H) — (H)
+                            </div>
+                        </div>
+                        <p class="sc-body" style="color:#000000;">That means there are 3 hydrogen in this</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 3. Molecule / Compound: Ammonia (NH3) -->
+        <article class="sr-showcase-card">
+            <div class="sr-card-head">
+                <h3>3. Chemical Compound: Ammonia (NH₃)</h3>
+                <span class="sr-card-meta">User Pick: Constituent elements with Groups + together explanation</span>
+            </div>
+
+            <div class="sr-variations-grid">
+                <!-- Var 1: Tactile Laboratory -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">
+                        <span>1. Tactile Laboratory</span>
+                        <span class="sr-badge-rec">Selected Baseline</span>
+                    </div>
+                    <div class="sc-box sc-style-tactile">
+                        <div class="sc-head">
+                            <span class="sc-pill bg-green">Covalent Compound</span>
+                            <h4 class="sc-title">Ammonia (NH₃)</h4>
+                        </div>
+                        <p class="sc-body">
+                            Formed from Nitrogen (Group 15) and Hydrogen (Group 1). Together, it is a pungent alkaline gas completely different from N₂ or H₂.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Var 2: Frosted Lab Glass -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">2. Frosted Lab Glass</div>
+                    <div class="sc-box sc-style-glass">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Ammonia (NH₃)</h4>
+                            <span class="sc-pill bg-green">Compound</span>
+                        </div>
+                        <p class="sc-body">
+                            Formed from Nitrogen (Group 15) and Hydrogen (Group 1). Together, it is a pungent alkaline gas completely different from N₂ or H₂.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Var 3: Compact Bento HUD -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">3. Compact Bento HUD</div>
+                    <div class="sc-box sc-style-bento">
+                        <div class="sc-head">
+                            <span class="sc-dot bg-green"></span>
+                            <span class="sc-pill text-green">Covalent · NH₃</span>
+                        </div>
+                        <h4 class="sc-title">Ammonia (NH₃)</h4>
+                        <p class="sc-body" style="font-size:0.86rem;">
+                            Formed from Nitrogen (Group 15) and Hydrogen (Group 1). Together, it is a pungent alkaline gas completely different from N₂ or H₂.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Var 4: High-Contrast Accent -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">4. High-Contrast Accent</div>
+                    <div class="sc-box sc-style-accent" style="border-top-color:#10b981;">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Ammonia (NH₃)</h4>
+                            <span class="sc-pill bg-green">Compound</span>
+                        </div>
+                        <p class="sc-body" style="color:#000000;">
+                            Formed from Nitrogen (Group 15) and Hydrogen (Group 1). Together, it is a pungent alkaline gas completely different from N₂ or H₂.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 4. Element Tray (Unbalanced) -->
+        <article class="sr-showcase-card">
+            <div class="sr-card-head">
+                <h3>4. Element Tray: Unbalanced (Reactants Low)</h3>
+                <span class="sr-card-meta">User Pick: "Nitrogen, Unbalanced. The Reactants' Nitrogen is low."</span>
+            </div>
+
+            <div class="sr-variations-grid">
+                <!-- Var 1: Tactile Laboratory -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">
+                        <span>1. Tactile Laboratory</span>
+                        <span class="sr-badge-rec">Selected Baseline</span>
+                    </div>
+                    <div class="sc-box sc-style-tactile">
+                        <div class="sc-head">
+                            <span class="sc-pill bg-red">Unbalanced</span>
+                            <h4 class="sc-title">Nitrogen, Unbalanced</h4>
+                        </div>
+                        <p class="sc-body">The Reactants' Nitrogen is low.</p>
+                    </div>
+                </div>
+
+                <!-- Var 2: Frosted Lab Glass -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">2. Frosted Lab Glass</div>
+                    <div class="sc-box sc-style-glass">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Nitrogen, Unbalanced</h4>
+                            <span class="sc-pill bg-red">Low Left</span>
+                        </div>
+                        <p class="sc-body">The Reactants' Nitrogen is low.</p>
+                    </div>
+                </div>
+
+                <!-- Var 3: Compact Bento HUD -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">3. Compact Bento HUD</div>
+                    <div class="sc-box sc-style-bento">
+                        <div class="sc-head">
+                            <span class="sc-dot bg-red"></span>
+                            <span class="sc-pill text-red">Deficit</span>
+                        </div>
+                        <h4 class="sc-title">Nitrogen, Unbalanced</h4>
+                        <p class="sc-body" style="font-size:0.86rem;">The Reactants' Nitrogen is low.</p>
+                    </div>
+                </div>
+
+                <!-- Var 4: High-Contrast Accent -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">4. High-Contrast Accent</div>
+                    <div class="sc-box sc-style-accent" style="border-top-color:#ef4444;">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Nitrogen, Unbalanced</h4>
+                            <span class="sc-pill bg-red">Alert</span>
+                        </div>
+                        <p class="sc-body" style="color:#000000;">The Reactants' Nitrogen is low.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <!-- 5. Scale Beaker: Reactants (Left Scale) -->
+        <article class="sr-showcase-card">
+            <div class="sr-card-head">
+                <h3>5. Scale Beaker: Reactants (Left Scale)</h3>
+                <span class="sr-card-meta">User Pick: "Reactants Scale. All the reactants will be here."</span>
+            </div>
+
+            <div class="sr-variations-grid">
+                <!-- Var 1: Tactile Laboratory -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">
+                        <span>1. Tactile Laboratory</span>
+                        <span class="sr-badge-rec">Selected Baseline</span>
+                    </div>
+                    <div class="sc-box sc-style-tactile">
+                        <div class="sc-head">
+                            <span class="sc-pill bg-slate">Reactants</span>
+                            <h4 class="sc-title">Reactants Scale</h4>
+                        </div>
+                        <p class="sc-body">All the reactants will be here.</p>
+                    </div>
+                </div>
+
+                <!-- Var 2: Frosted Lab Glass -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">2. Frosted Lab Glass</div>
+                    <div class="sc-box sc-style-glass">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Reactants Scale</h4>
+                            <span class="sc-pill bg-slate">Pan</span>
+                        </div>
+                        <p class="sc-body">All the reactants will be here.</p>
+                    </div>
+                </div>
+
+                <!-- Var 3: Compact Bento HUD -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">3. Compact Bento HUD</div>
+                    <div class="sc-box sc-style-bento">
+                        <div class="sc-head">
+                            <span class="sc-dot bg-slate"></span>
+                            <span class="sc-pill" style="color:#475569;">Vessel</span>
+                        </div>
+                        <h4 class="sc-title">Reactants Scale</h4>
+                        <p class="sc-body" style="font-size:0.86rem;">All the reactants will be here.</p>
+                    </div>
+                </div>
+
+                <!-- Var 4: High-Contrast Accent -->
+                <div class="sr-var-col">
+                    <div class="sr-var-header">4. High-Contrast Accent</div>
+                    <div class="sc-box sc-style-accent" style="border-top-color:#475569;">
+                        <div class="sc-head">
+                            <h4 class="sc-title">Reactants Scale</h4>
+                            <span class="sc-pill bg-slate">Left</span>
+                        </div>
+                        <p class="sc-body" style="color:#000000;">All the reactants will be here.</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+</div>
+
+<div id="sr-toast">Style applied!</div>
+
+<script src="js/info_cards.js"></script>
+<script>
+    function switchTheme(theme) {
+        document.querySelectorAll('.sr-pill-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.getAttribute('data-style') === theme);
+        });
+        localStorage.setItem('stoich_info_card_style', theme);
+
+        const card = document.getElementById('sci-info-card');
+        if (card) {
+            card.className = 'style-' + theme;
+        }
+
+        showToast('Playground style: ' + theme.toUpperCase());
+    }
+
+    function applySelectedStyleToGame() {
+        const activeTab = document.querySelector('.sr-pill-tab.active');
+        const theme = activeTab ? activeTab.getAttribute('data-style') : 'tactile';
+        localStorage.setItem('stoich_info_card_style', theme);
+        showToast('✅ Saved "' + theme.toUpperCase() + '" as live game style!');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('sr-toast');
+        t.innerText = msg;
+        t.classList.add('is-show');
+        setTimeout(() => {
+            t.classList.remove('is-show');
+        }, 2200);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const saved = localStorage.getItem('stoich_info_card_style') || 'tactile';
+        switchTheme(saved);
+    });
+</script>
+
+</body>
+</html>
