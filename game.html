@@ -17,7 +17,7 @@
             background-image: radial-gradient(rgba(255,255,255,0.2) 3px, transparent 3px);
             background-size: 20px 20px;
             margin: 0;
-            padding: clamp(10px, 2vw, 20px);
+            padding: clamp(6px, 1.2vw, 16px);
             font-family: 'Nunito', sans-serif;
             height: 100vh;
             width: 100vw;
@@ -31,10 +31,10 @@
             grid-template-rows: 90px minmax(0, 1fr);
             grid-template-columns: var(--left-w, 280px) minmax(0, 1fr) var(--right-w, 280px);
             transition: grid-template-columns 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            gap: clamp(10px, 2vw, 20px);
+            gap: clamp(10px, 1.4vw, 18px);
             width: 100%;
             height: 100%;
-            max-width: 1600px;
+            max-width: 1760px;
             margin: 0 auto;
         }
         
@@ -75,23 +75,23 @@
         /* Puzzle Selection Menu Back Button (Red Pill) */
         /* Puzzle Selection Menu Back Button (EXACT MATCH) */
         .btn-back {
-            padding: 0.4rem 1rem;
+            padding: 0.8rem 1.5rem;
             background: #ef4444; 
-            border: 2px solid var(--dark-border); 
-            border-radius: 12px;
+            border: 4px solid var(--dark-border); 
+            border-radius: 20px;
             color: white; 
-            font-family: 'Nunito', sans-serif; 
-            font-size: 1.1rem; 
+            font-family: inherit; 
+            font-size: 1.2rem; 
             font-weight: 900; 
             cursor: pointer;
-            box-shadow: 0 3px 0 var(--dark-border);
+            box-shadow: 0 6px 0 var(--dark-border);
             display: flex; 
             align-items: center; 
             gap: 0.5rem;
             transition: transform 0.1s, box-shadow 0.1s;
         }
-        .btn-back:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--dark-border); filter: brightness(1.1); }
-        .btn-back:active { transform: translateY(3px); box-shadow: 0 0 0 transparent; }
+        .btn-back:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--dark-border); filter: brightness(1.1); }
+        .btn-back:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
         
         /* Legacy Round Buttons */
         .legacy-btn {
@@ -189,38 +189,51 @@
         /* FAB Speed Dial Menu */
         .fab-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 14px;
             z-index: 100;
         }
         
         .fab-menu {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             opacity: 0;
             pointer-events: none;
-            transform: translateY(20px) scale(0.8);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(16px) scale(0.9);
+            transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
             transform-origin: bottom center;
         }
         
-        .fab-container:hover .fab-menu {
+        .fab-container:hover .fab-menu,
+        .fab-container:focus-within .fab-menu {
             opacity: 1;
             pointer-events: auto;
             transform: translateY(0) scale(1);
         }
         
+        .fab-container .legacy-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease, filter 0.15s ease !important;
+        }
+
+        .fab-menu .legacy-btn:hover {
+            transform: scale(1.08) translateY(-2px) !important;
+            filter: brightness(1.08);
+        }
+        
         .fab-main {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, border-color 0.2s !important;
         }
         
         .fab-container:hover .fab-main {
-            transform: rotate(180deg) scale(1.1) !important;
+            transform: rotate(180deg) scale(1.05) !important;
             background: #cbd5e1 !important;
             color: #1e293b !important;
             border-color: #94a3b8 !important;
@@ -988,7 +1001,188 @@
         0%, 100% { box-shadow: 0 0 0 4px rgba(192, 38, 211, 0.4) inset, 0 0 10px rgba(192, 38, 211, 0.3); background: rgba(253, 244, 255, 0.4); }
         50% { box-shadow: 0 0 0 8px rgba(192, 38, 211, 0.8) inset, 0 0 30px rgba(192, 38, 211, 0.6); background: rgba(250, 232, 255, 0.9); }
     }
-</style>
+
+        /* Exact Difficulty Pill Style matching Challenge Timer */
+        .lvl-diff {
+            font-size: 1.05rem;
+            font-weight: 900;
+            padding: 0 16px;
+            height: 38px;
+            border-radius: 14px;
+            letter-spacing: 0.5px;
+            border: 2.5px solid var(--dark-border);
+            box-shadow: 0 3px 0 var(--dark-border);
+            text-transform: capitalize;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            box-sizing: border-box;
+        }
+        .diff-easy { background: #10b981; color: white; }
+        .diff-medium { background: #f59e0b; color: white; }
+        .diff-hard { background: #ef4444; color: white; }
+
+        /* Clean Tactile Stopwatch Timer Badge */
+        .timer-pill-tactile {
+            background: #ffffff;
+            border: 2.5px solid var(--dark-border);
+            border-radius: 14px;
+            padding: 0 14px;
+            height: 38px;
+            box-shadow: 0 3px 0 var(--dark-border);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 900;
+            font-size: 1.15rem;
+            color: #0f172a;
+            font-family: 'Nunito', monospace, sans-serif;
+            min-width: 95px;
+            justify-content: center;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            box-sizing: border-box;
+        }
+        .timer-pill-tactile svg {
+            color: #4f46e5;
+            flex-shrink: 0;
+        }
+        .timer-pill-tactile.warning {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+            box-shadow: 0 3px 0 #b91c1c;
+            animation: timerPulse 0.8s infinite;
+        }
+        .timer-pill-tactile.warning svg {
+            color: #ef4444;
+        }
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Modifier Locked Collapsed Sidebars */
+        .good-block.collapsed.is-mod-locked .rect-btn {
+            opacity: 0.65;
+            cursor: not-allowed !important;
+            filter: grayscale(0.5);
+        }
+
+    
+        /* Challenge Modal Action Buttons with Neo-Brutalist Spring Animation */
+        .btn-modal-action {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 18px;
+            font-weight: 900;
+            font-size: 1.05rem;
+            font-family: inherit;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            user-select: none;
+            box-sizing: border-box;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+        }
+
+        .btn-modal-action .modal-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Primary - Try Again (Blue) */
+        .btn-modal-action.btn-try-again {
+            background: #3b82f6;
+            color: #ffffff;
+            border: 3.5px solid #1d4ed8;
+            box-shadow: 0 5px 0 #1e3a8a;
+        }
+        .btn-modal-action.btn-try-again:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #1e3a8a;
+            filter: brightness(1.1);
+        }
+        .btn-modal-action.btn-try-again:hover .modal-icon-retry {
+            transform: rotate(-180deg);
+        }
+        .btn-modal-action.btn-try-again:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #1e3a8a;
+            filter: brightness(0.96);
+        }
+
+        /* Secondary - Main Menu (Slate) */
+        .btn-modal-action.btn-main-menu {
+            background: #0f172a;
+            color: #ffffff;
+            border: 3.5px solid #1e293b;
+            box-shadow: 0 5px 0 #000000;
+        }
+        .btn-modal-action.btn-main-menu:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #000000;
+            filter: brightness(1.25);
+        }
+        .btn-modal-action.btn-main-menu:hover .modal-icon-home {
+            transform: translateY(-2px) scale(1.15);
+        }
+        .btn-modal-action.btn-main-menu:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #000000;
+            filter: brightness(0.96);
+        }
+
+        /* Victory - Play Again (Purple) */
+        .btn-modal-action.btn-play-again-purple {
+            background: #8b5cf6;
+            color: #ffffff;
+            border: 3.5px solid #6d28d9;
+            box-shadow: 0 5px 0 #5b21b6;
+        }
+        .btn-modal-action.btn-play-again-purple:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #5b21b6;
+            filter: brightness(1.1);
+        }
+        .btn-modal-action.btn-play-again-purple:hover .modal-icon-retry {
+            transform: rotate(-180deg);
+        }
+        .btn-modal-action.btn-play-again-purple:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #5b21b6;
+            filter: brightness(0.96);
+        }
+
+        /* Victory - Main Menu (Pink) */
+        .btn-modal-action.btn-main-menu-pink {
+            background: #ec4899;
+            color: #ffffff;
+            border: 3.5px solid #be185d;
+            box-shadow: 0 5px 0 #9d174d;
+        }
+        .btn-modal-action.btn-main-menu-pink:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #9d174d;
+            filter: brightness(1.1);
+        }
+        .btn-modal-action.btn-main-menu-pink:hover .modal-icon-home {
+            transform: translateY(-2px) scale(1.15);
+        }
+        .btn-modal-action.btn-main-menu-pink:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #9d174d;
+            filter: brightness(0.96);
+        }
+
+    </style>
 
 
 
@@ -1230,6 +1424,7 @@ document.addEventListener('click', () => {
 }, {once: false});
 
 window.playSound = function(type) {
+    if (window.isMuted) return;
     if (!audioCtx) window.initAudio();
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -1261,17 +1456,48 @@ window.playSound = function(type) {
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.start();
             osc.stop(audioCtx.currentTime + 0.1);
-        } else if (type === 'swoosh') {
-            // "expandinga nd collasping ethe element tray and teh prf beaker, it shoudl have a swoosh sound instead"
-            // Simulate swoosh with a fast filtered noise burst or a rapid low sine sweep
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.15);
-            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
-            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
+        } else if (type === 'swoosh' || type === 'whoosh') {
+            // "expanding and collapsing the element tray and the prof beaker, it should have a swoosh / whoosh sound instead"
+            try {
+                const bufferSize = Math.floor(audioCtx.sampleRate * 0.22);
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+                const whiteNoise = audioCtx.createBufferSource();
+                whiteNoise.buffer = noiseBuffer;
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(280, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(750, audioCtx.currentTime + 0.08);
+                filter.frequency.exponentialRampToValueAtTime(160, audioCtx.currentTime + 0.22);
+                filter.Q.setValueAtTime(2.2, audioCtx.currentTime);
+
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                noiseGain.gain.linearRampToValueAtTime(0.32, audioCtx.currentTime + 0.06);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+
+                whiteNoise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                whiteNoise.start();
+                whiteNoise.stop(audioCtx.currentTime + 0.22);
+                return;
+            } catch(e) {
+                // Fallback to sine sweep if noise buffer fails
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.12);
+                osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.22);
+                gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.22);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.22);
+            }
         } else if (type === 'drop') {
             // "change teh audio of adding stuff n to teh drop box" - plop sound
             osc.type = 'sine';
@@ -1373,6 +1599,21 @@ window.addEventListener('load', () => {
 });
 
 </script>
+<script>
+        (function() {
+            var p = new URLSearchParams(window.location.search);
+            var f = p.get('form') || '';
+            var lvl = p.get('level') || '';
+            var m = p.get('mode') || '';
+            if (f.indexOf('5') !== -1 || lvl.toUpperCase().indexOf('F5') === 0) {
+                document.documentElement.style.setProperty('--bg-color', '#10b981');
+                document.documentElement.classList.add('is-form5-mode');
+            } else if (m === 'challenge') {
+                document.documentElement.style.setProperty('--bg-color', '#f59e0b');
+                document.documentElement.classList.add('is-challenge-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div id="iris-wipe-overlay"></div>
@@ -1396,7 +1637,7 @@ window.addEventListener('load', () => {
             </button>
         </div>
         <!-- Main Trigger Button -->
-        <button class="legacy-btn fab-main" style="background:#1e293b; color:#ffffff; border:4px solid #0f172a; box-shadow:0 4px 0 #0f172a;">
+        <button class="legacy-btn fab-main" onclick="if(typeof playSound==='function') playSound('pop');" style="background:#1e293b; color:#ffffff; border:4px solid #0f172a; box-shadow:0 4px 0 #0f172a;">
             <svg style="width:32px;height:32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         </button>
     </div>
@@ -1422,11 +1663,22 @@ window.addEventListener('load', () => {
         <!-- Block 1: Top Bar -->
         <div class="good-block block-top" style="display: flex; justify-content: center; align-items: center; min-height: 80px; position: relative;">
             <button class="btn-back interactive" onclick="window.handleGameBackClick()" style="position: absolute; left: 20px;">
-                &#9664; Back
+                <span class="back-icon">◀</span> Back
             </button>
-            <div id="challenge-hud-pills" style="display:none; position:absolute; right:20px; align-items:center; gap:10px;">
-                <div id="challenge-round-badge" style="background:#f3e8ff; color:#7e22ce; border:2px solid #d8b4fe; border-radius:12px; padding:6px 14px; font-weight:900; font-size:0.95rem;">ROUND 1/5</div>
-                <div id="challenge-timer-badge" style="background:#1e293b; color:#38bdf8; border:2px solid #0284c7; border-radius:12px; padding:6px 14px; font-weight:900; font-size:1.1rem; font-family:monospace; min-width:80px; text-align:center;">⏱️ 00:00</div>
+            <div id="challenge-hud-pills" style="display:none; position:absolute; right:20px; align-items:center; gap:12px;">
+                <button id="challenge-test-timeout-btn" class="interactive" onclick="window.handleChallengeTimeout()" title="Developer Quick Test: Trigger Timeout" style="height:38px; padding:0 14px; background:#fef2f2; color:#dc2626; border:2.5px solid #ef4444; border-radius:14px; font-weight:900; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 0 #b91c1c; box-sizing:border-box; transition:transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 0 #b91c1c';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #b91c1c';" onmousedown="this.style.transform='translateY(2px)'; this.style.boxShadow='0 1px 0 #b91c1c';">
+                    <span>⏰</span>
+                    <span>Test Timeout</span>
+                </button>
+                <div id="challenge-diff-pill" class="lvl-diff diff-easy">Easy</div>
+                <div id="challenge-timer-badge" class="timer-pill-tactile">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="13" r="8"/>
+                        <path d="M12 9v4l2 2"/>
+                        <path d="M10 2h4"/>
+                    </svg>
+                    <span id="challenge-timer-text">00:00</span>
+                </div>
             </div>
             <div id="level-title" class="block-title" style="margin: 0; font-size: 2rem; text-align: center;">Loading...</div>
         </div>
@@ -1656,7 +1908,7 @@ window.addEventListener('load', () => {
     <svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C7.86 2 4.5 5.36 4.5 9.5c0 3.82 2.66 7.12 6.36 8.31V20c0 .55.45 1 1 1h.28c.11 0 .22-.03.32-.08l.1-.06.27-.19c.38-.28.84-.42 1.3-.42.45 0 .9.14 1.28.42l.27.19.1.06c.1.05.21.08.32.08h.28c.55 0 1-.45 1-1v-2.19c3.7-1.19 6.36-4.49 6.36-8.31C19.5 5.36 16.14 2 12 2z"></path></svg>
     Hint please!
 </button>
-    <button class="rect-btn btn-trash" onclick="clearChat()" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
+    <button class="rect-btn btn-trash" onclick="clearChat(true)" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
         <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
     </button>
 </div>
