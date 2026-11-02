@@ -1,0 +1,500 @@
+/* ==========================================================================
+   STOICHBALANCE - UNIVERSAL CHEMICAL HOVER INFO CARD SYSTEM
+   Compact, High-Retention Neo-Brutalist Laboratory Tooltips
+   ========================================================================== */
+
+#sci-info-card {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2147483647;
+    pointer-events: none;
+    width: 295px;
+    max-width: calc(100vw - 28px);
+    background: #ffffff;
+    border: 2.5px solid #0f172a;
+    border-top: 6px solid #0f172a;
+    border-radius: 14px;
+    box-shadow: 0 5px 0 #0f172a, 0 12px 24px rgba(15, 23, 42, 0.12);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: 'Nunito', Arial, sans-serif;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    visibility: hidden;
+    will-change: transform, opacity, top, left;
+}
+
+#sci-info-card.is-visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    visibility: visible;
+}
+
+/* Card Header: Title on Left, Badge on Right */
+.sic-header {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 6px;
+    width: 100%;
+}
+
+.sic-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    border: 1.5px solid #1e293b;
+    box-shadow: 0 1.5px 0 #1e293b;
+    flex-shrink: 0;
+}
+
+/* Badge Color Themes */
+.sic-badge-coeff { background: #f59e0b; }
+.sic-badge-element { background: #06b6d4; }
+.sic-badge-subscript { background: #8b5cf6; }
+.sic-badge-state { background: #3b82f6; }
+.sic-badge-operator { background: #64748b; }
+.sic-badge-molecule { background: #10b981; }
+.sic-badge-control { background: #475569; }
+.sic-badge-settings { background: #6366f1; }
+.sic-badge-balanced { background: #10b981; }
+.sic-badge-unbalanced { background: #ef4444; }
+
+.sic-title {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* Visual Demonstration Box */
+.sic-visual-box {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.sic-visual-graphic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.sic-visual-caption {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #64748b;
+    text-align: center;
+    line-height: 1.25;
+}
+
+/* Groups Visualizer for Coefficients */
+.sic-groups-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.sic-mol-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 4px 8px;
+    box-shadow: 0 1.5px 0 #94a3b8;
+}
+
+.sic-group-label {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.sic-group-atoms {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Add Molecule Breakdown List */
+.sic-add-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.sic-add-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: #0f172a;
+}
+
+.sic-add-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-radius: 5px;
+    padding: 1px 5px;
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+/* Balance Scale / Tray Indicators */
+.sic-balance-meter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-weight: 900;
+    font-size: 0.82rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.sic-need-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 900;
+    font-size: 0.78rem;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+.sic-need-pill.need-react {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1.5px solid #bfdbfe;
+}
+.sic-need-pill.need-prod {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1.5px solid #fed7aa;
+}
+.sic-need-pill.is-balanced {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1.5px solid #a7f3d0;
+}
+
+/* Atom Circle */
+.sic-atom-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid #1e293b;
+    box-shadow: 0 1.5px 0 #1e293b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 0.75rem;
+    color: #ffffff;
+}
+
+/* Bond Connector Line */
+.sic-bond-line {
+    width: 8px;
+    height: 3px;
+    background: #1e293b;
+    border-radius: 2px;
+}
+
+/* Compact Key Tip Callout */
+.sic-callout {
+    background: #fefce8;
+    border: 1.5px solid #fef08a;
+    border-left: 3.5px solid #eab308;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #854d0e;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sic-callout-icon {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* Hover target highlights */
+.has-chem-info {
+    cursor: help !important;
+    position: relative;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.has-chem-info:hover {
+    filter: brightness(1.08);
+}
+
+.sci-elem-token {
+    display: inline-block;
+    padding: 0 1px;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.sci-formula {
+    cursor: help;
+    border-radius: 6px;
+    transition: all 0.12s ease;
+    padding: 2px 4px;
+}
+.sci-formula:hover {
+    outline: 2px dashed #06b6d4;
+    background: rgba(6, 182, 212, 0.08);
+}
+
+.sci-sub-token {
+    display: inline-block;
+    pointer-events: auto !important;
+    font-size: 0.62em !important;
+    vertical-align: -0.28em !important;
+    line-height: 0 !important;
+    cursor: help;
+    padding: 0 2px;
+    border-radius: 4px;
+    transition: all 0.12s ease;
+}
+.sci-sub-token:hover {
+    background: rgba(139, 92, 246, 0.2);
+    outline: 2px dashed #8b5cf6;
+}
+
+.sci-state-token {
+    display: inline-block;
+    padding: 0 2px;
+    border-radius: 4px;
+    transition: all 0.12s ease;
+}
+.sci-state-token:hover {
+    background: rgba(59, 130, 246, 0.2);
+    outline: 2px dashed #3b82f6;
+}
+
+.sci-coeff.has-chem-info:hover {
+    transform: scale(1.15) !important;
+    outline: 3px solid #f59e0b;
+}
+
+#level-title.has-chem-info:hover {
+    color: #2563eb;
+    text-decoration: underline dotted #2563eb 2px;
+}
+
+.footer-stat.has-chem-info {
+    cursor: help !important;
+    transition: transform 0.1s ease, filter 0.1s ease;
+}
+.footer-stat.has-chem-info:hover {
+    filter: brightness(1.25);
+    outline: 2px dashed #ffffff;
+    border-radius: 6px;
+}
+
+
+/* ==========================================================================
+   STYLE VARIANTS FOR SHOWROOM & LIVE GAME
+   ========================================================================== */
+
+.sic-desc {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #334155;
+    line-height: 1.35;
+}
+
+/* 1. MINIMALIST DIRECT (User's Direction: Clean, Zero Fluff, Bold Direct Statement) */
+#sci-info-card.style-minimalist,
+.card-preview-box.style-minimalist {
+    border: 3px solid #0f172a;
+    border-radius: 14px;
+    box-shadow: 0 5px 0 #0f172a, 0 10px 20px rgba(15, 23, 42, 0.12);
+    padding: 10px 14px;
+    background: #ffffff;
+    max-width: 280px;
+}
+#sci-info-card.style-minimalist .sic-header,
+.card-preview-box.style-minimalist .sic-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    gap: 3px;
+}
+#sci-info-card.style-minimalist .sic-badge,
+.card-preview-box.style-minimalist .sic-badge {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+#sci-info-card.style-minimalist .sic-title,
+.card-preview-box.style-minimalist .sic-title {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: #0f172a;
+}
+#sci-info-card.style-minimalist .sic-desc,
+.card-preview-box.style-minimalist .sic-desc {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 2px;
+}
+
+/* 2. TACTILE LAB PILL (Chunky Game Visuals with Soft laboratory Tints) */
+#sci-info-card.style-tactile,
+.card-preview-box.style-tactile {
+    border: 3px solid #334155;
+    border-radius: 18px;
+    box-shadow: 0 6px 0 #1e293b, 0 12px 25px rgba(0,0,0,0.15);
+    background: #f8fafc;
+    padding: 12px 14px;
+}
+#sci-info-card.style-tactile .sic-header,
+.card-preview-box.style-tactile .sic-header {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 6px 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 3. MICRO-HUD PRECISION (Emil Kowalski Style: Deep Slate, Monospace Cues, Ultra-Crisp) */
+#sci-info-card.style-microhud,
+.card-preview-box.style-microhud {
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    color: #f8fafc;
+    padding: 10px 12px;
+}
+#sci-info-card.style-microhud .sic-header,
+.card-preview-box.style-microhud .sic-header {
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 5px;
+}
+#sci-info-card.style-microhud .sic-title,
+.card-preview-box.style-microhud .sic-title {
+    color: #ffffff;
+    font-size: 0.98rem;
+    letter-spacing: -0.2px;
+}
+#sci-info-card.style-microhud .sic-desc,
+.card-preview-box.style-microhud .sic-desc {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+#sci-info-card.style-microhud .sic-visual-box,
+.card-preview-box.style-microhud .sic-visual-box {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+#sci-info-card.style-microhud .sic-callout,
+.card-preview-box.style-microhud .sic-callout {
+    background: #1e293b;
+    border-left-color: #38bdf8;
+    color: #cbd5e1;
+}
+
+/* 4. EDUCATIONAL FLASHCARD (Structured Study Card with Pedagogical Tags) */
+#sci-info-card.style-flashcard,
+.card-preview-box.style-flashcard {
+    background: #ffffff;
+    border: 3px solid #2563eb;
+    border-radius: 14px;
+    box-shadow: 0 6px 0 #1d4ed8, 0 10px 20px rgba(37, 99, 235, 0.15);
+    padding: 12px 14px;
+}
+#sci-info-card.style-flashcard .sic-header,
+.card-preview-box.style-flashcard .sic-header {
+    border-bottom: 2px dashed #bfdbfe;
+    padding-bottom: 6px;
+}
+#sci-info-card.style-flashcard .sic-title,
+.card-preview-box.style-flashcard .sic-title {
+    color: #1e3a8a;
+}
+
+/* 5. FROSTED LAB GLASS (Apple Style) */
+#sci-info-card.style-glass {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 2px solid rgba(226, 232, 240, 0.9) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+}
+#sci-info-card.style-glass .sic-badge {
+    border-radius: 999px !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 6. COMPACT BENTO HUD (Emil Kowalski Precision) */
+#sci-info-card.style-bento {
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08) !important;
+    padding: 11px 13px !important;
+}
+
+/* 7. HIGH-CONTRAST ACCENT */
+#sci-info-card.style-accent {
+    background: #ffffff !important;
+    border: 2.5px solid #0f172a !important;
+    border-top-width: 6px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 0 #0f172a !important;
+}
