@@ -1,0 +1,182 @@
+/* ========================================================
+   STOICHBALANCE REFINED DEPTH LAYER (TONED DOWN & CLEAN)
+   Tactile Lab Equipment, Soft Contact Shadows & Refined Elevation
+   ======================================================== */
+
+/* 1. Main Console Container - Crisp Beveled Edge & Natural Ground Shadow */
+.main-container {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    0 12px 0 var(--dark-border),
+    0 20px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* 2. Left Panel - Natural Subtle Contact Shadow Under Scale */
+.brand-wrapper {
+  position: relative;
+}
+
+.logo-icon {
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 10px 4px rgba(0, 0, 0, 0.1)) !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo-icon:hover {
+  transform: scale(1.05) rotate(-2deg);
+}
+
+/* Subtle neutral ground shadow under scale (no glowing orbs) */
+.brand-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 18px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* 3. Inset Lab Display for Player Name Input */
+.name-input {
+  background: #f8fafc !important;
+  border: 3.5px solid var(--dark-border) !important;
+  box-shadow:
+    inset 0 3px 5px rgba(0, 0, 0, 0.06),
+    0 2px 0 rgba(255, 255, 255, 0.9) !important;
+  transition: all 0.2s ease !important;
+}
+
+.name-input:focus {
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow:
+    inset 0 1px 3px rgba(37, 99, 235, 0.08),
+    0 0 0 4px rgba(37, 99, 235, 0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* Stats Button */
+#challenge-stats-btn {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
+    0 4px 0 var(--dark-border) !important;
+}
+
+#challenge-stats-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
+    0 6px 0 var(--dark-border) !important;
+}
+
+/* 4. Refined Satin Play Button (No Harsh Gloss) */
+.btn-play {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.35),
+    0 6px 0 var(--dark-border),
+    0 12px 18px rgba(16, 185, 129, 0.2) !important;
+  text-shadow: 0 1.5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-play:hover {
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.45),
+    0 8px 0 var(--dark-border),
+    0 16px 22px rgba(16, 185, 129, 0.28) !important;
+}
+
+.btn-play:active {
+  transform: translateY(4px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(0, 0, 0, 0.15),
+    0 2px 0 var(--dark-border) !important;
+}
+
+/* 5. Right Panel - Docked Recessed Cards vs Raised Active Module */
+.right-panel {
+  background: #f8fafc !important;
+}
+
+/* Docked feel for unselected cards */
+.mode-card:not(.active-mode) {
+  background: #ffffff !important;
+  border: 3.5px solid #cbd5e1 !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.03),
+    0 4px 0 #cbd5e1 !important;
+  opacity: 0.82 !important;
+  transform: scale(0.985) !important;
+}
+
+.mode-card:not(.active-mode):hover {
+  border-color: var(--dark-border) !important;
+  box-shadow:
+    0 5px 0 var(--dark-border),
+    0 8px 16px rgba(0, 0, 0, 0.06) !important;
+  transform: scale(0.995) translateY(-2px) !important;
+  opacity: 1 !important;
+}
+
+/* Active Selected Card */
+.mode-card.active-mode {
+  border-color: var(--dark-border) !important;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.4),
+    0 8px 0 var(--dark-border),
+    0 14px 22px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Vibrant Solid Colors (Subtle Gradient) */
+.card-blue.active-mode {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%) !important;
+}
+
+.card-orange.active-mode {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
+}
+
+.card-purple.active-mode {
+  background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%) !important;
+}
+
+/* 6. Sub Buttons (Tiers & Forms) */
+.sub-btn {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.2),
+    0 4px 0 var(--dark-border) !important;
+}
+
+.sub-btn.active-sub {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    0 4px 0 var(--dark-border) !important;
+}
+
+/* 7. Challenge Modifiers Inset Tray */
+.home-modifiers-section {
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.22),
+    0 1.5px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.home-mod-pill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 3px 0 var(--dark-border) !important;
+}
+
+.home-mod-pill.active {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 3px 0 var(--dark-border) !important;
+}
+
+.home-multiplier-pill { background: #facc15 !important; color: #1e1b4b !important; border: 2px solid var(--dark-border) !important; font-weight: 900 !important; }
