@@ -6,7 +6,7 @@
     <title>Stoichbalance - Level Selection</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css?v=1792982023">
-    <link rel="stylesheet" href="css/levels.css?v=1792985600">
+    <link rel="stylesheet" href="css/levels.css?v=1793583324">
     <script src="levels.js?v=1792981377"></script>
 
 <script>
@@ -172,71 +172,7 @@ window.addEventListener('load', () => {
 
 </script>
 
-<script>
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function initAudio() {
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-}
-window.playSound = function(type) {
-    if (!audioCtx) window.initAudio();
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
 
-    initAudio();
-    if (!audioCtx) return;
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    
-    if (type === 'start') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
-        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-            } else if (type === 'tactile') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.05);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
-        } else if (type === 'retro-select') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
-            osc.frequency.setValueAtTime(880.00, audioCtx.currentTime + 0.2);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.4);
-        } else if (type === 'page') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
-    } else if (type === 'back') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.15);
-        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-    }
-}
-</script>
 
 <style>
 .level-card:hover, .level-card.kb-focus {
@@ -255,6 +191,18 @@ window.playSound = function(type) {
         if (new URLSearchParams(window.location.search).get('mode') === 'challenge') {
             document.documentElement.classList.add('is-challenge-mode');
         }
+    </script>
+<script>
+        (function() {
+            var p = new URLSearchParams(window.location.search);
+            var f = p.get('form') || '';
+            var m = p.get('mode') || '';
+            if (f.indexOf('5') !== -1) {
+                document.documentElement.classList.add('is-form5-mode');
+            } else if (m === 'challenge') {
+                document.documentElement.classList.add('is-challenge-mode');
+            }
+        })();
     </script>
 </head>
 <body>
@@ -282,8 +230,15 @@ window.playSound = function(type) {
             
             <div class="header-right">
                 <div class="score-widget">
-                    <span class="score-icon">🏆</span>
+                    <span class="score-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+                    </svg></span>
                     <span class="score-text">3 / 15</span>
+                </div>
+                <div class="challenge-tier-selector" id="challenge-tier-selector" style="display:none;">
+                    <button class="tier-tab-btn interactive" data-tier="easy" type="button">EASY</button>
+                    <button class="tier-tab-btn interactive" data-tier="medium" type="button">MEDIUM</button>
+                    <button class="tier-tab-btn interactive" data-tier="hard" type="button">HARD</button>
                 </div>
             </div>
         </header>
@@ -295,28 +250,54 @@ window.playSound = function(type) {
       </div>
   </div>
 
-  <script src="js/levels.js?v=1792981377"></script>
+  
 <script>
 let myCurrentPage = 1;
 const ITEMS_PER_PAGE = 6;
 let myTotalPages = 1;
 
-function getLevelIcon(title) {
-    let t = title.toLowerCase();
-    if(t.includes('haber')) return '🏭';
-    if(t.includes('contact')) return '⚗️';
-    if(t.includes('combust') || t.includes('burn')) return '🔥';
-    if(t.includes('acid') || t.includes('base') || t.includes('neutrali')) return '💧';
-    if(t.includes('rust') || t.includes('iron')) return '🔩';
-    if(t.includes('photo')) return '☀️';
-    if(t.includes('resp')) return '🫁';
-    if(t.includes('precip')) return '🌧️';
-    if(t.includes('metal')) return '🪙';
-    if(t.includes('decompose')) return '💥';
-    if(t.includes('ostwald')) return '🌩️';
-    if(t.includes('extract')) return '⛏️';
+function getLevelIcon(title, isSolved) {
+    if (isSolved) return '✅';
+    let t = (title || '').toLowerCase();
+    
+    // Haber Process / Ammonia
+    if (t.includes('haber') || t.includes('ammonia')) return '🏭';
+    // Sodium-Water Reaction
+    if (t.includes('sodium') || t.includes('water reaction')) return '💥';
+    // Halogen Displacement
+    if (t.includes('halogen') || t.includes('iodide') || t.includes('bromide')) return '🧪';
+    // Acid-Metal Reaction
+    if (t.includes('acid-metal') || (t.includes('acid') && t.includes('metal') && !t.includes('carbonate'))) return '⚗️';
+    // Neutralisation
+    if (t.includes('neutral')) return '💧';
+    // Metal Displacement
+    if (t.includes('metal displacement')) return '🪙';
+    // Acid-Carbonate Reaction
+    if (t.includes('carbonate')) return '🫧';
+    // Combustion
+    if (t.includes('combust') || t.includes('burn')) return '🔥';
+    // Precipitation
+    if (t.includes('precipit')) return '🌧️';
+    // Decomposition
+    if (t.includes('decomp')) return '⚡';
+    // Oxidation of Magnesium
+    if (t.includes('magnesium') || t.includes('oxidation')) return '✨';
+    // Esterification
+    if (t.includes('ester')) return '🍓';
+    // Hydration of Ethene
+    if (t.includes('ethene') || t.includes('hydrat')) return '🌊';
+    // Contact Process
+    if (t.includes('contact')) return '⚙️';
+    // Reduction of Metal Oxide
+    if (t.includes('reduction') || t.includes('oxide')) return '🌋';
+    // Fermentation
+    if (t.includes('ferment')) return '🍇';
+    // General Acid fallback
+    if (t.includes('acid')) return '🧪';
+    
     return '🧪';
 }
+
 
 let currentFocusIndex = -1;
 
@@ -361,42 +342,78 @@ document.addEventListener('keydown', (e) => {
 
 
 window.renderChallengeScreen = function(params) {
-    const tier = (params.get('tier') || 'easy').toLowerCase();
-    const tierUpper = tier.toUpperCase();
+    let currentTier = (params.get('tier') || 'easy').toLowerCase();
     const playerName = params.get('name') || localStorage.getItem('currentPlayer') || 'Player';
     
     // Switch background layer from blue to purple
     const bgEl = document.getElementById('bg-levels');
     if (bgEl) {
-        bgEl.className = 'bg-layer bg-purple active-bg';
+        bgEl.className = 'bg-layer bg-orange active-bg';
     }
     document.body.classList.add('is-challenge-mode');
 
-    // 1. Header elements
-    const nameEl = document.getElementById('display-name');
-    if (nameEl) nameEl.innerText = playerName;
-    
-    const titleEl = document.getElementById('form-title');
-    if (titleEl) titleEl.innerText = `${tierUpper} CHALLENGE`;
-    
-    const subTitleEl = document.querySelector('.levels-subtitle');
-    if (subTitleEl) subTitleEl.innerText = '5 Sequential Mystery Reactions';
-    
-    // Personal best lookup
-    let history = JSON.parse(localStorage.getItem('challengeHistory_' + playerName) || '[]');
-    let tierHistory = history.filter(h => h.tier && h.tier.toLowerCase() === tier);
-    let bestStr = 'None yet';
-    if (tierHistory.length > 0) {
-        let fastest = tierHistory.reduce((prev, curr) => (prev.timeSec < curr.timeSec ? prev : curr));
-        bestStr = `${fastest.timeStr || (fastest.timeSec + 's')} (${'⭐'.repeat(fastest.stars || 3)})`;
+    // Helper: Capitalize
+    function formatTierName(t) {
+        return t.charAt(0).toUpperCase() + t.slice(1);
     }
-    const scoreText = document.querySelector('.score-text');
-    if (scoreText) scoreText.innerText = bestStr;
-    const scoreIcon = document.querySelector('.score-icon');
-    if (scoreIcon) scoreIcon.innerHTML = '🏆';
-    
+
+    // 1. Clean Header: Replace greeting, subtitle, and score widget
+    const titleEl = document.getElementById('form-title');
+    if (titleEl) {
+        titleEl.innerText = `${formatTierName(currentTier)} Challenge`;
+    }
+
+    // Activate the top-right tier selector
+    const tierSelector = document.getElementById('challenge-tier-selector');
+    if (tierSelector) {
+        tierSelector.style.display = 'inline-flex';
+        updateTierButtons(currentTier);
+        
+        tierSelector.querySelectorAll('.tier-tab-btn').forEach(btn => {
+            btn.onclick = function(e) {
+                e.stopPropagation();
+                if (typeof window.playSound === 'function') window.playSound('retro-select');
+                const selectedTier = btn.getAttribute('data-tier');
+                if (selectedTier !== currentTier) {
+                    currentTier = selectedTier;
+                    config.tier = selectedTier;
+                    
+                    // Update header title
+                    if (titleEl) titleEl.innerText = `${formatTierName(currentTier)} Challenge`;
+                    
+                    // Update right column tier badge
+                    const tierPill = document.getElementById('cfg-tier-pill');
+                    if (tierPill) {
+                        tierPill.innerText = `${currentTier.toUpperCase()} MODE`;
+                        if (currentTier === 'hard') tierPill.style.background = '#ef4444';
+                        else if (currentTier === 'medium') tierPill.style.background = '#f59e0b';
+                        else tierPill.style.background = '#10b981';
+                    }
+                    
+                    updateTierButtons(currentTier);
+                    
+                    // Update browser URL query without reloading
+                    const newUrl = `levels.html?mode=challenge&tier=${encodeURIComponent(currentTier)}&name=${encodeURIComponent(playerName)}`;
+                    window.history.replaceState({ tier: currentTier }, '', newUrl);
+                    
+                    updateLiveMultiplier();
+                }
+            };
+        });
+    }
+
+    function updateTierButtons(activeTier) {
+        if (!tierSelector) return;
+        tierSelector.querySelectorAll('.tier-tab-btn').forEach(b => {
+            if (b.getAttribute('data-tier') === activeTier) {
+                b.classList.add('active');
+            } else {
+                b.classList.remove('active');
+            }
+        });
+    }
+
     // 2. Modifiers state (Standard Baseline: Scale ON, Hints ON, Timer Stopwatch)
-    // Toggles represent CHALLENGES: Hide Scale (OFF), No Hints (OFF), 90s Rush (OFF)
     let challenges = {
         hideScale: false,
         noHints: false,
@@ -404,28 +421,26 @@ window.renderChallengeScreen = function(params) {
     };
 
     let config = {
-        tier: tier,
+        tier: currentTier,
         scale: 'on',
         hints: '1',
         timer: 'stopwatch',
         player: playerName
     };
     
-    // Function returning the exact dynamic summary sentence for all 8 variations
+    // Dynamic Summary Sentence
     function getSummarySentence() {
         if (!challenges.speedRush) {
-            // STOPWATCH MODE: Always emphasizes "fastest possible time"
             if (!challenges.hideScale && !challenges.noHints) {
-                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> with the 3D scale and 1 hint token.';
+                return 'Balance 5 equations in the <b style="color:#10b981;">fastest possible time</b> with the 3D scale and 1 hint token.';
             } else if (challenges.hideScale && !challenges.noHints) {
-                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> using <b style="color:#7e22ce;">mental math</b>, with 1 hint token.';
+                return 'Balance 5 equations in the <b style="color:#10b981;">fastest possible time</b> using <b style="color:#7e22ce;">mental math</b>, with 1 hint token.';
             } else if (!challenges.hideScale && challenges.noHints) {
-                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> with the 3D scale and <b style="color:#2563eb;">zero hints</b>.';
+                return 'Balance 5 equations in the <b style="color:#10b981;">fastest possible time</b> with the 3D scale and <b style="color:#2563eb;">zero hints</b>.';
             } else {
-                return 'Balance 5 equations in the <b style="color:#16a34a;">fastest possible time</b> using pure <b style="color:#7e22ce;">mental math</b> with <b style="color:#2563eb;">zero hints</b>.';
+                return 'Balance 5 equations in the <b style="color:#10b981;">fastest possible time</b> using pure <b style="color:#7e22ce;">mental math</b> with <b style="color:#2563eb;">zero hints</b>.';
             }
         } else {
-            // 90S COUNTDOWN RUSH MODE
             if (!challenges.hideScale && !challenges.noHints) {
                 return 'Race against the clock to balance 5 equations in <b style="color:#d97706;">90 seconds</b>, with the 3D scale and 1 hint token.';
             } else if (challenges.hideScale && !challenges.noHints) {
@@ -445,31 +460,26 @@ window.renderChallengeScreen = function(params) {
     const challengeHtml = `
         <div class="challenge-main-container">
             
-            <!-- MIDDLE AREA: SPLIT INTO LEFT (CHALLENGE MODIFIERS) AND RIGHT (OVERVIEW) -->
+            <!-- MIDDLE AREA: SPLIT INTO LEFT (MODIFIERS) AND RIGHT (OVERVIEW) -->
             <div class="challenge-split-deck">
                 
                 <!-- LEFT COLUMN: CHALLENGE MODIFIERS -->
                 <div class="deck-left-col">
                     <div class="deck-header-wrap">
-                        <div class="deck-title-group">
-                            <span class="deck-kicker">CUSTOMIZE RUN</span>
-                            <h2 class="deck-main-title">Challenge Modifiers</h2>
-                        </div>
+                        <h2 class="deck-main-title">Challenge Modifiers</h2>
                         <span class="deck-status-pill" id="deck-status-pill">0 / 3 ACTIVE</span>
                     </div>
                     
                     <div class="modifiers-list">
                         
-                        <!-- CHALLENGE 1: HIDE 3D SCALE -->
-                        <div class="mod-card is-neutral interactive" id="row-hide-scale" tabindex="0" role="button" aria-label="Toggle Hide 3D Scale">
+                        <!-- CHALLENGE 1: HIDE BALANCE SCALE -->
+                        <div class="mod-card is-neutral interactive" id="row-hide-scale" tabindex="0" role="button" aria-label="Toggle Hide Balance Scale">
                             <div class="mod-icon-box">
                                 <span>🧠</span>
                             </div>
                             <div class="mod-content">
-                                <div class="mod-title">Hide 3D Scale</div>
-                                <div id="desc-hide-scale" class="mod-desc">
-                                    Turn on to hide the visual balance beam and solve with mental math (+0.5x).
-                                </div>
+                                <div class="mod-title">Hide Balance Scale</div>
+                                <span class="mod-bonus-badge" id="desc-hide-scale">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-hide-scale">
                                 <div class="tactile-switch-knob">
@@ -485,9 +495,7 @@ window.renderChallengeScreen = function(params) {
                             </div>
                             <div class="mod-content">
                                 <div class="mod-title">Disable Hints</div>
-                                <div id="desc-no-hints" class="mod-desc">
-                                    Turn on to play without any emergency hints from Prof. Beaker (+0.5x).
-                                </div>
+                                <span class="mod-bonus-badge" id="desc-no-hints">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-no-hints">
                                 <div class="tactile-switch-knob">
@@ -503,9 +511,7 @@ window.renderChallengeScreen = function(params) {
                             </div>
                             <div class="mod-content">
                                 <div class="mod-title">90s Speed Rush</div>
-                                <div id="desc-rush-mode" class="mod-desc">
-                                    Turn on to race against an intense 90-second countdown clock (+0.5x).
-                                </div>
+                                <span class="mod-bonus-badge" id="desc-rush-mode">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-rush-mode">
                                 <div class="tactile-switch-knob">
@@ -515,62 +521,36 @@ window.renderChallengeScreen = function(params) {
                         </div>
 
                     </div>
-
-                    <div class="deck-tip-box">
-                        <span>💡</span>
-                        <span><b>Pro Tip:</b> Turn on challenge modifiers to boost your score multiplier and unlock badges!</span>
-                    </div>
                 </div>
 
-                <!-- RIGHT COLUMN: CLEAN REFINED OVERVIEW -->
+                <!-- RIGHT COLUMN: STREAMLINED RUN OVERVIEW -->
                 <div class="deck-right-col">
                     <div class="lab-summary-card">
                         
                         <!-- Top Header -->
                         <div class="summary-top-bar">
-                            <div>
-                                <span class="summary-kicker">CHALLENGE DETAILS</span>
-                                <h2 class="summary-main-title">Run Overview</h2>
-                            </div>
-                            <span class="summary-tier-badge" id="cfg-tier-pill">${tierUpper} MODE</span>
+                            <h2 class="summary-main-title">Run Overview</h2>
+                            <span class="summary-tier-badge" id="cfg-tier-pill">${currentTier.toUpperCase()} MODE</span>
                         </div>
 
-                        <!-- 1. PERSONAL BEST STRIP -->
-                        <div class="summary-pb-strip">
-                            <div class="pb-left">
-                                <span class="title-icon-badge yellow">🏆</span>
-                                <span class="pb-label">Personal Best</span>
+                        <!-- 1. MULTIPLIER HERO BOX -->
+                        <div class="multiplier-hero-box">
+                            <div class="multiplier-top-row">
+                                <span class="multiplier-hero-label">⚡ Score Multiplier</span>
+                                <span class="outside-rank-badge" id="cfg-multiplier-tag">STANDARD</span>
                             </div>
-                            <span class="pb-val" id="cfg-best-val">${bestStr}</span>
-                        </div>
-
-                        <!-- 2. SCORE MULTIPLIER (With Outside Rank Pill) -->
-                        <div class="summary-block">
-                            <div class="block-header">
-                                <div class="title-with-badge">
-                                    <span class="block-title">
-                                        <span class="title-icon-badge amber">⚡</span> Score Multiplier
-                                    </span>
-                                    <span class="outside-rank-badge" id="cfg-multiplier-tag">STANDARD</span>
-                                </div>
-                            </div>
-                            <div class="multiplier-meter-box">
-                                <div class="meter-number-row">
-                                    <span class="multiplier-giant-number" id="cfg-multiplier-val">1.0x</span>
-                                    <span class="multiplier-sublabel">Difficulty Multiplier</span>
-                                </div>
+                            <div class="multiplier-meter-row">
+                                <span class="multiplier-giant-number" id="cfg-multiplier-val">1.0x</span>
                                 <div class="multiplier-bar-track">
                                     <div class="multiplier-bar-fill" id="cfg-multiplier-bar" style="width: 20%;"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. RUN OBJECTIVE -->
+                        <!-- 2. RUN GOAL -->
                         <div class="summary-block">
                             <div class="block-header">
-                                <span class="block-title">
-                                    <span class="title-icon-badge purple">🎯</span> Run Objective
-                                </span>
+                                <span class="block-title">🎯 Run Goal</span>
                             </div>
                             <div class="objective-text-box">
                                 <div class="objective-sentence" id="cfg-dynamic-sentence">
@@ -579,42 +559,28 @@ window.renderChallengeScreen = function(params) {
                             </div>
                         </div>
 
-                        <!-- 4. QUALIFYING BADGES -->
+                        <!-- 3. QUALIFYING BADGES -->
                         <div class="summary-block">
                             <div class="block-header">
-                                <span class="block-title">
-                                    <span class="title-icon-badge blue">🏅</span> Qualifying Badges
-                                </span>
+                                <span class="block-title">🏅 Qualifying Badges</span>
                                 <span class="badges-status-pill" id="cfg-badges-count">1 / 4 QUALIFIED</span>
                             </div>
                             <div class="badges-2x2-grid">
                                 <div class="lab-badge-chip locked" id="chip-badge-mental">
                                     <span class="chip-emoji">🧠</span>
-                                    <div class="chip-text-group">
-                                        <span class="chip-name">Mental Math</span>
-                                        <span class="chip-bonus">Scale Hidden (+0.5x)</span>
-                                    </div>
+                                    <span class="chip-name">Mental Math</span>
                                 </div>
                                 <div class="lab-badge-chip locked" id="chip-badge-solo">
                                     <span class="chip-emoji">🎓</span>
-                                    <div class="chip-text-group">
-                                        <span class="chip-name">Solo Chemist</span>
-                                        <span class="chip-bonus">Hints Disabled (+0.5x)</span>
-                                    </div>
+                                    <span class="chip-name">Solo Chemist</span>
                                 </div>
                                 <div class="lab-badge-chip locked" id="chip-badge-speed">
                                     <span class="chip-emoji">⏳</span>
-                                    <div class="chip-text-group">
-                                        <span class="chip-name">Speed Demon</span>
-                                        <span class="chip-bonus">90s Rush (+0.5x)</span>
-                                    </div>
+                                    <span class="chip-name">Speed Demon</span>
                                 </div>
                                 <div class="lab-badge-chip unlocked-master" id="chip-badge-master">
                                     <span class="chip-emoji">⭐</span>
-                                    <div class="chip-text-group">
-                                        <span class="chip-name">3-Star Record</span>
-                                        <span class="chip-bonus">Flawless Accuracy</span>
-                                    </div>
+                                    <span class="chip-name">3-Star Record</span>
                                 </div>
                             </div>
                         </div>
@@ -624,13 +590,13 @@ window.renderChallengeScreen = function(params) {
 
             </div>
 
-            <!-- BOTTOM AREA: RESTORED FULL-WIDTH GUCCI CHALLENGE FOOTER -->
+            <!-- BOTTOM AREA: FOOTER -->
             <div class="challenge-footer">
                 <div class="footer-brief-block">
                     <div class="footer-target-icon">🎯</div>
                     <div class="footer-brief-texts">
                         <div class="footer-brief-title">5 Mystery Reactions • Time Attack</div>
-                        <div class="footer-brief-desc">Balance all 5 equations in a row to set your fastest time.</div>
+                        <div class="footer-brief-desc">Balance all 5 equations in a row to set your personal best.</div>
                     </div>
                 </div>
                 
@@ -647,20 +613,16 @@ window.renderChallengeScreen = function(params) {
     // Tier pill styling
     const tierPill = document.getElementById('cfg-tier-pill');
     if (tierPill) {
-        if (tier === 'hard') {
-            tierPill.style.background = '#ef4444';
-        } else if (tier === 'medium') {
-            tierPill.style.background = '#f59e0b';
-        } else {
-            tierPill.style.background = '#8b5cf6';
-        }
+        if (currentTier === 'hard') tierPill.style.background = '#ef4444';
+        else if (currentTier === 'medium') tierPill.style.background = '#f59e0b';
+        else tierPill.style.background = '#10b981';
     }
 
     // Dynamic Multiplier & Badge Counter Logic
     function updateLiveMultiplier() {
         let mult = 1.0;
         let activeCount = 0;
-        let unlockedBadges = 1; // 3-star record is eligible by default
+        let unlockedBadges = 1;
         
         if (challenges.hideScale) {
             mult += 0.5;
@@ -678,7 +640,6 @@ window.renderChallengeScreen = function(params) {
             unlockedBadges++;
         }
         
-        // Update header pill
         const statusPill = document.getElementById('deck-status-pill');
         if (statusPill) {
             statusPill.innerText = `${activeCount} / 3 ACTIVE`;
@@ -730,7 +691,6 @@ window.renderChallengeScreen = function(params) {
         const countEl = document.getElementById('cfg-badges-count');
         if (countEl) countEl.innerText = `${unlockedBadges} / 4 QUALIFIED`;
 
-        // Update the dynamic summary sentence live
         const sentenceEl = document.getElementById('cfg-dynamic-sentence');
         if (sentenceEl) {
             sentenceEl.innerHTML = getSummarySentence();
@@ -753,10 +713,10 @@ window.renderChallengeScreen = function(params) {
                 card.classList.remove('is-neutral');
             }
             if (sw) {
-                sw.classList.add('is-active', 'is-on-purple');
+                sw.classList.add('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerHTML = '<b style="color:#7e22ce;">Scale hidden!</b> Solve using mental math for +0.5x bonus.';
+                desc.innerText = 'ACTIVE (+0.5x)';
             }
         } else {
             if (card) {
@@ -764,10 +724,10 @@ window.renderChallengeScreen = function(params) {
                 card.classList.add('is-neutral');
             }
             if (sw) {
-                sw.classList.remove('is-active', 'is-on-purple');
+                sw.classList.remove('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerText = 'Turn on to hide the visual balance beam and solve with mental math (+0.5x).';
+                desc.innerText = '+0.5x Multiplier';
             }
         }
         
@@ -797,7 +757,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.add('is-active', 'is-on-blue');
             }
             if (desc) {
-                desc.innerHTML = '<b style="color:#2563eb;">Hints disabled!</b> Solve solo without hints for +0.5x bonus.';
+                desc.innerText = 'ACTIVE (+0.5x)';
             }
         } else {
             if (card) {
@@ -808,7 +768,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.remove('is-active', 'is-on-blue');
             }
             if (desc) {
-                desc.innerText = 'Turn on to play without any emergency hints from Prof. Beaker (+0.5x).';
+                desc.innerText = '+0.5x Multiplier';
             }
         }
         
@@ -838,7 +798,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.add('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerHTML = '<b style="color:#d97706;">90s Rush active!</b> Clear all 5 rounds before time expires (+0.5x bonus).';
+                desc.innerText = 'ACTIVE (+0.5x)';
             }
         } else {
             if (card) {
@@ -849,7 +809,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.remove('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerText = 'Turn on to race against an intense 90-second countdown clock (+0.5x).';
+                desc.innerText = '+0.5x Multiplier';
             }
         }
         
@@ -893,6 +853,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const nameEl = document.getElementById('display-name');
     if (nameEl) nameEl.innerText = nameParam;
     const formNumber = formParam.includes('5') ? '5' : '4';
+    if (formNumber === '5') {
+        document.documentElement.classList.add('is-form5-mode');
+        document.body.classList.add('is-form5-mode');
+        const bgEl = document.getElementById('bg-levels');
+        if (bgEl) {
+            bgEl.className = 'bg-layer bg-green active-bg';
+        }
+    }
     
     // Update titles
     const titleEl = document.getElementById('form-title');
@@ -925,7 +893,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let scoreText = document.querySelector('.score-text');
     let scoreIcon = document.querySelector('.score-icon');
     if(scoreText) scoreText.innerText = solvedCount + ' / ' + keys.length;
-    if(scoreIcon) scoreIcon.innerHTML = '🏆';
+    if(scoreIcon) scoreIcon.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+                    </svg>`;
 
 
     if(!gridContainer) return;
@@ -969,30 +939,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.currentTarget.style.transform = 'translateY(6px)';
                 e.currentTarget.style.setProperty('box-shadow', 'none', 'important');
                 window.playSound('retro-select');
-                window.transitionTo('game.html?level=' + k);
+                window.transitionTo(`game.html?level=${k}&form=${encodeURIComponent(formParam)}&name=${encodeURIComponent(nameParam)}`);
             };
             
             let bannerClass = isSolved ? 'banner-green' : 'banner-blue';
             let bannerText = isSolved ? 'REVIEW (SOLVED)' : 'PLAY';
-            let iconText = isSolved ? '✅' : getLevelIcon(L.title);
+            let iconText = getLevelIcon(L.title, isSolved);
             
             let starHtml = '';
             if (isSolved) {
-                let svgFull = `<svg width="14" height="14" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 1px; filter:drop-shadow(0 1px 0 rgba(0,0,0,0.15));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
-                let svgHalf = `<svg width="14" height="14" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 1px; filter:drop-shadow(0 1px 0 rgba(0,0,0,0.15));"><defs><linearGradient id="hgPopup" x1="0" x2="1" y1="0" y2="0"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#e2e8f0"/></linearGradient></defs><polygon fill="url(#hgPopup)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+                const makeFull = () => `<svg width="24" height="24" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 2px; filter:drop-shadow(0 2px 0 rgba(0,0,0,0.18));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
+                const makeHalf = () => `<svg width="24" height="24" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 2px; filter:drop-shadow(0 2px 0 rgba(0,0,0,0.18));"><defs><linearGradient id="hgPopup" x1="0" x2="1" y1="0" y2="0"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#e2e8f0"/></linearGradient></defs><polygon fill="url(#hgPopup)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
                 
-                if (stars === 3) starHtml = `<span style="display:flex; align-items:center; margin-left:4px;">${svgFull}${svgFull}${svgFull}</span>`;
-                else if (stars === 1.5) starHtml = `<span style="display:flex; align-items:center; margin-left:4px;">${svgFull}${svgHalf}</span>`;
+                let sIcons = '';
+                if (stars >= 3) {
+                    sIcons = makeFull() + makeFull() + makeFull();
+                } else if (stars >= 2.5) {
+                    sIcons = makeFull() + makeFull() + makeHalf();
+                } else if (stars >= 2) {
+                    sIcons = makeFull() + makeFull();
+                } else if (stars >= 1.5) {
+                    sIcons = makeFull() + makeHalf();
+                } else if (stars >= 1) {
+                    sIcons = makeFull();
+                } else {
+                    sIcons = makeFull() + makeFull() + makeFull();
+                }
+                starHtml = `<span class="lvl-stars">${sIcons}</span>`;
             }
 
             card.innerHTML = `
-                <div class="card-top" style="display:flex; justify-content:space-between; align-items:center; position:relative;">
+                <div class="card-top">
                     <span class="lvl-num">${niceNum}</span>
-                    <span class="lvl-stars" style="position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; background:rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.08); padding: 3px 8px; border-radius:12px;">${starHtml}</span>
+                    ${starHtml}
                     <span class="lvl-diff diff-${diff}">${diffLabel}</span>
                 </div>
-                <div class="card-icon">${iconText}</div>
                 <div class="card-body">
+                    <div class="card-icon">${iconText}</div>
                     <h3 class="lvl-name">${L.title}</h3>
                     <p class="lvl-equation">${L.equation}</p>
                 </div>
