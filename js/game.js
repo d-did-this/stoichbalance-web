@@ -1,10 +1,15 @@
 
 window.handleGameBackClick = function() {
+    if (typeof playSound === "function") playSound("click");
     if (window.isChallengeMode) {
         if (window.challengeInterval) clearInterval(window.challengeInterval);
         window.transitionTo('index.html');
     } else {
-        window.transitionTo('levels.html');
+        const params = new URLSearchParams(window.location.search);
+        const lvl = params.get('level') || '';
+        const form = params.get('form') || (lvl.toUpperCase().startsWith('F5') ? 'Form 5' : 'Form 4');
+        const name = params.get('name') || localStorage.getItem('currentPlayer') || 'Player';
+        window.transitionTo(`levels.html?form=${encodeURIComponent(form)}&mode=class&name=${encodeURIComponent(name)}`);
     }
 };
 
@@ -29,6 +34,7 @@ let currentLevelData = null;
 
 
 window.toggleFullscreen = function() {
+    if (typeof playSound === "function") playSound("tactile");
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(err => {
             console.log("Error attempting to enable fullscreen:", err);
@@ -43,6 +49,28 @@ window.toggleFullscreen = function() {
 
 
 window.toggleBlock = function(side) {
+    if (window.isChallengeMode) {
+        if (side === 'left' && window.challengeScaleSetting === 'off') {
+            if (typeof playSound === 'function') playSound('wrong');
+            let block = document.querySelector(".block-left");
+            if (block) {
+                block.classList.add("shake-locked");
+                setTimeout(() => block.classList.remove("shake-locked"), 400);
+            }
+            return;
+        }
+        if (side === 'right' && window.challengeHintsSetting === '0') {
+            if (typeof playSound === 'function') playSound('wrong');
+            let block = document.querySelector(".block-right");
+            if (block) {
+                block.classList.add("shake-locked");
+                setTimeout(() => block.classList.remove("shake-locked"), 400);
+            }
+            return;
+        }
+    }
+    
+    if (typeof playSound === "function") playSound("whoosh");
     let block = document.querySelector(".block-" + side);
     if(block) block.classList.toggle("collapsed");
     
@@ -78,11 +106,18 @@ function initEngine() {
 
     const params = new URLSearchParams(window.location.search);
     let mode = params.get('mode');
+    let formParam = params.get('form') || '';
+    let levelId = params.get('level') || 'F4L6';
     if (mode === 'challenge') {
+        document.documentElement.style.setProperty('--bg-color', '#f59e0b');
+        document.documentElement.classList.add('is-challenge-mode');
         window.initChallengeMode(params);
         return;
     }
-    let levelId = params.get('level') || 'F4L6';
+    if (formParam.includes('5') || levelId.toUpperCase().startsWith('F5')) {
+        document.documentElement.style.setProperty('--bg-color', '#10b981');
+        document.documentElement.classList.add('is-form5-mode');
+    }
     // Remove quotes if present
     levelId = levelId.replace(/['"]/g, '');
     
@@ -270,6 +305,7 @@ window.addMolecule = function(side, typeId) {
 };
 
 window.undo = function() {
+    if (typeof playSound === "function") playSound("undo");
     if (window.actionHistory.length === 0) return;
     let last = window.actionHistory.pop();
     if (last.action === "add") {
@@ -281,6 +317,7 @@ window.undo = function() {
 };
 
 window.resetEquation = function() {
+    if (typeof playSound === "function") playSound("trash");
     window.actionHistory = [];
     currentLevelData.reactants.forEach(m => {
         let row = document.getElementById("row-react-" + m.id);
@@ -311,6 +348,9 @@ window.toggleMute = function() {
     if(on && off) {
         on.style.display = window.isMuted ? "none" : "block";
         off.style.display = window.isMuted ? "block" : "none";
+    }
+    if (!window.isMuted && typeof playSound === "function") {
+        playSound("pop");
     }
 };
 
@@ -649,7 +689,8 @@ window.addChatMessage = function(msg, prefixLabel) {
     return;
 };
 
-window.clearChat = function() {
+window.clearChat = function(userInitiated) {
+    if (userInitiated && typeof playSound === "function") playSound("trash");
     let container = document.querySelector(".beaker-message");
     if(container) container.innerHTML = "";
 };
@@ -1059,17 +1100,18 @@ window.initChallengeMode = function(params) {
     // Start Timer
     if (window.challengeInterval) clearInterval(window.challengeInterval);
     window.challengeInterval = setInterval(() => {
+        let timerContainer = document.getElementById('challenge-timer-badge');
+        let timerText = document.getElementById('challenge-timer-text') || timerContainer;
+        
         if (window.challengeTimerSetting === 'countdown') {
             window.challengeCountdownRemaining--;
-            let timerEl = document.getElementById('challenge-timer-badge');
-            if (timerEl) {
-                let m = Math.floor(window.challengeCountdownRemaining / 60);
-                let s = window.challengeCountdownRemaining % 60;
-                timerEl.innerText = `⏳ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (window.challengeCountdownRemaining <= 10) {
-                    timerEl.style.color = '#ef4444';
-                    timerEl.style.borderColor = '#ef4444';
-                }
+            let rem = Math.max(0, window.challengeCountdownRemaining);
+            let m = Math.floor(rem / 60);
+            let s = rem % 60;
+            let str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (timerText) timerText.innerText = str;
+            if (timerContainer && window.challengeCountdownRemaining <= 10) {
+                timerContainer.classList.add('warning');
             }
             if (window.challengeCountdownRemaining <= 0) {
                 clearInterval(window.challengeInterval);
@@ -1077,12 +1119,10 @@ window.initChallengeMode = function(params) {
             }
         } else {
             window.challengeElapsedSec = Math.floor((Date.now() - window.challengeStartTime) / 1000);
-            let timerEl = document.getElementById('challenge-timer-badge');
-            if (timerEl) {
-                let m = Math.floor(window.challengeElapsedSec / 60);
-                let s = window.challengeElapsedSec % 60;
-                timerEl.innerText = `⏱️ ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }
+            let m = Math.floor(window.challengeElapsedSec / 60);
+            let s = window.challengeElapsedSec % 60;
+            let str = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if (timerText) timerText.innerText = str;
         }
     }, 1000);
     
@@ -1099,11 +1139,15 @@ window.loadChallengeRound = function(roundIndex) {
     
     let titleEl = document.getElementById("level-title");
     if (titleEl) {
-        titleEl.innerHTML = `<span style="color:#9333ea; font-size:0.85em; text-transform:uppercase; font-weight:900;">${window.challengeTier} Challenge</span> • Round ${roundIndex + 1}/5 : ${currentLevelData.title}`;
+        titleEl.innerText = `Round ${roundIndex + 1}/5 : ${currentLevelData.title}`;
     }
     
-    let roundBadge = document.getElementById('challenge-round-badge');
-    if (roundBadge) roundBadge.innerText = `ROUND ${roundIndex + 1}/5`;
+    let diffPill = document.getElementById('challenge-diff-pill') || document.getElementById('challenge-round-badge');
+    if (diffPill) {
+        let tierClean = (window.challengeTier || 'easy').toLowerCase();
+        diffPill.className = `lvl-diff diff-${tierClean}`;
+        diffPill.innerText = tierClean.charAt(0).toUpperCase() + tierClean.slice(1);
+    }
     
     window.applyChallengeScaleSettings();
     window.updateChallengeHintButton();
@@ -1124,7 +1168,11 @@ window.loadChallengeRound = function(roundIndex) {
 window.applyChallengeScaleSettings = function() {
     let scaleSection = document.querySelector('.section-scale');
     let scaleCards = document.querySelectorAll('.pro-scale-card');
+    let leftBlock = document.querySelector('.block-left');
+    let rightBlock = document.querySelector('.block-right');
+    let layout = document.querySelector('.good-layout');
     
+    // 1. Hide Scale Modifier -> Blur beam & collapse Element Tray
     if (window.challengeScaleSetting === 'off' && !window.challengeScalePeeked) {
         if (scaleSection) {
             scaleSection.style.filter = 'blur(14px)';
@@ -1134,6 +1182,15 @@ window.applyChallengeScaleSettings = function() {
             c.style.filter = 'blur(10px)';
             c.style.pointerEvents = 'none';
         });
+        if (leftBlock) {
+            leftBlock.classList.add('collapsed');
+            leftBlock.classList.add('is-mod-locked');
+            let btn = leftBlock.querySelector('.rect-btn');
+            if (btn) btn.setAttribute('title', 'Element Trays locked (No Scale Challenge active)');
+        }
+        if (layout) {
+            layout.style.setProperty('--left-w', '80px');
+        }
     } else {
         if (scaleSection) {
             scaleSection.style.filter = 'none';
@@ -1143,6 +1200,26 @@ window.applyChallengeScaleSettings = function() {
             c.style.filter = 'none';
             c.style.pointerEvents = 'auto';
         });
+        if (leftBlock) {
+            leftBlock.classList.remove('is-mod-locked');
+        }
+    }
+    
+    // 2. No Hints Modifier -> Collapse Prof Beaker
+    if (window.challengeHintsSetting === '0') {
+        if (rightBlock) {
+            rightBlock.classList.add('collapsed');
+            rightBlock.classList.add('is-mod-locked');
+            let btn = rightBlock.querySelector('.rect-btn');
+            if (btn) btn.setAttribute('title', 'Prof. Beaker locked (No Hints Solo Mode)');
+        }
+        if (layout) {
+            layout.style.setProperty('--right-w', '80px');
+        }
+    } else {
+        if (rightBlock) {
+            rightBlock.classList.remove('is-mod-locked');
+        }
     }
 };
 
@@ -1341,8 +1418,22 @@ window.handleChallengeRoundComplete = function(isPerfect) {
         ${badgesSection}
 
         <div style="display:flex; gap:12px; margin-top:28px;">
-            <button class="interactive" onclick="window.location.reload()" style="flex:1; padding:14px; background:#8b5cf6; color:white; border:4px solid #6d28d9; border-radius:16px; font-weight:900; font-size:1.1rem; cursor:pointer; box-shadow:0 6px 0 #5b21b6;">🔁 PLAY AGAIN</button>
-            <button class="interactive" onclick="window.transitionTo('index.html')" style="flex:1; padding:14px; background:#ec4899; color:white; border:4px solid #be185d; border-radius:16px; font-weight:900; font-size:1.1rem; cursor:pointer; box-shadow:0 6px 0 #9d174d;">🏠 MAIN MENU</button>
+            <button class="btn-modal-action btn-play-again-purple interactive" onclick="if(typeof playSound==='function') playSound('start'); window.location.reload();">
+                <svg class="modal-icon modal-icon-retry" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                    <path d="M16 21h5v-5"></path>
+                </svg>
+                <span>PLAY AGAIN</span>
+            </button>
+            <button class="btn-modal-action btn-main-menu-pink interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('index.html');">
+                <svg class="modal-icon modal-icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>MAIN MENU</span>
+            </button>
         </div>
     `;
     
@@ -1351,7 +1442,102 @@ window.handleChallengeRoundComplete = function(isPerfect) {
 };
 
 window.handleChallengeTimeout = function() {
+    if (window.challengeInterval) clearInterval(window.challengeInterval);
     if (typeof playSound === 'function') playSound('error');
-    alert("Time has run out! The chemical reaction overheated. Try again!");
-    window.location.reload();
+
+    let player = window.challengePlayer || localStorage.getItem('currentPlayer') || 'Student';
+    let roundsCleared = window.challengeCurrentRound || 0;
+    let tierClean = (window.challengeTier || 'easy').toLowerCase();
+    let tierDisplay = tierClean.charAt(0).toUpperCase() + tierClean.slice(1);
+    
+    // 1. Record the timeout run into player history
+    let history = JSON.parse(localStorage.getItem('challengeHistory_' + player) || '[]');
+    let today = new Date();
+    let dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    history.push({
+        tier: tierClean,
+        timeSec: 90,
+        timeStr: '90s (Timeout)',
+        stars: 0,
+        status: 'timeout',
+        roundsCleared: roundsCleared,
+        scale: window.challengeScaleSetting,
+        hints: window.challengeHintsSetting === '0' ? '0' : '1',
+        timer: 'countdown',
+        date: dateStr
+    });
+    localStorage.setItem('challengeHistory_' + player, JSON.stringify(history));
+
+    // 2. Build the Tactile Arcade Timeout Pop-out Modal
+    let overlay = document.createElement("div");
+    overlay.id = "challenge-timeout-popup";
+    overlay.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15,23,42,0.85); display:flex; justify-content:center; align-items:center; z-index:9999999; backdrop-filter:blur(12px);";
+    
+    let card = document.createElement("div");
+    card.style.cssText = "background:white; border:6px solid #ef4444; border-radius:32px; padding:44px 34px; text-align:center; box-shadow:0 24px 0 #b91c1c; max-width:580px; width:92%; animation:slideUpFade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative; box-sizing:border-box;";
+    
+    card.innerHTML = `
+        <div style="width:76px; height:76px; border-radius:22px; background:#fef2f2; border:3.5px solid #ef4444; box-shadow:0 4px 0 #b91c1c; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="#ef4444" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2.5 2"></path>
+                <path d="M5 3 2 6"></path>
+                <path d="m22 6-3-3"></path>
+                <path d="M12 2v3"></path>
+            </svg>
+        </div>
+        
+        <span style="display:inline-block; font-size:0.82rem; font-weight:900; letter-spacing:1.5px; color:#ef4444; background:#fef2f2; border:2px solid #fecaca; border-radius:10px; padding:5px 14px; text-transform:uppercase; margin-bottom:10px;">
+            TIME HAS RUN OUT
+        </span>
+
+        <h1 style="margin:2px 0 10px; font-size:2.4rem; font-weight:900; color:#0f172a; letter-spacing:-0.5px; line-height:1.1;">
+            Reaction Overheated!
+        </h1>
+        
+        <p style="margin:0 auto 24px; font-size:1.05rem; font-weight:700; color:#64748b; line-height:1.45; max-width:440px;">
+            The 90-second countdown expired before balancing all 5 reactions. This attempt was logged into your career records.
+        </p>
+        
+        <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:20px; padding:16px 20px; display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:28px; text-align:center;">
+            <div>
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Progress</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#0f172a; margin-top:2px;">${roundsCleared} / 5</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">Round ${roundsCleared + 1} Reached</div>
+            </div>
+            <div style="border-left:2px solid #e2e8f0; border-right:2px solid #e2e8f0;">
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Time Elapsed</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#dc2626; margin-top:2px;">90s</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#64748b;">90s Rush Limit</div>
+            </div>
+            <div>
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Attempt Logged</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#7e22ce; margin-top:2px;">Recorded</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#64748b;">${player}</div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:14px;">
+            <button class="btn-modal-action btn-try-again interactive" onclick="if(typeof playSound==='function') playSound('start'); window.location.reload();">
+                <svg class="modal-icon modal-icon-retry" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                    <path d="M16 21h5v-5"></path>
+                </svg>
+                <span>TRY AGAIN</span>
+            </button>
+            <button class="btn-modal-action btn-main-menu interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('index.html');">
+                <svg class="modal-icon modal-icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                </svg>
+                <span>MAIN MENU</span>
+            </button>
+        </div>
+    `;
+    
+    overlay.appendChild(card);
+    document.body.appendChild(overlay);
 };
