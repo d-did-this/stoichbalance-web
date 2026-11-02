@@ -1614,6 +1614,7 @@ window.addEventListener('load', () => {
             }
         })();
     </script>
+    <link rel="stylesheet" href="css/info_cards.css">
 </head>
 <body>
     <div id="iris-wipe-overlay"></div>
@@ -1621,18 +1622,18 @@ window.addEventListener('load', () => {
     <!-- Floating Action Button (FAB) Menu -->
     <div class="fab-container">
         <div class="fab-menu">
-            <button id="btn-mute" class="legacy-btn" onclick="toggleMute()" style="background:#14b8a6; color:white; border:4px solid #0d9488; box-shadow:0 4px 0 #0d9488;">
+            <button id="btn-mute" class="legacy-btn has-chem-info" data-info="settings-mute" onclick="toggleMute()" style="background:#14b8a6; color:white; border:4px solid #0d9488; box-shadow:0 4px 0 #0d9488;">
                 <svg id="icon-sound-on" style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15.536 8.464a5 5 0 010 7.072M17.95 6.05a8 8 0 010 11.9M6.5 9L11 4.5v15L6.5 15H3V9h3.5z"></path></svg>
                 <svg id="icon-sound-off" style="width:36px;height:36px; display:none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
             </button>
-            <button class="legacy-btn" onclick="toggleFullscreen()" style="background:#8b5cf6; color:white; border:4px solid #7c3aed; box-shadow:0 4px 0 #7c3aed;">
+            <button class="legacy-btn has-chem-info" data-info="settings-fullscreen" onclick="toggleFullscreen()" style="background:#8b5cf6; color:white; border:4px solid #7c3aed; box-shadow:0 4px 0 #7c3aed;">
                 <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
             </button>
-            <button class="legacy-btn" onclick="window.revealHeuristicHint()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8;">?</button>
-            <button class="legacy-btn" onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c;">
+            <button class="legacy-btn has-chem-info" data-info="settings-help" onclick="window.openTutorial()" style="background:#3b82f6; color:#ffffff; border:4px solid #1d4ed8; box-shadow:0 4px 0 #1d4ed8;">?</button>
+            <button class="legacy-btn has-chem-info" data-info="settings-undo" onclick="undo()" style="background:#f97316; color:white; border:4px solid #c2410c; box-shadow:0 4px 0 #c2410c;">
                 <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
             </button>
-            <button class="legacy-btn" onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c;">
+            <button class="legacy-btn has-chem-info" data-info="settings-reset" onclick="resetEquation()" style="background:#ef4444; color:white; border:4px solid #b91c1c; box-shadow:0 4px 0 #b91c1c;">
                 <svg style="width:36px;height:36px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
             </button>
         </div>
@@ -1645,13 +1646,13 @@ window.addEventListener('load', () => {
     
     <!-- Side Mode Switcher -->
     <div id="mode-switcher-sidebar" style="position: fixed; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 99999;">
-        <button id="btn-side-simple" class="side-tab-btn active-tab" onclick="window.switchViewMode('simple')" data-tooltip="Simple Mode">
+        <button id="btn-side-simple" class="side-tab-btn active-tab has-chem-info" data-info="mode-simple" onclick="window.switchViewMode('simple')" data-tooltip="Simple Mode">
             <div style="display:flex; flex-direction:column; align-items:center;">
     <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
     <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">SIMPLE</span>
 </div>
         </button>
-        <button id="btn-side-pro" class="side-tab-btn" onclick="window.switchViewMode('pro')" data-tooltip="Pro Mode">
+        <button id="btn-side-pro" class="side-tab-btn has-chem-info" data-info="mode-pro" onclick="window.switchViewMode('pro')" data-tooltip="Pro Mode">
             <div style="display:flex; flex-direction:column; align-items:center;">
     <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
     <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">PRO</span>
@@ -1666,12 +1667,12 @@ window.addEventListener('load', () => {
                 <span class="back-icon">◀</span> Back
             </button>
             <div id="challenge-hud-pills" style="display:none; position:absolute; right:20px; align-items:center; gap:12px;">
-                <button id="challenge-test-timeout-btn" class="interactive" onclick="window.handleChallengeTimeout()" title="Developer Quick Test: Trigger Timeout" style="height:38px; padding:0 14px; background:#fef2f2; color:#dc2626; border:2.5px solid #ef4444; border-radius:14px; font-weight:900; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 0 #b91c1c; box-sizing:border-box; transition:transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 0 #b91c1c';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #b91c1c';" onmousedown="this.style.transform='translateY(2px)'; this.style.boxShadow='0 1px 0 #b91c1c';">
+                <button id="challenge-test-timeout-btn" class="interactive has-chem-info" data-info="btn-test-timeout" onclick="window.handleChallengeTimeout()" title="Developer Quick Test: Trigger Timeout" style="height:38px; padding:0 14px; background:#fef2f2; color:#dc2626; border:2.5px solid #ef4444; border-radius:14px; font-weight:900; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 0 #b91c1c; box-sizing:border-box; transition:transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 0 #b91c1c';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #b91c1c';" onmousedown="this.style.transform='translateY(2px)'; this.style.boxShadow='0 1px 0 #b91c1c';">
                     <span>⏰</span>
                     <span>Test Timeout</span>
                 </button>
-                <div id="challenge-diff-pill" class="lvl-diff diff-easy">Easy</div>
-                <div id="challenge-timer-badge" class="timer-pill-tactile">
+                <div id="challenge-diff-pill" class="lvl-diff diff-easy has-chem-info" data-info="challenge-diff">Easy</div>
+                <div id="challenge-timer-badge" class="timer-pill-tactile has-chem-info" data-info="challenge-timer">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="13" r="8"/>
                         <path d="M12 9v4l2 2"/>
@@ -1680,7 +1681,7 @@ window.addEventListener('load', () => {
                     <span id="challenge-timer-text">00:00</span>
                 </div>
             </div>
-            <div id="level-title" class="block-title" style="margin: 0; font-size: 2rem; text-align: center;">Loading...</div>
+            <div id="level-title" class="block-title has-chem-info" data-info="level-title" style="margin: 0; font-size: 2rem; text-align: center;">Loading...</div>
         </div>
         
         
@@ -1691,7 +1692,7 @@ window.addEventListener('load', () => {
             
             <div class="sidebar-content">
 
-                <button class="rect-btn" onclick="toggleBlock('left')">
+                <button class="rect-btn has-chem-info" data-info="btn-tray" onclick="toggleBlock('left')">
                     <span class="btn-text-full" style="display:flex; align-items:center;">
                         <svg style="width:24px;height:24px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         Element Trays
@@ -1781,8 +1782,8 @@ window.addEventListener('load', () => {
     
     <!-- Section 1: Split Status Bar -->
     <div class="status-bar-shared" style="height: 35px; margin-bottom: 85px; flex-shrink: 0; width: 100%;">
-        <div class="status-half status-left">UNBALANCED</div>
-        <div class="status-half status-right">NOT SIMPLIFIED</div>
+        <div class="status-half status-left has-chem-info" data-info="status-balance">UNBALANCED</div>
+        <div class="status-half status-right has-chem-info" data-info="status-simplify">NOT SIMPLIFIED</div>
     </div>
     
     
@@ -1792,10 +1793,10 @@ window.addEventListener('load', () => {
         <div class="giant-seesaw-wrapper" style="width: 100%; height: 100%; margin: 0; display: flex; justify-content: center; position: relative;">
             <div class="giant-seesaw" style="width: 100%; max-width: 100%; margin: 0 auto; height: 100%; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
                 <div class="giant-plank" id="adv-giant-plank" style="width: 100%; height: 10px; background: #cbd5e1; border-radius: 5px; border: 3px solid #94a3b8; position: absolute; bottom: 40px; transform-origin: center; transition: transform 0.3s; transform: rotate(-3deg);">
-                    <div class="beaker left-beaker" id="adv-beaker-react" style="transform-origin: bottom right; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; left: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
+                    <div class="beaker left-beaker has-chem-info" data-info="scale-bucket" data-side="left" id="adv-beaker-react" style="transform-origin: bottom right; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; left: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
                         <!-- engine.js populates this -->
                     </div>
-                    <div class="beaker right-beaker" id="adv-beaker-prod" style="transform-origin: bottom left; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; right: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
+                    <div class="beaker right-beaker has-chem-info" data-info="scale-bucket" data-side="right" id="adv-beaker-prod" style="transform-origin: bottom left; width: 220px; height: 80px; border: 4px solid #38bdf8; border-top: none; background: rgba(56,189,248,0.1); border-radius: 0 0 16px 16px; position: absolute; bottom: 6px; right: 0px; display: flex; flex-wrap: wrap-reverse; align-content: flex-start; justify-content: center; padding: 10px; gap: 2px;">
                         <!-- engine.js populates this -->
                     </div>
                 </div>
@@ -1885,7 +1886,7 @@ window.addEventListener('load', () => {
             
             <div class="sidebar-content">
 
-                <button class="rect-btn" onclick="toggleBlock('right')">
+                <button class="rect-btn has-chem-info" data-info="prof-beaker" onclick="toggleBlock('right')">
                     <span class="btn-text-full" style="display:flex; align-items:center;">
                         <svg style="width:24px;height:24px;margin-right:8px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         Prof. Beaker
@@ -1904,11 +1905,11 @@ window.addEventListener('load', () => {
 
 
 <div class="beaker-actions" style="margin-top: 15px; margin-bottom: 5px; flex-shrink: 0; display: flex; align-items: stretch; gap: 5px; width: 100%; min-height: 40px;">
-    <button class="btn-hint-clean" style="width: 100%; border-radius: 12px; padding: 8px 12px; background: linear-gradient(to bottom, #fde047, #facc15) !important; color: #713f12 !important; font-size: 1rem; font-weight: 900; border: 3px solid #ca8a04 !important; box-shadow: 0 6px 0 #a16207 !important; transition: all 0.1s; margin-bottom: 5px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;" onclick="if(typeof playSound==='function') playSound('click'); window.revealHeuristicHint();" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none !important';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';" onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';">
+    <button class="btn-hint-clean has-chem-info" data-info="btn-hint" style="width: 100%; border-radius: 12px; padding: 8px 12px; background: linear-gradient(to bottom, #fde047, #facc15) !important; color: #713f12 !important; font-size: 1rem; font-weight: 900; border: 3px solid #ca8a04 !important; box-shadow: 0 6px 0 #a16207 !important; transition: all 0.1s; margin-bottom: 5px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;" onclick="if(typeof playSound==='function') playSound('click'); window.revealHeuristicHint();" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none !important';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';" onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #a16207 !important';">
     <svg style="width: 24px; height: 24px;" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C7.86 2 4.5 5.36 4.5 9.5c0 3.82 2.66 7.12 6.36 8.31V20c0 .55.45 1 1 1h.28c.11 0 .22-.03.32-.08l.1-.06.27-.19c.38-.28.84-.42 1.3-.42.45 0 .9.14 1.28.42l.27.19.1.06c.1.05.21.08.32.08h.28c.55 0 1-.45 1-1v-2.19c3.7-1.19 6.36-4.49 6.36-8.31C19.5 5.36 16.14 2 12 2z"></path></svg>
     Hint please!
 </button>
-    <button class="rect-btn btn-trash" onclick="clearChat(true)" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
+    <button class="rect-btn btn-trash has-chem-info" data-info="settings-clear-chat" onclick="clearChat(true)" style="width: 44px; height: 100%; flex-shrink: 0; background: #ef4444; color: #fff; border: 4px solid #1e293b; box-shadow: 0 4px 0 #1e293b; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.1s; padding: 0;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 0 #1e293b';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 0 #1e293b';" onmousedown="this.style.transform='translateY(4px)'; this.style.boxShadow='0 0 0 transparent';">
         <svg style="width: 26px; height: 26px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
     </button>
 </div>
@@ -1956,6 +1957,9 @@ window.addEventListener('load', () => {
 
 
 
+    <script src="js/element_data.js"></script>
+    <script src="js/info_cards.js"></script>
+    <script src="js/tutorial.js"></script>
 </body>
 
 
