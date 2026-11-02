@@ -6,7 +6,9 @@
     <title>Stoichbalance - Fun Chemistry UI</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/levels.css?v=1792981377">
-    <link rel="stylesheet" href="css/style.css?v=1792986155">
+    <link rel="stylesheet" href="css/style.css?v=1793583571">
+    <!-- EXPERIMENTAL DEPTH LAYER (Remove to revert) -->
+    <link rel="stylesheet" href="css/experimental_depth.css">
 
 <script>
 // Unified Audio Engine and Page Transitions
@@ -177,9 +179,9 @@ window.addEventListener('load', () => {
 
     <!-- HIGH-INTENSITY DYNAMIC BACKGROUNDS -->
     <div class="bg-layer bg-blue active-bg" id="bg-class"></div>
-    <div class="bg-layer bg-purple" id="bg-challenge"></div>
+    <div class="bg-layer bg-orange" id="bg-challenge"></div>
     <div class="bg-layer bg-green" id="bg-form5"></div>
-    <div class="bg-layer bg-orange" id="bg-sandbox"></div>
+    <div class="bg-layer bg-purple" id="bg-sandbox"></div>
 
     <!-- INTERACTIVE CHEMISTRY CANVAS -->
     <div id="particle-canvas"></div>
@@ -189,8 +191,17 @@ window.addEventListener('load', () => {
         <div class="widget-icon">❓</div>
     </button>
 
-    <button class="fun-widget widget-right interactive" onclick="openElements()">
-        <div class="widget-icon">🧪</div>
+    <button class="fun-widget widget-right interactive" onclick="openElements()" title="Interactive Periodic Table" aria-label="Interactive Periodic Table">
+        <svg viewBox="0 0 48 48" width="46" height="46" fill="none" style="display:block;">
+            <g transform="rotate(-11 24 24)">
+                <!-- Lip -->
+                <rect x="11.5" y="8" width="25" height="4.2" rx="2" fill="#05553f"/>
+                <!-- Liquid Fill in base -->
+                <path d="M14.2 26.5 C19 27.8 29 27.8 33.8 26.5 L35.2 35.8 C35.8 39.2 33 42 29.5 42 H18.5 C15 42 12.2 39.2 12.8 35.8 Z" fill="#05553f"/>
+                <!-- Beaker Contour Walls -->
+                <path d="M15.2 11.5 L14.2 22 L12.8 35.8 C12.2 39.2 15 42 18.5 42 H29.5 C33 42 35.8 39.2 35.2 35.8 L33.8 22 L32.8 11.5" stroke="#05553f" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+        </svg>
     </button>
 
     <!-- HIGHLY DESIGNED MAIN CONTAINER -->
@@ -209,23 +220,29 @@ window.addEventListener('load', () => {
             <div class="launch-wrapper">
                 <div class="input-group" style="position: relative;">
                     <label>PLAYER NAME</label>
-                    <div style="display: flex; gap: 10px; width: 100%; align-items: stretch;">
-                        <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()" style="flex: 1; text-align: left; padding: clamp(1rem, 2vh, 1.3rem) 1.2rem;">
-                        <button class="btn-stats interactive" id="challenge-stats-btn" onclick="openStatsModal()">
-                            <span>📊</span>
-                            <span>Stats</span>
+                    <div style="display: flex; gap: 12px; width: 100%; align-items: center;">
+                        <div class="player-input-wrapper">
+                            <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()" style="width: 100%; text-align: left; height: 74px; box-sizing: border-box; padding: 0 3.8rem 0 1.4rem;">
+                            <button type="button" id="player-dropdown-toggle-btn" class="player-dropdown-btn interactive" onclick="togglePlayerDropdown(event)" aria-label="Select saved player profile" title="Select saved player profile" style="display: none;">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"/>
+                                </svg>
+                            </button>
+                            <!-- Profile Dropdown aligned directly beneath text box -->
+                            <div id="profile-dropdown" style="display:none; position:absolute; top:calc(100% + 4px); left:0; width:100%; background:white; border:3.5px solid var(--dark-border); border-radius:18px; box-shadow:0 12px 28px rgba(0,0,0,0.22); z-index:100; max-height:220px; overflow-y:auto; flex-direction:column; padding: 6px; box-sizing: border-box;">
+                                <!-- JS injected profiles -->
+                            </div>
+                        </div>
+                        <button class="btn-stats interactive" id="challenge-stats-btn" onclick="openStatsModal()" title="Career Records & Achievements" aria-label="Career Records">
+                            <svg class="stats-btn-svg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+                            </svg>
                         </button>
-                    </div>
-                    
-                    <!-- Profile Dropdown -->
-                    <div id="profile-dropdown" style="display:none; position:absolute; top:100%; left:0; width:100%; background:white; border:4px solid #e2e8f0; border-top:none; border-radius:0 0 16px 16px; box-shadow:0 10px 25px rgba(0,0,0,0.15); z-index:100; max-height:200px; overflow-y:auto; flex-direction:column; padding: 5px;">
-                        <!-- JS injected profiles -->
                     </div>
                 </div>
                 
                 <button class="btn-play interactive" id="main-play-btn" onclick="startGame()">
                     <span id="play-btn-text">Start Form 4</span>
-                    <span class="play-icon">▶</span>
                 </button>
             </div>
         </div>
@@ -256,7 +273,7 @@ window.addEventListener('load', () => {
                 </div>
 
                 <!-- Challenge Mode -->
-                <div class="mode-card card-purple interactive" id="mode-challenge" onclick="selectMode('challenge')">
+                <div class="mode-card card-orange interactive" id="mode-challenge" onclick="selectMode('challenge')">
                     <div class="mode-header">
                         <div class="mode-icon">⏱️</div>
                         <div class="mode-info">
@@ -266,17 +283,58 @@ window.addEventListener('load', () => {
                     </div>
                     <div class="mode-options-wrapper">
                         <div class="mode-options-inner">
-                            <div class="mode-options-content">
-                                <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'challenge', 'Easy')">Easy</button>
-                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Medium')">Medium</button>
-                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Hard')">Hard</button>
+                            <div class="challenge-options-container">
+                                <!-- Row 1: Difficulty Tiers -->
+                                <div class="challenge-tiers-row">
+                                    <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'challenge', 'Easy')">Easy</button>
+                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Medium')">Medium</button>
+                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Hard')">Hard</button>
+                                </div>
+                                
+                                <!-- Row 2: Challenge Modifiers -->
+                                <div class="home-modifiers-section" onclick="event.stopPropagation();">
+                                    <div class="home-modifiers-header">
+                                        <span class="home-modifiers-label">
+    <svg class="header-bolt-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15">
+        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+    </svg>
+    Modifiers
+</span>
+                                        <span class="home-multiplier-pill" id="home-multiplier-tag">1.0x STANDARD</span>
+                                    </div>
+                                    <div class="home-modifiers-grid">
+    <button class="home-mod-pill interactive" id="home-mod-scale" onclick="toggleHomeModifier(event, 'scale')" type="button" title="Solve without the balance beam (+0.5x)">
+        <svg class="mod-icon-svg icon-scale" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v17M5 8l7-3 7 3"/>
+            <path d="M2 14l3-6 3 6a3 3 0 0 1-6 0zm14 0l3-6 3 6a3 3 0 0 1-6 0z"/>
+            <path d="M8 21h8"/>
+            <line x1="3" y1="3" x2="21" y2="21" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="pill-text">No Scale</span>
+    </button>
+    <button class="home-mod-pill interactive" id="home-mod-hints" onclick="toggleHomeModifier(event, 'hints')" type="button" title="Solve without hints (+0.5x)">
+        <svg class="mod-icon-svg icon-hints" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6m-4 3h2m-5-8a6 6 0 1 1 8 0c-.8.8-1.5 2-1.5 3h-5c0-1-.7-2.2-1.5-3z"/>
+            <line x1="3" y1="3" x2="21" y2="21" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <span class="pill-text">No Hints</span>
+    </button>
+    <button class="home-mod-pill interactive" id="home-mod-rush" onclick="toggleHomeModifier(event, 'rush')" type="button" title="90-second countdown rush (+0.5x)">
+        <svg class="mod-icon-svg icon-rush" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="13" r="8"/>
+            <path d="M12 9v4l2.5 2.5M10 2h4m-2 0v3"/>
+        </svg>
+        <span class="pill-text">90s Rush</span>
+    </button>
+</div>
+</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sandbox Mode -->
-                <div class="mode-card card-orange interactive" id="mode-sandbox" onclick="selectMode('sandbox')">
+                <div class="mode-card card-purple interactive" id="mode-sandbox" onclick="selectMode('sandbox')">
                     <div class="mode-header">
                         <div class="mode-icon">🛠️</div>
                         <div class="mode-info">
@@ -547,36 +605,59 @@ window.addEventListener('load', () => {
         
         <!-- HEADER -->
         <div class="stats-modal-header">
-            <div class="stats-header-left">
-                <div class="stats-header-icon-box">📊</div>
-                <div>
-                    <span class="stats-header-kicker">CAREER RECORD</span>
-                    <h2 class="stats-header-title">PLAYER STATS</h2>
-                </div>
-            </div>
-            
-            <div class="stats-header-right">
-                <div class="stats-player-badge">
-                    <span class="player-badge-label">Chemist</span>
-                    <span class="player-badge-name" id="stats-profile-name">Student</span>
-                </div>
-                <button class="neo-close-btn interactive" onclick="closeStatsModal()" aria-label="Close stats modal">&times;</button>
-            </div>
+    <div class="stats-header-left">
+        <div class="stats-header-icon-box">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2563eb" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
+            </svg>
         </div>
+        <div>
+            <span class="stats-header-kicker">CAREER ARCHIVE</span>
+            <h2 class="stats-header-title">Player Records</h2>
+        </div>
+    </div>
+    
+    <div class="stats-header-right">
+        <div class="stats-player-badge">
+            <span class="player-badge-label">Chemist</span>
+            <span class="player-badge-name" id="stats-profile-name">Student</span>
+        </div>
+        <button class="neo-close-btn interactive" onclick="closeStatsModal()" aria-label="Close stats modal">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+</div>
 
-        <!-- SEGMENTED TABS -->
-        <div class="stats-tabs-bar">
-            <button id="tab-btn-history" class="stats-tab-btn active interactive" onclick="switchStatsTab('history')">
-                <span class="tab-icon">📜</span>
-                <span>MATCH HISTORY</span>
-                <span class="tab-count-pill" id="history-count-pill">0</span>
-            </button>
-            <button id="tab-btn-badges" class="stats-tab-btn interactive" onclick="switchStatsTab('badges')">
-                <span class="tab-icon">🏅</span>
-                <span>BADGES & TROPHIES</span>
-                <span class="tab-count-pill" id="badges-count-text">0/10</span>
-            </button>
-        </div>
+<!-- SEGMENTED TABS & FILTER BAR -->
+<div class="stats-tabs-bar">
+    <div class="stats-tabs-group">
+        <button id="tab-btn-history" class="stats-tab-btn active interactive" onclick="switchStatsTab('history')">
+            <svg class="tab-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+            </svg>
+            <span>Match History</span>
+            <span class="tab-count-pill" id="history-count-pill">0</span>
+        </button>
+        <button id="tab-btn-badges" class="stats-tab-btn interactive" onclick="switchStatsTab('badges')">
+            <svg class="tab-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6"/>
+                <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+            <span>Badges & Trophies</span>
+            <span class="tab-count-pill" id="badges-count-text">0/10</span>
+        </button>
+    </div>
+    
+    <div class="stats-filter-group" id="stats-filter-controls">
+        <span class="stats-filter-label">FILTER:</span>
+        <button class="stats-filter-btn active interactive" id="filter-btn-all" onclick="setMatchHistoryFilter('all')">All</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-easy" onclick="setMatchHistoryFilter('easy')">Easy</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-medium" onclick="setMatchHistoryFilter('medium')">Medium</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-hard" onclick="setMatchHistoryFilter('hard')">Hard</button>
+    </div>
+</div>
 
         <!-- TAB CONTENT CONTAINER -->
         <div class="stats-scroll-content">
