@@ -1,4 +1,36 @@
 
+// Universal chemical formula tokenizer for hover info cards
+function tokenizeChemicalFormula(html) {
+    let clean = html.replace(/<span[^>]*>([0-9]+)<\/span>/gi, '_SUB_$1_');
+    const uniMap = { '₂':'2', '₃':'3', '₄':'4', '₅':'5', '₆':'6', '₇':'7', '₈':'8', '₉':'9' };
+    clean = clean.replace(/([₂₃₄₅₆₇₈₉])/g, (m, c) => `_SUB_${uniMap[c]}_`);
+
+    const tokenRegex = /_SUB_(\d+)_|([A-Z][a-z]?)|(\()|(\))|(\d+)/g;
+    let result = '';
+    let lastElement = 'H';
+    let match;
+
+    while ((match = tokenRegex.exec(clean)) !== null) {
+        if (match[1] !== undefined) {
+            const count = match[1];
+            result += `<span class="sci-sub-token has-chem-info" data-info="subscript" data-element="${lastElement}" data-count="${count}">${count}</span>`;
+        } else if (match[2] !== undefined) {
+            const el = match[2];
+            lastElement = el;
+            result += `<span class="sci-elem-token has-chem-info" data-info="element" data-element="${el}">${el}</span>`;
+        } else if (match[3] !== undefined) {
+            result += '(';
+        } else if (match[4] !== undefined) {
+            result += ')';
+        } else if (match[5] !== undefined) {
+            const count = match[5];
+            result += `<span class="sci-sub-token has-chem-info" data-info="subscript" data-element="${lastElement}" data-count="${count}">${count}</span>`;
+        }
+    }
+    return result;
+}
+
+
 window.handleGameBackClick = function() {
     if (typeof playSound === "function") playSound("click");
     if (window.isChallengeMode) {
@@ -170,33 +202,30 @@ function renderBoard() {
     if (sleekEq) {
         let rHtml = `<div style="display: flex; justify-content: flex-start; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">`;
         currentLevelData.reactants.forEach((m, idx) => {
-            let formula = m.displayHtml;
-            // add sub styling
-            formula = formula.replace(/([\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089])/g, '<span class="sci-sub">$1</span>');
+            let formula = tokenizeChemicalFormula(m.displayHtml);
+            let coeffHtml = `<div id="coeff-eq-react-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
+            let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
             
-            let coeffHtml = '<div id="coeff-eq-react-' + m.id + '" class="sci-coeff img-coeff">1</div>';
-            
-            rHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula">${formula}<span class="state-label">(${m.state || 'aq'})</span></div></div>`;
+            rHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
             
             if (idx < currentLevelData.reactants.length - 1) {
-                rHtml += '<div class="sci-plus">+</div>';
+                rHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
             }
         });
         rHtml += '</div>';
         
-        let arrowHtml = '<div style="display: flex; justify-content: center;"><div class="sci-arrow-box" style="border-radius: 12px;">&#10142;</div></div>';
+        let arrowHtml = '<div style="display: flex; justify-content: center;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
         
         let pHtml = `<div style="display: flex; justify-content: flex-end; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">`;
         currentLevelData.products.forEach((m, idx) => {
-            let formula = m.displayHtml;
-            formula = formula.replace(/([\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089])/g, '<span class="sci-sub">$1</span>');
+            let formula = tokenizeChemicalFormula(m.displayHtml);
+            let coeffHtml = `<div id="coeff-eq-prod-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
+            let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
             
-            let coeffHtml = '<div id="coeff-eq-prod-' + m.id + '" class="sci-coeff img-coeff">1</div>';
-            
-            pHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula">${formula}<span class="state-label">(${m.state || 'aq'})</span></div></div>`;
+            pHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
             
             if (idx < currentLevelData.products.length - 1) {
-                pHtml += '<div class="sci-plus">+</div>';
+                pHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
             }
         });
         pHtml += '</div>';
@@ -211,7 +240,7 @@ function renderBoard() {
         btnReactContainer.innerHTML = '';
         currentLevelData.reactants.forEach(m => {
             let btn = document.createElement('div');
-            btn.className = 'mol-btn btn-react';
+            btn.className = 'mol-btn btn-react has-chem-info'; btn.setAttribute('data-info', 'btn-react'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'react'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
             btn.innerHTML = `<span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>${m.displayHtml}</span>`;
             
               btn.onclick = () => window.addMolecule('react', m.id);
@@ -225,7 +254,7 @@ function renderBoard() {
         btnProdContainer.innerHTML = '';
         currentLevelData.products.forEach(m => {
             let btn = document.createElement('div');
-            btn.className = 'mol-btn btn-prod';
+            btn.className = 'mol-btn btn-prod has-chem-info'; btn.setAttribute('data-info', 'btn-prod'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'prod'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
             btn.innerHTML = `<span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>${m.displayHtml}</span>`;
             
               btn.onclick = () => window.addMolecule('prod', m.id);
@@ -473,7 +502,7 @@ window.updateSimulation = function() {
             }
 
             html += `
-            <div class="pro-scale-card ${colorClass}" style="position: relative; ${visualGlow}">${diffBadge}
+            <div class="pro-scale-card ${colorClass} has-chem-info" data-info="tracker-card" data-element="${el}" data-rcount="${rCount}" data-pcount="${pCount}" style="position: relative; ${visualGlow}">${diffBadge}
                 <h3>${ELEM_NAMES[el] || el} (${el})</h3>
                 <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
 
@@ -504,7 +533,7 @@ window.updateSimulation = function() {
             let colorClass = isEmptyState ? "f-empty" : (isBalancedState ? "f-green" : "f-red");
             let textStyle = "color:white;";
             let smallMarble = getHyperMarble(el).replace("width: 28px; height: 28px;", "width: 22px; height: 22px; font-size: 11px;");
-            fHtml += "<div class=\"footer-stat " + colorClass + "\" style=\"flex:1; display:flex; justify-content:center; align-items:center; " + textStyle + " font-weight:900; gap:8px; font-size:1.1rem; padding: 5px; border-left: 1px solid rgba(255,255,255,0.2);\">" + smallMarble + "<span>= " + rCounts[el] + "</span></div>";
+            fHtml += "<div class=\"footer-stat " + colorClass + " has-chem-info\" data-info=\"footer-count\" data-element=\"" + el + "\" data-side=\"react\" data-count=\"" + rCounts[el] + "\" style=\"flex:1; display:flex; justify-content:center; align-items:center; " + textStyle + " font-weight:900; gap:8px; font-size:1.1rem; padding: 5px; border-left: 1px solid rgba(255,255,255,0.2);\">" + smallMarble + "<span>= " + rCounts[el] + "</span></div>";
         });
         fReact.innerHTML = fHtml;
         if(fReact.children.length > 0) fReact.children[0].style.borderLeft = "none";
@@ -523,7 +552,7 @@ window.updateSimulation = function() {
             let colorClass = isEmptyState ? "f-empty" : (isBalancedState ? "f-green" : "f-red");
             let textStyle = "color:white;";
             let smallMarble = getHyperMarble(el).replace("width: 28px; height: 28px;", "width: 22px; height: 22px; font-size: 11px;");
-            fHtml += "<div class=\"footer-stat " + colorClass + "\" style=\"flex:1; display:flex; justify-content:center; align-items:center; " + textStyle + " font-weight:900; gap:8px; font-size:1.1rem; padding: 5px; border-left: 1px solid rgba(255,255,255,0.2);\">" + smallMarble + "<span>= " + pCounts[el] + "</span></div>";
+            fHtml += "<div class=\"footer-stat " + colorClass + " has-chem-info\" data-info=\"footer-count\" data-element=\"" + el + "\" data-side=\"prod\" data-count=\"" + pCounts[el] + "\" style=\"flex:1; display:flex; justify-content:center; align-items:center; " + textStyle + " font-weight:900; gap:8px; font-size:1.1rem; padding: 5px; border-left: 1px solid rgba(255,255,255,0.2);\">" + smallMarble + "<span>= " + pCounts[el] + "</span></div>";
         });
         fProd.innerHTML = fHtml;
         if(fProd.children.length > 0) fProd.children[0].style.borderLeft = "none";
@@ -628,7 +657,7 @@ window.updateSimulation = function() {
         if (isEmpty) {
             statusRight.innerHTML = "NO ATOMS"; statusRight.style.background = "#94a3b8";
             statusLeft.innerHTML = "EMPTY"; statusLeft.style.background = "#94a3b8";
-        } else if (!isComplete) {
+        } else if (!isComplete || !isBalanced) {
             statusRight.innerHTML = "INCOMPLETE"; statusRight.style.background = "#ef4444";
         } else if (isSimplified) {
             statusRight.innerHTML = "SIMPLIFIED"; statusRight.style.background = "#22c55e";
