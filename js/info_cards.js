@@ -758,6 +758,15 @@
                 };
             }
 
+            case 'settings-menu': {
+                return {
+                    badgeClass: 'sic-badge-settings',
+                    badgeText: 'Setting',
+                    accentColor: '#1e293b',
+                    title: 'Settings?'
+                };
+            }
+
             case 'settings-clear-chat': {
                 return {
                     badgeClass: 'sic-badge-settings',
@@ -1064,14 +1073,35 @@
             }
 
             case 'mode-simple':
-            case 'mode-pro': {
-                const isSimple = type === 'mode-simple';
+            case 'mode-scale': {
                 return {
-                    badgeClass: 'sic-badge-state',
-                    badgeText: 'Mode',
-                    title: isSimple ? 'Simple Mode' : 'Pro Mode',
-                    visualHtml: `<div style="font-size:1.4rem; text-align:center;">${isSimple ? '⚖️ Seesaw Physics' : '🔬 Coefficients Only'}</div>`,
-                    callout: `Switch visual style anytime.`
+                    badgeClass: 'sic-badge-settings',
+                    badgeText: 'View Mode',
+                    accentColor: '#3b82f6',
+                    title: 'Scale View',
+                    desc: 'Classic seesaw balance scale with dropping marble atoms.'
+                };
+            }
+
+            case 'mode-bar': {
+                return {
+                    badgeClass: 'sic-badge-settings',
+                    badgeText: 'View Mode',
+                    accentColor: '#10b981',
+                    title: 'Bar View',
+                    desc: 'Flat bar graph comparing atom counts that does not tilt.'
+                };
+            }
+
+            
+
+            case 'bar-graph-view': {
+                return {
+                    badgeClass: 'sic-badge-settings',
+                    badgeText: 'Comparison',
+                    accentColor: '#10b981',
+                    title: 'Bar Graph View',
+                    desc: 'Level bar comparison of each element between reactants (left) and products (right).'
                 };
             }
 
@@ -1106,6 +1136,11 @@
         `;
 
         cardEl.className = 'is-visible';
+        if (!data.desc && !data.visualHtml) {
+            cardEl.classList.add('sic-compact');
+        } else {
+            cardEl.classList.remove('sic-compact');
+        }
         positionCard(target);
         currentTarget = target;
     }
@@ -1120,22 +1155,53 @@
         if (!cardEl) return;
         const rect = target.getBoundingClientRect();
         const cardRect = cardEl.getBoundingClientRect();
-        const gap = 10;
+        const gap = 12;
 
-        let top = rect.top - cardRect.height - gap;
-        let left = rect.left + (rect.width / 2) - (cardRect.width / 2);
+        const infoType = target.getAttribute('data-info') || '';
 
-        if (top < 10) {
-            top = rect.bottom + gap;
+        // Check if target is a setting on the left (How to play or left-docked modes)
+        const isLeftSettings = target.closest('#left-bottom-hud') || 
+                               target.closest('#mode-switcher-sidebar') ||
+                               ['settings-help'].includes(infoType) ||
+                               (rect.left < 110 && rect.bottom > window.innerHeight - 260);
+
+        // Check if target is a setting on the right (Settings gear FAB, Mute, Fullscreen, Undo, Reset)
+        const isRightSettings = target.closest('.fab-container') || 
+                                target.closest('.fab-menu') ||
+                                ['settings-mute', 'settings-fullscreen', 'settings-undo', 'settings-reset', 'settings-menu'].includes(infoType) ||
+                                (rect.right > window.innerWidth - 120 && rect.bottom > window.innerHeight - 380);
+
+        let top;
+        let left;
+
+        if (isLeftSettings) {
+            // Position on the RIGHT side of the left setting button
+            left = rect.right + gap;
+            top = rect.top + (rect.height / 2) - (cardRect.height / 2);
+        } else if (isRightSettings) {
+            // Position on the LEFT side of the right setting button
+            left = rect.left - cardRect.width - gap;
+            top = rect.top + (rect.height / 2) - (cardRect.height / 2);
+        } else {
+            // Default: above the target (or below if near top)
+            top = rect.top - cardRect.height - gap;
+            left = rect.left + (rect.width / 2) - (cardRect.width / 2);
+
+            if (top < 10) {
+                top = rect.bottom + gap;
+            }
         }
 
+        // Viewport bounding clamp
         if (left < 10) {
             left = 10;
         } else if (left + cardRect.width > window.innerWidth - 10) {
             left = window.innerWidth - cardRect.width - 10;
         }
 
-        if (top + cardRect.height > window.innerHeight - 10) {
+        if (top < 10) {
+            top = 10;
+        } else if (top + cardRect.height > window.innerHeight - 10) {
             top = window.innerHeight - cardRect.height - 10;
         }
 
