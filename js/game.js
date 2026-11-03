@@ -681,6 +681,10 @@ window.updateSimulation = function() {
         } else {
             window.lastWinState = "none";
         }
+
+        if (typeof window.updateBarGraph === "function") {
+            window.updateBarGraph(rCounts, pCounts, isBalanced);
+        }
     }
 };
 
@@ -771,70 +775,146 @@ window.revealHeuristicHint = function() {
 
 
 
-window.currentViewMode = "simple";
+window.currentViewMode = "scale";
+
+window.updateBarGraph = function(rCounts, pCounts, isBalanced) {
+    const container = document.getElementById('section-bar-graph');
+    const lvl = (typeof currentLevelData !== 'undefined' && currentLevelData) ? currentLevelData : window.currentLevelData;
+    if (!container || !lvl) return;
+
+    if (!rCounts || !pCounts) {
+        if (window.counts) {
+            rCounts = window.counts.rCounts || {};
+            pCounts = window.counts.pCounts || {};
+            isBalanced = (JSON.stringify(rCounts) === JSON.stringify(pCounts) && !window.counts.isEmpty);
+        } else {
+            rCounts = {};
+            pCounts = {};
+            isBalanced = false;
+        }
+    }
+
+    const rBox = document.getElementById('bar-graph-reactants');
+    const pBox = document.getElementById('bar-graph-products');
+    const symEl = document.getElementById('bar-graph-symbol');
+
+    if (!rBox || !pBox || !symEl) return;
+
+    // Check if totally empty
+    let totalAtoms = 0;
+    for (let el in rCounts) totalAtoms += rCounts[el] || 0;
+    for (let el in pCounts) totalAtoms += pCounts[el] || 0;
+    const isEmpty = (totalAtoms === 0);
+
+    // Equality Symbol: = when balanced, ≠ when unbalanced
+    if (isBalanced && !isEmpty) {
+        symEl.innerHTML = "=";
+        symEl.style.color = "#10b981";
+    } else {
+        symEl.innerHTML = "&#8800;";
+        symEl.style.color = "#1e3a8a";
+    }
+
+    // Helper to calculate tall proportional bar height (up to 130px)
+    function calcBarHeight(count) {
+        if (count === 0) return 6;
+        return Math.min(130, Math.max(16, 10 + count * 12));
+    }
+
+    // Build Reactant Bars
+    let rHtml = '';
+    lvl.elements.forEach(el => {
+        const count = rCounts[el] || 0;
+        const color = (typeof ATOM_COLORS !== 'undefined' && ATOM_COLORS[el]) ? ATOM_COLORS[el] : { bg: '#94a3b8', color: '#ffffff' };
+        const barH = calcBarHeight(count);
+        const marbleHtml = typeof getHyperMarble === 'function' 
+            ? getHyperMarble(el).replace('width: 28px; height: 28px;', 'width: 20px; height: 20px; font-size: 11px;')
+            : `<div style="width:18px;height:18px;border-radius:50%;background:${color.bg};"></div>`;
+
+        rHtml += `
+            <div class="bar-col" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; width:56px; height:100%;">
+                <span class="bar-count" style="font-size:1.25rem; font-weight:900; color:#0f172a; margin-bottom:5px; font-family:'Nunito',sans-serif;">${count}</span>
+                <div class="bar-fill" style="width:46px; height:${barH}px; background:${color.bg}; border:2.5px solid #0f172a; border-radius:6px; box-shadow:0 3px 0 rgba(0,0,0,0.18); transition:height 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+                <div class="bar-label" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-weight:900; font-size:1.15rem; color:#0f172a;">
+                    ${marbleHtml}
+                    <span>${el}</span>
+                </div>
+            </div>
+        `;
+    });
+    rBox.innerHTML = rHtml;
+
+    // Build Product Bars
+    let pHtml = '';
+    lvl.elements.forEach(el => {
+        const count = pCounts[el] || 0;
+        const color = (typeof ATOM_COLORS !== 'undefined' && ATOM_COLORS[el]) ? ATOM_COLORS[el] : { bg: '#94a3b8', color: '#ffffff' };
+        const barH = calcBarHeight(count);
+        const marbleHtml = typeof getHyperMarble === 'function' 
+            ? getHyperMarble(el).replace('width: 28px; height: 28px;', 'width: 20px; height: 20px; font-size: 11px;')
+            : `<div style="width:18px;height:18px;border-radius:50%;background:${color.bg};"></div>`;
+
+        pHtml += `
+            <div class="bar-col" style="display:flex; flex-direction:column; align-items:center; justify-content:flex-end; width:56px; height:100%;">
+                <span class="bar-count" style="font-size:1.25rem; font-weight:900; color:#0f172a; margin-bottom:5px; font-family:'Nunito',sans-serif;">${count}</span>
+                <div class="bar-fill" style="width:46px; height:${barH}px; background:${color.bg}; border:2.5px solid #0f172a; border-radius:6px; box-shadow:0 3px 0 rgba(0,0,0,0.18); transition:height 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);"></div>
+                <div class="bar-label" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-weight:900; font-size:1.15rem; color:#0f172a;">
+                    ${marbleHtml}
+                    <span>${el}</span>
+                </div>
+            </div>
+        `;
+    });
+    pBox.innerHTML = pHtml;
+};
+
 window.switchViewMode = function(mode) {
+    if (mode === "simple" || mode === "pro") mode = "scale";
     if (mode === window.currentViewMode) return;
     window.currentViewMode = mode;
     if(typeof playSound === "function") playSound("switch");
     
-    let btnSimple = document.getElementById("btn-side-simple");
-    let btnPro = document.getElementById("btn-side-pro");
-    if(mode === "simple") {
-        if(btnSimple) btnSimple.classList.add("active-tab");
-        if(btnPro) btnPro.classList.remove("active-tab");
-        
-        document.querySelector(".block-left").style.display = "flex";
-        document.querySelector(".block-right").style.display = "flex";
-        
-        let blockMiddle = document.querySelector(".block-middle");
-        if(blockMiddle) {
-            blockMiddle.style.display = "flex";
-            blockMiddle.style.gridColumn = "";
-            blockMiddle.style.gridRow = "";
+    let btnScale = document.getElementById("btn-side-scale") || document.getElementById("btn-side-simple");
+    let btnBar = document.getElementById("btn-side-bar");
+
+    if (btnScale) btnScale.classList.toggle("active-tab", mode === "scale");
+    if (btnBar) btnBar.classList.toggle("active-tab", mode === "bar");
+
+    let secScale = document.querySelector(".section-scale");
+    let secBar = document.getElementById("section-bar-graph");
+    let blockLeft = document.querySelector(".block-left");
+    let blockRight = document.querySelector(".block-right");
+    let blockMiddle = document.querySelector(".block-middle");
+    let statusBar = document.querySelector(".status-bar-shared");
+    let layout = document.querySelector(".good-layout");
+
+    if (blockLeft) blockLeft.style.display = "flex";
+    if (blockRight) blockRight.style.display = "flex";
+    if (blockMiddle) {
+        blockMiddle.style.display = "flex";
+        blockMiddle.style.gridColumn = "";
+        blockMiddle.style.gridRow = "";
+    }
+
+    if (layout) {
+        let leftCollapsed = blockLeft?.classList.contains("collapsed");
+        let rightCollapsed = blockRight?.classList.contains("collapsed");
+        layout.style.setProperty("--left-w", leftCollapsed ? "80px" : "280px");
+        layout.style.setProperty("--right-w", rightCollapsed ? "80px" : "280px");
+        layout.style.gridTemplateRows = "";
+    }
+
+    if (mode === "scale") {
+        if (secScale) secScale.style.display = "flex";
+        if (secBar) secBar.style.display = "none";
+        if (statusBar) statusBar.style.marginBottom = "85px";
+    } else {
+        if (secScale) secScale.style.display = "none";
+        if (secBar) secBar.style.display = "flex";
+        if (statusBar) statusBar.style.marginBottom = "24px";
+        if (typeof window.updateBarGraph === "function") {
+            window.updateBarGraph();
         }
-        
-        let blockPro = document.getElementById("block-pro");
-        if(blockPro) blockPro.style.display = "none";
-        
-        // Reset grid
-        let layout = document.querySelector(".good-layout");
-        if(layout) {
-            let leftCollapsed = document.querySelector(".block-left")?.classList.contains("collapsed");
-            let rightCollapsed = document.querySelector(".block-right")?.classList.contains("collapsed");
-            layout.style.setProperty("--left-w", leftCollapsed ? "80px" : "280px");
-            layout.style.setProperty("--right-w", rightCollapsed ? "80px" : "280px");
-            layout.style.gridTemplateRows = "";
-        }
-    } else if(mode === "pro") {
-        if(btnPro) btnPro.classList.add("active-tab");
-        if(btnSimple) btnSimple.classList.remove("active-tab");
-        
-        document.querySelector(".block-left").style.display = "none";
-        document.querySelector(".block-right").style.display = "none";
-        
-        let blockMiddle = document.querySelector(".block-middle");
-        if(blockMiddle) {
-            blockMiddle.style.display = "flex";
-            blockMiddle.style.gridColumn = "1 / -1";
-            blockMiddle.style.gridRow = "3";
-        }
-        
-        let blockPro = document.getElementById("block-pro");
-        if(blockPro) blockPro.style.setProperty("display", "flex", "important");
-        
-        // Collapse grid so pro block can span cleanly
-        let layout = document.querySelector(".good-layout");
-        if(layout) {
-            layout.style.setProperty("--left-w", "0px");
-            layout.style.setProperty("--right-w", "0px");
-            layout.style.gridTemplateRows = "90px minmax(0, 1fr) auto";
-        }
-        
-        if(!window.proEquationRendered) {
-            window.renderProModeEquation();
-            window.proEquationRendered = true;
-        }
-        window.syncProBoxes();
     }
 };
 
@@ -1570,3 +1650,28 @@ window.handleChallengeTimeout = function() {
     overlay.appendChild(card);
     document.body.appendChild(overlay);
 };
+
+
+// Clean up any historical zoom state from localStorage or inline styles
+function cleanupZoom() {
+    try {
+        localStorage.removeItem('stoich_zoom_level');
+    } catch(e) {}
+    if (document.documentElement) document.documentElement.style.zoom = '';
+    if (document.body) document.body.style.zoom = '';
+    const layout = document.querySelector('.good-layout');
+    if (layout) {
+        layout.style.transform = '';
+        layout.style.transformOrigin = '';
+        layout.style.width = '';
+        layout.style.height = '';
+        layout.style.maxWidth = '';
+        layout.style.margin = '';
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', cleanupZoom);
+} else {
+    cleanupZoom();
+}
