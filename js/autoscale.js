@@ -67,6 +67,95 @@
             }
         }
 
+        // Auto-scale Game Dashboard stage for tablets and compact landscape screens
+        const gameLayout = document.querySelector('.good-layout');
+        if (gameLayout) {
+            // In phone portrait mode, let vertical flow handle it
+            if (window.innerWidth < window.innerHeight) {
+                gameLayout.style.zoom = '';
+                gameLayout.style.width = '';
+                gameLayout.style.height = '';
+                document.body.style.display = '';
+                document.body.style.padding = '';
+                return;
+            }
+
+            // Clearance gutters for peripheral floating widgets
+            // Left HUD: Mode switcher (width 65px at left 15px -> ends at 80px)
+            // Right HUD: Settings FAB (width 56px at right 18px -> starts at 100vw - 74px)
+            // Left Bottom HUD: Help button (width 56px at left 18px -> ends at 74px)
+            const minGutter = 86;
+            const gutter = Math.min(Math.max(window.innerWidth * 0.08, minGutter), 115);
+            const availW = window.innerWidth - (gutter * 2);
+            const availH = window.innerHeight - 24;
+
+            // Desktop widescreen fluid expansion (e.g. 1080p, 1440p)
+            if (window.innerWidth >= 1440 && window.innerHeight >= 860) {
+                document.body.style.padding = 'clamp(8px, 1.5vh, 16px) clamp(92px, 6.5vw, 110px)';
+                document.body.style.display = '';
+                document.body.style.alignItems = '';
+                document.body.style.justifyContent = '';
+                gameLayout.style.zoom = '';
+                gameLayout.style.width = '';
+                gameLayout.style.height = '';
+                const leftSidebar = document.getElementById('mode-switcher-sidebar');
+                if (leftSidebar) {
+                    leftSidebar.style.transform = 'translateY(-50%)';
+                    leftSidebar.style.left = '15px';
+                }
+                const leftBottom = document.getElementById('left-bottom-hud');
+                if (leftBottom) {
+                    leftBottom.style.transform = '';
+                    leftBottom.style.left = '24px';
+                    leftBottom.style.bottom = '24px';
+                }
+                const rightFab = document.querySelector('.fab-container');
+                if (rightFab) {
+                    rightFab.style.transform = '';
+                    rightFab.style.right = '24px';
+                    rightFab.style.bottom = '24px';
+                }
+            } else {
+                // Tablet and compact landscape screens: proportional stage autoscale
+                const baseW = 1200;
+                const baseH = 740;
+                const scale = Math.min(availW / baseW, availH / baseH, 1.0);
+
+                document.body.style.padding = '12px ' + gutter + 'px';
+                document.body.style.display = 'flex';
+                document.body.style.alignItems = 'center';
+                document.body.style.justifyContent = 'center';
+                document.body.style.boxSizing = 'border-box';
+
+                gameLayout.style.zoom = scale;
+                gameLayout.style.width = Math.round(availW / scale) + 'px';
+                gameLayout.style.height = Math.round(availH / scale) + 'px';
+
+                // Scale peripheral floating HUD controls proportionally
+                const widgetScale = Math.min(Math.max(scale, 0.78), 1.0);
+                const leftSidebar = document.getElementById('mode-switcher-sidebar');
+                if (leftSidebar) {
+                    leftSidebar.style.transform = `translateY(-50%) scale(${widgetScale})`;
+                    leftSidebar.style.transformOrigin = 'left center';
+                    leftSidebar.style.left = '14px';
+                }
+                const leftBottom = document.getElementById('left-bottom-hud');
+                if (leftBottom) {
+                    leftBottom.style.transform = `scale(${widgetScale})`;
+                    leftBottom.style.transformOrigin = 'bottom left';
+                    leftBottom.style.left = '16px';
+                    leftBottom.style.bottom = '16px';
+                }
+                const rightFab = document.querySelector('.fab-container');
+                if (rightFab) {
+                    rightFab.style.transform = `scale(${widgetScale})`;
+                    rightFab.style.transformOrigin = 'bottom right';
+                    rightFab.style.right = '16px';
+                    rightFab.style.bottom = '16px';
+                }
+            }
+        }
+
         // Auto-scale Periodic Table modal to fit any landscape screen
         const ptWrapper = document.querySelector('.pt-modal-wrapper');
         if (ptWrapper) {
