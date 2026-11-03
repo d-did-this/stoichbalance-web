@@ -200,7 +200,7 @@ function renderBoard() {
     const sleekEq = document.getElementById('dynamic-sleek-equation');
     
     if (sleekEq) {
-        let rHtml = `<div style="display: flex; justify-content: flex-start; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">`;
+        let rHtml = `<div style="display: flex; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqw, 12px); flex-shrink: 0;">`;
         currentLevelData.reactants.forEach((m, idx) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
             let coeffHtml = `<div id="coeff-eq-react-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
@@ -214,9 +214,9 @@ function renderBoard() {
         });
         rHtml += '</div>';
         
-        let arrowHtml = '<div style="display: flex; justify-content: center;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
+        let arrowHtml = '<div style="display: flex; justify-content: center; align-items: center; flex-shrink: 0;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
         
-        let pHtml = `<div style="display: flex; justify-content: flex-end; align-items: center; gap: clamp(5px, 1.5cqw, 15px); min-width: 0; width: 100%;">`;
+        let pHtml = `<div style="display: flex; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqw, 12px); flex-shrink: 0;">`;
         currentLevelData.products.forEach((m, idx) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
             let coeffHtml = `<div id="coeff-eq-prod-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
