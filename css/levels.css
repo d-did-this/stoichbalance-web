@@ -25,7 +25,7 @@
 .levels-header {
     background: #f8fafc;
     border-bottom: 6px solid var(--dark-border);
-    padding: clamp(1rem, 2vh, 1.5rem) clamp(1.5rem, 3vw, 3rem);
+    padding: clamp(0.5rem, 1.2vh, 1rem) clamp(1rem, 2vw, 2.5rem);
     display: flex; justify-content: space-between; align-items: center;
 }
 
@@ -41,9 +41,9 @@
 }
 
 .btn-back {
-    padding: 0.8rem 1.5rem;
+    padding: clamp(0.4rem, 0.8vh, 0.65rem) clamp(0.8rem, 1.2vw, 1.2rem);
     background: #ef4444; border: 4px solid var(--dark-border); border-radius: 20px;
-    color: white; font-family: inherit; font-size: 1.2rem; font-weight: 900; cursor: pointer;
+    color: white; font-family: inherit; font-size: clamp(0.9rem, 1.1vw, 1.1rem); font-weight: 900; cursor: pointer;
     box-shadow: 0 6px 0 var(--dark-border);
     display: flex; align-items: center; gap: 0.5rem;
     transition: transform 0.1s, box-shadow 0.1s;
@@ -51,12 +51,12 @@
 .btn-back:hover { transform: translateY(-2px); box-shadow: 0 8px 0 var(--dark-border); filter: brightness(1.1); }
 .btn-back:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
 
-.levels-title { font-size: clamp(2rem, 3vw, 2.5rem); font-weight: 900; color: var(--text-main); letter-spacing: -1px; line-height: 1.1; margin: 0; }
+.levels-title { font-size: clamp(1.6rem, 2.2vw, 2.2rem); font-weight: 900; color: var(--text-main); letter-spacing: -1px; line-height: 1.1; margin: 0; }
 .levels-subtitle { font-size: 1rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
 
 .score-widget {
     background: #fde047; border: 4px solid var(--dark-border); border-radius: 20px;
-    padding: 0.6rem 1.2rem; display: flex; align-items: center; gap: 0.5rem;
+    padding: clamp(0.3rem, 0.6vh, 0.5rem) clamp(0.6rem, 1vw, 1rem); display: flex; align-items: center; gap: 0.5rem;
     box-shadow: 0 6px 0 var(--dark-border);
 }
 .score-icon { 
@@ -81,14 +81,14 @@
 
 .levels-grid {
     flex: 1; 
-    padding: clamp(1rem, 2vw, 2rem); 
-    overflow-y: auto; /* Automatically allows scrolling ONLY on tiny screens */
+    padding: clamp(0.5rem, 1vh, 1.2rem) clamp(0.8rem, 1.5vw, 1.8rem);
+    overflow-y: hidden;
     
     display: grid; 
     grid-template-columns: repeat(3, 1fr);
     /* Stretch to fill the screen (1fr), but NEVER squish below 260px */
-    grid-template-rows: repeat(2, minmax(260px, 1fr));
-    gap: clamp(1rem, 2vw, 2rem);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.5rem, 1vh, 1.2rem);
     
     scrollbar-width: thin; scrollbar-color: var(--gray-border) transparent;
 }
@@ -97,10 +97,10 @@
 
 .pagination {
     background: #f8fafc; border-top: 6px solid var(--dark-border);
-    padding: 0.8rem 2rem; display: flex; justify-content: space-between; align-items: center;
+    padding: clamp(0.35rem, 0.8vh, 0.65rem) clamp(2rem, 4vw, 5.5rem) clamp(0.35rem, 0.8vh, 0.65rem) 2rem; display: flex; justify-content: space-between; align-items: center;
 }
 .btn-page {
-    padding: 0.6rem 1.2rem; background: white; border: 4px solid var(--dark-border); border-radius: 20px;
+    padding: clamp(0.3rem, 0.6vh, 0.5rem) 1rem; background: white; border: 4px solid var(--dark-border); border-radius: 20px;
     color: var(--text-main); font-family: inherit; font-size: 1rem; font-weight: 900; cursor: pointer;
     box-shadow: 0 4px 0 var(--dark-border); transition: all 0.1s;
 }
@@ -118,6 +118,7 @@
 .level-card {
     background: white; border: 4.5px solid var(--dark-border); border-radius: 22px;
     display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;
+    min-height: 0;
     box-shadow: 0 8px 0 var(--dark-border);
     transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.12s;
     position: relative;
@@ -147,14 +148,14 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
-    padding: clamp(14px, 2vh, 18px) 18px clamp(12px, 1.8vh, 15px) 18px;
+    padding: clamp(6px, 1vh, 12px) clamp(10px, 1.2vw, 16px);
     border-bottom: 2.5px dashed #cbd5e1;
     background: #f8fafc;
 }
 .lvl-num {
-    width: 34px;
-    height: 34px;
-    font-size: 1.15rem;
+    width: clamp(26px, 2.8vh, 32px);
+    height: clamp(26px, 2.8vh, 32px);
+    font-size: clamp(0.85rem, 1vh, 1.05rem);
     font-weight: 900;
     color: var(--dark-border);
     background: #e2e8f0;
@@ -178,9 +179,9 @@
     min-height: 28px;
 }
 .lvl-diff {
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 0.85vw, 0.82rem);
     font-weight: 900;
-    padding: 5px 14px;
+    padding: clamp(2px, 0.5vh, 4px) clamp(8px, 0.8vw, 12px);
     border-radius: 14px;
     letter-spacing: 0.5px;
     border: 2.5px solid var(--dark-border);
@@ -192,7 +193,7 @@
 
 /* Middle Section: Card Body & Equation */
 .card-icon { 
-    font-size: clamp(2.8rem, 5.2vh, 3.6rem); 
+    font-size: clamp(1.8rem, 3.5vh, 3rem); 
     text-align: center;
     padding: 4px 0 0;
     line-height: 1;
@@ -207,19 +208,19 @@
 }
 
 .card-body { 
-    padding: 8px 16px 10px;
+    padding: clamp(3px, 0.6vh, 6px) clamp(8px, 1vw, 12px);
     text-align: center;
     flex: 1; 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px; 
+    gap: clamp(2px, 0.6vh, 6px);
 }
 
 /* TITLE & EQUATION */
 .lvl-name {
-    font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+    font-size: clamp(0.9rem, 1.1vw, 1.15rem);
     font-weight: 900;
     color: var(--text-main);
     line-height: 1.15;
@@ -230,11 +231,11 @@
 .lvl-equation {
     background: #eff6ff; color: #1d4ed8; 
     font-family: monospace; font-weight: 900; 
-    font-size: clamp(0.95rem, 1.3vw, 1.15rem);
-    padding: 6px 14px;
+    font-size: clamp(0.78rem, 0.95vw, 1rem);
+    padding: clamp(3px, 0.5vh, 5px) clamp(6px, 0.8vw, 10px);
     border-radius: 10px;
     border: 2px solid #bfdbfe;
-    margin: 0;
+    margin: clamp(6px, 1.2vh, 12px) 0 0 0;
     width: 100%;
     max-width: 360px;
     text-align: center;
@@ -243,16 +244,24 @@
     scrollbar-width: none;
     box-shadow: 0 2px 0 rgba(0,0,0,0.03);
 }
+
+@media (min-width: 1200px) {
+    .lvl-equation {
+        font-size: clamp(1.05rem, 1.2vw, 1.22rem);
+        padding: clamp(5px, 0.8vh, 8px) clamp(12px, 1.2vw, 18px);
+        max-width: 420px;
+    }
+}
 .lvl-equation::-webkit-scrollbar { display: none; }
 .level-card.mastered .lvl-equation { background: white; color: var(--green); border-color: var(--green); }
 
 /* Bottom Section: Status Banners (Expanded Space & Tactile Height) */
 .status-banner {
-    padding: clamp(14px, 2.2vh, 18px) 1rem;
-    min-height: 58px;
+    padding: clamp(6px, 1vh, 12px) 0.8rem;
+    min-height: clamp(34px, 4.5vh, 48px);
     text-align: center;
     font-weight: 900;
-    font-size: 1.15rem;
+    font-size: clamp(0.85rem, 1.1vw, 1.05rem);
     letter-spacing: 2.5px;
     border-top: 4px solid var(--dark-border);
     display: flex;
@@ -291,7 +300,7 @@
     .levels-grid { 
         display: flex; flex-direction: column; 
         padding: 1.5rem 1rem; gap: 1rem; 
-        overflow-y: auto; /* Required for list view */
+    overflow-y: hidden;
     }
     
     /* MOBILE COMPACT HORIZONTAL ROWS */
@@ -418,7 +427,7 @@ html.is-form5-mode .dot.active {
     width: 100%;
     box-sizing: border-box;
     align-items: center;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 /* =========================================
@@ -831,7 +840,7 @@ html.is-form5-mode .dot.active {
     border-radius: 10px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: clamp(2px, 0.6vh, 6px);
     border: 1.5px solid;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     user-select: none;
@@ -1085,7 +1094,7 @@ html.is-form5-mode .dot.active {
         border-radius: 12px;
     }
     .levels-grid {
-        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
         gap: 6px !important;
         padding: 4px 10px !important;
     }
@@ -1150,3 +1159,55 @@ html.is-form5-mode .dot.active {
 }
 
 
+
+/* =========================================
+   PERSISTENT FULLSCREEN TOGGLE BUTTON
+========================================= */
+.btn-fullscreen-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #facc15;
+  color: #1e293b;
+  border: 4px solid #1e293b;
+  box-shadow: 0 5px 0 #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 99999;
+  transition: transform 0.1s, box-shadow 0.1s;
+  outline: none;
+  user-select: none;
+}
+.btn-fullscreen-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 #1e293b;
+}
+.btn-fullscreen-toggle:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #1e293b;
+}
+
+@media (max-height: 760px) and (min-aspect-ratio: 1/1) {
+  .btn-fullscreen-toggle {
+    width: 42px !important;
+    height: 42px !important;
+    bottom: 12px !important;
+    right: 12px !important;
+    border-width: 3.5px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 0 #1e293b !important;
+  }
+  .btn-fullscreen-toggle svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+.btn-fullscreen-toggle svg {
+  pointer-events: none;
+}
