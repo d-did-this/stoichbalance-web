@@ -1040,4 +1040,113 @@ html.is-form5-mode .dot.active {
     box-shadow: 0 0 0 transparent;
 }
 
+/* =========================================
+   TABLET & SHORT-HEIGHT LANDSCAPE RESPONSIVENESS
+========================================= */
+@media (max-height: 760px) and (min-aspect-ratio: 1/1) {
+    body {
+        padding: 4px 10px !important;
+        overflow: hidden !important;
+    }
+    .levels-container {
+        height: min(95svh, 95dvh, calc(100vh - 16px), 576px);
+        max-height: min(97svh, 584px);
+        border-radius: clamp(20px, 3vw, 32px);
+    }
+    .levels-header {
+        padding: 4px clamp(10px, 1.5vw, 18px);
+        min-height: 48px;
+    }
+    .levels-header .btn-back {
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        border-radius: 12px;
+    }
+    .levels-header .header-center .user-greeting,
+    .user-greeting {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+        margin-bottom: 1px;
+    }
+    .levels-header .header-center h1,
+    .levels-title {
+        font-size: 1.25rem !important;
+        margin: 0;
+        line-height: 1.1;
+    }
+    .levels-header .header-center .levels-subtitle,
+    .levels-subtitle {
+        font-size: 0.65rem;
+        margin: 0;
+    }
+    .score-widget {
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        border-radius: 12px;
+    }
+    .levels-grid {
+        grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+        padding: 4px 10px !important;
+    }
+    .level-card {
+        border-width: 3px;
+        border-radius: 14px;
+        box-shadow: 0 3px 0 var(--dark-border);
+    }
+    .card-top {
+        padding: 2px 8px 1px 8px;
+    }
+    .lvl-stars {
+        padding: 1px 6px;
+        min-height: 18px;
+        font-size: 0.7rem;
+    }
+    .lvl-diff {
+        font-size: 0.65rem;
+        padding: 1px 6px;
+        border-radius: 8px;
+    }
+    .card-body {
+        padding: 2px 8px 3px;
+        gap: 2px;
+    }
+    .card-icon {
+        font-size: 1.7rem;
+        line-height: 1;
+    }
+    .lvl-name {
+        font-size: 0.82rem;
+        line-height: 1.1;
+    }
+    .lvl-equation {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+    .status-banner {
+        padding: 4px 8px;
+        min-height: 30px;
+        font-size: 0.78rem;
+        letter-spacing: 1px;
+        border-top-width: 2.5px;
+    }
+    .pagination {
+        padding: 3px 1rem;
+        min-height: 32px;
+        gap: 10px;
+    }
+    .btn-page {
+        padding: 3px 10px;
+        font-size: 0.75rem;
+        border-radius: 10px;
+    }
+    .page-dots {
+        gap: 6px;
+    }
+    .dot {
+        width: 8px;
+        height: 8px;
+    }
+}
+
 
