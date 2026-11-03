@@ -67,7 +67,7 @@
             selector: ".fab-container",
             badge: "Settings Menu",
             title: "Game Controls & Settings",
-            desc: "Access quick utility controls here: toggle sound (Mute/Unmute), go Full screen, Undo moves, Reset the board, or re-open this guide anytime!",
+            desc: "Access quick utility controls here: toggle sound (Mute/Unmute), go Full screen, Undo moves, or Reset the board. You can also re-open this tutorial or zoom with the buttons on the bottom left!",
             tip: "🚀 You are all set to start balancing equations. Have fun!"
         }
     ];
