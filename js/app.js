@@ -1743,3 +1743,159 @@ window.renderBadges = function(player) {
     
     container.innerHTML = bannerHtml + gridHtml;
 };
+
+/* ========================================================
+   TOP FLOATING TYPING BAR ENGINE (OPTION 2)
+======================================================== */
+window.handlePlayerNameClick = function(e) {
+    const isTouchOrTablet = ('ontouchstart' in window) || 
+                            (navigator.maxTouchPoints > 0) || 
+                            (window.innerWidth <= 1280 && window.innerHeight <= 900);
+    if (isTouchOrTablet) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const inp = document.getElementById('player-name');
+        if (inp) inp.blur();
+        window.openTopTypingBar();
+        return false;
+    }
+    if (typeof window.showProfileDropdown === 'function') {
+        window.showProfileDropdown();
+    }
+};
+
+window.handlePlayerNameFocus = function(e) {
+    const isTouchOrTablet = ('ontouchstart' in window) || 
+                            (navigator.maxTouchPoints > 0) || 
+                            (window.innerWidth <= 1280 && window.innerHeight <= 900);
+    if (isTouchOrTablet) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const inp = document.getElementById('player-name');
+        if (inp) inp.blur();
+        window.openTopTypingBar();
+        return;
+    }
+    if (typeof window.showProfileDropdown === 'function') {
+        window.showProfileDropdown();
+    }
+};
+
+window.openTopTypingBar = function() {
+    const overlay = document.getElementById('top-typing-bar-overlay');
+    const topInput = document.getElementById('top-typing-input');
+    const mainInput = document.getElementById('player-name');
+    const dropdown = document.getElementById('profile-dropdown');
+    if (dropdown) dropdown.style.display = 'none';
+
+    if (!overlay || !topInput) return;
+
+    if (typeof window.playSound === 'function') window.playSound('click');
+    topInput.value = mainInput ? mainInput.value : '';
+
+    window.renderTopTypingChips();
+
+    overlay.style.display = 'flex';
+    setTimeout(() => {
+        topInput.focus();
+        topInput.select();
+    }, 60);
+};
+
+window.confirmTopTypingName = function() {
+    const overlay = document.getElementById('top-typing-bar-overlay');
+    const topInput = document.getElementById('top-typing-input');
+    const mainInput = document.getElementById('player-name');
+    if (!topInput || !mainInput) return;
+
+    let val = topInput.value.trim();
+    if (!val) {
+        if (typeof goofyNames !== 'undefined' && goofyNames.length) {
+            val = goofyNames[Math.floor(Math.random() * goofyNames.length)];
+        } else {
+            val = 'Student';
+        }
+    }
+
+    mainInput.value = val;
+    localStorage.setItem('currentPlayer', val);
+
+    let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+    if (!profiles.includes(val)) {
+        profiles.push(val);
+        localStorage.setItem('profiles', JSON.stringify(profiles));
+        if (typeof window.checkPlayerDropdownVisibility === 'function') {
+            window.checkPlayerDropdownVisibility();
+        }
+    }
+
+    if (typeof window.playSound === 'function') window.playSound('success');
+    if (overlay) overlay.style.display = 'none';
+};
+
+window.closeTopTypingBar = function() {
+    const overlay = document.getElementById('top-typing-bar-overlay');
+    if (overlay) overlay.style.display = 'none';
+    if (typeof window.playSound === 'function') window.playSound('click');
+};
+
+window.randomizeTopTypingName = function() {
+    const topInput = document.getElementById('top-typing-input');
+    if (!topInput || typeof goofyNames === 'undefined') return;
+    const rand = goofyNames[Math.floor(Math.random() * goofyNames.length)];
+    topInput.value = rand;
+    if (typeof window.playSound === 'function') window.playSound('select');
+    topInput.focus();
+};
+
+window.renderTopTypingChips = function() {
+    const container = document.getElementById('top-typing-chips');
+    if (!container) return;
+    container.innerHTML = '<span class="typing-chip-label">Quick Picks:</span>';
+
+    let profiles = JSON.parse(localStorage.getItem('profiles') || '[]');
+    let chips = profiles.slice(-2);
+    
+    if (typeof goofyNames !== 'undefined') {
+        for (let name of goofyNames) {
+            if (chips.length >= 4) break;
+            if (!chips.includes(name)) chips.push(name);
+        }
+    }
+
+    chips.forEach(name => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'typing-chip interactive';
+        btn.innerText = name;
+        btn.onclick = () => {
+            const topInput = document.getElementById('top-typing-input');
+            if (topInput) {
+                topInput.value = name;
+                if (typeof window.playSound === 'function') window.playSound('select');
+                topInput.focus();
+            }
+        };
+        container.appendChild(btn);
+    });
+};
+
+// Wire up Enter and Escape on top typing input
+document.addEventListener('DOMContentLoaded', () => {
+    const topInput = document.getElementById('top-typing-input');
+    if (topInput) {
+        topInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.confirmTopTypingName();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                window.closeTopTypingBar();
+            }
+        });
+    }
+});
