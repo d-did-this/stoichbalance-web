@@ -53,3 +53,104 @@
   3. The subframe unloads and loads entirely hidden behind the closed aperture, eliminating all white flashes and layout jumps.
   4. Local iris wipes inside child frames are automatically disabled (`display: none`) to eliminate conflicting transitions and conserve tablet GPU resources.
   5. The master iris expands outward to `0vmax` only after `frame.onload` and layout settlement complete, delivering 100% flicker-free 60 FPS transitions while preserving the beloved camera aperture Iris Wipe.
+
+
+## 8. Tablet Game Board Scaling & Headroom Preservation
+* **Symptom**: On tablets (1164 × 776):
+  1. The game board (`.good-layout`) collided with the floating side tabs (`#mode-switcher-sidebar`), the floating help button (`#left-bottom-hud`), and the settings button (`.fab-container`).
+  2. The tops of the glass beakers on the balance seesaw were clipped off by the container boundary.
+  3. The cards touched the very bottom edge of the tablet display with zero breathing room.
+* **Root Causes**:
+  - The previous responsive stylesheet used a media query restricted to `@media (max-width: 1024px), (max-height: 760px)`. Because the tablet viewport is 1164 × 776, it was treated as a 1080p desktop, loading full desktop-sized cards and 74px margins.
+  - The old tablet media query had forced `.grid-section.section-scale { height: 95px !important; }` while the seesaw plank and beakers required over 120px, shaving off the top 25px of the beakers.
+* **Solution**:
+  1. Integrated `.good-layout` into `js/autoscale.js` to proportionally scale the entire 3-column lab stage on tablet viewports while preserving widescreen fluid mode on desktop monitors.
+  2. Provided dedicated 86px - 115px clearance gutters and proportionally scaled floating HUD buttons, ensuring at least 20px of clear space around the board.
+  3. Tuned the fulcrum (28px), plank (28px), and scale section (145px) geometry, guaranteeing ample headroom for the balance beakers even when fully tilted.
+
+
+## 9. Touch-Hold vs Synthetic Hover Conflict & Proportional Laboratory Layout
+* **Symptom**: On tablets and mobile touchscreens, every normal finger tap on a molecule button or header immediately opened a large chemical info card right on top of the stage, blocking the user from seeing the scale or reaction products. At the same time, top bars, sidebars, and balance beakers were oversized and crowded the board.
+* **Root Causes**:
+  1. Touchscreens emit synthetic `mouseover` events following `touchstart` and `touchend`. Because the tooltip engine listened directly to `mouseover`, every quick gameplay tap triggered the popup as if a mouse hovered over it.
+  2. The top bar was fixed to `min-height: 80px`, sidebars spanned up to 280px each, and balance beakers were 220px wide. On a 1164x776 tablet, this compressed the center reaction column down to less than 480px and filled the screen with oversized elements.
+* **Solution**:
+  1. Implemented pointer discrimination in `js/info_cards.js`. When a touch event is detected (`pointerType === 'touch'`), synthetic `mouseover` events are suppressed.
+  2. Implemented a 450ms long-press hold timer. Quick finger taps (< 450ms) add molecules with zero popup disruption. Holding a button stationary for >= 450ms triggers the chemical card cleanly with light haptic feedback.
+  3. Tapping anywhere outside the card dismisses it immediately.
+  4. Preserved immediate hover and leave responsiveness for desktop mouse users.
+  5. Scaled down top bar (45px - 52px), sidebars (176px - 200px), and balance scale (156px beakers, 110px container) in `@media (max-width: 1280px), (max-height: 850px)`. This expanded the center reaction board from 486px to 609px (+123px width), allowing up to 3 element trays to fit in a single glance without scrolling.
+
+
+## 10. Dynamic Equation Layout Rule, Tactile Button Integrity, Element Tray Stack Headroom, and Gap Geometry
+* **Symptom**:
+  1. The chemical equation arrow was displaced or terms were pushed 800px apart to opposite screen edges when using full-width `flex-start` and `flex-end`.
+  2. In tablet view, the chemical equation text was shrunken too small (0.9rem), and coefficient badges turned black when count was zero.
+  3. Action buttons in Prof. Beaker lost their proper height matching and red trash styling.
+  4. The dotted vertical separator line in the element tray mini scale vanished after an aggressive CSS rule (`border-right: none`), and stacked atom blocks were chopped off by an artificial 32px height constraint with `overflow: hidden`.
+  5. The gap between the status bar and the balance scale/bar view was cramped, causing beakers to touch the status bar when tilting.
+  6. Message content sent by Professor Beaker was oversized on tablet screens.
+  7. Switching from Bar View back to Scale View failed to re-sync the active scale simulation.
+* **Root Causes**:
+  - Reactants and products flying apart occurred when using extreme alignments without grouping against the arrow.
+  - Setting `el.style.background = count === 0 ? "#1e293b" : "#ef4444"` in JavaScript caused coefficient boxes to turn into black bars instead of red badges.
+  - Missing base `.btn-trash` CSS rules caused the trash button to collapse in size on tablet.
+  - `border-right: none !important` and `height: 32px !important; overflow: hidden !important;` on `.mini-seesaw` removed the dividing line and clipped stacked atom blocks.
+  - `window.switchViewMode` did not re-invoke `window.updateSimulation()` when switching back to `"scale"`.
+* **Solution**:
+  1. Enforced the centered arrow invariant: `.eq-reactants` has `flex: 1; justify-content: flex-end`, `.eq-products` has `flex: 1; justify-content: flex-start`, and `.eq-arrow-wrapper` stays locked at the 50% midpoint.
+  2. Fixed `.sci-coeff` to always maintain `#ef4444` red background with `#b91c1c` border.
+  3. Increased equation sizing to `1.25rem` on tablet and `clamp(1.2rem, 3.8cqw, 2.05rem)` on desktop.
+  4. Restored `.btn-hint-clean` (gold/yellow `#facc15`, 4px/2.5px border, lightbulb SVG) and `.btn-trash` (red `#ef4444`, 4px/2.5px border, white trash SVG) with identical heights and tactile click transforms.
+  5. Restored the dashed dividing line on `.mini-stack-zone.left` (`border-right: 2px dashed rgba(0, 0, 0, 0.2)`), increased `.mini-seesaw` height to 64px on tablet (90px on desktop), with `overflow: visible` for stacked atom blocks.
+  6. Increased the gap below the status bar to 16px, and increased `.section-scale` / `#section-bar-graph` height to 140px on tablet so tilting beakers never collide with the status bar.
+  7. Added `.beaker-bubble-text` and `.beaker-sender-tag` classes, reducing font size to `0.84rem` on tablet for clean reading.
+  8. Added `if (typeof window.updateSimulation === "function") window.updateSimulation();` in `switchViewMode("scale")` so the scale immediately re-syncs when switching back from Bar View.
+
+
+
+## 11. Scale vs Bar Container Footprint Equalization, Responsive Action Buttons, and Bottom Edge Shadow Headroom
+* **Symptom**:
+  1. Switching between Scale View and Bar View caused the chemical equation and lower reaction board to jump vertically. On desktop, the Bar Graph container had an inline height of 195px while the Scale was 145px, and JavaScript dynamically stripped the status bar bottom margin upon switching to Bar mode.
+  2. On tablet view, the Hint button text ("Hint please!") was overflowing the button boundary, pushing the lightbulb SVG icon off to the left and overlapping the trash button. When sidebars narrowed or shrank, the text was clipped.
+  3. On both desktop and tablet views, the 3D drop-shadow and rounded bottom corners of the Hint and Trash buttons were cut off by the bottom border of the right sidebar card.
+* **Root Causes**:
+  - The status bar bottom margin was set inline (`margin-bottom: 85px`) and removed at runtime by `statusBar.style.removeProperty("margin-bottom")` in `window.switchViewMode()`.
+  - `#section-bar-graph` and `.section-scale` lacked equalized container heights and margins across both CSS and markup.
+  - "Hint please!" was 12 characters long, which in Nunito Bold 0.8rem exceeded the available ~90px width inside the narrow tablet sidebar. A subsequent non-scoped desktop rule at line 1391 had overridden the tablet media query rule.
+  - `.block-right` and `.sidebar-content` had insufficient bottom padding and `overflow: hidden`, causing the 4px 3D box-shadow of `.btn-hint-clean` and `.btn-trash` to collide with the card's 18px rounded bottom corners.
+* **Solution**:
+  1. Equalized container geometry: `.section-scale` and `#section-bar-graph` now share the exact same height (`160px` desktop, `140px` tablet) and margin-bottom (`14px` desktop, `10px` tablet). Removed runtime mutation of `margin-bottom` in `window.switchViewMode()`.
+  2. Made the Hint button text responsive: `<span class="hint-text-desktop">Hint please!</span><span class="hint-text-tablet">Hint</span>`, showing "Hint please!" on desktop and "Hint" on tablet/compact screens with `text-overflow: ellipsis; overflow: hidden;`.
+  3. Added bottom shadow headroom: Gave `.good-block.block-right` explicit bottom padding (`20px` desktop, `16px` tablet), set `margin-bottom: 6px; padding-bottom: 2px;` on `.beaker-actions`, and enabled `overflow: visible` so 3D button shadows remain fully visible.
+
+
+## 12. Equation Alignment Invariant and Complete Action Button Visibility
+* **Symptom**:
+  1. The dynamic equation had reactants aligned to the right (`justify-content: flex-end`) and products aligned to the left (`justify-content: flex-start`), clustering around the arrow instead of left-aligning reactants and right-aligning products.
+  2. The Hint button on tablet had been shortened to "Hint" as an earlier workaround to avoid overflow.
+* **Root Causes**:
+  - `initEngine()` in `js/game.js` set `justify-content: flex-end` for reactants and `justify-content: flex-start` for products.
+  - The tablet right sidebar was clamped to 178px-192px with 12px padding, leaving insufficient width for the 12-character "Hint please!" text alongside the 18px SVG and trash button.
+* **Solution**:
+  1. Enforced the equation alignment rule across both `js/game.js` and `game.html`: `.eq-reactants` uses `justify-content: flex-start !important;` (left-aligned), `.eq-products` uses `justify-content: flex-end !important;` (right-aligned), and `.eq-arrow-wrapper` is centered at the exact 50% midpoint.
+  2. Adjusted tablet equation font scaling to `1.05rem` with `gap: 6px` to prevent long molecular formulas from crowding the center arrow.
+  3. Increased tablet sidebar clamp to `clamp(198px, 19vw, 216px)`, giving both sidebars comfortable breathing room. Standardized the button text to `"Hint please!"` on all devices with `font-size: 0.78rem` on tablet, ensuring full visibility without truncation or clipping.
+
+
+## 13. Tablet Collapsed Parity, Equation Compaction, Laptop Scale Expansion, and In-Place Fullscreen Persistence
+* **Symptoms**:
+  1. On tablet view, collapsing the element tray or Prof. Beaker left an awkward squished button with uneven padding, small 18px icons, and flat 3px shadows, unlike the polished 60x60 square tiles in laptop view.
+  2. The block containing the equation in tablet view was too tall (90px), taking up excessive vertical room from the drop buckets below.
+  3. The scale and bar graph block on laptop view was relatively short (160px), constraining vertical bar growth.
+  4. In both laptop and tablet views, clicking "NEXT LEVEL" on the victory modal caused the browser to immediately exit fullscreen mode.
+* **Root Causes**:
+  - Tablet CSS rules for `.good-block` (`padding: 10px 12px !important;`) and `.block-left .rect-btn` (`padding: 5px 8px !important; border-radius: 12px !important; svg width: 18px !important;`) overrode the desktop `.good-block.collapsed` rules.
+  - `.section-equation` had `height: 90px;` in desktop CSS and was not overridden with a reduced height in the tablet media query.
+  - The scale and bar graph container had a hardcoded `height: 160px;` with `calcBarHeight()` capped at 82px.
+  - The victory modal's "NEXT LEVEL" button triggered `window.slideTransitionTo()`, which executed `window.location.href = url`. Browsers automatically terminate HTML5 Fullscreen upon document navigation or reload.
+* **Solutions**:
+  1. **Tablet Collapsed Parity**: Added scoped rules `body .good-layout .good-block.collapsed` with `padding: 0 !important;` and `.rect-btn` forced to a centered `60px x 60px` tile with `border-radius: 16px !important; box-shadow: 0 6px 0 var(--dark-border) !important;` and 32px centered SVG icon, matching laptop view exactly.
+  2. **Reduced Tablet Equation Height**: Set `.grid-section.section-equation` on tablet to `height: 46px !important; min-height: 44px !important; padding: 4px 10px !important;` with compact `0.95rem` typography, reducing height by 49% with zero overflow.
+  3. **Increased Laptop Scale & Bar Height**: Increased `.section-scale` and `#section-bar-graph` height from `160px` to `195px` (`margin-bottom: 16px;`), and updated `calcBarHeight()` to allow reactant and product bars to grow up to 105px.
+  4. **In-Place Fullscreen Persistence**: Re-architected `window.slideTransitionTo()` and `window.transitionTo()` for inter-level navigation: when navigating between levels within `game.html`, the engine pushes the new URL via `history.pushState(null, '', url)` and calls `initEngine()` directly in-place. The document stays alive in memory, keeping HTML5 Fullscreen 100% continuous and uninterrupted.
