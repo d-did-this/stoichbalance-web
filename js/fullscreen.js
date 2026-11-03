@@ -104,46 +104,54 @@
     });
 
     // =========================================================================
-    // GPU-ACCELERATED FLICKER-FREE TRANSITION CURTAIN (TOP WINDOW ONLY)
+    // GPU-ACCELERATED FLICKER-FREE MASTER IRIS WIPE (TOP WINDOW ONLY)
     // =========================================================================
     function getOrCreateMasterCurtain() {
         let curtain = document.getElementById('stoich-master-curtain');
         if (!curtain) {
-            curtain = document.createElement('div');
-            curtain.id = 'stoich-master-curtain';
-            curtain.style.position = 'fixed';
-            curtain.style.top = '0';
-            curtain.style.left = '0';
-            curtain.style.width = '100vw';
-            curtain.style.height = '100vh';
-            curtain.style.background = '#0f172a';
-            curtain.style.zIndex = '99999999';
-            curtain.style.opacity = '0';
-            curtain.style.pointerEvents = 'none';
-            curtain.style.transition = 'opacity 0.2s ease-in-out';
-            curtain.style.willChange = 'opacity';
-            document.body.appendChild(curtain);
+            curtain = document.getElementById('iris-wipe-overlay');
+            if (curtain) {
+                curtain.id = 'stoich-master-curtain';
+            } else {
+                curtain = document.createElement('div');
+                curtain.id = 'stoich-master-curtain';
+                document.body.appendChild(curtain);
+            }
         }
+        curtain.style.position = 'fixed';
+        curtain.style.top = '50%';
+        curtain.style.left = '50%';
+        curtain.style.transform = 'translate(-50%, -50%)';
+        curtain.style.width = '240vmax';
+        curtain.style.height = '240vmax';
+        curtain.style.borderRadius = '50%';
+        curtain.style.zIndex = '99999999';
+        curtain.style.pointerEvents = 'none';
+        curtain.style.transition = 'box-shadow 0.48s cubic-bezier(0.645, 0.045, 0.355, 1)';
+        curtain.style.webkitTransition = '-webkit-box-shadow 0.48s cubic-bezier(0.645, 0.045, 0.355, 1), box-shadow 0.48s cubic-bezier(0.645, 0.045, 0.355, 1)';
+        curtain.style.willChange = 'box-shadow';
         return curtain;
     }
 
     function showCurtain(cb) {
         const curtain = getOrCreateMasterCurtain();
         curtain.style.pointerEvents = 'all';
-        void curtain.offsetWidth; // Force layout
-        curtain.style.opacity = '1';
+        void curtain.offsetWidth; // Force layout reflow
+        curtain.style.boxShadow = 'inset 0 0 0 130vmax #0f172a'; // Iris circle closes inward to center
+        curtain.classList.remove('open');
         if (typeof cb === 'function') {
-            setTimeout(cb, 220);
+            setTimeout(cb, 480);
         }
     }
 
     function hideCurtain(delay = 60) {
         setTimeout(() => {
-            const curtain = document.getElementById('stoich-master-curtain');
-            if (curtain) {
-                curtain.style.opacity = '0';
+            const curtain = getOrCreateMasterCurtain();
+            curtain.style.boxShadow = 'inset 0 0 0 0vmax #0f172a'; // Iris circle opens outward from center
+            curtain.classList.add('open');
+            setTimeout(() => {
                 curtain.style.pointerEvents = 'none';
-            }
+            }, 480);
         }, delay);
     }
 
@@ -290,6 +298,14 @@
             const localOverlay = document.getElementById('iris-wipe-overlay');
             if (localOverlay) {
                 localOverlay.style.display = 'none';
+            }
+        } else {
+            // On top window, ensure master iris is initialized in open state
+            const curtain = getOrCreateMasterCurtain();
+            if (curtain) {
+                curtain.style.boxShadow = 'inset 0 0 0 0vmax #0f172a';
+                curtain.classList.add('open');
+                curtain.style.pointerEvents = 'none';
             }
         }
     }
