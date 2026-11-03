@@ -42,14 +42,14 @@
 * **Solution**: Replaced hard minimum row heights with `grid-template-rows: repeat(2, minmax(0, 1fr))` and set `overflow-y: hidden`. Applied coordinated CSS `clamp()` tokens to `.levels-header`, `.btn-back`, `.levels-title`, `.card-top`, `.lvl-num`, `.lvl-diff`, `.card-body`, `.lvl-equation`, and `.status-banner`. All 6 level cards on the active page now fit comfortably within the viewport on all screens from 800 × 600 to 1920 × 1080 with zero scrolling.
 
 
-## 7. Eliminating Tablet Fullscreen Transition Flicker
-* **Symptom**: In fullscreen mode on tablets, navigating between pages (home -> levels, levels -> game, and back) caused visible flickering, stuttering, and white/background flashes during transitions.
+## 7. Eliminating Tablet Fullscreen Transition Flicker & Preserving the Circular Iris Wipe
+* **Symptom**: In fullscreen mode on tablets, navigating between pages (home -> levels, levels -> game, and back) caused visible flickering, stuttering, and white/background flashes during transitions. Replacing this with a plain opacity fade removed the flicker but lost the circular Iris Wipe animation that users love.
 * **Root Causes**:
   1. **Iframe Document Unload**: When navigating inside a subframe via `window.location.href`, the browser destroys the outgoing document immediately. Until the incoming document finishes network retrieval and parsing, the iframe briefly flashes white or renders transparently, exposing the underlying parent page.
   2. **Overlapping Heavy GPU Box-Shadows**: Each individual page ran its own 200vmax animated inset box-shadow (`#iris-wipe-overlay`). Running overlapping, unsynchronized box-shadow rasterizations on mobile GPUs caused severe frame drops and compositor stutter.
 * **Solution**:
-  1. Built a single master GPU-accelerated curtain (`#stoich-master-curtain`) hosted exclusively on `window.top`.
-  2. The curtain animates pure `opacity` (a composite-only property requiring zero paint passes).
-  3. All navigations fade the master curtain to solid dark navy `#0f172a` in 200 ms. The subframe unloads and loads entirely hidden behind the opaque curtain.
-  4. Local iris wipes inside child frames are automatically disabled (`display: none`) to eliminate conflicting transitions.
-  5. The master curtain unveils the new page only after `frame.onload` and `requestAnimationFrame()` layout settlement complete, delivering 100% flicker-free 60 FPS transitions.
+  1. Built a single master circular Iris Wipe (`#stoich-master-curtain`) hosted exclusively on `window.top` with `z-index: 99999999`.
+  2. When navigating, `window.top` smoothly contracts the iris circle inward to solid dark navy `#0f172a` (`box-shadow: inset 0 0 0 130vmax #0f172a` in 0.48s cubic-bezier).
+  3. The subframe unloads and loads entirely hidden behind the closed aperture, eliminating all white flashes and layout jumps.
+  4. Local iris wipes inside child frames are automatically disabled (`display: none`) to eliminate conflicting transitions and conserve tablet GPU resources.
+  5. The master iris expands outward to `0vmax` only after `frame.onload` and layout settlement complete, delivering 100% flicker-free 60 FPS transitions while preserving the beloved camera aperture Iris Wipe.
