@@ -37,3 +37,17 @@ To ensure seamless visual appeal on tablets without regression on desktop monito
    `grid-template-rows: repeat(2, minmax(0, 1fr));` ensures both card rows fit on short tablet screens.
 5. **Adaptive Vertical Padding (`index.html`)**:
    Responsive brand margins and input heights keep the entire launch card framed within `94vh` on short tablet screens.
+
+
+## 4. Master Circular Iris Wipe & Persistent Stage Engine (`js/fullscreen.js`)
+To guarantee unbroken native fullscreen and 60 FPS transitions without screen flashing across physical tablets:
+* **Single Master Iris Orchestrator**:
+  - Maintained on `window.top` with `z-index: 99999999`.
+  - Geometric aperture: `width: 240vmax; height: 240vmax; border-radius: 50%;`.
+  - Closing state: `box-shadow: inset 0 0 0 130vmax #0f172a;` (0.48s cubic-bezier).
+  - Open state: `box-shadow: inset 0 0 0 0vmax #0f172a;`.
+* **Zero-Flicker Stage Concealment**:
+  - During subframe navigations, the iris contracts inward to solid navy `#0f172a`.
+  - Frame document unloading, network fetch, and initial layout settlement occur completely behind the closed aperture.
+  - Subframe local overlays are set to `display: none` to prevent competing GPU operations and duplicate transitions.
+  - Upon `frame.onload` and layout readiness, `window.top` expands the aperture outward from the center, unveiling the new page smoothly.
