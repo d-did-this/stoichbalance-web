@@ -51,3 +51,59 @@ To guarantee unbroken native fullscreen and 60 FPS transitions without screen fl
   - Frame document unloading, network fetch, and initial layout settlement occur completely behind the closed aperture.
   - Subframe local overlays are set to `display: none` to prevent competing GPU operations and duplicate transitions.
   - Upon `frame.onload` and layout readiness, `window.top` expands the aperture outward from the center, unveiling the new page smoothly.
+
+
+## 5. Proportional Stage Scaler & Headroom Contract (`game.html`, `js/autoscale.js`)
+To eliminate element collisions, text squeezing, and beaker clipping on tablet screens:
+* **Dedicated Peripheral Clearance Channels**:
+  - Reserving `gutter = Math.min(Math.max(window.innerWidth * 0.08, 86), 115)`.
+  - Guarantees `>= 20px` clear space between `#mode-switcher-sidebar` (left), `#left-bottom-hud` (bottom-left), `.fab-container` (bottom-right), and `.good-layout`.
+* **Proportional Autoscale on Tablet Viewports**:
+  - Activated when `window.innerWidth < 1440` or `window.innerHeight < 860`.
+  - Base reference: `baseW = 1140`, `baseH = 700`.
+  - Factor: `scale = Math.min(availW / baseW, availH / baseH, 1.0)`.
+  - Peripheral HUD controls scale proportionally by `widgetScale = Math.min(Math.max(scale, 0.78), 1.0)`.
+  - On widescreen 1080p monitors (`>= 1440w`, `>= 860h`), autoscale automatically yields to the full unzoomed fluid CSS grid.
+* **Scale Headroom Geometry**:
+  - Fulcrum height set to 28px (`border-bottom: 28px solid #334155`).
+  - Plank bottom set to 28px (`bottom: 28px`).
+  - Section container height set to 145px (`height: 145px`).
+  - Beakers (`height: 76px`, `bottom: 6px`) retain at least 19px of vertical headroom when resting and 8px+ when tilting, guaranteeing zero clipping of the rounded glass rims.
+
+
+## 6. Sleek Tablet Proportions & Touch-Hold Information Cards (`game.html`, `js/info_cards.js`)
+* **Sleek Proportional Dimensions for Tablets (`@media (max-width: 1280px), (max-height: 850px)`)**:
+  - Top Bar: Slimmed to 45px - 52px height (`min-height: 52px; max-height: 54px;`), 1.25rem title font size, and 36px back button.
+  - Sidebars: Constrained to 176px - 200px width (`clamp(185px, 18vw, 205px)`), freeing up over 120px of extra width for the center interactive stage.
+  - Center Board: Expands to 600px+ width, allowing spacious 50/50 Reactants and Products columns.
+  - Beakers & Balance Scale: Beakers sized to 156px - 165px width and 64px - 67px height, resting on a 22px plank in a 110px container, with unclipped tilt headroom.
+  - Element Trays & Prof. Beaker: Sized compactly with 36px mini seesaws and 0.92rem titles, guaranteeing up to 3 element cards fit without vertical scrolling.
+* **Touch-Hold Interaction Contract (`js/info_cards.js`)**:
+  - Distinguishes physical touch events (`pointerType === 'touch'`) from physical desktop mouse movement.
+  - Fast taps (< 450ms) add or manipulate molecules without triggering the info card popup, eliminating screen obstruction during rapid gameplay.
+  - Deliberate long press (>= 450ms hold without movement > 10px) triggers the chemical info card with subtle haptic vibration (`navigator.vibrate(25)`).
+  - Tapping outside or tapping the card instantly dismisses the info popup.
+  - Desktop mouse hover and mouse leave continue to function immediately with zero latency.
+
+
+## 7. Equation Centering, Button Alignment, and Mode Preservation Invariants
+* **Symmetric Equation Layout Rule (`#dynamic-sleek-equation`)**:
+  - The equation row uses a balanced 3-part layout:
+    - Reactants side (`.eq-reactants`): `flex: 1; display: flex; justify-content: flex-end; align-items: center; min-width: 0;` (reactants positioned cleanly on the left, leading up to the center arrow).
+    - Center arrow (`.eq-arrow-wrapper`): `flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(8px, 1.5vw, 24px);` (locked at the exact 50% midpoint of the container, aligning with the balance scale fulcrum and column divider).
+    - Products side (`.eq-products`): `flex: 1; display: flex; justify-content: flex-start; align-items: center; min-width: 0;` (products positioned cleanly on the right, leading away from the center arrow).
+  - Red Coefficient Badges (`.sci-coeff`): Always rendered with red `#ef4444` background, 4px/3px solid `#b91c1c` border, and crisp white bold text.
+  - Formula tokens use `clamp(1.2rem, 3.8cqw, 2.05rem)` on desktop and `1.25rem` on tablet, guaranteeing punchy legibility without overflow.
+* **Element Tray Mini Scale Geometry**:
+  - Mini seesaws maintain 68px (tablet) to 85px (desktop) height with `overflow: visible` so stacked atom blocks never get clipped.
+  - The vertical dividing dashed line (`border-right: 2px dashed rgba(30, 41, 59, 0.25)`) resides on `.mini-stack-zone.left` at 100% height, clearly dividing reactants and products without overshooting.
+* **Prof. Beaker Action Buttons & Chat Bubble Scaling**:
+  - Both `.btn-hint` and `.btn-trash` share 4px solid #1e293b borders (3.5px on tablet), matching heights (42px desktop, 38px tablet), matching baseline alignments, and 3D box shadows. Text uses `white-space: nowrap` to prevent multiline wrapping.
+  - Chat messages sent by Professor Beaker use `.beaker-bubble-text` scaled down to `0.8rem` on tablets for comfortable reading.
+* **Scale / Bar Block Headroom & Status Bar Gap**:
+  - Status bar (`.status-bar-shared`) maintains an explicit 18px (tablet) to 22px (desktop) bottom gap before the scale/bar container.
+  - `.grid-section.section-scale` and `#section-bar-graph` maintain 140px (tablet) to 195px (desktop) height, with `calcBarHeight()` scaling up to 105px.
+  - Tablet equation block (`.section-equation`) is compacted to 46px height with 0.95rem typography, maximizing vertical space for drop containers.
+* **In-Place Inter-Level Navigation & Fullscreen Continuity Invariant**:
+  - Transitioning between levels (`window.slideTransitionTo()` and `window.transitionTo()`) updates the browser history via `history.pushState(null, '', url)` and triggers `initEngine()` in-place.
+  - By avoiding document destruction and page reloads (`window.location.href`), HTML5 Fullscreen is continuously preserved without exiting across all level completions.
