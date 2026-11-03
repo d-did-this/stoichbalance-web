@@ -1,4 +1,4 @@
-// Persistent Fullscreen and Seamless Stage Engine for Stoichbalance
+// Persistent Fullscreen and Flicker-Free Seamless Stage Engine for Stoichbalance
 (function() {
     const FS_KEY = 'stoich_fullscreen';
     let isNavigating = false;
@@ -103,7 +103,118 @@
         });
     });
 
-    // Listen for messages between parent shell and child frames
+    // =========================================================================
+    // GPU-ACCELERATED FLICKER-FREE TRANSITION CURTAIN (TOP WINDOW ONLY)
+    // =========================================================================
+    function getOrCreateMasterCurtain() {
+        let curtain = document.getElementById('stoich-master-curtain');
+        if (!curtain) {
+            curtain = document.createElement('div');
+            curtain.id = 'stoich-master-curtain';
+            curtain.style.position = 'fixed';
+            curtain.style.top = '0';
+            curtain.style.left = '0';
+            curtain.style.width = '100vw';
+            curtain.style.height = '100vh';
+            curtain.style.background = '#0f172a';
+            curtain.style.zIndex = '99999999';
+            curtain.style.opacity = '0';
+            curtain.style.pointerEvents = 'none';
+            curtain.style.transition = 'opacity 0.2s ease-in-out';
+            curtain.style.willChange = 'opacity';
+            document.body.appendChild(curtain);
+        }
+        return curtain;
+    }
+
+    function showCurtain(cb) {
+        const curtain = getOrCreateMasterCurtain();
+        curtain.style.pointerEvents = 'all';
+        void curtain.offsetWidth; // Force layout
+        curtain.style.opacity = '1';
+        if (typeof cb === 'function') {
+            setTimeout(cb, 220);
+        }
+    }
+
+    function hideCurtain(delay = 60) {
+        setTimeout(() => {
+            const curtain = document.getElementById('stoich-master-curtain');
+            if (curtain) {
+                curtain.style.opacity = '0';
+                curtain.style.pointerEvents = 'none';
+            }
+        }, delay);
+    }
+
+    // Top window unified flicker-free stage navigator
+    window.seamlessNavigate = function(url) {
+        if (!isTopWindow()) {
+            try {
+                window.top.seamlessNavigate(url);
+            } catch (e) {
+                window.top.postMessage({ type: 'STOICH_SEAMLESS_NAVIGATE', url: url }, '*');
+            }
+            return;
+        }
+
+        showCurtain(() => {
+            // Returning to home (index.html)
+            if (url === 'index.html' || url.startsWith('index.html')) {
+                const frame = document.getElementById('stoich-fullscreen-viewport');
+                if (frame) {
+                    frame.style.display = 'none';
+                    frame.src = 'about:blank';
+                }
+                try {
+                    window.history.pushState(null, '', 'index.html');
+                } catch (e) {}
+
+                if (typeof window.autoScaleStage === 'function') {
+                    window.autoScaleStage();
+                }
+
+                requestAnimationFrame(() => {
+                    hideCurtain(60);
+                });
+                return;
+            }
+
+            // Navigating to subpage (levels.html or game.html)
+            let frame = document.getElementById('stoich-fullscreen-viewport');
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'stoich-fullscreen-viewport';
+                frame.setAttribute('allow', 'fullscreen; autoplay');
+                frame.style.position = 'fixed';
+                frame.style.top = '0';
+                frame.style.left = '0';
+                frame.style.width = '100vw';
+                frame.style.height = '100vh';
+                frame.style.border = 'none';
+                frame.style.zIndex = '999990';
+                frame.style.background = '#0f172a';
+                document.body.appendChild(frame);
+            }
+
+            frame.style.display = 'block';
+
+            // One-time load handler to unveil only when DOM and layout are ready
+            frame.onload = function() {
+                try {
+                    window.history.pushState({ stoichUrl: url }, '', url);
+                } catch (e) {}
+
+                requestAnimationFrame(() => {
+                    hideCurtain(80);
+                });
+            };
+
+            frame.src = url;
+        });
+    };
+
+    // Cross-window message listener
     window.addEventListener('message', (ev) => {
         if (!ev.data) return;
         if (ev.data.type === 'STOICH_FS_STATE') {
@@ -112,120 +223,34 @@
             if (isTopWindow()) requestFullscreenInternal();
         } else if (ev.data.type === 'STOICH_FS_EXIT') {
             if (isTopWindow()) exitFullscreenInternal();
-        } else if (ev.data.type === 'STOICH_NAVIGATE') {
-            if (isTopWindow() && typeof window.transitionTo === 'function') {
-                window.transitionTo(ev.data.url);
-            }
+        } else if (ev.data.type === 'STOICH_SEAMLESS_NAVIGATE') {
+            if (isTopWindow()) window.seamlessNavigate(ev.data.url);
         }
     });
 
-    // Top window helper to close seamless stage and return home
-    window.returnToHome = function() {
-        const overlay = document.getElementById('iris-wipe-overlay');
-        const frame = document.getElementById('stoich-fullscreen-viewport');
-        if (overlay) overlay.classList.remove('open');
-
-        setTimeout(() => {
-            if (frame) {
-                frame.style.display = 'none';
-                frame.src = 'about:blank';
-            }
-            try {
-                window.history.pushState(null, '', 'index.html');
-            } catch (e) {}
-
-            setTimeout(() => {
-                if (overlay) overlay.classList.add('open');
-                if (typeof window.autoScaleStage === 'function') window.autoScaleStage();
-            }, 100);
-        }, 500);
-    };
-
-    window.updateViewportUrl = function(newUrl) {
-        if (isTopWindow()) {
-            try {
-                window.history.pushState({ stoichUrl: newUrl }, '', newUrl);
-            } catch (e) {}
-        }
-    };
-
     // Unified Transition Handler
     window.transitionTo = function(url) {
-        const overlay = document.getElementById('iris-wipe-overlay');
         const wantsFs = localStorage.getItem(FS_KEY) === 'true' || isFullscreenActive();
 
-        // Subframe handling
+        // If inside subframe, delegate navigation to parent stage
         if (!isTopWindow()) {
-            if (url === 'index.html' || url.startsWith('index.html')) {
-                try {
-                    window.top.returnToHome();
-                    return;
-                } catch (e) {
-                    window.top.postMessage({ type: 'STOICH_NAVIGATE', url: 'index.html' }, '*');
-                    return;
-                }
-            }
-
-            // Normal subframe navigation keeps parent document fullscreen intact
-            if (overlay) {
-                overlay.classList.remove('open');
-                setTimeout(() => {
-                    try { window.top.updateViewportUrl(url); } catch (e) {}
-                    window.location.href = url;
-                }, 550);
-            } else {
-                try { window.top.updateViewportUrl(url); } catch (e) {}
-                window.location.href = url;
-            }
-            return;
-        }
-
-        // Top window handling
-        if (url === 'index.html' || url.startsWith('index.html')) {
-            const frame = document.getElementById('stoich-fullscreen-viewport');
-            if (frame && frame.style.display !== 'none') {
-                window.returnToHome();
+            try {
+                window.top.seamlessNavigate(url);
+                return;
+            } catch (e) {
+                window.top.postMessage({ type: 'STOICH_SEAMLESS_NAVIGATE', url: url }, '*');
                 return;
             }
         }
 
-        // If fullscreen is active or requested, use Seamless Fullscreen Stage to preserve fullscreen
-        if (wantsFs && url !== 'index.html') {
-            if (overlay) overlay.classList.remove('open');
-
-            setTimeout(() => {
-                let frame = document.getElementById('stoich-fullscreen-viewport');
-                if (!frame) {
-                    frame = document.createElement('iframe');
-                    frame.id = 'stoich-fullscreen-viewport';
-                    frame.setAttribute('allow', 'fullscreen; autoplay');
-                    frame.style.position = 'fixed';
-                    frame.style.top = '0';
-                    frame.style.left = '0';
-                    frame.style.width = '100vw';
-                    frame.style.height = '100vh';
-                    frame.style.border = 'none';
-                    frame.style.zIndex = '999990';
-                    frame.style.background = '#0f172a';
-                    document.body.appendChild(frame);
-                }
-
-                frame.src = url;
-                frame.style.display = 'block';
-                try {
-                    window.history.pushState({ stoichUrl: url }, '', url);
-                } catch (e) {}
-
-                frame.onload = function() {
-                    setTimeout(() => {
-                        if (overlay) overlay.classList.add('open');
-                    }, 80);
-                };
-            }, overlay ? 500 : 0);
+        // If top window in fullscreen mode, use seamless stage
+        if (wantsFs) {
+            window.seamlessNavigate(url);
             return;
         }
 
-        // Fallback: standard navigation when not in fullscreen mode
+        // Normal window fallback navigation
+        const overlay = document.getElementById('iris-wipe-overlay');
         if (overlay) {
             overlay.classList.remove('open');
             setTimeout(() => { window.location.href = url; }, 550);
@@ -250,19 +275,27 @@
             const frame = document.getElementById('stoich-fullscreen-viewport');
             if (frame && frame.style.display !== 'none') {
                 if (e.state && e.state.stoichUrl && !e.state.stoichUrl.startsWith('index.html')) {
-                    frame.src = e.state.stoichUrl;
+                    window.seamlessNavigate(e.state.stoichUrl);
                 } else {
-                    window.returnToHome();
+                    window.seamlessNavigate('index.html');
                 }
             }
         }
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // On subframes, disable local iris wipe to prevent double transitions and GPU thrashing
+    function initFrameState() {
         updateButtonUI(isFullscreenActive());
-    });
+        if (!isTopWindow()) {
+            const localOverlay = document.getElementById('iris-wipe-overlay');
+            if (localOverlay) {
+                localOverlay.style.display = 'none';
+            }
+        }
+    }
 
+    document.addEventListener('DOMContentLoaded', initFrameState);
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        updateButtonUI(isFullscreenActive());
+        initFrameState();
     }
 })();
