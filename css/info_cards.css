@@ -35,6 +35,12 @@
     visibility: visible;
 }
 
+#sci-info-card.sic-compact {
+    width: auto;
+    min-width: 170px;
+    max-width: 250px;
+}
+
 /* Card Header: Title on Left, Badge on Right */
 .sic-header {
     display: flex;
