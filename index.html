@@ -6,7 +6,7 @@
     <title>Stoichbalance - Fun Chemistry UI</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/levels.css?v=1792981377">
-    <link rel="stylesheet" href="css/style.css?v=1793583571">
+    <link rel="stylesheet" href="css/style.css?v=1793678700">
     <!-- EXPERIMENTAL DEPTH LAYER (Remove to revert) -->
     <link rel="stylesheet" href="css/experimental_depth.css">
 
@@ -187,8 +187,11 @@ window.addEventListener('load', () => {
     <div id="particle-canvas"></div>
 
     <!-- Fun Chunky Widgets -->
-    <button class="fun-widget widget-left interactive" onclick="alert('Help Guide Opened!')">
-        <div class="widget-icon">❓</div>
+    <button class="fun-widget widget-left interactive" onclick="alert('Help Guide Opened!')" title="How to Play Guide" aria-label="How to Play Guide">
+        <svg viewBox="0 0 48 48" width="44" height="44" fill="none" style="display:block;">
+            <path d="M16 17.5C16 13.3579 19.5817 10 24 10C28.4183 10 32 13.3579 32 17.5C32 20.8 29.8 23 26.5 25.2C24.5 26.6 23.5 28 23.5 31" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="23.5" cy="38" r="3.4" fill="#1e293b"/>
+        </svg>
     </button>
 
     <button class="fun-widget widget-right interactive" onclick="openElements()" title="Interactive Periodic Table" aria-label="Interactive Periodic Table">
@@ -222,7 +225,7 @@ window.addEventListener('load', () => {
                     <label>PLAYER NAME</label>
                     <div style="display: flex; gap: 12px; width: 100%; align-items: center;">
                         <div class="player-input-wrapper">
-                            <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onfocus="showProfileDropdown()" onkeyup="filterProfiles()" style="width: 100%; text-align: left; height: 74px; box-sizing: border-box; padding: 0 3.8rem 0 1.4rem;">
+                            <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onclick="window.handlePlayerNameClick(event)" onfocus="window.handlePlayerNameFocus(event)" onkeyup="filterProfiles()" style="width: 100%; text-align: left; height: 74px; box-sizing: border-box; padding: 0 3.8rem 0 1.4rem;">
                             <button type="button" id="player-dropdown-toggle-btn" class="player-dropdown-btn interactive" onclick="togglePlayerDropdown(event)" aria-label="Select saved player profile" title="Select saved player profile" style="display: none;">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="6 9 12 15 18 9"/>
@@ -484,7 +487,7 @@ window.addEventListener('load', () => {
 .vk-pt-btn .el-symbol { font-size: clamp(14px, 1.6vw, 24px); text-transform: capitalize; }
 .vk-pt-btn .el-name { font-size: clamp(8px, 0.75vw, 11px); text-transform: capitalize; }
 
-@media (max-width: 1300px) {
+@media (max-width: 1300px) and (max-aspect-ratio: 1/1) {
     .pt-modal-wrapper {
         flex-direction: column; overflow-y: auto; max-height: none; height: auto;
     }
@@ -493,6 +496,49 @@ window.addEventListener('load', () => {
     }
     .pt-grid-panel {
         flex: none; min-height: 700px;
+    }
+}
+
+@media (max-height: 760px) and (min-aspect-ratio: 1/1) {
+    #periodic-picker-modal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        width: 100vw !important;
+        height: 100% !important;
+        height: 100svh !important;
+        display: none;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .pt-modal-wrapper {
+        flex-direction: row !important;
+        zoom: clamp(0.52, calc(100svh / 950px), 0.60) !important;
+        width: 1260px !important;
+        height: 840px !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: auto !important;
+        gap: 16px !important;
+        padding: 14px !important;
+    }
+    .pt-grid-panel {
+        flex: 3.2 !important;
+        min-height: auto !important;
+        padding: 14px !important;
+        border-radius: 28px !important;
+    }
+    .pt-details-panel {
+        flex: 1.2 !important;
+        min-width: 320px !important;
+        max-width: 380px !important;
+        min-height: auto !important;
+        padding: 18px !important;
+        border-radius: 28px !important;
     }
 }
 
@@ -677,5 +723,39 @@ window.addEventListener('load', () => {
         </div>
     </div>
 </div>
+    <!-- TOP FLOATING TYPING BAR (TABLET/MOBILE OPTION 2) -->
+    <div id="top-typing-bar-overlay" class="typing-bar-overlay" style="display:none;" onclick="if(event.target === this) window.closeTopTypingBar()">
+        <div class="typing-bar-card">
+            <div class="typing-bar-header">
+                <div class="typing-bar-title-wrap">
+                    <span class="typing-bar-icon">✏️</span>
+                    <span class="typing-bar-title">Enter Player Name</span>
+                </div>
+                <button type="button" class="typing-bar-close interactive" onclick="window.closeTopTypingBar()" aria-label="Close">&times;</button>
+            </div>
+            
+            <div class="typing-bar-input-row">
+                <input type="text" id="top-typing-input" class="typing-bar-input" placeholder="Type your name..." autocomplete="off" maxlength="24">
+                <button type="button" id="top-typing-dice-btn" class="typing-bar-dice interactive" onclick="window.randomizeTopTypingName()" title="Random Fun Chemistry Name" aria-label="Random Chemistry Name">🎲</button>
+                <button type="button" id="top-typing-done-btn" class="typing-bar-done interactive" onclick="window.confirmTopTypingName()">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <span>Done</span>
+                </button>
+            </div>
+
+            <div class="typing-bar-chips" id="top-typing-chips">
+                <span class="typing-chip-label">Quick Picks:</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persistent Fullscreen Toggle Button -->
+    <button class="btn-fullscreen-toggle interactive" onclick="window.toggleFullscreen()" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:26px;height:26px;display:block;"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+    <script src="js/fullscreen.js"></script>
+    <script src="js/autoscale.js"></script>
 </body>
 </html>
