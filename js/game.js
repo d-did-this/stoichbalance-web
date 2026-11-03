@@ -110,8 +110,16 @@ window.toggleBlock = function(side) {
     if(layout) {
         let leftCollapsed = document.querySelector(".block-left")?.classList.contains("collapsed");
         let rightCollapsed = document.querySelector(".block-right")?.classList.contains("collapsed");
-        layout.style.setProperty("--left-w", leftCollapsed ? "80px" : "280px");
-        layout.style.setProperty("--right-w", rightCollapsed ? "80px" : "280px");
+        if (leftCollapsed) {
+            layout.style.setProperty("--left-w", "72px");
+        } else {
+            layout.style.removeProperty("--left-w");
+        }
+        if (rightCollapsed) {
+            layout.style.setProperty("--right-w", "72px");
+        } else {
+            layout.style.removeProperty("--right-w");
+        }
     }
 };
 
@@ -200,10 +208,10 @@ function renderBoard() {
     const sleekEq = document.getElementById('dynamic-sleek-equation');
     
     if (sleekEq) {
-        let rHtml = `<div style="display: flex; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqw, 12px); flex-shrink: 0;">`;
+        let rHtml = `<div class="eq-side eq-reactants" style="flex: 1; display: flex; justify-content: flex-start; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
         currentLevelData.reactants.forEach((m, idx) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
-            let coeffHtml = `<div id="coeff-eq-react-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
+            let coeffHtml = `<div id="coeff-eq-react-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>0</div>`;
             let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
             
             rHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
@@ -214,9 +222,9 @@ function renderBoard() {
         });
         rHtml += '</div>';
         
-        let arrowHtml = '<div style="display: flex; justify-content: center; align-items: center; flex-shrink: 0;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
+        let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(8px, 1.5vw, 24px);"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
         
-        let pHtml = `<div style="display: flex; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqw, 12px); flex-shrink: 0;">`;
+        let pHtml = `<div class="eq-side eq-products" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
         currentLevelData.products.forEach((m, idx) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
             let coeffHtml = `<div id="coeff-eq-prod-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
@@ -611,7 +619,7 @@ window.updateSimulation = function() {
         if(el) {
             let count = molCounts.react[m.id] || 0;
             el.innerText = count;
-            el.style.background = count === 0 ? "#1e293b" : "#ef4444";
+            el.style.background = "#ef4444";
         }
     });
     currentLevelData.products.forEach(m => {
@@ -619,7 +627,7 @@ window.updateSimulation = function() {
         if(el) {
             let count = molCounts.prod[m.id] || 0;
             el.innerText = count;
-            el.style.background = count === 0 ? "#1e293b" : "#ef4444";
+            el.style.background = "#ef4444";
         }
     });
 
@@ -708,10 +716,10 @@ window.addChatMessage = function(msg, prefixLabel) {
     
     let finalHtml = `
     <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-        <div style="background: ${avatarBg}; color: ${avatarColor}; font-weight: 900; font-size: 0.8rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px; margin-bottom: 6px; margin-left: 12px; border: 1px solid ${borderColor};">
+        <div class="beaker-sender-tag" style="background: ${avatarBg}; color: ${avatarColor}; font-weight: 900; font-size: 0.8rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px; margin-bottom: 6px; margin-left: 12px; border: 1px solid ${borderColor};">
             ${badgeText}
         </div>
-        <div style="${bubbleStyle}">
+        <div class="beaker-bubble-text" style="${bubbleStyle}">
             ${msg}
         </div>
     </div>`;
@@ -815,10 +823,11 @@ window.updateBarGraph = function(rCounts, pCounts, isBalanced) {
         symEl.style.color = "#1e3a8a";
     }
 
-    // Helper to calculate tall proportional bar height (up to 130px)
+    // Proportional bar height fitted to shared scale/bar box height
     function calcBarHeight(count) {
         if (count === 0) return 6;
-        return Math.min(130, Math.max(16, 10 + count * 12));
+        const maxH = (window.innerWidth <= 1200 || window.innerHeight <= 850) ? 66 : 105;
+        return Math.min(maxH, Math.max(12, 12 + count * 12));
     }
 
     // Build Reactant Bars
@@ -899,19 +908,28 @@ window.switchViewMode = function(mode) {
     if (layout) {
         let leftCollapsed = blockLeft?.classList.contains("collapsed");
         let rightCollapsed = blockRight?.classList.contains("collapsed");
-        layout.style.setProperty("--left-w", leftCollapsed ? "80px" : "280px");
-        layout.style.setProperty("--right-w", rightCollapsed ? "80px" : "280px");
+        if (leftCollapsed) {
+            layout.style.setProperty("--left-w", "72px");
+        } else {
+            layout.style.removeProperty("--left-w");
+        }
+        if (rightCollapsed) {
+            layout.style.setProperty("--right-w", "72px");
+        } else {
+            layout.style.removeProperty("--right-w");
+        }
         layout.style.gridTemplateRows = "";
     }
 
     if (mode === "scale") {
         if (secScale) secScale.style.display = "flex";
         if (secBar) secBar.style.display = "none";
-        if (statusBar) statusBar.style.marginBottom = "85px";
+        if (typeof window.updateSimulation === "function") {
+            window.updateSimulation();
+        }
     } else {
         if (secScale) secScale.style.display = "none";
         if (secBar) secBar.style.display = "flex";
-        if (statusBar) statusBar.style.marginBottom = "24px";
         if (typeof window.updateBarGraph === "function") {
             window.updateBarGraph();
         }
@@ -1134,8 +1152,29 @@ window.showWinPopup = function(isPerfect) {
         document.body.appendChild(slideOverlay);
         if(typeof playSound==='function') playSound('start');
         setTimeout(() => { slideOverlay.style.left = "0"; }, 10);
-        setTimeout(() => { window.location.href = url; }, 550);
-    }
+
+        let match = url.match(/game\.html\?level=([^&]+)/);
+        if (match && match[1]) {
+            setTimeout(() => {
+                let winPopup = document.getElementById("win-popup");
+                if (winPopup) winPopup.remove();
+                window.actionHistory = [];
+                window.activeVisualHint = null;
+                history.pushState(null, '', url);
+                initEngine();
+                if (localStorage.getItem('stoich_fullscreen') === 'true' && !document.fullscreenElement) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(() => {});
+                    }
+                }
+                slideOverlay.style.transition = "left 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease";
+                slideOverlay.style.left = "-100vw";
+                setTimeout(() => { slideOverlay.remove(); }, 450);
+            }, 550);
+        } else {
+            setTimeout(() => { window.location.href = url; }, 550);
+        }
+    };
 
     let buttonsHtml = `<div style="display: flex; gap: 16px; margin-top: 35px; flex-wrap: wrap; justify-content:center;">`;
     
