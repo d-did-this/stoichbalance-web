@@ -235,7 +235,7 @@
     padding: clamp(3px, 0.5vh, 5px) clamp(6px, 0.8vw, 10px);
     border-radius: 10px;
     border: 2px solid #bfdbfe;
-    margin: clamp(6px, 1.2vh, 12px) 0 0 0;
+    margin: clamp(10px, 1.8vh, 16px) 0 0 0;
     width: 100%;
     max-width: 360px;
     text-align: center;
@@ -247,9 +247,10 @@
 
 @media (min-width: 1200px) {
     .lvl-equation {
-        font-size: clamp(1.05rem, 1.2vw, 1.22rem);
-        padding: clamp(5px, 0.8vh, 8px) clamp(12px, 1.2vw, 18px);
-        max-width: 420px;
+        font-size: clamp(1.15rem, 1.35vw, 1.32rem);
+        padding: clamp(6px, 0.9vh, 10px) clamp(14px, 1.3vw, 20px);
+        max-width: 440px;
+        margin-top: 14px;
     }
 }
 .lvl-equation::-webkit-scrollbar { display: none; }
