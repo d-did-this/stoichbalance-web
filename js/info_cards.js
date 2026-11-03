@@ -1209,8 +1209,30 @@
         cardEl.style.left = `${Math.round(left)}px`;
     }
 
+    let lastTouchTime = 0;
+    let lastPointerType = 'mouse';
+    let holdTimeout = null;
+    let touchStartTarget = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTouchHoldTriggered = false;
+
+    function isTouchPointer(e) {
+        if (e && e.pointerType) {
+            return e.pointerType === 'touch' || e.pointerType === 'pen';
+        }
+        if (lastPointerType === 'mouse') {
+            return false;
+        }
+        return (Date.now() - lastTouchTime) < 800;
+    }
+
     function setupListeners() {
+        // Desktop mouse hover listeners
         document.addEventListener('mouseover', (e) => {
+            // Completely ignore synthesized mouseover triggered by touch taps
+            if (isTouchPointer(e)) return;
+
             const target = e.target.closest('[data-info]');
             if (target && target !== currentTarget) {
                 showCard(target, e);
@@ -1218,11 +1240,120 @@
         });
 
         document.addEventListener('mouseout', (e) => {
+            if (isTouchPointer(e)) return;
+
             const target = e.target.closest('[data-info]');
             if (target && target === currentTarget) {
                 activeHideTimeout = setTimeout(() => {
                     hideCard();
                 }, 40);
+            }
+        });
+
+        // Touch long-press hold mechanics for mobile and tablet
+        const onTouchDown = (target, clientX, clientY) => {
+            lastTouchTime = Date.now();
+            isTouchHoldTriggered = false;
+
+            // If a card is currently showing, any new tap outside dismisses it immediately
+            if (cardEl && cardEl.classList.contains('is-visible')) {
+                hideCard();
+            }
+
+            if (!target) return;
+
+            touchStartTarget = target;
+            touchStartX = clientX;
+            touchStartY = clientY;
+
+            if (holdTimeout) clearTimeout(holdTimeout);
+            holdTimeout = setTimeout(() => {
+                isTouchHoldTriggered = true;
+                showCard(target);
+                if (navigator.vibrate) {
+                    try { navigator.vibrate(25); } catch (_) {}
+                }
+            }, 450); // 450ms hold duration
+        };
+
+        const onTouchMove = (clientX, clientY) => {
+            lastTouchTime = Date.now();
+            if (holdTimeout) {
+                const dist = Math.hypot(clientX - touchStartX, clientY - touchStartY);
+                if (dist > 10) {
+                    // Canceled due to scrolling or panning
+                    clearTimeout(holdTimeout);
+                    holdTimeout = null;
+                    touchStartTarget = null;
+                }
+            }
+        };
+
+        const onTouchEnd = () => {
+            lastTouchTime = Date.now();
+            if (holdTimeout) {
+                clearTimeout(holdTimeout);
+                holdTimeout = null;
+            }
+            touchStartTarget = null;
+        };
+
+        if (window.PointerEvent) {
+            document.addEventListener('pointerover', (e) => {
+                lastPointerType = e.pointerType || 'mouse';
+            }, { passive: true });
+
+            document.addEventListener('pointermove', (e) => {
+                lastPointerType = e.pointerType || 'mouse';
+                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                    onTouchMove(e.clientX, e.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('pointerdown', (e) => {
+                lastPointerType = e.pointerType || 'mouse';
+                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                    const target = e.target.closest('[data-info]');
+                    onTouchDown(target, e.clientX, e.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('pointerup', (e) => {
+                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                    onTouchEnd();
+                }
+            }, { passive: true });
+
+            document.addEventListener('pointercancel', (e) => {
+                if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+                    onTouchEnd();
+                }
+            }, { passive: true });
+        } else {
+            // Touch fallback for older web engines
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches[0]) {
+                    const t = e.touches[0];
+                    const target = e.target.closest('[data-info]');
+                    onTouchDown(target, t.clientX, t.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    const t = e.touches[0];
+                    onTouchMove(t.clientX, t.clientY);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', onTouchEnd, { passive: true });
+            document.addEventListener('touchcancel', onTouchEnd, { passive: true });
+        }
+
+        // Suppress browser context menu on long-press hold so users see the card cleanly
+        document.addEventListener('contextmenu', (e) => {
+            if (isTouchHoldTriggered || (Date.now() - lastTouchTime < 600 && e.target.closest('[data-info]'))) {
+                e.preventDefault();
             }
         });
 
