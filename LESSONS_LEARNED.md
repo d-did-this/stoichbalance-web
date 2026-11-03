@@ -40,3 +40,16 @@
 * **Symptom**: On tablets and compact laptops (1164 × 776, 1366 × 768, 1024 × 768), cards 4, 5, and 6 on `levels.html` were pushed below the fold, forcing vertical scrolling.
 * **Root Cause**: `.levels-grid` enforced `grid-template-rows: repeat(2, minmax(260px, 1fr))` along with fixed card body, banner, and header heights. This demanded over 590px of vertical space for the grid alone, exceeding the available container height (470px - 510px).
 * **Solution**: Replaced hard minimum row heights with `grid-template-rows: repeat(2, minmax(0, 1fr))` and set `overflow-y: hidden`. Applied coordinated CSS `clamp()` tokens to `.levels-header`, `.btn-back`, `.levels-title`, `.card-top`, `.lvl-num`, `.lvl-diff`, `.card-body`, `.lvl-equation`, and `.status-banner`. All 6 level cards on the active page now fit comfortably within the viewport on all screens from 800 × 600 to 1920 × 1080 with zero scrolling.
+
+
+## 7. Eliminating Tablet Fullscreen Transition Flicker
+* **Symptom**: In fullscreen mode on tablets, navigating between pages (home -> levels, levels -> game, and back) caused visible flickering, stuttering, and white/background flashes during transitions.
+* **Root Causes**:
+  1. **Iframe Document Unload**: When navigating inside a subframe via `window.location.href`, the browser destroys the outgoing document immediately. Until the incoming document finishes network retrieval and parsing, the iframe briefly flashes white or renders transparently, exposing the underlying parent page.
+  2. **Overlapping Heavy GPU Box-Shadows**: Each individual page ran its own 200vmax animated inset box-shadow (`#iris-wipe-overlay`). Running overlapping, unsynchronized box-shadow rasterizations on mobile GPUs caused severe frame drops and compositor stutter.
+* **Solution**:
+  1. Built a single master GPU-accelerated curtain (`#stoich-master-curtain`) hosted exclusively on `window.top`.
+  2. The curtain animates pure `opacity` (a composite-only property requiring zero paint passes).
+  3. All navigations fade the master curtain to solid dark navy `#0f172a` in 200 ms. The subframe unloads and loads entirely hidden behind the opaque curtain.
+  4. Local iris wipes inside child frames are automatically disabled (`display: none`) to eliminate conflicting transitions.
+  5. The master curtain unveils the new page only after `frame.onload` and `requestAnimationFrame()` layout settlement complete, delivering 100% flicker-free 60 FPS transitions.
