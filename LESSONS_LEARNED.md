@@ -168,3 +168,19 @@
   1. Removed redundant 'Tap again for exact answer' text and gave the MINOH Rule a centered, padded highlight callout.
   2. Implemented `getMinohElementClassification(sym)` across all element tokens, molecule cards, and drawer tracker cards, displaying explicit badges: `[M] Metal`, `[I] Polyatomic Ion`, `[N] Non-Metal`, `[O] Oxygen`, and `[H] Hydrogen`.
   3. Built `window.buildLevelMinohPlanCard(levelData)` to analyze any reaction and post a tailored MINOH balancing attack order right after the welcome greeting. Intact polyatomic ions are detected and prioritized as single units.
+
+
+## 12. Vercel Serverless Architecture, Client-Side Pedagogical Fallbacks, and Audio Synthesis Envelope Smoothing
+* **Symptom**:
+  1. In production on Vercel, student messages ("hello", "lets") repeatedly triggered "Connection interrupted. Let us check the scales on the left to see what needs balancing!".
+  2. A proactive reminder card (`Left: 2 ⚖️ Right: 1 💡 Tap I am Stuck! Help! below for help!`) triggered prematurely after only 25 seconds of idle time.
+  3. Clicking "Start Form 4" or "Start Form 5" emitted a harsh, distorted, clipping square-wave buzz.
+* **Root Causes**:
+  1. Vercel static deployments do not run a background `node server.js` instance; they require cloud serverless functions inside an `api/` directory (`api/chat.js`). Without `api/chat.js`, `/api/chat` returned a 404 HTML document that broke `JSON.parse` and triggered the generic network catch block. Furthermore, client-side code lacked a graceful offline conversational fallback.
+  2. `resetIdleGuidanceTimer` had a short 25-second timeout and did not check if the student was already actively chatting in the conversation window.
+  3. `playSound('start')` used an un-lowpassed, raw square wave (`osc.type = 'square'`) at an aggressive 0.3 gain with instantaneous attack, producing clipping and odd-harmonic audio distortion on speakers.
+* **Solution**:
+  1. Built and deployed `api/chat.js` as an official Vercel Serverless Function with CORS support, DeepSeek API integration, and system prompt preservation.
+  2. Implemented `getLocalProfBeakerReply()` in `js/game.js` to immediately handle greetings, reset requests, terminology questions, and MINOH balancing advice if network connectivity drops or serverless cold-starts occur.
+  3. Extended idle guidance timer to 50 seconds and suppressed idle popups whenever chat messages are present (`window.beakerChatHistory.length > 0`).
+  4. Redesigned `playSound('start')` using a four-note major chord sine arpeggio (C5 -> E5 -> G5 -> C6) with gradual 0.02s linear attack ramps and smooth exponential decay, producing a warm, pleasant chime.
