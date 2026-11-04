@@ -1,3 +1,134 @@
+window.buildLevelMinohPlanCard = function(levelData) {
+    if (!levelData || !levelData.elements) return '';
+
+    const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
+    const KNOWN_POLYATOMIC = [
+        { key: 'NO3', display: 'NO₃', name: 'Nitrate', elements: ['N', 'O'] },
+        { key: 'SO4', display: 'SO₄', name: 'Sulfate', elements: ['S', 'O'] },
+        { key: 'CO3', display: 'CO₃', name: 'Carbonate', elements: ['C', 'O'] },
+        { key: 'OH', display: 'OH', name: 'Hydroxide', elements: ['O', 'H'] }
+    ];
+
+    const rRaw = (levelData.reactants || []).map(r => r.id).join(' ');
+    const pRaw = (levelData.products || []).map(p => p.id).join(' ');
+
+    const activeIons = [];
+    let strippedR = rRaw;
+    let strippedP = pRaw;
+
+    for (const ion of KNOWN_POLYATOMIC) {
+        if (rRaw.includes(ion.key) && pRaw.includes(ion.key)) {
+            activeIons.push(ion);
+            strippedR = strippedR.split(ion.key).join('');
+            strippedP = strippedP.split(ion.key).join('');
+        }
+    }
+
+    const strippedCombined = strippedR + ' ' + strippedP;
+
+    const metals = [];
+    const nonMetals = [];
+    let hasOxygen = strippedCombined.includes('O');
+    let hasHydrogen = strippedCombined.includes('H');
+
+    for (const el of levelData.elements) {
+        if (METALS.has(el)) {
+            metals.push(el);
+        } else if (el === 'O' || el === 'H') {
+            // Handled via stripped check
+        } else {
+            if (strippedCombined.includes(el)) {
+                nonMetals.push(el);
+            }
+        }
+    }
+
+    const steps = [];
+    if (metals.length > 0) {
+        steps.push({ letter: 'M', title: 'Metals', items: metals.map(m => (ELEM_NAMES[m] || m) + ' (' + m + ')'), priority: 1, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' });
+    }
+    if (activeIons.length > 0) {
+        steps.push({ letter: 'I', title: 'Polyatomic Ions', items: activeIons.map(i => i.name + ' (' + i.display + ')'), priority: 2, color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' });
+    }
+    if (nonMetals.length > 0) {
+        steps.push({ letter: 'N', title: 'Non-Metals', items: nonMetals.map(n => (ELEM_NAMES[n] || n) + ' (' + n + ')'), priority: 3, color: '#0369a1', bg: '#f0f9ff', border: '#bae6fd' });
+    }
+    if (hasOxygen) {
+        steps.push({ letter: 'O', title: 'Oxygen', items: ['Oxygen (O)'], priority: 4, color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' });
+    }
+    if (hasHydrogen) {
+        steps.push({ letter: 'H', title: 'Hydrogen', items: ['Hydrogen (H)'], priority: 5, color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' });
+    }
+
+    if (steps.length === 0) return '';
+
+    // Summary order string
+    let orderBadges = steps.map(s => `<span style="background:${s.bg}; color:${s.color}; border:1px solid ${s.border}; border-radius:6px; padding:2px 7px; font-weight:900; font-size:0.78rem;">[${s.letter}] ${s.items.map(it => it.replace(/\s*\([^)]*\)/, '')).join(', ')}</span>`).join(' <span style="color:#94a3b8; font-size:0.75rem;">➔</span> ');
+
+    // Steps list rows
+    let stepsRowsHtml = steps.map((s, idx) => `
+        <div style="display:flex; align-items:center; justify-content:space-between; background:${s.bg}; border:1px solid ${s.border}; border-radius:8px; padding:5px 9px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span style="background:${s.color}; color:#ffffff; width:20px; height:20px; border-radius:50%; font-size:0.72rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">${idx + 1}</span>
+                <span style="font-weight:900; font-size:0.84rem; color:${s.color};">[${s.letter}] ${s.title}:</span>
+            </div>
+            <span style="font-weight:800; font-size:0.82rem; color:#1e293b;">${s.items.join(', ')}</span>
+        </div>
+    `).join('');
+
+    return `
+    <div class="minoh-plan-card" style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid #e2e8f0; padding-bottom:6px;">
+            <span style="font-weight:900; font-size:0.86rem; color:#1e293b; display:inline-flex; align-items:center; gap:6px;">
+                <span>🎯</span> <span>MINOH Balancing Order</span>
+            </span>
+            <span style="font-size:0.72rem; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Best Practice</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+            ${stepsRowsHtml}
+        </div>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:6px 8px; margin-top:2px;">
+            <span style="font-size:0.72rem; font-weight:900; color:#475569; text-transform:uppercase;">Sequence:</span>
+            ${orderBadges}
+        </div>
+    </div>`;
+};
+
+
+window.spamTracker = {
+    lastSide: null,
+    lastId: null,
+    consecutiveClicks: 0,
+    mistakeCount: 0,
+    lastWarningTime: 0
+};
+
+window.showLabWarning = function(msg) {
+    let now = Date.now();
+    if (now - window.spamTracker.lastWarningTime < 2200) return;
+    window.spamTracker.lastWarningTime = now;
+    if (typeof playSound === "function") playSound("wrong");
+    
+    let existing = document.getElementById('lab-warning-toast');
+    if (existing) existing.remove();
+    let toast = document.createElement('div');
+    toast.id = 'lab-warning-toast';
+    toast.style.cssText = "position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: #fef3c7; color: #92400e; border: 3px solid #d97706; box-shadow: 0 4px 14px rgba(217,119,6,0.3); border-radius: 14px; padding: 10px 20px; font-weight: 800; font-size: 0.95rem; z-index: 9999; display: flex; align-items: center; gap: 8px; pointer-events: none; animation: popBounceIn 0.3s ease;";
+    toast.innerHTML = `<span>⚠️</span> <span>${msg}</span>`;
+    
+    let middle = document.querySelector('.block-middle');
+    if (middle) {
+        middle.style.position = 'relative';
+        middle.appendChild(toast);
+        setTimeout(() => {
+            toast.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(-10px)';
+            setTimeout(() => toast.remove(), 400);
+        }, 2800);
+    }
+};
+
 
 // Universal chemical formula tokenizer for hover info cards
 function tokenizeChemicalFormula(html) {
@@ -176,11 +307,37 @@ function initEngine() {
         let prefix = match ? "Level " + match[1] + " : " : "";
         titleEl.innerText = prefix + currentLevelData.title;
     }
-    updateSimulation();
+    
+    // Remove any review mode top button from previous level
+    window.isReviewMode = false;
+    let existingReviewBtn = document.getElementById('btn-top-next-level');
+    if (existingReviewBtn) existingReviewBtn.remove();
+
+    window.hardFloorOfOne = (!window.isChallengeMode && levelId !== 'TUT0' && levelId !== 'tutorial');
+    
+    window.unproductiveMovesCount = 0;
+    window.lastBalanceScore = 999;
+    window.proactiveBeakerTriggeredForLevel = false;
+    if (typeof window.resetIdleGuidanceTimer === 'function') window.resetIdleGuidanceTimer();
+
+    if (window.hardFloorOfOne) {
+        window.initDefaultMolecules();
+    } else {
+        updateSimulation();
+    }
     
     // Welcome message
 
-        setTimeout(() => { window.clearChat(); window.addChatMessage("Welcome to <b>" + currentLevelData.title + "</b>!<br><br>Let us balance the reaction.", "Prof. Beaker"); }, 100);
+        setTimeout(() => { 
+            window.clearChat(); 
+            window.addChatMessage("Welcome! Let's balance <b>" + currentLevelData.title + "</b>.<br>⚖️ Equal atoms on both sides wins!", "Prof. Beaker"); 
+            let minohCardHtml = window.buildLevelMinohPlanCard(currentLevelData);
+            if (minohCardHtml) {
+                setTimeout(() => {
+                    window.addChatMessage(minohCardHtml, "MINOH Strategy");
+                }, 280);
+            }
+        }, 100);
 }
 
 function getAtomMarble(element) {
@@ -202,43 +359,113 @@ function renderBoard() {
     }
 
     
-    // Render Sleek Equation
-    const sleekReact = document.getElementById('sleek-reactants');
-    const sleekProd = document.getElementById('sleek-products');
+    // Render Sleek Equation (Auto-detecting single-row vs 3-row layout)
     const sleekEq = document.getElementById('dynamic-sleek-equation');
+    const eqSection = document.querySelector('.section-equation');
     
     if (sleekEq) {
-        let rHtml = `<div class="eq-side eq-reactants" style="flex: 1; display: flex; justify-content: flex-start; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
-        currentLevelData.reactants.forEach((m, idx) => {
+        const totalMols = currentLevelData.reactants.length + currentLevelData.products.length;
+        let totalFormulaChars = 0;
+        currentLevelData.reactants.forEach(m => totalFormulaChars += (m.id || '').length);
+        currentLevelData.products.forEach(m => totalFormulaChars += (m.id || '').length);
+        
+        const is3RowMode = (totalMols >= 4) || (currentLevelData.reactants.length > 2) || (currentLevelData.products.length > 2) || (totalFormulaChars >= 22);
+
+        const buildMolHtml = (m, side) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
-            let coeffHtml = `<div id="coeff-eq-react-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>0</div>`;
+            let coeffHtml = `<div id="coeff-eq-${side}-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
             let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
-            
-            rHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
-            
-            if (idx < currentLevelData.reactants.length - 1) {
-                rHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
+            return `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
+        };
+
+        if (is3RowMode) {
+            if (eqSection) {
+                eqSection.style.height = 'auto';
+                eqSection.style.minHeight = '100px';
+                eqSection.style.padding = '10px 18px';
             }
-        });
-        rHtml += '</div>';
-        
-        let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(8px, 1.5vw, 24px);"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
-        
-        let pHtml = `<div class="eq-side eq-products" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
-        currentLevelData.products.forEach((m, idx) => {
-            let formula = tokenizeChemicalFormula(m.displayHtml);
-            let coeffHtml = `<div id="coeff-eq-prod-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
-            let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
-            
-            pHtml += `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
-            
-            if (idx < currentLevelData.products.length - 1) {
-                pHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
+            sleekEq.style.display = 'grid';
+            sleekEq.style.gridTemplateColumns = '1fr auto 1fr';
+            sleekEq.style.alignItems = 'center';
+            sleekEq.style.gap = '14px';
+            sleekEq.style.width = '100%';
+
+            // LHS Reactants Column (Row 1: Mol 1, Row 2: +, Row 3: Mol 2)
+            let rHtml = '<div style="display: grid; grid-template-rows: auto auto auto; justify-items: center; align-items: center; gap: 2px;">';
+            if (currentLevelData.reactants.length >= 2) {
+                rHtml += buildMolHtml(currentLevelData.reactants[0], 'react');
+                rHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
+                rHtml += buildMolHtml(currentLevelData.reactants[1], 'react');
+            } else if (currentLevelData.reactants.length === 1) {
+                rHtml += '<div style="height: 24px;"></div>';
+                rHtml += buildMolHtml(currentLevelData.reactants[0], 'react');
+                rHtml += '<div style="height: 24px;"></div>';
             }
-        });
-        pHtml += '</div>';
-        
-        sleekEq.innerHTML = rHtml.replace("(')", "") + arrowHtml + pHtml.replace("(')", "");
+            rHtml += '</div>';
+
+            // Center Column (Row 2: Arrow)
+            let arrowHtml = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                <div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px; font-size: 1.3rem; padding: 8px 16px; box-shadow: 0 4px 0 #1d4ed8;">&#10142;</div>
+            </div>`;
+
+            // RHS Products Column (Row 1: Products 1 & 2, Row 2: +, Row 3: Product 3)
+            let pHtml = '<div style="display: grid; grid-template-rows: auto auto auto; justify-items: center; align-items: center; gap: 2px;">';
+            if (currentLevelData.products.length >= 3) {
+                pHtml += '<div style="display: flex; align-items: center; justify-content: center; gap: 6px;">';
+                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
+                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.2rem; color: #475569; margin: 0 2px;">+</div>';
+                pHtml += buildMolHtml(currentLevelData.products[1], 'prod');
+                pHtml += '</div>';
+                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
+                pHtml += buildMolHtml(currentLevelData.products[2], 'prod');
+            } else if (currentLevelData.products.length === 2) {
+                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
+                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
+                pHtml += buildMolHtml(currentLevelData.products[1], 'prod');
+            } else if (currentLevelData.products.length === 1) {
+                pHtml += '<div style="height: 24px;"></div>';
+                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
+                pHtml += '<div style="height: 24px;"></div>';
+            }
+            pHtml += '</div>';
+
+            sleekEq.innerHTML = rHtml + arrowHtml + pHtml;
+        } else {
+            // Normal Single-Line Layout
+            if (eqSection) {
+                eqSection.style.height = '';
+                eqSection.style.minHeight = '';
+                eqSection.style.padding = '15px 15px';
+            }
+            sleekEq.style.display = 'grid';
+            sleekEq.style.gridTemplateColumns = '1fr auto 1fr';
+            sleekEq.style.alignItems = 'center';
+            sleekEq.style.gap = '1cqw';
+            sleekEq.style.width = '100%';
+
+            let rHtml = `<div class="eq-side eq-reactants" style="flex: 1; display: flex; justify-content: flex-start; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
+            currentLevelData.reactants.forEach((m, idx) => {
+                rHtml += buildMolHtml(m, 'react');
+                if (idx < currentLevelData.reactants.length - 1) {
+                    rHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
+                }
+            });
+            rHtml += '</div>';
+
+            let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(8px, 1.5vw, 24px);"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
+
+            let pHtml = `<div class="eq-side eq-products" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
+            currentLevelData.products.forEach((m, idx) => {
+                pHtml += buildMolHtml(m, 'prod');
+                if (idx < currentLevelData.products.length - 1) {
+                    pHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
+                }
+            });
+            pHtml += '</div>';
+
+            sleekEq.innerHTML = rHtml + arrowHtml + pHtml;
+        }
     }
 
 
@@ -260,10 +487,17 @@ function renderBoard() {
     const btnProdContainer = document.getElementById('prod-btn-container');
     if(btnProdContainer) {
         btnProdContainer.innerHTML = '';
+        const isDenseProd = currentLevelData.products.length >= 3;
         currentLevelData.products.forEach(m => {
             let btn = document.createElement('div');
             btn.className = 'mol-btn btn-prod has-chem-info'; btn.setAttribute('data-info', 'btn-prod'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'prod'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
-            btn.innerHTML = `<span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>${m.displayHtml}</span>`;
+            if (isDenseProd) {
+                btn.style.padding = '8px 8px';
+                btn.style.fontSize = '0.95rem';
+                btn.style.flex = '1 1 0';
+                btn.style.minWidth = '0';
+            }
+            btn.innerHTML = `<span style="font-size: 1.3rem; margin-right: 4px;">+</span> <span>${m.displayHtml}</span>`;
             
               btn.onclick = () => window.addMolecule('prod', m.id);
             btnProdContainer.appendChild(btn);
@@ -299,55 +533,111 @@ function renderBoard() {
     }
 }
 
-// Global Override for addMolecule
+// Global Override for addMolecule with Hard Floor of 1 & Default Starting State
 window.actionHistory = window.actionHistory || [];
-window.addMolecule = function(side, typeId) {
-    window.activeVisualHint = null; // Clear hint on interaction
+window.hardFloorOfOne = true;
 
-    if(typeof playSound === "function") playSound("click");
+window.insertMoleculeBlock = function(side, typeId, recordHistory = true) {
     let rowId = "row-" + side + "-" + typeId;
     let row = document.getElementById(rowId);
     if (!row) return;
 
-    // Find molecule def
     let m = currentLevelData.reactants.find(x => x.id === typeId) || currentLevelData.products.find(x => x.id === typeId);
-    if(!m) return;
+    if (!m) return;
 
     let block = document.createElement("div");
     block.className = "mol-block";
-    
-    block.onclick = function() {
-    window.activeVisualHint = null; // Clear hint on interaction
 
-        if(typeof playSound === "function") playSound("undo");
-        window.actionHistory.push({ action: "remove", side: side, block: block, parent: row });
+    block.onclick = function() {
+        window.activeVisualHint = null;
+
+        // Hard floor constraint: prevent removing the last remaining molecule of a formula
+        if (window.hardFloorOfOne && row.querySelectorAll('.mol-block').length <= 1) {
+            if (typeof playSound === "function") playSound("error");
+            block.style.animation = "shakeError 0.35s ease";
+            setTimeout(() => { block.style.animation = ""; }, 350);
+            return;
+        }
+
+        if (typeof playSound === "function") playSound("undo");
+        if (recordHistory) {
+            window.actionHistory.push({ action: "remove", side: side, block: block, parent: row });
+        }
         block.remove();
         updateSimulation();
     };
 
     let marblesHtml = "";
-    for(let el in m.composition) {
+    for (let el in m.composition) {
         let count = m.composition[el];
-        for(let i=0; i<count; i++) {
+        for (let i = 0; i < count; i++) {
             marblesHtml += getHyperMarble(el);
         }
     }
 
     block.innerHTML = `<div class="mol-remove-overlay">&#10006;</div><div style="font-weight: 900; font-size: 1.1rem; color: #1e293b;">${m.displayHtml}</div><div style="display: flex; flex-wrap: wrap; justify-content: center;">${marblesHtml}</div>`;
     row.appendChild(block);
+
+    if (recordHistory) {
+        window.actionHistory.push({ action: "add", side: side, block: block, parent: row });
+    }
+};
+
+window.addMolecule = function(side, typeId) {
+    window.activeVisualHint = null;
     
-    window.actionHistory.push({ action: "add", side: side, block: block, parent: row });
+    // Track rapid consecutive clicks on same molecule
+    if (window.spamTracker.lastSide === side && window.spamTracker.lastId === typeId) {
+        window.spamTracker.consecutiveClicks++;
+    } else {
+        window.spamTracker.lastSide = side;
+        window.spamTracker.lastId = typeId;
+        window.spamTracker.consecutiveClicks = 1;
+    }
     
+    let row = document.getElementById("row-" + side + "-" + typeId);
+    let currentCoeff = row ? row.querySelectorAll('.mol-block').length : 0;
+    
+    if (window.spamTracker.consecutiveClicks >= 4 || currentCoeff >= 5) {
+        window.showLabWarning(`Whoa, slow down! Adding too many ${typeId} molecules will tilt the scale too far.`);
+    }
+    
+    if (typeof playSound === "function") playSound("click");
+    window.insertMoleculeBlock(side, typeId, true);
+    updateSimulation();
+};
+
+window.initDefaultMolecules = function() {
+    window.actionHistory = [];
+    if (!currentLevelData) return;
+    currentLevelData.reactants.forEach(m => {
+        let row = document.getElementById("row-react-" + m.id);
+        if (row && row.children.length === 0) {
+            window.insertMoleculeBlock('react', m.id, false);
+        }
+    });
+    currentLevelData.products.forEach(m => {
+        let row = document.getElementById("row-prod-" + m.id);
+        if (row && row.children.length === 0) {
+            window.insertMoleculeBlock('prod', m.id, false);
+        }
+    });
     updateSimulation();
 };
 
 window.undo = function() {
     if (typeof playSound === "function") playSound("undo");
     if (window.actionHistory.length === 0) return;
-    let last = window.actionHistory.pop();
+    let last = window.actionHistory[window.actionHistory.length - 1];
     if (last.action === "add") {
+        let row = last.parent;
+        if (window.hardFloorOfOne && row.querySelectorAll('.mol-block').length <= 1) {
+            return;
+        }
+        window.actionHistory.pop();
         last.block.remove();
     } else if (last.action === "remove") {
+        window.actionHistory.pop();
         last.parent.appendChild(last.block);
     }
     updateSimulation();
@@ -364,7 +654,11 @@ window.resetEquation = function() {
         let row = document.getElementById("row-prod-" + m.id);
         if(row) row.innerHTML = "";
     });
-    updateSimulation();
+    if (window.hardFloorOfOne) {
+        window.initDefaultMolecules();
+    } else {
+        updateSimulation();
+    }
 };
 
 window.toggleFullScreen = function() {
@@ -692,94 +986,624 @@ window.updateSimulation = function() {
 
         if (typeof window.updateBarGraph === "function") {
             window.updateBarGraph(rCounts, pCounts, isBalanced);
+        // Reset two-stage clue state ONLY if student actually added or removed a molecule
+        let currentBoardState = JSON.stringify(rCounts) + JSON.stringify(pCounts);
+        if (window.clueState && window.clueState.stage === 2) {
+            if (window.clueState.boardState && window.clueState.boardState !== currentBoardState) {
+                window.clueState = { el: null, side: null, stage: 1, boardState: null };
+                let dynamicLabel = document.getElementById('clue-btn-dynamic-text');
+                if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
+            }
+        }
+        }
+
+        if (typeof window.checkProactiveBeakerGuidance === "function") {
+            window.checkProactiveBeakerGuidance(rCounts, pCounts, isBalanced);
         }
     }
 };
 
 
-window.addChatMessage = function(msg, prefixLabel) {
-    let container = document.querySelector(".beaker-message");
-    if(!container) return;
+// ==========================================
+// Phase 2: Prof. Beaker AI & Study Room System
+// ==========================================
+window.beakerChatHistory = [];
+window.isBeakerThinking = false;
+window.unproductiveMovesCount = 0;
+window.lastBalanceScore = 999;
+window.proactiveBeakerTriggeredForLevel = false;
+window.idleGuidanceTimer = null;
+
+window.resetIdleGuidanceTimer = function() {
+    if (window.idleGuidanceTimer) clearTimeout(window.idleGuidanceTimer);
+    if (window.isChallengeMode) return;
+    window.idleGuidanceTimer = setTimeout(() => {
+        if (!window.proactiveBeakerTriggeredForLevel && window.counts && !window.counts.isEmpty) {
+            let rCounts = window.counts.rCounts || {};
+            let pCounts = window.counts.pCounts || {};
+            let worstEl = null;
+            let maxDiff = 0;
+            for (let el in rCounts) {
+                let diff = Math.abs((rCounts[el] || 0) - (pCounts[el] || 0));
+                if (diff > maxDiff) { maxDiff = diff; worstEl = el; }
+            }
+            if (worstEl && maxDiff > 0) {
+                window.proactiveBeakerTriggeredForLevel = true;
+                if (typeof playSound === 'function') playSound('pop');
+                let elName = ELEM_NAMES[worstEl] || worstEl;
+                let leftC = rCounts[worstEl] || 0;
+                let rightC = pCounts[worstEl] || 0;
+                let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstEl) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstEl) : `<b>${worstEl}</b>`);
+                let cardHtml = `
+                <div class="chat-clue-card">
+                    <div class="chat-clue-header">
+                        ${marbleHtml}
+                        <span><b>${elName}</b> is off!</span>
+                    </div>
+                    <div class="chat-scale-row">
+                        <div class="chat-side-pill left">Left: <b>${leftC}</b></div>
+                        <div class="chat-scale-icon">⚖️</div>
+                        <div class="chat-side-pill right">Right: <b>${rightC}</b></div>
+                    </div>
+                    <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">
+                        💡 Tap <b>I am Stuck! Help!</b> below for help!
+                    </div>
+                </div>`;
+                window.addChatMessage(cardHtml, "Prof. Beaker", "assistant");
+            }
+        }
+    }, 25000);
+};
+
+window.checkProactiveBeakerGuidance = function(rCounts, pCounts, isBalanced) {
+    if (isBalanced) {
+        window.unproductiveMovesCount = 0;
+        return;
+    }
     
-    let bubbleContainer = document.createElement("div");
-    bubbleContainer.style.cssText = "margin-top: 15px; width: 100%; box-sizing: border-box;";
+    let totalImbalance = 0;
+    let worstElement = null;
+    let maxDiff = 0;
+    for (let el in rCounts) {
+        let diff = Math.abs((rCounts[el] || 0) - (pCounts[el] || 0));
+        totalImbalance += diff;
+        if (diff > maxDiff) {
+            maxDiff = diff;
+            worstElement = el;
+        }
+    }
     
-    let isHint = prefixLabel && prefixLabel.includes("Hint");
+    if (totalImbalance >= window.lastBalanceScore) {
+        window.unproductiveMovesCount++;
+    } else {
+        window.unproductiveMovesCount = Math.max(0, window.unproductiveMovesCount - 1);
+    }
+    window.lastBalanceScore = totalImbalance;
     
-    let avatarBg = isHint ? '#fffbeb' : '#f0f9ff';
-    let avatarColor = isHint ? '#d97706' : '#0369a1';
-    let borderColor = isHint ? '#fde68a' : '#bae6fd';
-    let badgeText = prefixLabel || 'BEAKER';
-    let bubbleBg = isHint ? '#fefce8' : '#f1f5f9';
+    if (window.unproductiveMovesCount >= 3 && !window.proactiveBeakerTriggeredForLevel && worstElement) {
+        window.proactiveBeakerTriggeredForLevel = true;
+        window.unproductiveMovesCount = 0;
+        let elName = ELEM_NAMES[worstElement] || worstElement;
+        let leftC = rCounts[worstElement] || 0;
+        let rightC = pCounts[worstElement] || 0;
+        setTimeout(() => {
+            if (typeof playSound === 'function') playSound('pop');
+            let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstElement) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstElement) : `<b>${worstElement}</b>`);
+            let cardHtml = `
+            <div class="chat-clue-card">
+                <div class="chat-clue-header">
+                    ${marbleHtml}
+                    <span><b>${elName}</b> needs balance!</span>
+                </div>
+                <div class="chat-scale-row">
+                    <div class="chat-side-pill left">Left: <b>${leftC}</b></div>
+                    <div class="chat-scale-icon">⚖️</div>
+                    <div class="chat-side-pill right">Right: <b>${rightC}</b></div>
+                </div>
+                <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">
+                    💡 Tap <b>I am Stuck! Help!</b> or add <b>${worstElement}</b> to balance!
+                </div>
+            </div>`;
+            window.addChatMessage(cardHtml, "Prof. Beaker", "assistant");
+        }, 350);
+    }
+};
+
+function parseProfBeakerMarkdown(text) {
+    if (typeof text !== 'string') return text;
+    if (text.includes('<div') || text.includes('<table')) return text;
+
+    function parseInline(str) {
+        if (!str) return '';
+        // Bold and Italic
+        str = str.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        str = str.replace(/\*(.*?)\*/g, '<i>$1</i>');
+        // Colored text tags: [blue:text], [orange:text], [green:text]
+        str = str.replace(/\[blue:(.*?)\]/gi, '<span class="chat-highlight-blue">$1</span>');
+        str = str.replace(/\[orange:(.*?)\]/gi, '<span class="chat-highlight-orange">$1</span>');
+        str = str.replace(/\[green:(.*?)\]/gi, '<span class="chat-highlight-green">$1</span>');
+        // Convert chemical formulas with plain numbers into Unicode subscripts (e.g. N2 -> N₂, H2 -> H₂, NH3 -> NH₃, CO2 -> CO₂)
+        const subMap = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
+        str = str.replace(/\b([A-Z][a-z]?)(\d+)\b/g, (m, el, num) => {
+            let sub = num.split('').map(d => subMap[d] || d).join('');
+            return `${el}${sub}`;
+        });
+        return str;
+    }
+
+    let lines = text.split('\n');
+    let inTable = false;
+    let tableRows = [];
+    let processedLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line.startsWith('|') && line.endsWith('|')) {
+            inTable = true;
+            if (/^\|(\s*:?-+:?\s*\|)+$/.test(line)) {
+                continue; // skip delimiter row
+            }
+            let cells = line.slice(1, -1).split('|').map(c => c.trim());
+            tableRows.push(cells);
+        } else {
+            if (inTable && tableRows.length > 0) {
+                let header = tableRows[0];
+                let body = tableRows.slice(1);
+                let tHtml = '<table class="chat-table"><thead><tr>';
+                header.forEach(h => { tHtml += `<th>${parseInline(h)}</th>`; });
+                tHtml += '</tr></thead><tbody>';
+                body.forEach(row => {
+                    tHtml += '<tr>';
+                    row.forEach(cell => { tHtml += `<td>${parseInline(cell)}</td>`; });
+                    tHtml += '</tr>';
+                });
+                tHtml += '</tbody></table>';
+                processedLines.push(tHtml);
+                tableRows = [];
+                inTable = false;
+            }
+            if (line.length > 0) {
+                processedLines.push(parseInline(line));
+            }
+        }
+    }
+
+    if (inTable && tableRows.length > 0) {
+        let header = tableRows[0];
+        let body = tableRows.slice(1);
+        let tHtml = '<table class="chat-table"><thead><tr>';
+        header.forEach(h => { tHtml += `<th>${parseInline(h)}</th>`; });
+        tHtml += '</tr></thead><tbody>';
+        body.forEach(row => {
+            tHtml += '<tr>';
+            row.forEach(cell => { tHtml += `<td>${parseInline(cell)}</td>`; });
+            tHtml += '</tr>';
+        });
+        tHtml += '</tbody></table>';
+        processedLines.push(tHtml);
+    }
+
+    return processedLines.join('<br>').replace(/(<br>)*(<table class="chat-table">[\s\S]*?<\/table>)(<br>)*/g, '$2');
+}
+
+window.addChatMessage = function(msg, prefixLabel, role = 'assistant') {
+    let containers = [
+        document.querySelector(".beaker-message"),
+        document.getElementById("study-room-messages")
+    ].filter(Boolean);
+    if(containers.length === 0) return;
     
-    let bubbleStyle = `background: ${bubbleBg}; border: 2px solid ${borderColor}; border-radius: 12px; padding: 14px 18px; font-size: 1.05rem; color: #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.02); line-height: 1.5; font-weight: 600;`;
+    let isUser = (role === 'user');
+    let isHint = prefixLabel && (prefixLabel.includes("Hint") || prefixLabel.includes("Clue") || prefixLabel.includes("Step") || prefixLabel.includes("Guide") || prefixLabel.includes("Solution"));
+    
+    // High-contrast, unmistakable styling per sender
+    let badgeBg = isUser ? '#1e3a8a' : (isHint ? '#d97706' : '#0284c7');
+    let badgeColor = '#ffffff';
+    let badgeIcon = isUser ? '🎓 ' : (isHint ? '💡 ' : '🧪 ');
+    let badgeText = badgeIcon + (prefixLabel || (isUser ? 'Student' : 'Prof. Beaker'));
+    
+    let bubbleBg = isUser ? '#2563eb' : (isHint ? '#fffdf0' : '#ffffff');
+    let bubbleBorder = isUser ? '2.5px solid #1d4ed8' : (isHint ? '2.5px solid #f59e0b' : '2.5px solid #cbd5e1');
+    let textColor = isUser ? '#ffffff' : '#0f172a';
+    let align = isUser ? 'flex-end' : 'flex-start';
+    let radius = isUser ? 'border-radius: 16px; border-bottom-right-radius: 3px;' : 'border-radius: 16px; border-top-left-radius: 3px;';
+    let bubbleShadow = isUser ? 'box-shadow: 0 4px 10px rgba(37,99,235,0.25);' : (isHint ? 'box-shadow: 0 4px 12px rgba(245,158,11,0.18);' : 'box-shadow: 0 3px 8px rgba(0,0,0,0.06);');
+    let maxW = isUser ? 'max-width: 85%;' : 'max-width: 95%;';
+    
+    // Convert markdown formatting into HTML with tables, colors, and subscripts
+    let parsedMsg = parseProfBeakerMarkdown(msg);
+    
+    let bubbleStyle = `background: ${bubbleBg}; border: ${bubbleBorder}; ${radius}; padding: 11px 14px; font-size: 0.94rem; color: ${textColor}; ${bubbleShadow} line-height: 1.45; font-weight: ${isUser ? '700' : '600'}; ${maxW} word-break: break-word;`;
     
     let finalHtml = `
-    <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-        <div class="beaker-sender-tag" style="background: ${avatarBg}; color: ${avatarColor}; font-weight: 900; font-size: 0.8rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px; margin-bottom: 6px; margin-left: 12px; border: 1px solid ${borderColor};">
+    <div style="display: flex; flex-direction: column; align-items: ${align}; width: 100%;">
+        <div class="beaker-sender-tag" style="background: ${badgeBg}; color: ${badgeColor}; font-weight: 900; font-size: 0.76rem; letter-spacing: 0.3px; padding: 2px 10px; border-radius: 6px; margin-bottom: 4px; ${isUser ? 'margin-right: 6px;' : 'margin-left: 6px;'} box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
             ${badgeText}
         </div>
         <div class="beaker-bubble-text" style="${bubbleStyle}">
-            ${msg}
+            ${parsedMsg}
         </div>
     </div>`;
     
-    bubbleContainer.innerHTML = finalHtml;
-    container.appendChild(bubbleContainer);
-    container.scrollTop = container.scrollHeight;
-    return;
+    containers.forEach(c => {
+        let bubbleContainer = document.createElement("div");
+        bubbleContainer.style.cssText = "margin-top: 12px; width: 100%; box-sizing: border-box;";
+        bubbleContainer.innerHTML = finalHtml;
+        c.appendChild(bubbleContainer);
+        c.scrollTop = c.scrollHeight;
+    });
 };
 
 window.clearChat = function(userInitiated) {
     if (userInitiated && typeof playSound === "function") playSound("trash");
-    let container = document.querySelector(".beaker-message");
-    if(container) container.innerHTML = "";
+    let c1 = document.querySelector(".beaker-message");
+    if(c1) c1.innerHTML = "";
+    let c2 = document.getElementById("study-room-messages");
+    if(c2) c2.innerHTML = "";
+    window.beakerChatHistory = [];
+    window.clueState = { el: null, side: null, stage: 1, boardState: null };
+    let dynamicLabel = document.getElementById('clue-btn-dynamic-text');
+    if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
 };
 
-window.revealHeuristicHint = function() {
-    if(typeof playSound === "function") playSound("hint");
-    let rCounts = window.counts.rCounts;
-    let pCounts = window.counts.pCounts;
-    
-    let imbalancedEl = null;
-    let needsMoreOn = null;
-    
-    for (let el in rCounts) {
-        if (rCounts[el] < pCounts[el]) { imbalancedEl = el; needsMoreOn = "react"; break; }
-        if (pCounts[el] < rCounts[el]) { imbalancedEl = el; needsMoreOn = "prod"; break; }
+window.askProfBeaker = async function(userPrompt) {
+    if (!userPrompt || !userPrompt.trim()) return;
+    if (window.isBeakerThinking) return;
+
+    userPrompt = userPrompt.trim();
+    if (typeof playSound === 'function') playSound('click');
+    if (typeof window.resetIdleGuidanceTimer === 'function') window.resetIdleGuidanceTimer();
+
+    // 1. Render user message in chat
+    window.addChatMessage(userPrompt, "Student", "user");
+
+    // Clear input fields
+    const inputEl = document.getElementById('beaker-chat-input');
+    if (inputEl) inputEl.value = '';
+    const studyInputEl = document.getElementById('study-room-input');
+    if (studyInputEl) studyInputEl.value = '';
+
+    // 2. Add typing indicator
+    window.isBeakerThinking = true;
+    const sendBtn = document.getElementById('btn-beaker-send');
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.6'; }
+    const studySendBtn = document.getElementById('btn-study-room-send');
+    if (studySendBtn) { studySendBtn.disabled = true; studySendBtn.style.opacity = '0.6'; }
+
+    const typingId = 'beaker-typing-indicator';
+    let container = document.querySelector('.beaker-message');
+    let studyContainer = document.getElementById('study-room-messages');
+
+    function showTypingBubble(targetContainer) {
+        if (!targetContainer) return;
+        const typingEl = document.createElement('div');
+        typingEl.id = typingId;
+        typingEl.style.cssText = 'margin-top: 10px; display: flex; flex-direction: column; align-items: flex-start;';
+        typingEl.innerHTML = `
+            <div style="background: #f0f9ff; color: #0369a1; font-weight: 900; font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; margin-bottom: 4px; margin-left: 8px; border: 1px solid #bae6fd;">Prof. Beaker</div>
+            <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; border-top-left-radius: 3px; padding: 8px 14px;">
+                <div class="chat-typing-dots">
+                    <div class="chat-typing-dot"></div>
+                    <div class="chat-typing-dot"></div>
+                    <div class="chat-typing-dot"></div>
+                </div>
+            </div>`;
+        targetContainer.appendChild(typingEl);
+        targetContainer.scrollTop = targetContainer.scrollHeight;
     }
+    showTypingBubble(container);
+    showTypingBubble(studyContainer);
+
+    // 3. Build Level Context
+    let levelContext = '';
+    if (currentLevelData) {
+        const rCounts = window.counts?.rCounts || {};
+        const pCounts = window.counts?.pCounts || {};
+        const molReact = window.molCounts?.react || {};
+        const molProd = window.molCounts?.prod || {};
+        levelContext = `Level Title: ${currentLevelData.title}
+Chemical Equation: ${currentLevelData.equation}
+Current Reactant Multipliers: ${JSON.stringify(molReact)}
+Current Product Multipliers: ${JSON.stringify(molProd)}
+Current Reactant Atom Totals: ${JSON.stringify(rCounts)}
+Current Product Atom Totals: ${JSON.stringify(pCounts)}`;
+    }
+
+    // 4. Fetch DeepSeek from local proxy
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: userPrompt,
+                history: window.beakerChatHistory || [],
+                levelContext: levelContext
+            })
+        });
+
+        const data = await response.json();
+        document.querySelectorAll('#' + typingId).forEach(el => el.remove());
+
+        if (data.reply) {
+            let cleanReply = data.reply.replace(/\u2014/g, ' - ').replace(/;/g, ',');
+            window.addChatMessage(cleanReply, 'Prof. Beaker', 'assistant');
+            window.beakerChatHistory = window.beakerChatHistory || [];
+            window.beakerChatHistory.push({ role: 'user', content: userPrompt });
+            window.beakerChatHistory.push({ role: 'assistant', content: cleanReply });
+            if (typeof playSound === 'function') playSound('pop');
+        } else {
+            let errMsg = data.error || 'I could not process that request right now. Try checking the element trays on the left!';
+            window.addChatMessage(errMsg, 'Prof. Beaker', 'assistant');
+        }
+    } catch (err) {
+        document.querySelectorAll('#' + typingId).forEach(el => el.remove());
+        window.addChatMessage('Connection interrupted. Let us check the scales on the left to see what needs balancing!', 'Prof. Beaker', 'assistant');
+    } finally {
+        window.isBeakerThinking = false;
+        if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
+        if (studySendBtn) { studySendBtn.disabled = false; studySendBtn.style.opacity = '1'; }
+    }
+};
+
+window.sendChipPrompt = function(promptText) {
+    window.askProfBeaker(promptText);
+};
+
+window.submitBeakerInput = function() {
+    const inputEl = document.getElementById('beaker-chat-input');
+    if (inputEl && inputEl.value.trim()) {
+        window.askProfBeaker(inputEl.value.trim());
+    }
+};
+
+window.openStudyRoomModal = function() {
+    let modal = document.getElementById('study-room-modal');
+    if (!modal || !currentLevelData) return;
+    
+    let titleEl = document.getElementById('study-room-level-name');
+    if (titleEl) titleEl.innerText = (currentLevelData.title || '') + ' • SPM Chemistry Chapter 3';
+    
+    let eqEl = document.getElementById('study-room-equation');
+    if (eqEl) {
+        let eqFormatted = (currentLevelData.equation || '').replace(/([₂₃₄₅₆₇₈₉])/g, '<span style="font-size:0.7em; vertical-align:sub; font-weight:900;">$1</span>');
+        eqEl.innerHTML = eqFormatted;
+    }
+    
+    let tableContainer = document.getElementById('study-room-mass-table');
+    if (tableContainer) {
+        let rCounts = window.counts?.rCounts || {};
+        let pCounts = window.counts?.pCounts || {};
+        let elementsHtml = '';
+        
+        currentLevelData.elements.forEach(el => {
+            let r = rCounts[el] || 0;
+            let p = pCounts[el] || 0;
+            let elName = ELEM_NAMES[el] || el;
+            let marble = (typeof getHyperMarble === 'function') ? getHyperMarble(el) : (typeof getAtomMarble === 'function' ? getAtomMarble(el) : `<b>${el}</b>`);
+            let maxCount = Math.max(r, p, 1);
+            let rPct = Math.min(100, Math.round((r / maxCount) * 100));
+            let pPct = Math.min(100, Math.round((p / maxCount) * 100));
+            
+            let statusBadge = '';
+            let scaleIcon = '⚖️';
+            if (r === p && r > 0) {
+                statusBadge = `<span style="background:#dcfce7; color:#15803d; border:1.5px solid #86efac; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚖️ Balanced (${r} = ${p})</span>`;
+                scaleIcon = '⚖️';
+            } else if (r < p) {
+                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ Need +${p - r} on Left</span>`;
+                scaleIcon = '⚖️';
+            } else if (r > p) {
+                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ Need +${r - p} on Right</span>`;
+                scaleIcon = '⚖️';
+            } else {
+                statusBadge = `<span style="background:#f1f5f9; color:#64748b; border:1.5px solid #cbd5e1; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800;">Empty (0 = 0)</span>`;
+            }
+            
+            let color = ATOM_COLORS[el] || { bg: "#94a3b8", color: "white" };
+            
+            // Build visual marble rows
+            let rBalls = '';
+            let pBalls = '';
+            let rMax = Math.min(r, 8);
+            for (let i = 0; i < rMax; i++) {
+                rBalls += `<div style="width:16px; height:16px; border-radius:50%; background:${color.bg}; display:inline-flex; align-items:center; justify-content:center; color:${color.color}; font-size:8px; font-weight:900; box-shadow:inset -1px -1px 2px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.15); border:1px solid rgba(0,0,0,0.2); margin-right:2px;">${el}</div>`;
+            }
+            if (r > 8) rBalls += `<span style="font-size:0.75rem; font-weight:800; color:#64748b; margin-left:2px;">+${r - 8}</span>`;
+            if (r === 0) rBalls = '<span style="font-size:0.72rem; color:#94a3b8; font-weight:700;">0 atoms</span>';
+            
+            let pMax = Math.min(p, 8);
+            for (let i = 0; i < pMax; i++) {
+                pBalls += `<div style="width:16px; height:16px; border-radius:50%; background:${color.bg}; display:inline-flex; align-items:center; justify-content:center; color:${color.color}; font-size:8px; font-weight:900; box-shadow:inset -1px -1px 2px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.15); border:1px solid rgba(0,0,0,0.2); margin-right:2px;">${el}</div>`;
+            }
+            if (p > 8) pBalls += `<span style="font-size:0.75rem; font-weight:800; color:#64748b; margin-left:2px;">+${p - 8}</span>`;
+            if (p === 0) pBalls = '<span style="font-size:0.72rem; color:#94a3b8; font-weight:700;">0 atoms</span>';
+            
+            elementsHtml += `
+            <div style="background:#ffffff; border:2px solid #e2e8f0; border-radius:14px; padding:10px 12px; box-shadow:0 2px 4px rgba(0,0,0,0.04); display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        ${marble}
+                        <span style="font-size:0.92rem; font-weight:900; color:#1e293b;">${elName} (${el})</span>
+                    </div>
+                    ${statusBadge}
+                </div>
+                
+                <!-- Side-by-Side Visual Bar & Balls -->
+                <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px;">
+                    <!-- Reactants LHS -->
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
+                            <span style="color:#2563eb;">Reactants</span>
+                            <span style="background:#dbeafe; color:#1d4ed8; padding:1px 6px; border-radius:6px;">${r}</span>
+                        </div>
+                        <div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                            <div style="height:100%; width:${rPct}%; background:#3b82f6; border-radius:3px; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; align-items:center; min-height:18px; margin-top:2px;">
+                            ${rBalls}
+                        </div>
+                    </div>
+                    
+                    <!-- Middle Pivot -->
+                    <div style="font-size:1.1rem; line-height:1; display:flex; align-items:center; justify-content:center; color:#64748b;">
+                        ${scaleIcon}
+                    </div>
+                    
+                    <!-- Products RHS -->
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
+                            <span style="color:#ea580c;">Products</span>
+                            <span style="background:#ffedd5; color:#c2410c; padding:1px 6px; border-radius:6px;">${p}</span>
+                        </div>
+                        <div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">
+                            <div style="height:100%; width:${pPct}%; background:#f97316; border-radius:3px; transition:width 0.3s ease;"></div>
+                        </div>
+                        <div style="display:flex; align-items:center; min-height:18px; margin-top:2px;">
+                            ${pBalls}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        
+        tableContainer.innerHTML = elementsHtml;
+    }
+
+    modal.style.display = 'flex';
+};
+
+window.closeStudyRoomModal = function() {
+    let modal = document.getElementById('study-room-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.sendStudyRoomPrompt = function(promptText) {
+    window.askProfBeaker(promptText);
+};
+
+window.submitStudyRoomInput = function() {
+    const inputEl = document.getElementById('study-room-input');
+    if (inputEl && inputEl.value.trim()) {
+        let val = inputEl.value.trim();
+        inputEl.value = '';
+        window.askProfBeaker(val);
+    }
+};
+
+window.clueState = window.clueState || { el: null, side: null, stage: 1 };
+
+window.revealGuidedSolvingHint = function() {
+    if(typeof playSound === "function") playSound("hint");
+    if(!currentLevelData) return;
+    
+    let rCounts = window.counts ? window.counts.rCounts : {};
+    let pCounts = window.counts ? window.counts.pCounts : {};
+    
+    // MINOH Heuristic Priority: Metals (1) -> Non-metals (2) -> Oxygen (3) -> Hydrogen (4)
+    function getMinohWeight(el) {
+        const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
+        if (METALS.has(el)) return 1;
+        if (el === 'O') return 3;
+        if (el === 'H') return 4;
+        return 2; // Non-metals (C, N, Cl, S, P, etc.)
+    }
+
+    let candidates = [];
+    for (let el in rCounts) {
+        let diff = Math.abs((rCounts[el] || 0) - (pCounts[el] || 0));
+        if (diff > 0) {
+            candidates.push({
+                el,
+                diff,
+                weight: getMinohWeight(el),
+                needsMoreOn: ((rCounts[el] || 0) < (pCounts[el] || 0)) ? "react" : "prod"
+            });
+        }
+    }
+
+    candidates.sort((a, b) => {
+        if (a.weight !== b.weight) return a.weight - b.weight;
+        return b.diff - a.diff;
+    });
+
+    let bestCandidate = candidates[0] || null;
+    let imbalancedEl = bestCandidate ? bestCandidate.el : null;
+    let needsMoreOn = bestCandidate ? bestCandidate.needsMoreOn : null;
+    let maxDiff = bestCandidate ? bestCandidate.diff : 0;
     
     if (window.counts && window.counts.isEmpty) {
-        window.addChatMessage("Add some reactants or products to the scales to start balancing!", "Hint #" + window.hintCounter++);
+        window.addChatMessage("Add some molecules to the scales to begin balancing!", "Guided Step");
         return;
     }
-    if (!imbalancedEl) {
-        window.addChatMessage("Everything looks perfectly balanced! You are doing great!", "Hint #" + window.hintCounter++);
+    if (!imbalancedEl || maxDiff === 0) {
+        window.addChatMessage("All atoms are currently balanced! Review your atom counters or proceed to the next challenge.", "Guided Step");
         return;
     }
     
-    let sideName = needsMoreOn === "react" ? "REACTANTS" : "PRODUCTS";
-    let bestMol = null;
-    let bestMolObj = null;
-    let mols = needsMoreOn === "react" ? currentLevelData.reactants : currentLevelData.products;
-    mols.forEach(m => {
-        if (m.composition[imbalancedEl]) { bestMol = m.name || m.id; bestMolObj = m; }
-    });
+    let sideName = (needsMoreOn === "react") ? "Reactants" : "Products";
+    let targetMols = (needsMoreOn === "react") ? currentLevelData.reactants : currentLevelData.products;
+    let bestMolObj = targetMols.find(m => m.composition[imbalancedEl]) || targetMols[0];
     
-    // Set visual hint
     window.activeVisualHint = { element: imbalancedEl, side: needsMoreOn };
-    if(typeof playSound === "function") playSound("hint");
-    updateSimulation(); // Apply visual glow immediately
+    updateSimulation();
     
     let elName = ELEM_NAMES[imbalancedEl] || imbalancedEl;
-    let molHtml = `<span style="background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${bestMolObj.displayHtml}</span>`;
-    let sideHtml = `<span style="background: #fdf4ff; color: #c026d3; border: 1px solid #f5d0fe; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${sideName}</span>`;
-    let elHtml = `<span style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 1px 4px; border-radius: 4px; font-weight: 800; font-size: 0.9em;">${elName} atoms</span>`;
-    
-    let msg = `Add ${molHtml} to ${sideHtml} for ${elHtml}.`;
-    
-    window.addChatMessage(msg, "Hint #" + window.hintCounter++);
+    let rVal = rCounts[imbalancedEl] || 0;
+    let pVal = pCounts[imbalancedEl] || 0;
+    let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(imbalancedEl) : (typeof getAtomMarble === 'function' ? getAtomMarble(imbalancedEl) : `<b>${imbalancedEl}</b>`);
+    let dynamicLabel = document.getElementById('clue-btn-dynamic-text');
+
+    // Check if this is a repeat tap on the exact same imbalance: STAGE 2 (Full Solution + Explanation)
+    if (window.clueState.el === imbalancedEl && window.clueState.side === needsMoreOn && window.clueState.stage === 2) {
+        let cardHtml = `
+        <div class="chat-clue-card">
+            <div class="chat-clue-header">
+                ${marbleHtml}
+                <span style="color: #1e293b;"><b>Solution Move:</b> Balance <b>${elName}</b></span>
+            </div>
+            <div class="chat-scale-row">
+                <div class="chat-side-pill left">Left: <b>${rVal}</b></div>
+                <div class="chat-scale-icon">⚖️</div>
+                <div class="chat-side-pill right">Right: <b>${pVal}</b></div>
+            </div>
+            <div class="chat-action-box" style="background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; font-size: 0.98rem; font-weight: 800;">
+                👉 Tap <b>+ ${bestMolObj.displayHtml}</b> on <b>${sideName}</b>!
+            </div>
+            <div style="font-size: 0.84rem; color: #475569; font-weight: 700; margin-top: 6px; line-height: 1.35; padding: 7px 10px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px;">
+                🔬 <b>Why?</b> ${bestMolObj.displayHtml} contains ${imbalancedEl}. Adding it increases ${sideName} atoms towards equal balance!
+            </div>
+        </div>`;
+        window.addChatMessage(cardHtml, "Step Solution #" + (window.hintCounter++));
+        window.clueState = { el: null, side: null, stage: 1 };
+        if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
+    } else {
+        // STAGE 1: Socratic Guidance (Guide the student first)
+        let curState = JSON.stringify(rCounts) + JSON.stringify(pCounts);
+        window.clueState = { el: imbalancedEl, side: needsMoreOn, stage: 2, boardState: curState };
+        if (dynamicLabel) dynamicLabel.textContent = "Give me answer!";
+        
+        let cardHtml = `
+        <div class="chat-clue-card">
+            <div class="chat-clue-header">
+                ${marbleHtml}
+                <span><b>${elName}</b> is uneven!</span>
+            </div>
+            <div class="chat-scale-row">
+                <div class="chat-side-pill left">Left: <b>${rVal}</b></div>
+                <div class="chat-scale-icon">⚖️</div>
+                <div class="chat-side-pill right">Right: <b>${pVal}</b></div>
+            </div>
+            <div class="chat-action-box" style="background: #fffbeb; border: 2px dashed #f59e0b; color: #92400e;">
+                🤔 The <b>${sideName}</b> side is lighter on <b>${elName}</b>. Can you spot a molecule with <b>${imbalancedEl}</b> on ${sideName} to even it out?
+            </div>
+            <div style="font-size: 0.82rem; color: #b45309; font-weight: 800; margin-top: 6px; text-align: center; background: rgba(254, 243, 199, 0.7); padding: 5px 10px; border-radius: 8px; border: 1.5px solid rgba(245, 158, 11, 0.35);">
+                ✨ <b>MINOH Rule:</b> ${bestCandidate && bestCandidate.weight === 1 ? 'Metals first!' : (bestCandidate && bestCandidate.weight === 2 ? 'Non-metals before O & H!' : (bestCandidate && bestCandidate.weight === 3 ? 'Balance Oxygen now!' : 'Hydrogen finishes last!'))}
+            </div>
+        </div>`;
+        window.addChatMessage(cardHtml, "Step Guide #" + (window.hintCounter++));
+    }
 };
+window.revealHeuristicHint = window.revealGuidedSolvingHint;
 
 
 
@@ -1182,7 +2006,7 @@ window.showWinPopup = function(isPerfect) {
         buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #f59e0b; color: white; border: 4px solid #b45309; box-shadow: 0 8px 0 #92400e;">RETRY</button>`;
     }
     
-    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">REVIEW</button>`;
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.enterReviewMode('${nextLevel || ''}');" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">REVIEW</button>`;
     
     if (nextLevel) {
         buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">NEXT LEVEL</button>`;
@@ -1714,3 +2538,33 @@ if (document.readyState === 'loading') {
 } else {
     cleanupZoom();
 }
+
+
+window.enterReviewMode = function(nextLvl) {
+    window.isReviewMode = true;
+    let winPopup = document.getElementById('win-popup');
+    if (winPopup) winPopup.remove();
+
+    let topBlock = document.querySelector('.good-block.block-top');
+    if (topBlock && nextLvl && !document.getElementById('btn-top-next-level')) {
+        let btn = document.createElement('button');
+        btn.id = 'btn-top-next-level';
+        btn.className = 'btn-back btn-next-action interactive';
+        btn.style.cssText = 'position: absolute; right: 18px; left: auto; background: #10b981; border-color: #065f46; box-shadow: 0 4px 0 #065f46; display: inline-flex; align-items: center; justify-content: center; gap: 6px; top: 50%; transform: translateY(-50%);';
+        btn.innerHTML = '<span>Next</span> <span class="next-icon" style="font-size: 0.92em; line-height: 1;">▶</span>';
+        btn.onmouseover = function() { this.style.transform = 'translateY(-2px)'; this.style.boxShadow = '0 8px 0 #065f46'; };
+        btn.onmouseout = function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = '0 6px 0 #065f46'; };
+        btn.onmousedown = function() { this.style.transform = 'translateY(6px)'; this.style.boxShadow = '0 0 0 transparent'; };
+        btn.onclick = function() {
+            if (typeof playSound === 'function') playSound('start');
+            window.slideTransitionTo('game.html?level=' + nextLvl);
+        };
+        topBlock.appendChild(btn);
+    }
+
+    if (typeof window.addChatMessage === 'function') {
+        setTimeout(() => {
+            window.addChatMessage("Great work balancing this reaction! Take your time to review the beakers and atom counts, or click <b>Next ▶</b> on the top right when you are ready to continue.", "Prof. Beaker");
+        }, 150);
+    }
+};
