@@ -286,6 +286,7 @@ body {
 .main-container {
   position: relative;
   z-index: 10;
+  flex-shrink: 0;
   width: min(94vw, calc(100vw - clamp(150px, 16vw, 220px)));
   height: 90vh;
   max-width: 1380px;
@@ -900,7 +901,7 @@ body {
    NEO-BRUTALIST CHALLENGE MODALS & BUTTONS
 ========================================= */
 .btn-stats {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 74px;
