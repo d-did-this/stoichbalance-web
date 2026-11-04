@@ -391,18 +391,11 @@ function renderBoard() {
     }
 
     
-    // Render Sleek Equation (Auto-detecting single-row vs 3-row layout)
+    // Render Sleek Equation (Option A: Always Single-Line with Proportional Auto-Fit)
     const sleekEq = document.getElementById('dynamic-sleek-equation');
     const eqSection = document.querySelector('.section-equation');
     
     if (sleekEq) {
-        const totalMols = currentLevelData.reactants.length + currentLevelData.products.length;
-        let totalFormulaChars = 0;
-        currentLevelData.reactants.forEach(m => totalFormulaChars += (m.id || '').length);
-        currentLevelData.products.forEach(m => totalFormulaChars += (m.id || '').length);
-        
-        const is3RowMode = (totalMols >= 4) || (currentLevelData.reactants.length > 2) || (currentLevelData.products.length > 2) || (totalFormulaChars >= 22);
-
         const buildMolHtml = (m, side) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
             let coeffHtml = `<div id="coeff-eq-${side}-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
@@ -410,93 +403,44 @@ function renderBoard() {
             return `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
         };
 
-        if (is3RowMode) {
-            if (eqSection) {
-                eqSection.style.height = 'auto';
-                eqSection.style.minHeight = '100px';
-                eqSection.style.padding = '10px 18px';
+        if (eqSection) {
+            eqSection.style.height = '';
+            eqSection.style.minHeight = '';
+            eqSection.style.padding = '8px 14px';
+        }
+        sleekEq.style.display = 'flex';
+        sleekEq.style.justifyContent = 'center';
+        sleekEq.style.alignItems = 'center';
+        sleekEq.style.width = '100%';
+        sleekEq.style.whiteSpace = 'nowrap';
+        sleekEq.style.flexWrap = 'nowrap';
+        sleekEq.style.gap = 'clamp(4px, 1cqw, 12px)';
+
+        let rHtml = `<div class="eq-side eq-reactants" style="display: flex; align-items: center; justify-content: flex-end; gap: clamp(4px, 1cqw, 12px); white-space: nowrap; flex-wrap: nowrap; flex-shrink: 0;">`;
+        currentLevelData.reactants.forEach((m, idx) => {
+            rHtml += buildMolHtml(m, 'react');
+            if (idx < currentLevelData.reactants.length - 1) {
+                rHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
             }
-            sleekEq.style.display = 'grid';
-            sleekEq.style.gridTemplateColumns = '1fr auto 1fr';
-            sleekEq.style.alignItems = 'center';
-            sleekEq.style.gap = '14px';
-            sleekEq.style.width = '100%';
+        });
+        rHtml += '</div>';
 
-            // LHS Reactants Column (Row 1: Mol 1, Row 2: +, Row 3: Mol 2)
-            let rHtml = '<div style="display: grid; grid-template-rows: auto auto auto; justify-items: center; align-items: center; gap: 2px;">';
-            if (currentLevelData.reactants.length >= 2) {
-                rHtml += buildMolHtml(currentLevelData.reactants[0], 'react');
-                rHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
-                rHtml += buildMolHtml(currentLevelData.reactants[1], 'react');
-            } else if (currentLevelData.reactants.length === 1) {
-                rHtml += '<div style="height: 24px;"></div>';
-                rHtml += buildMolHtml(currentLevelData.reactants[0], 'react');
-                rHtml += '<div style="height: 24px;"></div>';
+        let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(6px, 1.2vw, 16px); white-space: nowrap;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
+
+        let pHtml = `<div class="eq-side eq-products" style="display: flex; align-items: center; justify-content: flex-start; gap: clamp(4px, 1cqw, 12px); white-space: nowrap; flex-wrap: nowrap; flex-shrink: 0;">`;
+        currentLevelData.products.forEach((m, idx) => {
+            pHtml += buildMolHtml(m, 'prod');
+            if (idx < currentLevelData.products.length - 1) {
+                pHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
             }
-            rHtml += '</div>';
+        });
+        pHtml += '</div>';
 
-            // Center Column (Row 2: Arrow)
-            let arrowHtml = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                <div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px; font-size: 1.3rem; padding: 8px 16px; box-shadow: 0 4px 0 #1d4ed8;">&#10142;</div>
-            </div>`;
+        sleekEq.innerHTML = rHtml + arrowHtml + pHtml;
 
-            // RHS Products Column (Row 1: Products 1 & 2, Row 2: +, Row 3: Product 3)
-            let pHtml = '<div style="display: grid; grid-template-rows: auto auto auto; justify-items: center; align-items: center; gap: 2px;">';
-            if (currentLevelData.products.length >= 3) {
-                pHtml += '<div style="display: flex; align-items: center; justify-content: center; gap: 6px;">';
-                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
-                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.2rem; color: #475569; margin: 0 2px;">+</div>';
-                pHtml += buildMolHtml(currentLevelData.products[1], 'prod');
-                pHtml += '</div>';
-                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
-                pHtml += buildMolHtml(currentLevelData.products[2], 'prod');
-            } else if (currentLevelData.products.length === 2) {
-                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
-                pHtml += '<div class="sci-plus has-chem-info" data-info="plus" style="font-size: 1.35rem; font-weight: 900; color: #475569; line-height: 1; padding: 2px 0;">+</div>';
-                pHtml += buildMolHtml(currentLevelData.products[1], 'prod');
-            } else if (currentLevelData.products.length === 1) {
-                pHtml += '<div style="height: 24px;"></div>';
-                pHtml += buildMolHtml(currentLevelData.products[0], 'prod');
-                pHtml += '<div style="height: 24px;"></div>';
-            }
-            pHtml += '</div>';
-
-            sleekEq.innerHTML = rHtml + arrowHtml + pHtml;
-        } else {
-            // Normal Single-Line Layout
-            if (eqSection) {
-                eqSection.style.height = '';
-                eqSection.style.minHeight = '';
-                eqSection.style.padding = '15px 15px';
-            }
-            sleekEq.style.display = 'grid';
-            sleekEq.style.gridTemplateColumns = '1fr auto 1fr';
-            sleekEq.style.alignItems = 'center';
-            sleekEq.style.gap = '1cqw';
-            sleekEq.style.width = '100%';
-
-            let rHtml = `<div class="eq-side eq-reactants" style="flex: 1; display: flex; justify-content: flex-start; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
-            currentLevelData.reactants.forEach((m, idx) => {
-                rHtml += buildMolHtml(m, 'react');
-                if (idx < currentLevelData.reactants.length - 1) {
-                    rHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
-                }
-            });
-            rHtml += '</div>';
-
-            let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(8px, 1.5vw, 24px);"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
-
-            let pHtml = `<div class="eq-side eq-products" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: clamp(6px, 1.2cqw, 14px); min-width: 0;">`;
-            currentLevelData.products.forEach((m, idx) => {
-                pHtml += buildMolHtml(m, 'prod');
-                if (idx < currentLevelData.products.length - 1) {
-                    pHtml += '<div class="sci-plus has-chem-info" data-info="plus">+</div>';
-                }
-            });
-            pHtml += '</div>';
-
-            sleekEq.innerHTML = rHtml + arrowHtml + pHtml;
+        if (typeof window.autoFitEquation === 'function') {
+            window.autoFitEquation();
+            requestAnimationFrame(() => window.autoFitEquation());
         }
     }
 
@@ -1000,17 +944,25 @@ window.updateSimulation = function() {
         }
         
         // Handle Win State Detection
+        const currentParamLvl = (new URLSearchParams(window.location.search).get('level') || '').toUpperCase();
+        const isTutLevel = currentParamLvl.startsWith('TUT');
+
         if (isBalanced && isSimplified) {
             if (window.lastWinState !== "won") {
                 if(typeof window.playSound === "function") window.playSound("success");
                 window.lastWinState = "won";
-                setTimeout(() => window.showWinPopup(true), 300);
+                // In TUT0 interactive tutorial level, defer celebration modal until student reaches & clicks Finish Tour
+                if (!isTutLevel || window.tutorialFinished) {
+                    setTimeout(() => window.showWinPopup(true), 300);
+                }
             }
         } else if (isBalanced && !isSimplified) {
             if (window.lastWinState !== "balanced") {
                 if(typeof window.playSound === "function") window.playSound("success");
                 window.lastWinState = "balanced";
-                setTimeout(() => window.showWinPopup(false), 300);
+                if (!isTutLevel || window.tutorialFinished) {
+                    setTimeout(() => window.showWinPopup(false), 300);
+                }
             }
         } else {
             window.lastWinState = "none";
@@ -1752,8 +1704,10 @@ window.updateBarGraph = function(rCounts, pCounts, isBalanced) {
     // Proportional bar height fitted to shared scale/bar box height
     function calcBarHeight(count) {
         if (count === 0) return 6;
-        const maxH = (window.innerWidth <= 1200 || window.innerHeight <= 850) ? 66 : 105;
-        return Math.min(maxH, Math.max(12, 12 + count * 12));
+        const isCompact = (window.innerWidth <= 1200 || window.innerHeight <= 850);
+        const maxH = isCompact ? 100 : 130;
+        const increment = isCompact ? 6 : 7;
+        return Math.min(maxH, Math.max(12, Math.round(10 + count * increment)));
     }
 
     // Build Reactant Bars
@@ -2007,6 +1961,17 @@ window.syncProBoxes = function() {
 window.onload = function() { initEngine(); };
 
 window.showWinPopup = function(isPerfect) {
+
+    if (typeof window.closeTutorial === 'function') {
+        window.closeTutorial();
+    }
+    const tour = document.getElementById('stoich-spotlight-tour');
+    if (tour) {
+        tour.style.display = 'none';
+        tour.style.opacity = '0';
+        try { tour.remove(); } catch(e) {}
+    }
+
     if (window.isChallengeMode) {
         window.handleChallengeRoundComplete(isPerfect);
         return;
@@ -2032,7 +1997,7 @@ window.showWinPopup = function(isPerfect) {
 
     let overlay = document.createElement("div");
     overlay.id = "win-popup";
-    overlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.85); display: flex; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(12px);";
+    overlay.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15,23,42,0.85); display: flex; justify-content: center; align-items: center; z-index: 999999; backdrop-filter: blur(12px);";
     
     let borderColor = isPerfect ? "#10b981" : "#f59e0b"; // Modern emerald or amber
     let shadowColor = isPerfect ? "#047857" : "#b45309";
@@ -2671,3 +2636,32 @@ window.enterReviewMode = function(nextLvl) {
         }, 150);
     }
 };
+
+// ==========================================
+// Option A: Proportional Auto-Fit Loop for Chemical Equations
+// Keeps all equations strictly on a single horizontal line
+// ==========================================
+window.autoFitEquation = function() {
+    const sleekEq = document.getElementById('dynamic-sleek-equation');
+    if (!sleekEq) return;
+    const eqSection = sleekEq.closest('.section-equation') || sleekEq.parentElement;
+    if (!eqSection) return;
+
+    sleekEq.style.transform = 'none';
+    sleekEq.style.transformOrigin = 'center center';
+
+    const paddingAllowance = 24;
+    const availableWidth = eqSection.clientWidth - paddingAllowance;
+    const naturalWidth = sleekEq.scrollWidth;
+
+    if (naturalWidth > availableWidth && availableWidth > 0) {
+        const scale = Math.max(0.52, Math.min(1.0, (availableWidth / naturalWidth) * 0.98));
+        sleekEq.style.transform = `scale(${scale.toFixed(3)})`;
+    }
+};
+
+window.addEventListener('resize', () => {
+    if (typeof window.autoFitEquation === 'function') {
+        window.autoFitEquation();
+    }
+});
