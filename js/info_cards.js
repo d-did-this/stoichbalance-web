@@ -369,6 +369,57 @@
         return comp;
     }
 
+    
+    function getMinohElementClassification(sym) {
+        const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
+        if (METALS.has(sym)) {
+            return {
+                letter: 'M',
+                category: 'Metal',
+                priorityText: 'Priority 1 • Balance first!',
+                priorityShort: 'Priority 1 (First)',
+                tip: 'Metals are always balanced first in the MINOH order.',
+                bg: '#eff6ff',
+                color: '#1d4ed8',
+                border: '#bfdbfe'
+            };
+        }
+        if (sym === 'O') {
+            return {
+                letter: 'O',
+                category: 'Oxygen',
+                priorityText: 'Priority 4 • Leave for the end',
+                priorityShort: 'Priority 4 (Near End)',
+                tip: 'Oxygen is balanced near the end before Hydrogen.',
+                bg: '#fef2f2',
+                color: '#b91c1c',
+                border: '#fca5a5'
+            };
+        }
+        if (sym === 'H') {
+            return {
+                letter: 'H',
+                category: 'Hydrogen',
+                priorityText: 'Priority 5 • Always balance last',
+                priorityShort: 'Priority 5 (Last)',
+                tip: 'Hydrogen is always balanced last in the MINOH order.',
+                bg: '#ecfdf5',
+                color: '#047857',
+                border: '#6ee7b7'
+            };
+        }
+        return {
+            letter: 'N',
+            category: 'Non-Metal',
+            priorityText: 'Priority 3 • Balance after metals',
+            priorityShort: 'Priority 3 (After Metals)',
+            tip: 'Non-metals are balanced after metals and polyatomic ions.',
+            bg: '#f0f9ff',
+            color: '#0369a1',
+            border: '#bae6fd'
+        };
+    }
+
     function buildCardData(type, target, e) {
         const text = target.innerText.trim();
 
@@ -542,6 +593,7 @@
                 const sym = target.getAttribute('data-element') || text;
                 const meta = getElementMeta(sym);
                 const grp = ELEMENT_GROUPS[sym] || "Periodic Table Element";
+                const minoh = getMinohElementClassification(sym);
 
                 return {
                     badgeClass: 'sic-badge-element',
@@ -555,8 +607,12 @@
                                 <div style="color:#64748b; font-size:0.75rem;">${meta.type}</div>
                             </div>
                         </div>
+                        <div style="margin-top:6px; padding:4px 8px; border-radius:6px; background:${minoh.bg}; border:1.5px solid ${minoh.border}; display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <span style="font-size:0.76rem; font-weight:900; color:${minoh.color};">🏷️ MINOH: [${minoh.letter}] ${minoh.category}</span>
+                            <span style="font-size:0.72rem; font-weight:800; color:${minoh.color};">${minoh.priorityShort}</span>
+                        </div>
                     `,
-                    callout: `Every ${sym} atom entering on the left must exit on the right.`
+                    callout: `${minoh.tip} Every ${sym} atom entering on the left must exit on the right.`
                 };
             }
 
@@ -632,12 +688,52 @@
                     || COMPOUND_DESCRIPTIONS[rawFormula] 
                     || { name: molName, together: "A stable chemical substance formed by bonded elements.", type: "Covalent Compound" };
 
+                // Polyatomic Ion Detection
+                let polyInfoHtml = '';
+                const polyMap = [
+                    { key: 'NO3', display: 'NO₃', name: 'Nitrate Ion', tip: 'Contains polyatomic ion NO₃. Treat as an intact unit when balancing!' },
+                    { key: 'SO4', display: 'SO₄', name: 'Sulfate Ion', tip: 'Contains polyatomic ion SO₄. Treat as an intact unit when balancing!' },
+                    { key: 'CO3', display: 'CO₃', name: 'Carbonate Ion', tip: 'Contains polyatomic ion CO₃. Balances as Carbonate or decomposes into CO₂ + H₂O.' },
+                    { key: 'OH', display: 'OH', name: 'Hydroxide Ion', tip: 'Contains polyatomic ion OH. Balance together or check H and O at the end.' },
+                    { key: 'ClO3', display: 'ClO3', name: 'Chlorate Ion', tip: 'Contains polyatomic ion ClO₃. Balance intact or monitor during decomposition.' }
+                ];
+                const matchedPoly = polyMap.find(p => rawFormula.includes(p.key) || cleanKey.includes(p.key));
+                if (matchedPoly) {
+                    polyInfoHtml = `
+                        <div style="margin-top:6px; padding:5px 8px; border-radius:6px; background:#f5f3ff; border:1.5px solid #ddd6fe; text-align:left;">
+                            <div style="font-size:0.76rem; font-weight:900; color:#6d28d9; display:flex; align-items:center; justify-content:space-between;">
+                                <span>🏷️ MINOH: [ I ] Polyatomic Ion</span>
+                                <span style="background:#ede9fe; padding:1px 5px; border-radius:4px; font-size:0.7rem; font-weight:900;">${matchedPoly.display}</span>
+                            </div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#5b21b6; margin-top:2px; line-height:1.3;">
+                                ${matchedPoly.tip}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
+                    if (METALS.has(cleanKey) || METALS.has(rawFormula)) {
+                        polyInfoHtml = `
+                            <div style="margin-top:6px; padding:5px 8px; border-radius:6px; background:#eff6ff; border:1.5px solid #bfdbfe; text-align:left;">
+                                <div style="font-size:0.76rem; font-weight:900; color:#1d4ed8; display:flex; align-items:center; justify-content:space-between;">
+                                    <span>🏷️ MINOH: [ M ] Metal</span>
+                                    <span style="background:#dbeafe; padding:1px 5px; border-radius:4px; font-size:0.7rem; font-weight:900;">Priority 1</span>
+                                </div>
+                                <div style="font-size:0.72rem; font-weight:700; color:#1e40af; margin-top:2px; line-height:1.3;">
+                                    Pure metal element. Lock this down first in MINOH!
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
                 return {
                     badgeClass: 'sic-badge-molecule',
                     badgeText: compData.type || 'Covalent Compound',
-                    accentColor: '#10b981',
+                    accentColor: matchedPoly ? '#7c3aed' : '#10b981',
                     title: `${compData.name || molName} (${cleanFormula})`,
-                    desc: compData.together
+                    desc: compData.together,
+                    visualHtml: polyInfoHtml
                 };
             }
 
@@ -692,6 +788,7 @@
             case 'tracker-card': {
                 const elSym = target.getAttribute('data-element') || 'H';
                 const elMeta = getElementMeta(elSym);
+                const minoh = getMinohElementClassification(elSym);
 
                 let rCount = 0;
                 let pCount = 0;
@@ -706,43 +803,31 @@
                 const isBalanced = (rCount === pCount && rCount > 0);
                 const isEmpty = (rCount === 0 && pCount === 0);
 
+                let statusDesc = '';
                 if (isEmpty) {
-                    return {
-                        badgeClass: 'sic-badge-control',
-                        badgeText: 'Empty',
-                        accentColor: '#64748b',
-                        title: `${elMeta.name}, Empty`,
-                        desc: 'No atoms added yet.'
-                    };
-                }
-
-                if (isBalanced) {
-                    return {
-                        badgeClass: 'sic-badge-balanced',
-                        badgeText: 'Balanced',
-                        accentColor: '#10b981',
-                        title: `${elMeta.name}, Balanced`,
-                        desc: 'Left and right atom counts match.'
-                    };
-                }
-
-                // Unbalanced: exact user-requested phrasing
-                if (rCount < pCount) {
-                    return {
-                        badgeClass: 'sic-badge-unbalanced',
-                        badgeText: 'Unbalanced',
-                        accentColor: '#ef4444',
-                        title: `${elMeta.name}, Unbalanced`,
-                        desc: `The Reactants' ${elMeta.name} is low.`
-                    };
+                    statusDesc = 'No atoms added yet.';
+                } else if (isBalanced) {
+                    statusDesc = 'Left and right atom counts match.';
+                } else if (rCount < pCount) {
+                    statusDesc = `The Reactants' ${elMeta.name} is low.`;
                 } else {
-                    return {
-                        badgeClass: 'sic-badge-unbalanced',
-                        badgeText: 'Unbalanced',
-                        title: `${elMeta.name}, Unbalanced`,
-                        desc: `The Products' ${elMeta.name} is low.`
-                    };
+                    statusDesc = `The Products' ${elMeta.name} is low.`;
                 }
+
+                return {
+                    badgeClass: isBalanced ? 'sic-badge-balanced' : (isEmpty ? 'sic-badge-control' : 'sic-badge-unbalanced'),
+                    badgeText: isBalanced ? 'Balanced' : (isEmpty ? 'Empty' : 'Unbalanced'),
+                    accentColor: isBalanced ? '#10b981' : (isEmpty ? '#64748b' : '#ef4444'),
+                    title: `${elMeta.name} (${elSym})`,
+                    desc: statusDesc,
+                    visualHtml: `
+                        <div style="margin-top:4px; padding:4px 8px; border-radius:6px; background:${minoh.bg}; border:1.5px solid ${minoh.border}; display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <span style="font-size:0.76rem; font-weight:900; color:${minoh.color};">🏷️ MINOH: [${minoh.letter}] ${minoh.category}</span>
+                            <span style="font-size:0.72rem; font-weight:800; color:${minoh.color};">${minoh.priorityShort}</span>
+                        </div>
+                    `,
+                    callout: minoh.tip
+                };
             }
 
             // 11. Element Trays Toggle Drawer
@@ -857,10 +942,33 @@
 
             case 'btn-hint': {
                 return {
-                    badgeClass: 'sic-badge-coeff',
-                    badgeText: 'Hint',
-                    title: 'Need a Hint?',
-                    desc: 'Stuck? No shame in asking!'
+                    badgeClass: 'sic-badge-control',
+                    badgeText: 'Step Guide',
+                    accentColor: '#f59e0b',
+                    title: 'Next Move Guide',
+                    desc: 'Offers a two-stage clue: first guiding you on which side is uneven, then revealing the exact move if you need it.'
+                };
+            }
+
+            case 'btn-study-room': {
+                return {
+                    badgeClass: 'sic-badge-control',
+                    badgeText: 'Study Room',
+                    accentColor: '#2563eb',
+                    title: 'Chemistry Study Room',
+                    desc: 'Opens an expanded, full-screen laboratory workspace with molar mass tables and guided pedagogical dialogue.',
+                    callout: 'Click to enter fullscreen study room.'
+                };
+            }
+
+            case 'btn-ask-beaker': {
+                return {
+                    badgeClass: 'sic-badge-control',
+                    badgeText: 'AI Tutor',
+                    accentColor: '#3b82f6',
+                    title: 'Ask Prof. Beaker',
+                    desc: 'Sends your question to Prof. Beaker for instant chemistry insights, balancing advice, and tool instructions.',
+                    callout: 'Type a question and click to send.'
                 };
             }
 
