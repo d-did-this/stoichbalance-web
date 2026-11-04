@@ -295,9 +295,9 @@ function updateHomeMultiplier() {
 function updatePlayButton() {
     const playBtnText = document.getElementById('play-btn-text');
     const statsBtn = document.getElementById('challenge-stats-btn');
+    if (statsBtn) statsBtn.style.display = 'inline-flex';
     if (currentMode === 'class') {
         playBtnText.innerText = `Start ${currentSubOption}`;
-        if (statsBtn) statsBtn.style.display = 'none';
     } 
     else if (currentMode === 'challenge') {
         let mult = 1.0;
@@ -308,20 +308,15 @@ function updatePlayButton() {
         }
         let multStr = mult > 1.0 ? ` (${mult.toFixed(1)}x)` : '';
         playBtnText.innerText = `Start ${currentSubOption} Challenge${multStr}`;
-        if (statsBtn) statsBtn.style.display = 'inline-flex';
     } 
     else if (currentMode === 'sandbox') {
-        playBtnText.innerText = 'Enter Sandbox';
-        if (statsBtn) statsBtn.style.display = 'none';
+        const isLevels = (currentSubOption === 'Select Levels' || currentSubOption === 'Levels');
+        playBtnText.innerText = isLevels ? 'Select Levels' : 'Create Level';
     }
 }
 
 function startGame() {
-    if (currentMode !== 'challenge') {
-        if(typeof window.playSound==="function") window.playSound("start");
-    } else {
-        if(typeof window.playSound==="function") window.playSound("select");
-    }
+    if(typeof window.playSound==="function") window.playSound("start");
     const btn = document.getElementById('main-play-btn');
     if (btn) {
         btn.style.transform = 'translateY(8px)';
@@ -337,7 +332,13 @@ function startGame() {
     
     // Redirect to Level Selection Screen
     if (currentMode === 'sandbox') {
-        document.getElementById('sandbox-choice-modal').style.display = 'flex';
+        const isLevels = (currentSubOption === 'Select Levels' || currentSubOption === 'Levels');
+        if (isLevels) {
+            window.transitionTo(`levels.html?mode=sandbox&name=${encodeURIComponent(finalName)}`);
+        } else {
+            window.openVirtualKeyboard();
+        }
+        return;
     } else {
         const formParam = encodeURIComponent(currentSubOption);
         const nameParam = encodeURIComponent(finalName);
@@ -948,6 +949,15 @@ function generateGoofyName() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const initParams = new URLSearchParams(window.location.search);
+    if (initParams.get('mode') === 'sandbox') {
+        selectMode('sandbox');
+        if (initParams.get('action') === 'create') {
+            setTimeout(() => {
+                if (typeof window.openVirtualKeyboard === 'function') window.openVirtualKeyboard();
+            }, 250);
+        }
+    }
     updatePlayButton();
     generateGoofyName();
     
@@ -989,10 +999,28 @@ document.addEventListener('DOMContentLoaded', () => {
 // SANDBOX ENGINE
 // ==========================================
 
+window.openSandboxModal = function() {
+    if (typeof playSound === 'function') playSound('select');
+    const modal = document.getElementById('sandbox-choice-modal');
+    if (modal) modal.style.display = 'flex';
+    if (typeof window.renderSavedAiLevels === 'function') window.renderSavedAiLevels();
+};
+
+window.closeVirtualKeyboardModal = function() {
+    if (typeof playSound === 'function') playSound('click');
+    const modal = document.getElementById('sandbox-virtual-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.openVirtualKeyboardModal = function() {
+    window.openVirtualKeyboard();
+};
+
 window.openVirtualKeyboard = function() {
     if(typeof window.playSound==="function") window.playSound("click");
     document.getElementById('sandbox-virtual-modal').style.display = 'flex';
     document.getElementById('vk-display').innerText = '';
+    if (typeof window.updateVkKeypadState === 'function') window.updateVkKeypadState();
     
     // Generate PT Grid if not already done - uses full 118 elements and group colors!
     let grid = document.getElementById('vk-pt-grid');
@@ -1046,6 +1074,111 @@ window.vkClear = function() {
     if (launchBtn) launchBtn.style.display = 'none';
 };
 
+window.setVkBtnToCheckMode = function() {
+    const btn = document.getElementById('vk-check-btn') || document.getElementById('vk-solve-btn');
+    if (!btn) return;
+    btn.setAttribute('data-mode', 'check');
+    btn.disabled = false;
+    btn.style.background = '#f59e0b';
+    btn.style.color = '#1e1b4b';
+    btn.style.borderColor = '#1e293b';
+    btn.style.boxShadow = '0 4px 0 #1e293b';
+    btn.style.cursor = 'pointer';
+    btn.title = 'Check equation or let AI auto-complete';
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="vk-check-btn-text">Check Equation</span>
+    `;
+};
+
+window.setVkBtnToSaveMode = function() {
+    const btn = document.getElementById('vk-check-btn') || document.getElementById('vk-solve-btn');
+    if (!btn) return;
+    btn.setAttribute('data-mode', 'save');
+    btn.disabled = false;
+    btn.style.background = '#10b981';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#1e293b';
+    btn.style.boxShadow = '0 4px 0 #1e293b';
+    btn.style.cursor = 'pointer';
+    btn.title = 'Reaction is valid! Click to save this level to your collection';
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">Save This Level</span>
+    `;
+};
+
+window.setVkBtnToSavedMode = function() {
+    const btn = document.getElementById('vk-check-btn') || document.getElementById('vk-solve-btn');
+    if (!btn) return;
+    btn.setAttribute('data-mode', 'saved');
+    btn.disabled = true;
+    btn.style.background = '#059669';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#047857';
+    btn.style.boxShadow = 'none';
+    btn.style.cursor = 'default';
+    btn.title = 'Saved to custom levels';
+    btn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">Saved to Collection! ✓</span>
+    `;
+};
+
+window.onVkMainBtnClick = function() {
+    const btn = document.getElementById('vk-check-btn') || document.getElementById('vk-solve-btn');
+    if (!btn) return;
+    const mode = btn.getAttribute('data-mode') || 'check';
+    if (mode === 'save') {
+        if (typeof window.saveSandboxKeypadLevel === 'function') {
+            window.saveSandboxKeypadLevel();
+        }
+    } else if (mode === 'check') {
+        window.vkCheck();
+    }
+};
+
+window.updateVkKeypadState = function() {
+    let disp = document.getElementById('vk-display');
+    let text = disp ? (disp.innerText || disp.textContent || '').trim() : '';
+    let checkBtn = document.getElementById('vk-check-btn') || document.getElementById('vk-solve-btn');
+    let feedback = document.getElementById('vk-feedback');
+
+    if (checkBtn) {
+        checkBtn.style.display = text.length > 0 ? 'flex' : 'none';
+        const currentMode = checkBtn.getAttribute('data-mode');
+        if (currentMode !== 'check') {
+            window.setVkBtnToCheckMode();
+            window.validSandboxLevel = null;
+        }
+    }
+    if (text.length === 0) {
+        if (feedback) feedback.style.display = 'none';
+        window.validSandboxLevel = null;
+    }
+};
+
+window.vkClear = function() {
+    if(typeof window.playSound==="function") window.playSound("click");
+    let disp = document.getElementById('vk-display');
+    if (disp) disp.innerText = '';
+    let arrowBtn = document.getElementById('vk-arrow-btn');
+    if (arrowBtn) {
+        arrowBtn.disabled = false;
+        arrowBtn.style.opacity = '1';
+    }
+    window.updateVkKeypadState();
+};
+
 window.vkLoadPreset = function(presetEq) {
     if(typeof window.playSound==="function") window.playSound("click");
     let disp = document.getElementById('vk-display');
@@ -1055,13 +1188,16 @@ window.vkLoadPreset = function(presetEq) {
         arrowBtn.disabled = true;
         arrowBtn.style.opacity = '0.5';
     }
+    window.updateVkKeypadState();
     window.vkCheck();
 };
 
 window.vkType = function(char) {
     if(typeof window.playSound==="function") window.playSound("click");
     let disp = document.getElementById('vk-display');
-    document.getElementById('vk-feedback').style.display = 'none';
+    if (!disp) return;
+    let feedback = document.getElementById('vk-feedback');
+    if (feedback) feedback.style.display = 'none';
 
     if(char === '->' || char === '→') {
         disp.innerText += ' → ';
@@ -1080,13 +1216,18 @@ window.vkType = function(char) {
     } else {
         disp.innerText += char;
     }
+    window.updateVkKeypadState();
 };
 
 window.vkBackspace = function() {
     if(typeof window.playSound==="function") window.playSound("click");
     let disp = document.getElementById('vk-display');
-    let text = disp.innerText;
-    if(text.length === 0) return;
+    if (!disp) return;
+    let text = disp.innerText || disp.textContent || '';
+    if(text.length === 0) {
+        window.updateVkKeypadState();
+        return;
+    }
 
     if(text.endsWith(' → ') || text.endsWith(' -> ')) {
         disp.innerText = text.slice(0, -3);
@@ -1100,49 +1241,100 @@ window.vkBackspace = function() {
     } else {
         disp.innerText = text.slice(0, -1);
     }
-    document.getElementById('vk-feedback').style.display = 'none';
+    let feedback = document.getElementById('vk-feedback');
+    if (feedback) feedback.style.display = 'none';
+    window.updateVkKeypadState();
 };
 
+// Unified Check Equation & AI Auto-Complete Function
 window.vkCheck = function() {
     if(typeof window.playSound==="function") window.playSound("click");
     let feedback = document.getElementById('vk-feedback');
     let disp = document.getElementById('vk-display');
-    let eq = (disp.innerText || disp.value || '').trim();
+    let eq = (disp.innerText || disp.textContent || '').trim();
 
     if (!eq) {
-        feedback.style.display = 'block';
-        feedback.style.background = '#fef2f2';
-        feedback.style.color = '#b91c1c';
-        feedback.style.border = '2px solid #ef4444';
-        feedback.innerText = 'Please enter an equation (e.g. H2 + O2 -> H2O).';
+        if (feedback) {
+            feedback.style.display = 'block';
+            feedback.style.background = '#fef2f2';
+            feedback.style.color = '#991b1b';
+            feedback.style.border = '2px solid #ef4444';
+            feedback.innerText = 'Please enter a chemical formula or choose elements from the periodic table.';
+        }
         return;
     }
 
-    let res = window.validateAndSolveEquation ? window.validateAndSolveEquation(eq) : { valid: false, error: 'Validator loading...' };
-    feedback.style.display = 'block';
+    // 1. Check if complete equation with arrow and both sides
+    const hasArrow = eq.includes('->') || eq.includes('→') || eq.includes('=');
+    let parts = hasArrow ? eq.split(/->|→|=/) : [eq, ''];
+    let hasBothSides = parts.length >= 2 && parts[0].trim() && parts[1].trim();
 
-    if (res.valid) {
+    if (hasBothSides) {
+        let cleanEq = parts[0].trim() + ' -> ' + parts[1].trim();
+        let res = window.validateAndSolveEquation ? window.validateAndSolveEquation(cleanEq) : { valid: false, error: 'Validator loading...' };
+        
+        if (res.valid) {
+            feedback.style.display = 'block';
+            feedback.style.background = '#ecfdf5';
+            feedback.style.color = '#065f46';
+            feedback.style.border = '2px solid #10b981';
+            feedback.innerHTML = `✅ <b>Valid Reaction!</b> Balanced target: <b>${res.balancedString}</b>`;
+            
+            let dbMatch = (typeof window.resolveReactionFromPrompt === 'function') ? window.resolveReactionFromPrompt(res.equation) : null;
+            if (dbMatch && dbMatch.title) {
+                res.title = dbMatch.title;
+            } else {
+                res.title = 'Custom Reaction';
+            }
+            window.validSandboxLevel = res;
+            localStorage.setItem('stoich_custom_sandbox', JSON.stringify(res));
+            localStorage.setItem('stoich_sandbox_level', res.equation);
+
+            if (typeof window.setVkBtnToSaveMode === 'function') {
+                window.setVkBtnToSaveMode();
+            }
+            return;
+        }
+    }
+
+    // 2. Incomplete reaction or reactants-only: TRIGGER AI AUTO-COMPLETE!
+    let match = window.resolveReactionFromPrompt ? window.resolveReactionFromPrompt(eq) : null;
+    if (match) {
+        disp.innerText = match.equation;
+        let res = window.validateAndSolveEquation ? window.validateAndSolveEquation(match.equation) : null;
+        window.validSandboxLevel = {
+            valid: true,
+            title: match.title,
+            equation: match.equation,
+            balancedString: (res && res.balancedString) || match.balancedString,
+            reactants: (res && res.reactants) || match.reactants,
+            products: (res && res.products) || match.products,
+            coefficients: (res && { react: res.reactCoeffs, prod: res.prodCoeffs }) || match.coefficients,
+            difficulty: match.difficulty || "Custom Level"
+        };
+        localStorage.setItem('stoich_custom_sandbox', JSON.stringify(window.validSandboxLevel));
+        localStorage.setItem('stoich_sandbox_level', match.equation);
+
+        feedback.style.display = 'block';
         feedback.style.background = '#ecfdf5';
         feedback.style.color = '#065f46';
         feedback.style.border = '2px solid #10b981';
-        feedback.innerHTML = `✅ <b>Valid Reaction!</b> Balanced target: <b>${res.balancedString}</b>`;
-        
-        window.validSandboxLevel = res;
-        localStorage.setItem('stoich_custom_sandbox', JSON.stringify(res));
-        localStorage.setItem('stoich_sandbox_level', res.equation);
+        feedback.innerHTML = `✨ <b>AI Auto-Completed:</b> Identified <b>${match.title}</b>! Balanced: <b>${window.validSandboxLevel.balancedString}</b>`;
 
-        let launchBtn = document.getElementById('vk-launch-btn');
-        if (launchBtn) {
-            launchBtn.style.display = 'block';
-            launchBtn.scrollIntoView({ behavior: 'smooth' });
+        if (typeof window.setVkBtnToSaveMode === 'function') {
+            window.setVkBtnToSaveMode();
         }
-    } else {
-        feedback.style.background = '#fef2f2';
-        feedback.style.color = '#b91c1c';
-        feedback.style.border = '2px solid #ef4444';
-        feedback.innerHTML = `❌ <b>Cannot Balance:</b> ${res.error}`;
-        let launchBtn = document.getElementById('vk-launch-btn');
-        if (launchBtn) launchBtn.style.display = 'none';
+        return;
+    }
+
+    // 3. Fallback error
+    feedback.style.display = 'block';
+    feedback.style.background = '#fef2f2';
+    feedback.style.color = '#b91c1c';
+    feedback.style.border = '2px solid #ef4444';
+    feedback.innerHTML = `❌ <b>Could not balance:</b> Provide reactants and products with an arrow (e.g. <code>H₂ + O₂ → H₂O</code>) or type recognized formulas (e.g. <code>Mg + O₂</code>).`;
+    if (typeof window.setVkBtnToCheckMode === 'function') {
+        window.setVkBtnToCheckMode();
     }
 };
 
@@ -1985,3 +2177,537 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+// ==========================================
+// 🤖 AI REACTION & LEVEL GENERATION ENGINE
+// ==========================================
+
+const AI_REACTION_DATABASE = [
+    {
+        title: "Water Synthesis",
+        aliases: ["water", "water synthesis", "making water", "h2 + o2", "hydrogen oxygen"],
+        reactants: ["H2", "O2"],
+        products: ["H2O"],
+        equation: "H2 + O2 -> H2O",
+        balancedString: "2H2 + O2 -> 2H2O",
+        coefficients: { react: [2, 1], prod: [2] },
+        difficulty: "Easy (Form 4)",
+        minoh: "O -> H (Balance Oxygen first by adding H2O, then balance Hydrogen with H2)"
+    },
+    {
+        title: "Combustion of Methane",
+        aliases: ["methane", "burning methane", "ch4 + o2", "natural gas", "hydrocarbon combustion"],
+        reactants: ["CH4", "O2"],
+        products: ["CO2", "H2O"],
+        equation: "CH4 + O2 -> CO2 + H2O",
+        balancedString: "CH4 + 2O2 -> CO2 + 2H2O",
+        coefficients: { react: [1, 2], prod: [1, 2] },
+        difficulty: "Medium (Form 4)",
+        minoh: "C -> H -> O (Balance Carbon, then Hydrogen, and finally pure Oxygen)"
+    },
+    {
+        title: "Combustion of Propane",
+        aliases: ["propane", "burning propane", "c3h8 + o2", "lpg gas"],
+        reactants: ["C3H8", "O2"],
+        products: ["CO2", "H2O"],
+        equation: "C3H8 + O2 -> CO2 + H2O",
+        balancedString: "C3H8 + 5O2 -> 3CO2 + 4H2O",
+        coefficients: { react: [1, 5], prod: [3, 4] },
+        difficulty: "Hard (Form 5)",
+        minoh: "C -> H -> O (Balance 3 Carbons, 8 Hydrogens to 4 H2O, then tally 10 Oxygens to 5 O2)"
+    },
+    {
+        title: "Rusting of Iron",
+        aliases: ["rust", "rusting", "rusting iron", "fe + o2", "iron oxidation"],
+        reactants: ["Fe", "O2"],
+        products: ["Fe2O3"],
+        equation: "Fe + O2 -> Fe2O3",
+        balancedString: "4Fe + 3O2 -> 2Fe2O3",
+        coefficients: { react: [4, 3], prod: [2] },
+        difficulty: "Medium (Form 4)",
+        minoh: "Fe -> O (Use common multiple 6 for Oxygen atoms: 3 O2 and 2 Fe2O3, then 4 Fe)"
+    },
+    {
+        title: "Haber Process (Ammonia Synthesis)",
+        aliases: ["haber", "haber process", "ammonia", "making ammonia", "n2 + h2", "nitrogen hydrogen"],
+        reactants: ["N2", "H2"],
+        products: ["NH3"],
+        equation: "N2 + H2 -> NH3",
+        balancedString: "N2 + 3H2 -> 2NH3",
+        coefficients: { react: [1, 3], prod: [2] },
+        difficulty: "Easy (Form 4)",
+        minoh: "N -> H (Balance 2 Nitrogens with 2 NH3, then 6 Hydrogens with 3 H2)"
+    },
+    {
+        title: "Photosynthesis",
+        aliases: ["photosynthesis", "glucose synthesis", "plant food", "co2 + h2o", "carbon dioxide and water"],
+        reactants: ["CO2", "H2O"],
+        products: ["C6H12O6", "O2"],
+        equation: "CO2 + H2O -> C6H12O6 + O2",
+        balancedString: "6CO2 + 6H2O -> C6H12O6 + 6O2",
+        coefficients: { react: [6, 6], prod: [1, 6] },
+        difficulty: "Hard (Form 5)",
+        minoh: "C -> H -> O (Balance 6 Carbons, 12 Hydrogens, then tally 18 Oxygens)"
+    },
+    {
+        title: "Acid-Base Neutralization",
+        aliases: ["neutralization", "hcl + naoh", "acid base", "hydrochloric acid and sodium hydroxide"],
+        reactants: ["HCl", "NaOH"],
+        products: ["NaCl", "H2O"],
+        equation: "HCl + NaOH -> NaCl + H2O",
+        balancedString: "HCl + NaOH -> NaCl + H2O",
+        coefficients: { react: [1, 1], prod: [1, 1] },
+        difficulty: "Easy (Form 4)",
+        minoh: "Na -> Cl -> H -> O (Already balanced in 1:1:1:1 ratio)"
+    },
+    {
+        title: "Sulfuric Acid Neutralization",
+        aliases: ["sulfuric neutralization", "h2so4 + naoh", "battery acid neutralization"],
+        reactants: ["H2SO4", "NaOH"],
+        products: ["Na2SO4", "H2O"],
+        equation: "H2SO4 + NaOH -> Na2SO4 + H2O",
+        balancedString: "H2SO4 + 2NaOH -> Na2SO4 + 2H2O",
+        coefficients: { react: [1, 2], prod: [1, 2] },
+        difficulty: "Medium (Form 4)",
+        minoh: "Na -> S -> H -> O (Balance 2 Sodiums with 2 NaOH, then 4 Hydrogens with 2 H2O)"
+    },
+    {
+        title: "Zinc in Hydrochloric Acid",
+        aliases: ["zinc and acid", "zn + hcl", "zinc acid", "hydrogen gas generation"],
+        reactants: ["Zn", "HCl"],
+        products: ["ZnCl2", "H2"],
+        equation: "Zn + HCl -> ZnCl2 + H2",
+        balancedString: "Zn + 2HCl -> ZnCl2 + H2",
+        coefficients: { react: [1, 2], prod: [1, 1] },
+        difficulty: "Easy (Form 4)",
+        minoh: "Zn -> Cl -> H (Balance Chlorine with 2 HCl, which balances Hydrogen)"
+    },
+    {
+        title: "Magnesium Ribbon Combustion",
+        aliases: ["magnesium", "burning magnesium", "mg + o2", "bright white flame"],
+        reactants: ["Mg", "O2"],
+        products: ["MgO"],
+        equation: "Mg + O2 -> MgO",
+        balancedString: "2Mg + O2 -> 2MgO",
+        coefficients: { react: [2, 1], prod: [2] },
+        difficulty: "Easy (Form 4)",
+        minoh: "Mg -> O (Balance 2 Oxygens with 2 MgO, then 2 Magnesiums with 2 Mg)"
+    },
+    {
+        title: "Thermal Decomposition of Limestone",
+        aliases: ["limestone", "caco3", "calcium carbonate", "lime kiln", "quicklime"],
+        reactants: ["CaCO3"],
+        products: ["CaO", "CO2"],
+        equation: "CaCO3 -> CaO + CO2",
+        balancedString: "CaCO3 -> CaO + CO2",
+        coefficients: { react: [1], prod: [1, 1] },
+        difficulty: "Easy (Form 4)",
+        minoh: "Ca -> C -> O (1:1:1 stoichiometric ratio)"
+    },
+    {
+        title: "Decomposition of Potassium Chlorate",
+        aliases: ["potassium chlorate", "kclo3", "oxygen lab prep"],
+        reactants: ["KClO3"],
+        products: ["KCl", "O2"],
+        equation: "KClO3 -> KCl + O2",
+        balancedString: "2KClO3 -> 2KCl + 3O2",
+        coefficients: { react: [2], prod: [2, 3] },
+        difficulty: "Medium (Form 4)",
+        minoh: "K -> Cl -> O (Use common multiple 6 for Oxygen: 2 KClO3 and 3 O2)"
+    },
+    {
+        title: "Copper Displacing Silver Nitrate",
+        aliases: ["copper and silver nitrate", "cu + agno3", "silver tree", "single displacement"],
+        reactants: ["Cu", "AgNO3"],
+        products: ["Cu(NO3)2", "Ag"],
+        equation: "Cu + AgNO3 -> Cu(NO3)2 + Ag",
+        balancedString: "Cu + 2AgNO3 -> Cu(NO3)2 + 2Ag",
+        coefficients: { react: [1, 2], prod: [1, 2] },
+        difficulty: "Medium (Form 4)",
+        minoh: "Cu -> Ag -> N -> O (Balance nitrate polyatomic group with 2 AgNO3 and 2 Ag)"
+    },
+    {
+        title: "Sodium in Water",
+        aliases: ["sodium and water", "na + h2o", "alkali metal reaction"],
+        reactants: ["Na", "H2O"],
+        products: ["NaOH", "H2"],
+        equation: "Na + H2O -> NaOH + H2",
+        balancedString: "2Na + 2H2O -> 2NaOH + H2",
+        coefficients: { react: [2, 2], prod: [2, 1] },
+        difficulty: "Medium (Form 4)",
+        minoh: "Na -> O -> H (Use 2 NaOH to get even Hydrogens, then 2 H2O and 2 Na)"
+    },
+    {
+        title: "Decomposition of Hydrogen Peroxide",
+        aliases: ["elephant toothpaste", "h2o2", "hydrogen peroxide decomposition"],
+        reactants: ["H2O2"],
+        products: ["H2O", "O2"],
+        equation: "H2O2 -> H2O + O2",
+        balancedString: "2H2O2 -> 2H2O + O2",
+        coefficients: { react: [2], prod: [2, 1] },
+        difficulty: "Easy (Form 4)",
+        minoh: "H -> O (Balance Oxygen by doubling H2O2 and H2O)"
+    }
+];
+
+window.resolveReactionFromPrompt = function(promptText) {
+    if (!promptText || !promptText.trim()) return null;
+    const subMap = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+    let cleanPrompt = promptText.replace(/[₀-₉]/g, ch => subMap[ch] || ch);
+    let text = cleanPrompt.trim().toLowerCase();
+    
+    // Normalize arrow separators (including unicode right arrow →)
+    text = text.replace(/→/g, '->').replace(/-->/g, '->').replace(/=>/g, '->').replace(/=/g, '->');
+
+    // 1. Exact or Alias keyword match
+    for (let r of AI_REACTION_DATABASE) {
+        if (text === r.title.toLowerCase()) return r;
+        for (let alias of r.aliases) {
+            let cleanAlias = alias.toLowerCase().replace(/→/g, '->').replace(/-->/g, '->').replace(/[₀-₉]/g, ch => subMap[ch] || ch);
+            if (text === cleanAlias || text.includes(cleanAlias)) return r;
+        }
+    }
+
+    // 2. Direct Equation parsing if arrow exists AND both sides have formulas
+    if (text.includes('->')) {
+        let parts = text.split('->');
+        let reactSide = parts[0].trim();
+        let prodSide = parts[1].trim();
+
+        if (reactSide && prodSide) {
+            let cleanEq = reactSide.split('+').map(s => s.trim()).filter(Boolean).join(' + ') +
+                          ' -> ' +
+                          prodSide.split('+').map(s => s.trim()).filter(Boolean).join(' + ');
+
+            if (window.validateAndSolveEquation) {
+                let res = window.validateAndSolveEquation(cleanEq);
+                if (res && res.valid) {
+                    return {
+                        title: "Custom AI Reaction",
+                        aliases: [],
+                        reactants: res.reactants,
+                        products: res.products,
+                        equation: res.equation,
+                        balancedString: res.balancedString,
+                        coefficients: { react: res.reactCoeffs, prod: res.prodCoeffs },
+                        difficulty: "Custom Level",
+                        minoh: "Follow MINOH: Metals -> Polyatomic Ions -> Non-metals -> Oxygen -> Hydrogen"
+                    };
+                }
+            }
+        }
+    }
+
+    // 3. Reactant-only matching (e.g. "fe + o2", "ch4 + o2", "mg + o2 ->", "mg + o2")
+    let cleanTokensText = text.replace(/->/g, ' ').replace(/\+/g, ' ');
+    let tokens = cleanTokensText.split(/\s+/).map(t => t.trim()).filter(Boolean);
+    for (let r of AI_REACTION_DATABASE) {
+        let rReactants = r.reactants.map(m => m.toLowerCase().replace(/[₀-₉]/g, ch => subMap[ch] || ch));
+        let matches = 0;
+        for (let token of tokens) {
+            if (rReactants.includes(token)) matches++;
+        }
+        if (matches >= r.reactants.length && tokens.length <= r.reactants.length + 1) {
+            return r;
+        }
+        if (matches === tokens.length && tokens.length >= 1 && tokens.length === rReactants.length) {
+            return r;
+        }
+    }
+
+    // 4. Fallback search
+    for (let r of AI_REACTION_DATABASE) {
+        let rReactants = r.reactants.map(m => m.toLowerCase().replace(/[₀-₉]/g, ch => subMap[ch] || ch));
+        let matchCount = 0;
+        for (let token of tokens) {
+            if (rReactants.includes(token)) matchCount++;
+        }
+        if (matchCount > 0 && matchCount === rReactants.length) {
+            return r;
+        }
+    }
+
+    return null;
+};
+
+// In-Keypad AI Auto-Complete
+window.vkAiAutoComplete = function() {
+    if (typeof playSound === 'function') playSound('pop');
+    let disp = document.getElementById('vk-display');
+    if (!disp) return;
+    let currentText = (disp.innerText || disp.value || '').trim();
+
+    if (!currentText) {
+        let sample = AI_REACTION_DATABASE[Math.floor(Math.random() * AI_REACTION_DATABASE.length)];
+        disp.innerText = sample.equation;
+        window.vkCheck();
+        return;
+    }
+
+    let match = window.resolveReactionFromPrompt(currentText);
+    if (match) {
+        disp.innerText = match.equation;
+        window.vkCheck();
+        let feedback = document.getElementById('vk-feedback');
+        if (feedback) {
+            feedback.innerHTML = `✨ <b>AI Auto-Completed:</b> Identified <b>${match.title}</b>! Target: <b>${match.balancedString}</b>`;
+        }
+    } else {
+        // Fallback: check if valid as-is
+        window.vkCheck();
+    }
+};
+
+// Open AI Reaction & Level Generator Modal
+let currentGeneratedAiLevel = null;
+
+window.openAiLevelModal = function() {
+    if (typeof playSound === 'function') playSound('pop');
+    let modal = document.getElementById('sandbox-ai-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        let choiceModal = document.getElementById('sandbox-choice-modal');
+        if (choiceModal) choiceModal.style.display = 'none';
+        window.renderSavedAiLevels();
+    }
+};
+
+window.closeAiLevelModal = function() {
+    if (typeof playSound === 'function') playSound('click');
+    let modal = document.getElementById('sandbox-ai-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.setAiPrompt = function(promptText) {
+    let inp = document.getElementById('ai-level-input');
+    if (inp) {
+        inp.value = promptText;
+        window.generateAiLevel();
+    }
+};
+
+window.generateAiLevel = function() {
+    if (typeof playSound === 'function') playSound('click');
+    let inp = document.getElementById('ai-level-input');
+    let promptText = inp ? inp.value.trim() : '';
+    let preview = document.getElementById('ai-level-preview') || document.getElementById('ai-preview-card');
+    let statusBox = document.getElementById('ai-status-box');
+
+    if (!promptText) {
+        if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.style.background = '#fef2f2';
+            statusBox.style.color = '#991b1b';
+            statusBox.style.border = '2px solid #ef4444';
+            statusBox.innerHTML = '⚠️ Please enter a chemical reaction or topic!';
+        }
+        return;
+    }
+
+    let reaction = window.resolveReactionFromPrompt(promptText);
+
+    if (!reaction) {
+        if (statusBox) {
+            statusBox.style.display = 'block';
+            statusBox.style.background = '#fef2f2';
+            statusBox.style.color = '#991b1b';
+            statusBox.style.border = '2px solid #ef4444';
+            statusBox.innerHTML = '❌ <b>Could not recognize reaction.</b> Try writing formulas (e.g. <code>CH4 + O2</code> or <code>Fe + O2 -> Fe2O3</code>) or choose one of the suggestion chips!';
+        }
+        if (preview) preview.style.display = 'none';
+        return;
+    }
+
+    if (statusBox) statusBox.style.display = 'none';
+    currentGeneratedAiLevel = reaction;
+
+    if (preview) {
+        preview.style.display = 'flex';
+        let titleEl = document.getElementById('ai-preview-title');
+        let diffEl = document.getElementById('ai-preview-difficulty');
+        let eqEl = document.getElementById('ai-preview-equation');
+        
+        if (titleEl) titleEl.innerText = reaction.title;
+        if (diffEl) diffEl.innerText = reaction.difficulty;
+        if (eqEl) eqEl.innerHTML = `${reaction.equation} &nbsp;➔&nbsp; <span style="color:#059669;">${reaction.balancedString}</span>`;
+        
+        let saveBtn = document.getElementById('ai-save-btn');
+        if (saveBtn) {
+            saveBtn.innerText = "💾 Save Level";
+            saveBtn.disabled = false;
+        }
+    }
+};
+
+window.saveCurrentAiLevel = function() {
+    if (!currentGeneratedAiLevel) return;
+    if (typeof playSound === 'function') playSound('start');
+
+    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+    let exists = saved.some(l => l.equation === currentGeneratedAiLevel.equation);
+    if (!exists) {
+        saved.unshift({
+            title: currentGeneratedAiLevel.title,
+            equation: currentGeneratedAiLevel.equation,
+            balancedString: currentGeneratedAiLevel.balancedString,
+            difficulty: currentGeneratedAiLevel.difficulty,
+            createdAt: new Date().toISOString()
+        });
+        localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(saved));
+    }
+
+    let saveBtn = document.getElementById('ai-save-btn');
+    if (saveBtn) {
+        saveBtn.innerText = "✅ Saved to Collection!";
+        saveBtn.disabled = true;
+    }
+    window.renderSavedAiLevels();
+};
+
+window.playCurrentAiLevel = function() {
+    if (!currentGeneratedAiLevel) return;
+    if (typeof playSound === 'function') playSound('start');
+    let nameParam = encodeURIComponent(document.getElementById('player-name').value.trim() || 'Student');
+    let eqParam = encodeURIComponent(currentGeneratedAiLevel.equation);
+    window.transitionTo(`game.html?level=sandbox&name=${nameParam}&eq=${eqParam}`);
+};
+
+window.editInVirtualKeyboard = function() {
+    if (!currentGeneratedAiLevel) return;
+    window.closeAiLevelModal();
+    window.openVirtualKeyboardModal();
+    let disp = document.getElementById('vk-display');
+    if (disp) {
+        disp.innerText = currentGeneratedAiLevel.equation;
+        window.vkCheck();
+    }
+};
+
+window.saveSandboxKeypadLevel = function() {
+    if (!window.validSandboxLevel) return;
+    if (typeof playSound === 'function') playSound('start');
+
+    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+    let eq = window.validSandboxLevel.equation;
+    let exists = saved.some(l => l.equation === eq);
+
+    if (!exists) {
+        let title = window.validSandboxLevel.title;
+        if (!title || title.startsWith('Custom:') || title.trim() === eq.trim()) {
+            let dbMatch = (typeof window.resolveReactionFromPrompt === 'function') ? window.resolveReactionFromPrompt(eq) : null;
+            if (dbMatch && dbMatch.title) {
+                title = dbMatch.title;
+            } else {
+                title = `Custom Reaction`;
+            }
+        }
+        saved.unshift({
+            title: title,
+            equation: eq,
+            balancedString: window.validSandboxLevel.balancedString,
+            difficulty: window.validSandboxLevel.difficulty || "Custom Level",
+            createdAt: new Date().toISOString()
+        });
+        localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(saved));
+    }
+
+    if (typeof window.setVkBtnToSavedMode === 'function') {
+        window.setVkBtnToSavedMode();
+    }
+    window.renderSavedAiLevels();
+};
+
+window.renderSavedAiLevels = function() {
+    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+    let aiList = document.getElementById('ai-saved-list') || document.getElementById('ai-saved-levels-list');
+    let choiceList = document.getElementById('sandbox-saved-levels-list');
+    let countSpan = document.getElementById('ai-saved-count');
+    if (countSpan) countSpan.innerText = saved.length;
+
+    let html = '';
+    if (saved.length === 0) {
+        html = '<div style="font-size:13px; font-weight:700; color:#94a3b8; padding:8px 4px;">No saved custom levels yet. Create and save reactions above!</div>';
+    } else {
+        html = saved.map((lvl, idx) => {
+            let eq = lvl.equation || '';
+            let rawTitle = lvl.title || '';
+            
+            // Clean title and eliminate duplicate repeating strings
+            let displayTitle = rawTitle;
+            let isRedundant = !displayTitle || 
+                              displayTitle === eq || 
+                              displayTitle === ('Custom: ' + eq) || 
+                              displayTitle.toLowerCase().startsWith('custom:') ||
+                              displayTitle.replace(/[\s\-\>→\+]/g, '') === eq.replace(/[\s\-\>→\+]/g, '');
+
+            if (isRedundant) {
+                let dbMatch = (typeof window.resolveReactionFromPrompt === 'function') ? window.resolveReactionFromPrompt(eq) : null;
+                if (dbMatch && dbMatch.title) {
+                    displayTitle = dbMatch.title;
+                } else {
+                    displayTitle = `Custom Reaction #${saved.length - idx}`;
+                }
+            }
+
+            return `
+                <div style="background:#ffffff; border:2.5px solid #1e293b; border-radius:14px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 3px 0 #1e293b; width:100%; box-sizing:border-box;">
+                    <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+                        <div style="width:36px; height:36px; border-radius:10px; background:#ede9fe; color:#6d28d9; border:2px solid #1e293b; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 2px 0 #1e293b;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 2v7.31L4.1 19.33A2 2 0 0 0 5.82 22h12.36a2 2 0 0 0 1.72-2.67L14 9.31V2"/>
+                                <line x1="8" y1="2" x2="16" y2="2"/>
+                                <line x1="6.5" y1="16" x2="17.5" y2="16"/>
+                            </svg>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
+                            <span style="font-size:13.5px; font-weight:900; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${displayTitle}</span>
+                            <span style="font-size:12px; font-weight:800; color:#6d28d9; font-family:monospace; background:#f5f3ff; border:1px solid #ddd6fe; border-radius:6px; padding:2px 8px; width:fit-content; letter-spacing:0.3px;">${eq}</span>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
+                        <button type="button" class="interactive ai-saved-play-btn" onclick="window.playSavedLevel('${encodeURIComponent(lvl.equation)}')" 
+                            style="background:#10b981; border:2.5px solid #1e293b; color:#ffffff; font-size:12.5px; font-weight:900; border-radius:10px; padding:6px 14px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 0 #047857;" 
+                            title="Play Level Now">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                                <polygon points="5 3 19 12 5 21 5 3"/>
+                            </svg>
+                            <span>Play</span>
+                        </button>
+                        <button type="button" class="interactive ai-saved-del-btn" onclick="window.deleteSavedLevel(${idx})" 
+                            style="background:#fee2e2; border:2.5px solid #1e293b; color:#dc2626; border-radius:10px; padding:6px 10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 0 #991b1b;" 
+                            title="Delete Level">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    if (aiList) aiList.innerHTML = html;
+    if (choiceList) choiceList.innerHTML = html;
+};
+
+window.playSavedLevel = function(encodedEq) {
+    if (typeof playSound === 'function') playSound('start');
+    let nameParam = encodeURIComponent(document.getElementById('player-name').value.trim() || 'Student');
+    window.transitionTo(`game.html?level=sandbox&name=${nameParam}&eq=${encodedEq}`);
+};
+
+window.deleteSavedLevel = function(index) {
+    if (typeof playSound === 'function') playSound('click');
+    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+    saved.splice(index, 1);
+    localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(saved));
+    window.renderSavedAiLevels();
+};
+
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.renderSavedAiLevels();
+    });
+}
