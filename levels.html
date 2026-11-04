@@ -8,32 +8,37 @@
     <link rel="stylesheet" href="css/style.css?v=1792982023">
     <link rel="stylesheet" href="css/levels.css?v=1793583324">
     <script src="levels.js?v=1792981377"></script>
+    <script src="js/audio_assets.js"></script>
 
 <script>
 // Unified Audio Engine and Page Transitions
 const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
+let audioCtx = null;
 
 window.initAudio = function() {
-    if (!audioCtx) audioCtx = new AudioCtxClass();
+    if (!audioCtx) {
+        audioCtx = new AudioCtxClass();
+        window.audioCtx = audioCtx;
+    }
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
-}
+    return audioCtx;
+};
 
-// Ensure audio context is started on first interaction anywhere
-document.addEventListener('click', () => {
-    if(!audioCtx) window.initAudio();
-    else if(audioCtx.state === 'suspended') audioCtx.resume();
-}, {once: false});
+// Ensure audio context is unlocked on first interaction anywhere
+const audioUnlockEvents = ['click', 'pointerdown', 'touchstart', 'mousedown', 'keydown'];
+audioUnlockEvents.forEach(evt => {
+    document.addEventListener(evt, () => {
+        window.initAudio();
+    }, {passive: true, once: false});
+});
 
 window.playSound = function(type) {
     if (!audioCtx) window.initAudio();
-    if (audioCtx.state === 'suspended') {
+    if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
-
-
     
     try {
         const osc = audioCtx.createOscillator();
@@ -42,14 +47,58 @@ window.playSound = function(type) {
         gainNode.connect(audioCtx.destination);
         
         if (type === 'start') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.4);
+            if (window.__AUDIO_ASSETS && window.__AUDIO_ASSETS.start) {
+                try {
+                    const audio = new Audio(window.__AUDIO_ASSETS.start);
+                    audio.volume = 0.85;
+                    audio.play().catch(e => console.warn("HTML5 audio playback notice:", e));
+                } catch(e){}
+            }
+            // Rich, resonant laboratory power-on chord (C4, G4, C5, E5)
+            const t0 = audioCtx.currentTime;
+            const chord = [261.63, 392.00, 523.25, 659.25];
+            chord.forEach((freq, idx) => {
+                const noteOsc = audioCtx.createOscillator();
+                const noteGain = audioCtx.createGain();
+                noteOsc.type = idx < 2 ? 'triangle' : 'sine';
+                noteOsc.frequency.setValueAtTime(freq, t0 + idx * 0.035);
+                noteGain.gain.setValueAtTime(0.001, t0 + idx * 0.035);
+                noteGain.gain.linearRampToValueAtTime(0.32, t0 + idx * 0.035 + 0.02);
+                noteGain.gain.exponentialRampToValueAtTime(0.001, t0 + idx * 0.035 + 0.38);
+                noteOsc.connect(noteGain);
+                noteGain.connect(audioCtx.destination);
+                noteOsc.start(t0 + idx * 0.035);
+                noteOsc.stop(t0 + idx * 0.035 + 0.38);
+            });
+            return;
+        } else if (type === 'retro-select' || type === 'level-launch') {
+            if (window.__AUDIO_ASSETS && window.__AUDIO_ASSETS.retroSelect) {
+                try {
+                    const audio = new Audio(window.__AUDIO_ASSETS.retroSelect);
+                    audio.volume = 0.85;
+                    audio.play().catch(e => console.warn("HTML5 audio playback notice:", e));
+                } catch(e){}
+            }
+            // Completely unique arcade level-launch ascending sparkle chime (F5 -> A5 -> C6 -> E6 glide)
+            const t0 = audioCtx.currentTime;
+            const arpeggio = [698.46, 880.00, 1046.50, 1318.51];
+            arpeggio.forEach((freq, idx) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = idx === 3 ? 'sine' : 'triangle';
+                o.frequency.setValueAtTime(freq, t0 + idx * 0.045);
+                if (idx === 3) {
+                    o.frequency.exponentialRampToValueAtTime(1760.0, t0 + idx * 0.045 + 0.22);
+                }
+                g.gain.setValueAtTime(0.001, t0 + idx * 0.045);
+                g.gain.linearRampToValueAtTime(0.36, t0 + idx * 0.045 + 0.015);
+                g.gain.exponentialRampToValueAtTime(0.001, t0 + idx * 0.045 + 0.28);
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                o.start(t0 + idx * 0.045);
+                o.stop(t0 + idx * 0.045 + 0.28);
+            });
+            return;
         } else if (type === 'select') {
             // "choosing btween activity cshould have a btter unique sound instead" -> Marimba/Woodblock pop
             osc.type = 'sine';
@@ -157,10 +206,8 @@ window.transitionTo = function(url) {
     let overlay = document.getElementById('iris-wipe-overlay');
     if(overlay) {
         overlay.classList.remove('open');
-        setTimeout(() => { window.location.href = url; }, 550);
-    } else {
-        window.location.href = url;
     }
+    setTimeout(() => { window.location.href = url; }, 480);
 };
 
 window.addEventListener('load', () => {
@@ -186,7 +233,56 @@ window.addEventListener('load', () => {
 .level-card.solved-card:hover, .level-card.solved-card.kb-focus {
     box-shadow: 0 10px 0 #16a34a, 0 0 20px rgba(255,255,255,0.8) !important;
 }
-</style>
+
+        /* Sandbox Mode Purple Palette */
+        html.is-sandbox-mode,
+        html.is-sandbox-mode body {
+            background-color: #7c3aed !important;
+        }
+        html.is-sandbox-mode #bg-levels {
+            background: #7c3aed !important;
+            opacity: 1 !important;
+        }
+        html.is-sandbox-mode #bg-levels::after {
+            background-image: radial-gradient(rgba(255,255,255,0.2) 3px, transparent 3px) !important;
+            background-size: 40px 40px !important;
+        }
+        html.is-sandbox-mode .user-greeting {
+            background: #f5f3ff !important;
+            color: #7c3aed !important;
+            border-color: #8b5cf6 !important;
+        }
+        html.is-sandbox-mode .levels-subtitle {
+            color: #475569 !important;
+            font-weight: 900 !important;
+        }
+
+        .btn-card-delete {
+            width: 26px;
+            height: 26px;
+            background: #fee2e2;
+            border: 2px solid #1e293b;
+            border-radius: 8px;
+            color: #dc2626;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 0 #991b1b;
+            padding: 0;
+            transition: transform 0.1s, box-shadow 0.1s, background-color 0.1s;
+        }
+        .btn-card-delete:hover {
+            background: #fecaca;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 0 #991b1b;
+        }
+        .btn-card-delete:active {
+            transform: translateY(2px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+    </style>
     <script>
         if (new URLSearchParams(window.location.search).get('mode') === 'challenge') {
             document.documentElement.classList.add('is-challenge-mode');
@@ -201,6 +297,8 @@ window.addEventListener('load', () => {
                 document.documentElement.classList.add('is-form5-mode');
             } else if (m === 'challenge') {
                 document.documentElement.classList.add('is-challenge-mode');
+            } else if (m === 'sandbox') {
+                document.documentElement.classList.add('is-sandbox-mode');
             }
         })();
     </script>
@@ -845,10 +943,218 @@ window.renderChallengeScreen = function(params) {
     }
 };
 
+
+window.renderSandboxLevelsScreen = function(params) {
+    document.documentElement.classList.add('is-sandbox-mode');
+    document.body.classList.add('is-sandbox-mode');
+    const bgEl = document.getElementById('bg-levels');
+    if (bgEl) {
+        bgEl.className = 'bg-layer bg-purple active-bg';
+        bgEl.style.background = '#7c3aed';
+    }
+
+    const nameParam = params.get('name') || localStorage.getItem('currentPlayer') || 'Player';
+    const nameEl = document.getElementById('display-name');
+    if (nameEl) nameEl.innerText = nameParam;
+
+    const titleEl = document.getElementById('form-title');
+    if (titleEl) titleEl.innerText = 'Sandbox Levels';
+
+    const subEl = document.querySelector('.levels-subtitle');
+    if (subEl) subEl.innerText = 'CUSTOM CREATED REACTIONS';
+
+    // Hide tutorial button in sandbox mode (tutorial is only for syllabus mode)
+    const tutBtn = document.getElementById('btn-levels-tutorial');
+    if (tutBtn) tutBtn.style.display = 'none';
+
+    // Remove old header create button if present
+    const oldCreateBtn = document.getElementById('btn-sandbox-create-level');
+    if (oldCreateBtn) oldCreateBtn.remove();
+
+    const gridContainer = document.querySelector('.grid-wrapper');
+    if (!gridContainer) return;
+
+    window.deleteSandboxCustomLevel = function(idx) {
+        let currentSaved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+        let item = currentSaved[idx];
+        let titleStr = (item && (item.title || item.equation)) || 'this level';
+        if (confirm(`Delete level "${titleStr}"?`)) {
+            if (typeof window.playSound === 'function') window.playSound('trash');
+            currentSaved.splice(idx, 1);
+            localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(currentSaved));
+            renderList();
+        }
+    };
+
+    function renderList() {
+        gridContainer.querySelectorAll('.levels-grid, .pagination').forEach(el => el.remove());
+
+        let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+
+        const scoreText = document.querySelector('.score-text');
+        if (scoreText) scoreText.innerText = `${saved.length} Created`;
+
+        if (saved.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'levels-grid';
+            emptyDiv.style.cssText = 'display:flex; justify-content:center; align-items:center; width:100%; min-height:360px;';
+            emptyDiv.innerHTML = `
+                <div style="text-align:center; padding:48px 24px; background:#ffffff; border:4px solid #1e293b; border-radius:28px; box-shadow:0 10px 0 #1e293b; max-width:540px; margin:20px auto; width:90%; box-sizing:border-box;">
+                    <div style="font-size:56px; line-height:1; margin-bottom:14px;">🧪</div>
+                    <h2 style="font-size:24px; font-weight:900; color:#1e1b4b; margin:0 0 8px 0;">No Custom Levels Yet!</h2>
+                    <p style="font-size:14.5px; font-weight:700; color:#64748b; margin:0 0 22px 0; line-height:1.5;">Click below to open the Periodic Table & Numpad builder and craft your first custom reaction level.</p>
+                    <button class="interactive" onclick="window.transitionTo('index.html?mode=sandbox&action=create')" style="background:#8b5cf6; color:#ffffff; border:3.5px solid #1e293b; border-radius:16px; padding:12px 24px; font-size:16px; font-weight:900; box-shadow:0 5px 0 #1e293b; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                        <span>✨</span> <span>Create Your First Level</span>
+                    </button>
+                </div>
+            `;
+            gridContainer.appendChild(emptyDiv);
+            return;
+        }
+
+        const totalItems = saved.length + 1;
+        myTotalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+        if (myTotalPages < 1) myTotalPages = 1;
+        if (myCurrentPage > myTotalPages) myCurrentPage = myTotalPages;
+
+        for (let p = 1; p <= myTotalPages; p++) {
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'levels-grid';
+            pageDiv.id = 'page-' + p;
+            pageDiv.style.display = (p === myCurrentPage) ? '' : 'none';
+
+            const startIdx = (p - 1) * ITEMS_PER_PAGE;
+            const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, totalItems);
+
+            for (let i = startIdx; i < endIdx; i++) {
+                if (i < saved.length) {
+                    const lvl = saved[i];
+                    const niceNum = i + 1;
+                    const card = document.createElement('div');
+                    card.className = 'level-card interactive';
+                    card.onmouseenter = () => {
+                        if (typeof window.playSound === 'function') window.playSound('tactile');
+                        currentFocusIndex = -1;
+                        Array.from(document.querySelectorAll('.level-card')).forEach(c => c.classList.remove('kb-focus'));
+                    };
+                    card.onclick = (e) => {
+                        e.currentTarget.style.transform = 'translateY(6px)';
+                        e.currentTarget.style.setProperty('box-shadow', 'none', 'important');
+                        if (typeof window.playSound === 'function') window.playSound('retro-select');
+                        window.transitionTo(`game.html?level=sandbox&name=${encodeURIComponent(nameParam)}&eq=${encodeURIComponent(lvl.equation)}`);
+                    };
+
+                    const eqText = lvl.equation || 'Custom Reaction';
+                    let displayTitle = lvl.title;
+                    if (!displayTitle || displayTitle.startsWith('Custom:') || displayTitle.trim() === eqText.trim()) {
+                        displayTitle = `Custom Reaction #${niceNum}`;
+                    }
+                    const iconText = (typeof getLevelIcon === 'function') ? getLevelIcon(displayTitle || lvl.equation, false) : '🧪';
+
+                    card.innerHTML = `
+                        <div class="card-top">
+                            <span class="lvl-num">${niceNum}</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="lvl-diff diff-easy" style="background:#8b5cf6; color:white; border-color:#1e293b;">Custom</span>
+                                <button type="button" class="btn-card-delete interactive" title="Delete custom level" onclick="event.stopPropagation(); window.deleteSandboxCustomLevel(${i});">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-icon">${iconText}</div>
+                            <h3 class="lvl-name">${displayTitle}</h3>
+                            <p class="lvl-equation">${eqText}</p>
+                        </div>
+                        <div class="status-banner banner-blue">PLAY</div>
+                    `;
+                    pageDiv.appendChild(card);
+                } else {
+                    const createCard = document.createElement('div');
+                    createCard.className = 'level-card interactive';
+                    createCard.onmouseenter = () => {
+                        if (typeof window.playSound === 'function') window.playSound('tactile');
+                        currentFocusIndex = -1;
+                        Array.from(document.querySelectorAll('.level-card')).forEach(c => c.classList.remove('kb-focus'));
+                    };
+                    createCard.onclick = (e) => {
+                        e.currentTarget.style.transform = 'translateY(6px)';
+                        e.currentTarget.style.setProperty('box-shadow', 'none', 'important');
+                        if (typeof window.playSound === 'function') window.playSound('click');
+                        window.transitionTo(`index.html?mode=sandbox&action=create&name=${encodeURIComponent(nameParam)}`);
+                    };
+
+                    createCard.innerHTML = `
+                        <div class="card-top">
+                            <span class="lvl-num" style="background:#ede9fe; color:#6d28d9; font-weight:900;">+</span>
+                            <span class="lvl-diff diff-easy" style="background:#f3e8ff; color:#7e22ce; border-color:#d8b4fe;">Create</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-icon">⚗️</div>
+                            <h3 class="lvl-name">Build New Level</h3>
+                            <p class="lvl-equation" style="color:#6d28d9; background:#f5f3ff; border-color:#ddd6fe;">Periodic Table & Numpad</p>
+                        </div>
+                        <div class="status-banner banner-blue" style="background:#8b5cf6 !important; border-top-color:#6d28d9 !important;">+ CREATE LEVEL</div>
+                    `;
+                    pageDiv.appendChild(createCard);
+                }
+            }
+            gridContainer.appendChild(pageDiv);
+        }
+
+        const pagDiv = document.createElement('div');
+        pagDiv.className = 'pagination';
+
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'btn-page interactive';
+        prevBtn.id = 'btn-prev';
+        prevBtn.innerHTML = '◀ Prev';
+        prevBtn.disabled = (myCurrentPage === 1);
+        prevBtn.onclick = () => {
+            if (typeof window.playSound === 'function') window.playSound('page');
+            window.changePage(myCurrentPage - 1);
+        };
+
+        const dotsDiv = document.createElement('div');
+        dotsDiv.className = 'page-dots';
+        for (let p = 1; p <= myTotalPages; p++) {
+            const dot = document.createElement('span');
+            dot.className = 'dot' + (p === myCurrentPage ? ' active' : '');
+            dot.id = 'dot-' + p;
+            dotsDiv.appendChild(dot);
+        }
+
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'btn-page interactive';
+        nextBtn.id = 'btn-next';
+        nextBtn.innerHTML = 'Next ▶';
+        nextBtn.disabled = (myCurrentPage === myTotalPages);
+        nextBtn.onclick = () => {
+            if (typeof window.playSound === 'function') window.playSound('page');
+            window.changePage(myCurrentPage + 1);
+        };
+
+        pagDiv.appendChild(prevBtn);
+        pagDiv.appendChild(dotsDiv);
+        pagDiv.appendChild(nextBtn);
+
+        gridContainer.appendChild(pagDiv);
+    }
+
+    renderList();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('mode') === 'challenge') {
         window.renderChallengeScreen(params);
+        return;
+    }
+    if (params.get('mode') === 'sandbox') {
+        window.renderSandboxLevelsScreen(params);
         return;
     }
     const formParam = params.get('form') || 'Form 4';
