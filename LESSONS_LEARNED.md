@@ -184,3 +184,20 @@
   2. Implemented `getLocalProfBeakerReply()` in `js/game.js` to immediately handle greetings, reset requests, terminology questions, and MINOH balancing advice if network connectivity drops or serverless cold-starts occur.
   3. Extended idle guidance timer to 50 seconds and suppressed idle popups whenever chat messages are present (`window.beakerChatHistory.length > 0`).
   4. Redesigned `playSound('start')` using a four-note major chord sine arpeggio (C5 -> E5 -> G5 -> C6) with gradual 0.02s linear attack ramps and smooth exponential decay, producing a warm, pleasant chime.
+
+
+## 13. Scripted Spotlight Walkthrough Architecture, Sandbox Stoichiometric Engine, and Tablet Long-Press Physics
+* **Symptom**:
+  1. First-time students had no hands-on walkthrough demonstrating how to read formulas, hold cards on tablets, drop molecules, or balance scales.
+  2. The main menu Help button opened a passive text modal that felt static and unengaging.
+  3. Teachers could not input custom reactions or test equations outside predefined levels.
+  4. Tablet users experienced sluggish info card opening and had no clear cue for dismissing open popups.
+* **Root Causes**:
+  1. A passive explanation modal does not build muscle memory. Students need physical interaction triggers that highlight one control at a time.
+  2. Arbitrary equation inputs can be stoichiometrically unsolvable, syntactically broken, or contain invalid elements.
+  3. Standard mobile touch listeners either conflict with scroll behavior or introduce noticeable delay if the hold threshold exceeds 400ms.
+* **Solution**:
+  1. Built `TUT0` (`js/tutorial.js`) featuring 4 physical viewport blocker divs that cut a spotlight hole over the active target. The walkthrough listens for real student interactions (clicking cards, adding atoms, opening the study room, correcting mistakes) before advancing.
+  2. Upgraded the home page Help button to `startHomeSpotlightTour()`, featuring spotlight focus across Player Name, Game Modes, and a 1-click launchpad into `TUT0`.
+  3. Implemented a universal chemical formula parser and stoichiometric matrix solver (`js/element_data.js`) supporting parentheses, physical typing, and virtual periodic table input with instant chemical validity feedback and balanced equation outputs.
+  4. Tuned tablet hold threshold to 320ms, added `.sic-touch-holding` physical press feedback, and added an explicit tap-anywhere dismiss hint.
