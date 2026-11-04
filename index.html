@@ -1017,30 +1017,28 @@ window.addEventListener('load', () => {
 
     <!-- HOME SCREEN INTERACTIVE SPOTLIGHT TOUR ENGINE -->
     <div id="home-spotlight-tour" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99990; pointer-events:none; font-family:'Fredoka',system-ui,sans-serif;">
-        <!-- Non-dimming transparent blockers: Home page remains 100% visible and bright -->
-        <div id="home-tour-blocker-top" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-bottom" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-left" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-right" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
+        <!-- Dimmed background overlays with physical cutout -->
+        <div id="home-tour-blocker-top" style="position:fixed; background:rgba(15,23,42,0.78); pointer-events:auto; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-bottom" style="position:fixed; background:rgba(15,23,42,0.78); pointer-events:auto; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-left" style="position:fixed; background:rgba(15,23,42,0.78); pointer-events:auto; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-right" style="position:fixed; background:rgba(15,23,42,0.78); pointer-events:auto; transition:all 0.22s ease;"></div>
 
-        <!-- Spotlight Pulse Ring: Vibrant blue animated focus ring -->
-        <div id="home-tour-pulse" style="position:fixed; border:4px solid #2563eb; border-radius:18px; box-shadow:0 0 0 5px rgba(37,99,235,0.4), 0 0 30px rgba(37,99,235,0.75); pointer-events:none; transition:all 0.22s ease; z-index:99992;">
-            <div id="home-tour-ring-pill" style="position:absolute; top:-34px; left:50%; transform:translateX(-50%); background:#2563eb; color:#ffffff; font-size:11px; font-weight:900; padding:3px 12px; border-radius:999px; box-shadow:0 4px 12px rgba(0,0,0,0.25); white-space:nowrap; border:2px solid #ffffff; letter-spacing:0.5px;">👇 SPOTLIGHT</div>
-        </div>
+        <!-- Clean glowing blue focus ring (no pill text) -->
+        <div id="home-tour-pulse" style="position:fixed; border:3.5px solid #38bdf8; border-radius:18px; box-shadow:0 0 0 4px rgba(56,189,248,0.4), 0 0 25px rgba(56,189,248,0.6); pointer-events:none; transition:all 0.22s ease; z-index:99992;"></div>
 
-        <div id="home-tour-card" style="position:fixed; background:#ffffff; border:4.5px solid #2563eb; border-radius:22px; box-shadow:0 20px 45px rgba(0,0,0,0.35); max-width:440px; width:92vw; padding:22px; box-sizing:border-box; z-index:99995; pointer-events:auto; transition:all 0.22s ease;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span id="ht-badge" style="background:#dbeafe; color:#1e40af; border:1.5px solid #93c5fd; font-size:0.75rem; font-weight:900; padding:3px 10px; border-radius:999px;">STEP 1 OF 7</span>
-                <button onclick="closeHomeTour()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; border-radius:50%; width:28px; height:28px; font-weight:900; color:#475569; cursor:pointer;">✕</button>
+        <div id="home-tour-card" style="position:fixed; background:#ffffff; border:4px solid #2563eb; border-radius:20px; box-shadow:0 16px 36px rgba(0,0,0,0.35); max-width:400px; width:90vw; padding:18px 20px; box-sizing:border-box; z-index:99995; pointer-events:auto; transition:all 0.22s ease;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span id="ht-badge" style="background:#dbeafe; color:#1e40af; border:1.5px solid #93c5fd; font-size:0.75rem; font-weight:900; padding:2px 8px; border-radius:999px;">1/7 Profile</span>
+                <button onclick="closeHomeTour()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; border-radius:50%; width:28px; height:28px; font-weight:900; color:#475569; cursor:pointer;" title="Close tour">✕</button>
             </div>
-            <h3 id="ht-title" style="margin:0 0 8px 0; font-size:1.25rem; font-weight:900; color:#0f172a; line-height:1.2;">Title</h3>
-            <p id="ht-desc" style="margin:0 0 12px 0; font-size:0.92rem; font-weight:600; line-height:1.45; color:#334155;">Description</p>
-            <div id="ht-tip" style="background:#fefce8; border:1.5px solid #fef08a; border-radius:12px; padding:8px 12px; font-size:0.84rem; font-weight:800; color:#854d0e; margin-bottom:16px;">Tip</div>
+            <h3 id="ht-title" style="margin:0 0 6px 0; font-size:1.15rem; font-weight:900; color:#0f172a; line-height:1.2;">Title</h3>
+            <p id="ht-desc" style="margin:0 0 10px 0; font-size:0.9rem; font-weight:600; line-height:1.4; color:#334155;">Description</p>
+            <div id="ht-tip" style="background:#fefce8; border:1.5px solid #fef08a; border-radius:10px; padding:6px 10px; font-size:0.82rem; font-weight:800; color:#854d0e; margin-bottom:12px;">Tip</div>
 
-            <div id="ht-actions" style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #f1f5f9; padding-top:14px; gap:8px;">
-                <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:12px; padding:8px 16px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
+            <div id="ht-actions" style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #f1f5f9; padding-top:12px; gap:8px;">
+                <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
                 <div style="display:flex; gap:8px;">
-                    <button id="ht-btn-next" onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:12px; padding:8px 18px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">Next →</button>
+                    <button id="ht-btn-next" onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">Next →</button>
                 </div>
             </div>
         </div>
@@ -1052,52 +1050,52 @@ window.addEventListener('load', () => {
         const HOME_STEPS = [
             {
                 selector: ".player-input-wrapper",
-                badge: "STEP 1 OF 7: PROFILE",
+                badge: "1/7 Profile",
                 title: "Your Player Profile",
-                desc: "Type your name or student ID here. Stoichbalance automatically saves your unlocked levels, stars, and high score achievements locally to your browser.",
-                tip: "💡 Your records and stars stay safely linked to your player name!"
+                desc: "Enter your name here to save your stars, scores, and progress on this device.",
+                tip: "💡 Everything saves automatically."
             },
             {
                 selector: "#challenge-stats-btn",
-                badge: "STEP 2 OF 7: STATS & BADGES",
-                title: "Career Records & Achievements",
-                desc: "Tap this <b>Trophy button</b> anytime to inspect your Career Records! Filter match history by difficulty (Easy, Medium, Hard), review your balancing speed, and check earned achievement badges.",
-                tip: "🏆 Check here to see your personal best times and trophies!"
+                badge: "2/7 Records",
+                title: "Career Records & Medals",
+                desc: "Click the trophy to check your match history, best times, and earned badges.",
+                tip: "🏆 Track your personal records anytime."
             },
             {
                 selector: "button.fun-widget.widget-right",
-                badge: "STEP 3 OF 7: PERIODIC TABLE",
+                badge: "3/7 Elements",
                 title: "Interactive Periodic Table",
-                desc: "Tap this chemical beaker widget to open the full 118-element Interactive Periodic Table. Explore atomic numbers, chemical symbols, group families, and real-time animated electron Bohr orbital models!",
-                tip: "🔬 Hover over any element to explore its atomic structure!"
+                desc: "Click the beaker to explore all 118 elements and their atomic structures.",
+                tip: "🔬 Hover over any element to see its electron shells."
             },
             {
                 selector: "#mode-form4",
-                badge: "STEP 4 OF 7: SYLLABUS",
-                title: "Form 4 & Form 5 Class Modes",
-                desc: "Choose <b>Form 4</b> or <b>Form 5</b> for official Malaysian SPM chemistry syllabus equations! Progress through balanced chapters ranging from simple synthesis to complex combustion and single displacement.",
-                tip: "🎯 Start with Form 4 if you are studying SPM Form 4 chemistry."
+                badge: "4/7 Syllabus",
+                title: "Form 4 & Form 5 Chemistry",
+                desc: "Practice balancing official SPM chemistry textbook reactions chapter by chapter.",
+                tip: "📘 Start with Form 4 if you are a Form 4 student."
             },
             {
                 selector: "#mode-challenge",
-                badge: "STEP 5 OF 7: CHALLENGE & MODIFIERS",
+                badge: "5/7 Challenge",
                 title: "Challenge Mode & Modifiers",
-                desc: "Ready to test your speed against the clock? Choose your difficulty tier and activate 3 special modifiers to boost your score multiplier up to <b>2.5x</b>:<br>• <b>No Scale (+0.5x)</b>: Balance blind without the seesaw beam!<br>• <b>No Hints (+0.5x)</b>: Solve without Professor Beaker hints!<br>• <b>90s Rush (+0.5x)</b>: Race against a 90-second countdown sprint!",
-                tip: "⚡ Stack all 3 modifiers for maximum leaderboard score!"
+                desc: "Race the clock! Turn on No Scale, No Hints, or 90s Rush to boost your score up to 2.5x.",
+                tip: "⚡ Modifiers give you extra points on the leaderboard."
             },
             {
                 selector: "#mode-sandbox",
-                badge: "STEP 6 OF 7: SANDBOX MODE",
-                title: "Sandbox Mode (Reaction Builder)",
-                desc: "Teachers and students can build and test any chemical equation! Use the full 118-element Chemistry Keyboard or type directly on your physical keyboard. The game validates atom conservation and solves the balanced equation instantly!",
-                tip: "🧪 Test custom classroom problems or design your own reaction puzzles!"
+                badge: "6/7 Sandbox",
+                title: "Custom Equation Builder",
+                desc: "Build your own reactions using the full periodic table keyboard or type freely.",
+                tip: "🧪 Great for testing custom exam questions."
             },
             {
                 selector: "#main-play-btn",
-                badge: "STEP 7 OF 7: PLAY TUTORIAL",
-                title: "Hands-On Interactive Tutorial",
-                desc: "Ready to balance? Launch our dedicated <b>Interactive Tutorial Level (TUT0)</b> where a live spotlight guides you step-by-step through solving your first water reaction ($2\\text{H}_2 + \\text{O}_2 \\rightarrow 2\\text{H}_2\\text{O}$)!",
-                tip: "🚀 Recommended: Tap Play Tutorial (TUT0) to start immediately!",
+                badge: "7/7 Tutorial",
+                title: "First Time Playing?",
+                desc: "Play the interactive tutorial to learn how to balance your first equation step by step.",
+                tip: "🚀 Tap Play Tutorial to get started!",
                 isFinal: true
             }
         ];
@@ -1147,17 +1145,17 @@ window.addEventListener('load', () => {
 
             if (step.isFinal) {
                 actions.innerHTML = `
-                    <button onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:12px; padding:8px 14px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
+                    <button onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 12px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="closeHomeTour(); openHelpGuideModal();" style="background:#3b82f6; border:2px solid #1d4ed8; border-radius:12px; padding:8px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">📖 Notes</button>
-                        <button onclick="closeHomeTour(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=TUT0');" style="background:#10b981; border:2px solid #047857; border-radius:12px; padding:8px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #047857;">🎓 Play Tutorial (TUT0)</button>
+                        <button onclick="closeHomeTour(); openHelpGuideModal();" style="background:#3b82f6; border:2px solid #1d4ed8; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">📖 Notes</button>
+                        <button onclick="closeHomeTour(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=TUT0');" style="background:#10b981; border:2px solid #047857; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #047857;">🎓 Play Tutorial</button>
                     </div>
                 `;
             } else {
                 actions.innerHTML = `
-                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:12px; padding:8px 16px; font-weight:800; color:#475569; cursor:pointer; opacity:${currentHomeStep === 0 ? '0.4' : '1'}; pointer-events:${currentHomeStep === 0 ? 'none' : 'auto'};">Back</button>
+                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer; opacity:${currentHomeStep === 0 ? '0.4' : '1'}; pointer-events:${currentHomeStep === 0 ? 'none' : 'auto'};">Back</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:12px; padding:8px 18px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">Next →</button>
+                        <button onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">Next →</button>
                     </div>
                 `;
             }
@@ -1180,38 +1178,52 @@ window.addEventListener('load', () => {
                 };
             }
 
+            // Update dimming blockers around the cutout
+            const topEl = document.getElementById('home-tour-blocker-top');
+            const bottomEl = document.getElementById('home-tour-blocker-bottom');
+            const leftEl = document.getElementById('home-tour-blocker-left');
+            const rightEl = document.getElementById('home-tour-blocker-right');
             const pulse = document.getElementById('home-tour-pulse');
             const card = document.getElementById('home-tour-card');
+
+            if (topEl && bottomEl && leftEl && rightEl) {
+                topEl.style.top = '0px';
+                topEl.style.left = '0px';
+                topEl.style.width = '100vw';
+                topEl.style.height = `${rect.top}px`;
+
+                bottomEl.style.top = `${rect.top + rect.height}px`;
+                bottomEl.style.left = '0px';
+                bottomEl.style.width = '100vw';
+                bottomEl.style.height = `calc(100vh - ${rect.top + rect.height}px)`;
+
+                leftEl.style.top = `${rect.top}px`;
+                leftEl.style.left = '0px';
+                leftEl.style.width = `${rect.left}px`;
+                leftEl.style.height = `${rect.height}px`;
+
+                rightEl.style.top = `${rect.top}px`;
+                rightEl.style.left = `${rect.left + rect.width}px`;
+                rightEl.style.width = `calc(100vw - ${rect.left + rect.width}px)`;
+                rightEl.style.height = `${rect.height}px`;
+            }
 
             if (pulse) {
                 pulse.style.top = `${rect.top}px`;
                 pulse.style.left = `${rect.left}px`;
                 pulse.style.width = `${rect.width}px`;
                 pulse.style.height = `${rect.height}px`;
-
-                const pill = document.getElementById('home-tour-ring-pill');
-                if (pill) {
-                    if (rect.top < 45) {
-                        pill.style.top = 'auto';
-                        pill.style.bottom = '-32px';
-                        pill.innerText = '👆 SPOTLIGHT';
-                    } else {
-                        pill.style.bottom = 'auto';
-                        pill.style.top = '-34px';
-                        pill.innerText = '👇 SPOTLIGHT';
-                    }
-                }
             }
 
             if (card) {
-                const cardWidth = Math.min(440, window.innerWidth - 32);
-                const cardHeight = card.offsetHeight || 240;
+                const cardWidth = Math.min(400, window.innerWidth - 32);
+                const cardHeight = card.offsetHeight || 220;
                 let cardLeft = rect.left + (rect.width / 2) - (cardWidth / 2);
                 cardLeft = Math.max(16, Math.min(cardLeft, window.innerWidth - cardWidth - 16));
 
-                let cardTop = rect.top + rect.height + 16;
+                let cardTop = rect.top + rect.height + 14;
                 if (cardTop + cardHeight > window.innerHeight - 20) {
-                    cardTop = Math.max(16, rect.top - cardHeight - 16);
+                    cardTop = Math.max(16, rect.top - cardHeight - 14);
                 }
 
                 card.style.top = `${cardTop}px`;
