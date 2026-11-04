@@ -422,49 +422,145 @@ window.addEventListener('load', () => {
         <div id="builder-feedback" style="font-size:22px; font-weight:900; text-align:center; padding:15px; border-radius:16px; display:none;"></div>
     </div>
 </div>
-<div id="sandbox-virtual-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.9); z-index:999999; justify-content:center; align-items:center;">
-    <div class="card" style="width:95%; max-width:1400px; height:90vh; display:flex; flex-direction:column; gap:20px; background:#ffffff; border:4px solid #8b5cf6; padding:30px; border-radius:32px; box-shadow: 0 10px 0 rgba(0,0,0,0.1); position:relative;">
-        <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-virtual-modal').style.display='none';" style="position:absolute; top:20px; right:20px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
+<div id="sandbox-virtual-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.85); z-index:999999; justify-content:center; align-items:center; backdrop-filter:blur(8px);">
+    <div class="card" style="width:96vw; max-width:1600px; height:94vh; max-height:920px; display:flex; flex-direction:column; gap:12px; background:#ffffff; border:4px solid #8b5cf6; padding:20px 24px; border-radius:28px; box-shadow: 0 16px 36px rgba(0,0,0,0.25); position:relative; box-sizing:border-box;">
         
-        <h3 style="margin:0; font-size:32px; color:#4c1d95; font-weight:900; text-align:center;">Chemistry Keyboard</h3>
-        
-        <div id="vk-display" contenteditable="true" spellcheck="false" onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.vkCheck(); }" oninput="document.getElementById('vk-feedback').style.display='none'; let btn=document.getElementById('vk-launch-btn'); if(btn) btn.style.display='none';" style="font-size:38px; font-weight:900; text-align:center; padding:15px; border:4px solid #8b5cf6; border-radius:16px; min-height:80px; background:#f8fafc; color:#0f172a; display:flex; align-items:center; justify-content:center; letter-spacing:2px; outline:none; cursor:text;" title="Type directly with physical keyboard or click elements below"></div>
-        
-        <div id="vk-feedback" style="font-size:20px; font-weight:bold; text-align:center; padding:10px; border-radius:12px; display:none;"></div>
-        
-        <div style="display:flex; gap:20px; flex:1; min-height:0;">
-            <!-- PT Grid -->
-            <div id="vk-pt-grid" style="flex:3; display:grid; grid-template-columns: repeat(18, 1fr); grid-template-rows: repeat(9, 1fr); gap:4px; align-items:stretch; justify-items:stretch;"></div>
+        <!-- Header & Presets -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; padding-right:50px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="font-size:28px;">🧪</span>
+                <div>
+                    <h3 style="margin:0; font-size:22px; color:#4c1d95; font-weight:900; line-height:1.1;">Chemistry Keyboard & Equation Builder</h3>
+                    <p style="margin:2px 0 0 0; font-size:12px; color:#6b21a8; font-weight:700;">Tap elements on the periodic table or type with your physical keyboard.</p>
+                </div>
+            </div>
             
-            <!-- Numpad & Signs -->
-            <div style="flex:1; display:flex; flex-direction:column; gap:10px; background:#f1f5f9; padding:20px; border-radius:24px; border:4px solid #e2e8f0;">
-                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; flex:1;">
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('1')">1</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('2')">2</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('3')">3</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('4')">4</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('5')">5</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('6')">6</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('7')">7</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('8')">8</button>
-                    <button class="interactive" class="vk-num-btn" onclick="window.vkType('9')">9</button>
-                    <button class="interactive" class="vk-num-btn" style="grid-column: span 3;" onclick="window.vkType('0')">0</button>
+            <!-- Quick Preset Chips -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;">Quick Presets:</span>
+                <button type="button" class="vk-preset-chip interactive" onclick="window.vkLoadPreset('H2 + O2 -> H2O')">H₂ + O₂ → H₂O</button>
+                <button type="button" class="vk-preset-chip interactive" onclick="window.vkLoadPreset('CH4 + O2 -> CO2 + H2O')">CH₄ + O₂ → CO₂ + H₂O</button>
+                <button type="button" class="vk-preset-chip interactive" onclick="window.vkLoadPreset('Fe + O2 -> Fe2O3')">Fe + O₂ → Fe₂O₃</button>
+                <button type="button" class="vk-preset-chip interactive" onclick="window.vkLoadPreset('N2 + H2 -> NH3')">N₂ + H₂ → NH₃</button>
+                <button type="button" class="vk-preset-chip interactive" onclick="window.vkLoadPreset('Na + H2O -> NaOH + H2')">Na + H₂O → NaOH + H₂</button>
+            </div>
+        </div>
+
+        <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-virtual-modal').style.display='none';" style="position:absolute; top:18px; right:20px; background:#f1f5f9; border:3px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:14px; cursor:pointer; font-size:24px; width:44px; height:44px; display:flex; justify-content:center; align-items:center;">&times;</button>
+        
+        <!-- Interactive Equation Display -->
+        <div id="vk-display" contenteditable="true" spellcheck="false" onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.vkCheck(); }" oninput="document.getElementById('vk-feedback').style.display='none'; let btn=document.getElementById('vk-launch-btn'); if(btn) btn.style.display='none';" style="font-size:30px; font-weight:900; text-align:center; padding:10px 18px; border:3.5px solid #8b5cf6; border-radius:16px; min-height:56px; background:#f8fafc; color:#0f172a; display:flex; align-items:center; justify-content:center; letter-spacing:2px; outline:none; cursor:text; box-shadow:inset 0 2px 6px rgba(0,0,0,0.06);" title="Type directly with physical keyboard or click elements below"></div>
+        
+        <div id="vk-feedback" style="font-size:15px; font-weight:800; text-align:center; padding:7px 14px; border-radius:12px; display:none;"></div>
+        
+        <!-- Two-Column Layout: Periodic Table (Left) + Customized Equation Numpad (Right) -->
+        <div style="display:flex; gap:16px; flex:1; min-height:0; align-items:stretch;">
+            <!-- Left: Full 118-Element Interactive Periodic Table Grid -->
+            <div style="flex:3.7; min-width:0; display:flex; flex-direction:column; background:#ffffff; border:3.5px solid #cbd5e1; border-radius:20px; padding:10px; box-shadow:0 6px 0 #94a3b8; overflow:hidden;">
+                <div id="vk-pt-grid" style="display:grid; grid-template-columns: repeat(18, minmax(0, 1fr)); grid-template-rows: repeat(9, minmax(0, 1fr)); gap:3px; width:100%; height:100%; align-items:stretch; justify-items:stretch;"></div>
+            </div>
+            
+            <!-- Right: Proper Customized Equation Numpad -->
+            <div style="flex:1.1; min-width:300px; max-width:360px; display:flex; flex-direction:column; gap:8px; background:#f1f5f9; padding:14px; border-radius:20px; border:3.5px solid #cbd5e1; box-shadow:0 6px 0 #cbd5e1; box-sizing:border-box;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:5px;">
+                    <span style="font-size:12px; font-weight:900; color:#334155; text-transform:uppercase; letter-spacing:0.5px;">🔢 Equation Keypad</span>
+                    <button class="interactive" onclick="window.vkClear()" style="background:#fee2e2; border:1.5px solid #fca5a5; color:#b91c1c; font-size:11px; font-weight:900; border-radius:8px; padding:2px 8px; cursor:pointer;" title="Clear equation">🗑 CLEAR</button>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="interactive" class="vk-action-btn" onclick="window.vkType('+')" style="background:#3b82f6; box-shadow:0 6px 0 #2563eb;">+</button>
-                    <button class="interactive" id="vk-arrow-btn" class="vk-action-btn" onclick="window.vkType('->')" style="background:#10b981; box-shadow:0 6px 0 #059669;">&rarr;</button>
+
+                <!-- Calculator Numbers Grid -->
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:6px;">
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('7')">7</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('8')">8</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('9')">9</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('4')">4</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('5')">5</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('6')">6</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('1')">1</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('2')">2</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('3')">3</button>
+                    <button type="button" class="interactive vk-num-btn" onclick="window.vkType('0')">0</button>
+                    <button type="button" class="interactive vk-num-btn" style="background:#ede9fe; color:#5b21b6; border-color:#c4b5fd;" onclick="window.vkType('(')">(</button>
+                    <button type="button" class="interactive vk-num-btn" style="background:#ede9fe; color:#5b21b6; border-color:#c4b5fd;" onclick="window.vkType(')')">)</button>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="interactive" class="vk-action-btn" onclick="window.vkType('(')" style="background:#6366f1; box-shadow:0 6px 0 #4f46e5; font-size:22px;">(</button>
-                    <button class="interactive" class="vk-action-btn" onclick="window.vkType(')')" style="background:#6366f1; box-shadow:0 6px 0 #4f46e5; font-size:22px;">)</button>
+
+                <!-- Equation Operators -->
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+                    <button type="button" class="interactive vk-action-btn" onclick="window.vkType('+')" style="background:#3b82f6; box-shadow:0 4px 0 #2563eb; font-size:20px; padding:8px;">+ Plus</button>
+                    <button type="button" class="interactive vk-action-btn" id="vk-arrow-btn" onclick="window.vkType('->')" style="background:#10b981; box-shadow:0 4px 0 #059669; font-size:20px; padding:8px;">&rarr; Yields</button>
                 </div>
-                <button class="interactive" class="vk-action-btn" onclick="window.vkBackspace()" style="background:#ef4444; box-shadow:0 6px 0 #dc2626;">⌫ Backspace</button>
-                <button class="interactive" class="vk-action-btn" onclick="window.vkCheck()" style="background:#f59e0b; box-shadow:0 6px 0 #d97706; padding:18px; font-size:22px; margin-top:10px;">✅ Validate & Solve</button>
-                <button id="vk-launch-btn" class="interactive vk-action-btn" onclick="window.vkLaunchGame()" style="display:none; background:#10b981; box-shadow:0 6px 0 #059669; padding:18px; font-size:22px; margin-top:6px; color:white; font-weight:900; border-radius:16px; border:none; cursor:pointer;">🚀 Launch Sandbox Game</button>
+
+                <!-- Editing Tool: Backspace -->
+                <button type="button" class="interactive vk-action-btn" onclick="window.vkBackspace()" style="background:#ef4444; box-shadow:0 4px 0 #dc2626; padding:8px; font-size:14px;">⌫ Backspace</button>
+
+                <!-- Validation and Play Buttons -->
+                <button type="button" class="interactive vk-action-btn" onclick="window.vkCheck()" style="background:#f59e0b; box-shadow:0 4px 0 #d97706; padding:12px; font-size:15px; margin-top:2px;">🔍 Check & Solve Reaction</button>
+                <button type="button" id="vk-launch-btn" class="interactive vk-action-btn" onclick="window.vkLaunchGame()" style="display:none; background:#10b981; box-shadow:0 5px 0 #047857; padding:13px; font-size:16px; animation:pulse 1s infinite;">🚀 Launch Sandbox Game</button>
             </div>
         </div>
     </div>
 </div>
+<style>
+.vk-preset-chip {
+    background: #f1f5f9;
+    color: #334155;
+    border: 2px solid #cbd5e1;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.vk-preset-chip:hover {
+    background: #8b5cf6;
+    color: #ffffff;
+    border-color: #7c3aed;
+    transform: translateY(-2px);
+}
+.vk-num-btn {
+    background: #ffffff;
+    color: #0f172a;
+    border: 3px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    transition: all 0.12s ease;
+}
+.vk-num-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 #64748b;
+}
+.vk-num-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #64748b;
+}
+.vk-action-btn {
+    color: white;
+    font-weight: 900;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.12s ease;
+}
+.vk-action-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+.vk-action-btn:active {
+    transform: translateY(2px);
+}
+</style>
 <style>
 /* Responsive Periodic Table v2 */
 .pt-modal-wrapper {
@@ -921,16 +1017,20 @@ window.addEventListener('load', () => {
 
     <!-- HOME SCREEN INTERACTIVE SPOTLIGHT TOUR ENGINE -->
     <div id="home-spotlight-tour" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99990; pointer-events:none; font-family:'Fredoka',system-ui,sans-serif;">
-        <div id="home-tour-blocker-top" style="position:fixed; background:rgba(15,23,42,0.82); pointer-events:auto; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-bottom" style="position:fixed; background:rgba(15,23,42,0.82); pointer-events:auto; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-left" style="position:fixed; background:rgba(15,23,42,0.82); pointer-events:auto; transition:all 0.22s ease;"></div>
-        <div id="home-tour-blocker-right" style="position:fixed; background:rgba(15,23,42,0.82); pointer-events:auto; transition:all 0.22s ease;"></div>
+        <!-- Non-dimming transparent blockers: Home page remains 100% visible and bright -->
+        <div id="home-tour-blocker-top" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-bottom" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-left" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
+        <div id="home-tour-blocker-right" style="position:fixed; background:transparent; pointer-events:none; transition:all 0.22s ease;"></div>
 
-        <div id="home-tour-pulse" style="position:fixed; border:3.5px solid #38bdf8; border-radius:16px; box-shadow:0 0 0 4px rgba(56,189,248,0.35), 0 0 25px rgba(56,189,248,0.6); pointer-events:none; transition:all 0.22s ease; z-index:99992;"></div>
+        <!-- Spotlight Pulse Ring: Vibrant blue animated focus ring -->
+        <div id="home-tour-pulse" style="position:fixed; border:4px solid #2563eb; border-radius:18px; box-shadow:0 0 0 5px rgba(37,99,235,0.4), 0 0 30px rgba(37,99,235,0.75); pointer-events:none; transition:all 0.22s ease; z-index:99992;">
+            <div id="home-tour-ring-pill" style="position:absolute; top:-34px; left:50%; transform:translateX(-50%); background:#2563eb; color:#ffffff; font-size:11px; font-weight:900; padding:3px 12px; border-radius:999px; box-shadow:0 4px 12px rgba(0,0,0,0.25); white-space:nowrap; border:2px solid #ffffff; letter-spacing:0.5px;">👇 SPOTLIGHT</div>
+        </div>
 
-        <div id="home-tour-card" style="position:fixed; background:#ffffff; border:4.5px solid #2563eb; border-radius:22px; box-shadow:0 20px 45px rgba(0,0,0,0.45); max-width:440px; width:92vw; padding:22px; box-sizing:border-box; z-index:99995; pointer-events:auto; transition:all 0.22s ease;">
+        <div id="home-tour-card" style="position:fixed; background:#ffffff; border:4.5px solid #2563eb; border-radius:22px; box-shadow:0 20px 45px rgba(0,0,0,0.35); max-width:440px; width:92vw; padding:22px; box-sizing:border-box; z-index:99995; pointer-events:auto; transition:all 0.22s ease;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span id="ht-badge" style="background:#dbeafe; color:#1e40af; border:1.5px solid #93c5fd; font-size:0.75rem; font-weight:900; padding:3px 10px; border-radius:999px;">STEP 1 OF 3</span>
+                <span id="ht-badge" style="background:#dbeafe; color:#1e40af; border:1.5px solid #93c5fd; font-size:0.75rem; font-weight:900; padding:3px 10px; border-radius:999px;">STEP 1 OF 7</span>
                 <button onclick="closeHomeTour()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; border-radius:50%; width:28px; height:28px; font-weight:900; color:#475569; cursor:pointer;">✕</button>
             </div>
             <h3 id="ht-title" style="margin:0 0 8px 0; font-size:1.25rem; font-weight:900; color:#0f172a; line-height:1.2;">Title</h3>
@@ -951,25 +1051,53 @@ window.addEventListener('load', () => {
         let currentHomeStep = 0;
         const HOME_STEPS = [
             {
-                selector: ".input-group",
-                badge: "STEP 1 OF 3",
+                selector: ".player-input-wrapper",
+                badge: "STEP 1 OF 7: PROFILE",
                 title: "Your Player Profile",
-                desc: "Type your name or school roll here. Stoichbalance automatically saves your stars, solved equations, and SPM achievements locally on your browser.",
-                tip: "💡 Your scores and high achievements stay linked to your name!"
+                desc: "Type your name or student ID here. Stoichbalance automatically saves your unlocked levels, stars, and high score achievements locally to your browser.",
+                tip: "💡 Your records and stars stay safely linked to your player name!"
             },
             {
-                selector: ".modes-list",
-                badge: "STEP 2 OF 3",
-                title: "Malaysian SPM Syllabus & Modes",
-                desc: "Choose <b>Class Mode</b> for official Form 4 & Form 5 SPM chemistry reactions, <b>Challenge Mode</b> for rapid timed balancing, or <b>Sandbox Mode</b> to build and balance custom reactions!",
+                selector: "#challenge-stats-btn",
+                badge: "STEP 2 OF 7: STATS & BADGES",
+                title: "Career Records & Achievements",
+                desc: "Tap this <b>Trophy button</b> anytime to inspect your Career Records! Filter match history by difficulty (Easy, Medium, Hard), review your balancing speed, and check earned achievement badges.",
+                tip: "🏆 Check here to see your personal best times and trophies!"
+            },
+            {
+                selector: "button.fun-widget.widget-right",
+                badge: "STEP 3 OF 7: PERIODIC TABLE",
+                title: "Interactive Periodic Table",
+                desc: "Tap this chemical beaker widget to open the full 118-element Interactive Periodic Table. Explore atomic numbers, chemical symbols, group families, and real-time animated electron Bohr orbital models!",
+                tip: "🔬 Hover over any element to explore its atomic structure!"
+            },
+            {
+                selector: "#mode-form4",
+                badge: "STEP 4 OF 7: SYLLABUS",
+                title: "Form 4 & Form 5 Class Modes",
+                desc: "Choose <b>Form 4</b> or <b>Form 5</b> for official Malaysian SPM chemistry syllabus equations! Progress through balanced chapters ranging from simple synthesis to complex combustion and single displacement.",
                 tip: "🎯 Start with Form 4 if you are studying SPM Form 4 chemistry."
             },
             {
+                selector: "#mode-challenge",
+                badge: "STEP 5 OF 7: CHALLENGE & MODIFIERS",
+                title: "Challenge Mode & Modifiers",
+                desc: "Ready to test your speed against the clock? Choose your difficulty tier and activate 3 special modifiers to boost your score multiplier up to <b>2.5x</b>:<br>• <b>No Scale (+0.5x)</b>: Balance blind without the seesaw beam!<br>• <b>No Hints (+0.5x)</b>: Solve without Professor Beaker hints!<br>• <b>90s Rush (+0.5x)</b>: Race against a 90-second countdown sprint!",
+                tip: "⚡ Stack all 3 modifiers for maximum leaderboard score!"
+            },
+            {
+                selector: "#mode-sandbox",
+                badge: "STEP 6 OF 7: SANDBOX MODE",
+                title: "Sandbox Mode (Reaction Builder)",
+                desc: "Teachers and students can build and test any chemical equation! Use the full 118-element Chemistry Keyboard or type directly on your physical keyboard. The game validates atom conservation and solves the balanced equation instantly!",
+                tip: "🧪 Test custom classroom problems or design your own reaction puzzles!"
+            },
+            {
                 selector: "#main-play-btn",
-                badge: "STEP 3 OF 3",
-                title: "Learn By Doing with Hands-On Tutorial!",
-                desc: "New to balancing equations? We built a dedicated <b>Interactive Tutorial Level</b> where a live spotlight guides you step-by-step through solving your first water reaction ($2H₂ + O₂ → 2H₂O)!",
-                tip: "🚀 Recommended: Tap Start Interactive Tutorial to begin!",
+                badge: "STEP 7 OF 7: PLAY TUTORIAL",
+                title: "Hands-On Interactive Tutorial",
+                desc: "Ready to balance? Launch our dedicated <b>Interactive Tutorial Level (TUT0)</b> where a live spotlight guides you step-by-step through solving your first water reaction ($2\\text{H}_2 + \\text{O}_2 \\rightarrow 2\\text{H}_2\\text{O}$)!",
+                tip: "🚀 Recommended: Tap Play Tutorial (TUT0) to start immediately!",
                 isFinal: true
             }
         ];
@@ -1008,22 +1136,14 @@ window.addEventListener('load', () => {
         function renderHomeStep(index) {
             currentHomeStep = index;
             const step = HOME_STEPS[currentHomeStep];
+
             document.getElementById('ht-badge').innerText = step.badge;
             document.getElementById('ht-title').innerText = step.title;
             document.getElementById('ht-desc').innerHTML = step.desc;
             document.getElementById('ht-tip').innerHTML = step.tip;
 
             const backBtn = document.getElementById('ht-btn-back');
-            const nextBtn = document.getElementById('ht-btn-next');
             const actions = document.getElementById('ht-actions');
-
-            if (currentHomeStep === 0) {
-                backBtn.style.opacity = '0.4';
-                backBtn.style.pointerEvents = 'none';
-            } else {
-                backBtn.style.opacity = '1';
-                backBtn.style.pointerEvents = 'auto';
-            }
 
             if (step.isFinal) {
                 actions.innerHTML = `
@@ -1060,45 +1180,32 @@ window.addEventListener('load', () => {
                 };
             }
 
-            const topEl = document.getElementById('home-tour-blocker-top');
-            const bottomEl = document.getElementById('home-tour-blocker-bottom');
-            const leftEl = document.getElementById('home-tour-blocker-left');
-            const rightEl = document.getElementById('home-tour-blocker-right');
             const pulse = document.getElementById('home-tour-pulse');
             const card = document.getElementById('home-tour-card');
-
-            if (topEl && bottomEl && leftEl && rightEl) {
-                topEl.style.top = '0px';
-                topEl.style.left = '0px';
-                topEl.style.width = '100vw';
-                topEl.style.height = `${rect.top}px`;
-
-                bottomEl.style.top = `${rect.top + rect.height}px`;
-                bottomEl.style.left = '0px';
-                bottomEl.style.width = '100vw';
-                bottomEl.style.height = `calc(100vh - ${rect.top + rect.height}px)`;
-
-                leftEl.style.top = `${rect.top}px`;
-                leftEl.style.left = '0px';
-                leftEl.style.width = `${rect.left}px`;
-                leftEl.style.height = `${rect.height}px`;
-
-                rightEl.style.top = `${rect.top}px`;
-                rightEl.style.left = `${rect.left + rect.width}px`;
-                rightEl.style.width = `calc(100vw - ${rect.left + rect.width}px)`;
-                rightEl.style.height = `${rect.height}px`;
-            }
 
             if (pulse) {
                 pulse.style.top = `${rect.top}px`;
                 pulse.style.left = `${rect.left}px`;
                 pulse.style.width = `${rect.width}px`;
                 pulse.style.height = `${rect.height}px`;
+
+                const pill = document.getElementById('home-tour-ring-pill');
+                if (pill) {
+                    if (rect.top < 45) {
+                        pill.style.top = 'auto';
+                        pill.style.bottom = '-32px';
+                        pill.innerText = '👆 SPOTLIGHT';
+                    } else {
+                        pill.style.bottom = 'auto';
+                        pill.style.top = '-34px';
+                        pill.innerText = '👇 SPOTLIGHT';
+                    }
+                }
             }
 
             if (card) {
                 const cardWidth = Math.min(440, window.innerWidth - 32);
-                const cardHeight = card.offsetHeight || 250;
+                const cardHeight = card.offsetHeight || 240;
                 let cardLeft = rect.left + (rect.width / 2) - (cardWidth / 2);
                 cardLeft = Math.max(16, Math.min(cardLeft, window.innerWidth - cardWidth - 16));
 
