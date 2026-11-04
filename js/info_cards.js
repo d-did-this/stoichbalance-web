@@ -1241,6 +1241,7 @@
             ${data.visualHtml ? `<div class="sic-visual-box">${data.visualHtml}</div>` : ''}
             ${data.desc ? `<p class="sic-desc">${data.desc}</p>` : ''}
             ${data.callout ? `<div class="sic-callout"><span class="sic-callout-icon">💡</span><span>${data.callout}</span></div>` : ''}
+            ${isTouchHoldTriggered ? `<div class="sic-touch-hint" style="text-align:center; font-size:0.75rem; color:#64748b; font-weight:800; margin-top:8px; padding-top:6px; border-top:1px dashed #cbd5e1;">👆 Tap anywhere to close</div>` : ''}
         `;
 
         cardEl.className = 'is-visible';
@@ -1374,14 +1375,16 @@
             touchStartX = clientX;
             touchStartY = clientY;
 
+            target.classList.add('sic-touch-holding');
             if (holdTimeout) clearTimeout(holdTimeout);
             holdTimeout = setTimeout(() => {
                 isTouchHoldTriggered = true;
                 showCard(target);
+                target.classList.remove('sic-touch-holding');
                 if (navigator.vibrate) {
                     try { navigator.vibrate(25); } catch (_) {}
                 }
-            }, 450); // 450ms hold duration
+            }, 320); // 320ms snappy tablet hold duration
         };
 
         const onTouchMove = (clientX, clientY) => {
@@ -1389,7 +1392,7 @@
             if (holdTimeout) {
                 const dist = Math.hypot(clientX - touchStartX, clientY - touchStartY);
                 if (dist > 10) {
-                    // Canceled due to scrolling or panning
+                    if (touchStartTarget) touchStartTarget.classList.remove('sic-touch-holding');
                     clearTimeout(holdTimeout);
                     holdTimeout = null;
                     touchStartTarget = null;
@@ -1402,6 +1405,9 @@
             if (holdTimeout) {
                 clearTimeout(holdTimeout);
                 holdTimeout = null;
+            }
+            if (touchStartTarget) {
+                touchStartTarget.classList.remove('sic-touch-holding');
             }
             touchStartTarget = null;
         };
