@@ -1,5 +1,5 @@
 /**
- * Stoichbalance V2 - Interactive Spotlight Onboarding Tour
+ * Stoichbalance V2 - Interactive Spotlight Onboarding Tour & Tutorial Level Engine
  * Uses 4 surrounding dim blockers to physically expose each targeted button,
  * allowing students to interactively click and press the highlighted feature.
  */
@@ -11,19 +11,134 @@
     let activeClickListener = null;
     let activeTargetEl = null;
 
+    // 1. Scripted Interactive Tutorial Level (TUT0: Water Synthesis)
+    const TUT0_STEPS = [
+        {
+            selector: "#level-title",
+            fallbackSelector: "#dynamic-sleek-equation",
+            badge: "Tutorial 1/13",
+            title: "Welcome! Your First Reaction",
+            desc: "Chemical equations show how atoms rearrange. The Law of Conservation of Mass states that atoms cannot be created or destroyed. What goes in must equal what comes out!",
+            tip: "🎯 Mission: Equalize Hydrogen (H) and Oxygen (O) to make Water."
+        },
+        {
+            selector: "#dynamic-sleek-equation",
+            fallbackSelector: ".sleek-equation-card",
+            badge: "Touch & Inspect",
+            title: "Chemistry Info Cards",
+            desc: "Hover over any chemical symbol or formula to inspect its atomic composition and states of matter. <b>On tablet/touchscreen: press and hold for half a second</b> to open its interactive Chemistry Info Card!",
+            tip: "📱 Tablet Tip: Tap and hold any element to inspect its card."
+        },
+        {
+            selector: "#btn-add-react-H2",
+            fallbackSelector: '[data-info="btn-react"][data-mol-id="H2"], [data-info="btn-react"]',
+            badge: "Add Reactants",
+            title: "Step 1: Add Reactant H₂",
+            desc: "Tap the glowing <b>+ H₂</b> button to drop your first Hydrogen gas molecule into the left beaker. Notice that each molecule brings 2 Hydrogen atoms!",
+            tip: "👉 Tap + H₂ to drop Hydrogen into the beaker!",
+            interactiveClick: true
+        },
+        {
+            selector: "#btn-add-react-O2",
+            fallbackSelector: '[data-info="btn-react"][data-mol-id="O2"]',
+            badge: "Add Reactants",
+            title: "Step 2: Add Reactant O₂",
+            desc: "Now tap <b>+ O₂</b> to drop an Oxygen gas molecule into the left beaker. It brings 2 Oxygen atoms.",
+            tip: "👉 Tap + O₂ to add Oxygen!",
+            interactiveClick: true
+        },
+        {
+            selector: "#btn-add-prod-H2O",
+            fallbackSelector: '[data-info="btn-prod"][data-mol-id="H2O"], [data-info="btn-prod"]',
+            badge: "Add Products",
+            title: "Step 3: Create Water (H₂O)",
+            desc: "Now tap <b>+ H₂O</b> on the right side to add one Water molecule into the products beaker.",
+            tip: "👉 Tap + H₂O to create Water!",
+            interactiveClick: true
+        },
+        {
+            selector: ".scale-section",
+            fallbackSelector: "#adv-giant-plank, .mini-seesaw",
+            badge: "Reading the Scales",
+            title: "Step 4: Check the Seesaw Scale",
+            desc: "Look at the seesaw scale! We have 2 Hydrogens on each side (balanced!), but we have <b>2 Oxygens on the left</b> and only <b>1 on the right</b>. The scale is tilted because the reactants side is heavier!",
+            tip: "⚖️ The red badge (-1) warns you which side is lacking atoms."
+        },
+        {
+            selector: '[data-info="btn-tray"]',
+            fallbackSelector: "#btn-toggle-tray, .rect-btn",
+            badge: "Element Tray",
+            title: "Step 5: Open the Element Tray",
+            desc: "Tap the <b>Element Tray</b> on the left. It slides open a drawer tracking each atom individually and showing the MINOH balancing order.",
+            tip: "👉 Tap the Element Tray button to slide open the drawer!",
+            interactiveClick: true
+        },
+        {
+            selector: "#react-drop-container",
+            fallbackSelector: ".drop-zone",
+            badge: "Correction Tool",
+            title: "Step 6: Fixing Mistakes",
+            desc: "If you ever drop too many molecules, hover over any molecule card in the beaker (or tap it directly on tablet) to remove it. You never have to restart the whole level!",
+            tip: "💡 Click or tap any placed molecule card to remove it."
+        },
+        {
+            selector: "#prof-beaker-card",
+            fallbackSelector: '[data-info="btn-hint"], #chat-toggle-btn',
+            badge: "AI Chemistry Tutor",
+            title: "Step 7: Ask Prof. Beaker",
+            desc: "Stuck on a tricky reaction? Prof. Beaker uses the MINOH rule (Metals, Polyatomic Ions, Non-metals, Oxygen, Hydrogen) to give guided clues. Notice his advice: balance Oxygen first before Hydrogen!",
+            tip: "💡 Always follow the MINOH attack sequence!"
+        },
+        {
+            selector: "#btn-open-study-room",
+            fallbackSelector: '[data-info="btn-study-room"], .study-room-pill-btn',
+            badge: "Study Room",
+            title: "Step 8: Visual Study Room",
+            desc: "Need a full overview? Tap the <b>Study Room</b> button to inspect real-time comparison bars and stoichiometry formulas across the screen.",
+            tip: "🔍 Tap the button to open or press Next to continue!"
+        },
+        {
+            selector: "#btn-add-prod-H2O",
+            fallbackSelector: '[data-info="btn-prod"][data-mol-id="H2O"], [data-info="btn-prod"]',
+            badge: "Executing Strategy",
+            title: "Step 9: Balance Oxygen",
+            desc: "Following MINOH, let's fix Oxygen! The right side has 1 Oxygen, but needs 2. Tap <b>+ H₂O</b> to drop a second Water molecule.",
+            tip: "👉 Tap + H₂O now!",
+            interactiveClick: true
+        },
+        {
+            selector: "#btn-add-react-H2",
+            fallbackSelector: '[data-info="btn-react"][data-mol-id="H2"], [data-info="btn-react"]',
+            badge: "Final Balance",
+            title: "Step 10: Balance Hydrogen",
+            desc: "Look closely: Oxygen is now balanced (2 vs 2)! But the new Water molecule brought 4 Hydrogens on the right, while we only have 2 on the left. Tap <b>+ H₂</b> one more time to finish balancing!",
+            tip: "👉 Tap + H₂ to achieve perfect balance!",
+            interactiveClick: true
+        },
+        {
+            selector: ".status-bar-shared",
+            fallbackSelector: "#status-container, .status-left",
+            badge: "Mastery",
+            title: "Step 11: Perfect Balance!",
+            desc: "Both status bars shine green: <b>BALANCED</b> and <b>SIMPLIFIED</b>! You just balanced <b>2H₂ + O₂ → 2H₂O</b> using the Law of Conservation of Mass. You are now fully prepared for Form 4 and Form 5!",
+            tip: "🎉 Tap Finish Tour to celebrate your victory!"
+        }
+    ];
+
+    // 2. Standard Level Tour
     const TOUR_STEPS = [
         {
             selector: "#level-title",
             badge: "Level Info",
             title: "Check Your Level & Reaction",
-            desc: "Hover over the level title to inspect real-world chemistry background, reaction history, and key facts about the chemical equation.",
+            desc: "Hover over the level title (or tap and hold on tablet) to inspect real-world chemistry background, reaction history, and key facts about the chemical equation.",
             tip: "💡 Always check the level name to know what you are synthesizing!"
         },
         {
             selector: "#dynamic-sleek-equation",
             badge: "Equation & Hover Cards",
-            title: "Hover Over Anything in the Equation",
-            desc: "This is your chemical equation. Hover over any big coefficient, chemical formula, or small subscript to inspect real-time atom calculations, bonding groups, and element facts.",
+            title: "Hover (or Hold on Tablet) Any Element",
+            desc: "This is your chemical equation. Hover over any coefficient, chemical formula, or subscript (or press and hold on tablet) to inspect real-time atom calculations, bonding groups, and element facts.",
             tip: "💡 Try hovering over coefficients to see how groups multiply atoms!"
         },
         {
@@ -45,7 +160,7 @@
             selector: "#react-drop-container",
             badge: "Removing Molecules",
             title: "How to Remove Molecules",
-            desc: "Need to take back a move? Hover over any placed molecule card in the balance beaker to reveal the red <strong>✕ remove button</strong>, then click it to delete that molecule group.",
+            desc: "Need to take back a move? Hover over any placed molecule card in the balance beaker (or tap it directly on tablet) to reveal the red <strong>✕ remove button</strong>, then click it to delete that molecule group.",
             tip: "💡 You can also use the Undo button in Settings!"
         },
         {
@@ -60,7 +175,7 @@
             selector: '[data-info="btn-hint"]',
             badge: "Hints & Tutor",
             title: "Prof. Beaker & Hints",
-            desc: "Stuck on a tricky reaction? Click <strong>Hint please!</strong> or open <strong>Prof. Beaker</strong> on the right to get personalized step-by-step guidance without losing points.",
+            desc: "Stuck on a tricky reaction? Click <strong>I am Stuck! Help!</strong> or open <strong>Prof. Beaker</strong> on the right to get personalized step-by-step guidance without losing points.",
             tip: "💡 Stuck? There is no shame in asking for a clue!"
         },
         {
@@ -71,6 +186,15 @@
             tip: "🚀 You are all set to start balancing equations. Have fun!"
         }
     ];
+
+    function getActiveSteps() {
+        const params = new URLSearchParams(window.location.search);
+        const lvl = (params.get('level') || '').toUpperCase();
+        if (lvl === 'TUT0' || lvl === 'TUTORIAL') {
+            return TUT0_STEPS;
+        }
+        return TOUR_STEPS;
+    }
 
     function createTourDOM() {
         if (tourContainer) return;
@@ -93,7 +217,7 @@
 
         const blockerStyle = `
             position: fixed;
-            background: rgba(15, 23, 42, 0.78);
+            background: rgba(15, 23, 42, 0.82);
             pointer-events: auto;
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
             z-index: 99990;
@@ -125,7 +249,7 @@
                 border: 4.5px solid #2563eb;
                 border-radius: 20px;
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), inset 0 -4px 0 rgba(0,0,0,0.06);
-                max-width: 420px;
+                max-width: 430px;
                 width: 90vw;
                 padding: 20px 22px 18px 22px;
                 box-sizing: border-box;
@@ -147,7 +271,7 @@
                             padding: 2px 8px;
                             border-radius: 9999px;
                         ">STEP 1</span>
-                        <span id="tour-card-step-text" style="font-size:0.75rem; font-weight:800; color:#64748b;">Step 1 of 8</span>
+                        <span id="tour-card-step-text" style="font-size:0.75rem; font-weight:800; color:#64748b;">Step 1</span>
                     </div>
                     <button id="tour-btn-close" style="
                         background: #f1f5f9;
@@ -185,7 +309,7 @@
                 <!-- Footer Navigation -->
                 <div style="display:flex; justify-content:space-between; align-items:center; border-top:1.5px solid #f1f5f9; padding-top:12px;">
                     <!-- Dots -->
-                    <div id="tour-dots-row" style="display:flex; gap:5px;"></div>
+                    <div id="tour-dots-row" style="display:flex; gap:5px; flex-wrap:wrap; max-width:180px;"></div>
 
                     <!-- Buttons -->
                     <div style="display:flex; gap:8px;">
@@ -242,27 +366,28 @@
     }
 
     function positionSpotlight(stepIndex) {
-        const step = TOUR_STEPS[stepIndex];
-        let targetEl = document.querySelector(step.selector);
+        const steps = getActiveSteps();
+        const step = steps[stepIndex] || steps[0];
 
-        // Fallbacks for specific selectors
-        if (!targetEl && step.selector === '[data-info="btn-react"]') {
-            targetEl = document.querySelector('.btn-add-mol, button[onclick*="addMolecule"]');
-        }
-        if (!targetEl && step.selector === '#react-drop-container') {
-            targetEl = document.querySelector('.drop-zone, .beaker-drop-zone, .grid-reactants');
-        }
+        let targetEl = null;
+        if (step.selector) targetEl = document.querySelector(step.selector);
+        if (!targetEl && step.fallbackSelector) targetEl = document.querySelector(step.fallbackSelector);
 
         const padding = 8;
-        let rect = { top: 100, left: 100, width: 200, height: 60 };
+        let rect = {
+            top: window.innerHeight * 0.25,
+            left: window.innerWidth * 0.15,
+            width: window.innerWidth * 0.7,
+            height: 80
+        };
 
         if (targetEl) {
             const r = targetEl.getBoundingClientRect();
             rect = {
                 top: Math.max(0, r.top - padding),
                 left: Math.max(0, r.left - padding),
-                width: r.width + padding * 2,
-                height: r.height + padding * 2
+                width: Math.max(20, r.width + padding * 2),
+                height: Math.max(20, r.height + padding * 2)
             };
         }
 
@@ -305,8 +430,8 @@
 
         // 3. Position Popover Card
         if (popoverCard) {
-            const cardWidth = 420;
-            const cardHeight = popoverCard.offsetHeight || 220;
+            const cardWidth = Math.min(430, window.innerWidth - 32);
+            const cardHeight = popoverCard.offsetHeight || 240;
             const viewportW = window.innerWidth;
             const viewportH = window.innerHeight;
 
@@ -319,8 +444,8 @@
                 cardTop = Math.max(16, rect.top - cardHeight - 16);
             }
 
-            // If target is on the far right (like FAB settings menu), place popover to its left
-            if (rect.left > viewportW - 200) {
+            // If target is on the far right, place popover to its left
+            if (rect.left > viewportW - 220) {
                 cardLeft = Math.max(16, rect.left - cardWidth - 20);
                 cardTop = Math.max(16, Math.min(rect.top, viewportH - cardHeight - 20));
             }
@@ -348,32 +473,29 @@
     }
 
     function renderTourStep(index) {
+        const steps = getActiveSteps();
         if (index < 0) index = 0;
-        if (index >= TOUR_STEPS.length) index = TOUR_STEPS.length - 1;
+        if (index >= steps.length) index = steps.length - 1;
         currentStep = index;
 
-        const step = TOUR_STEPS[currentStep];
+        const step = steps[currentStep];
 
         document.getElementById('tour-card-badge').innerText = step.badge;
-        document.getElementById('tour-card-step-text').innerText = `Step ${currentStep + 1} of ${TOUR_STEPS.length}`;
+        document.getElementById('tour-card-step-text').innerText = `Step ${currentStep + 1} of ${steps.length}`;
         document.getElementById('tour-card-title').innerText = step.title;
         document.getElementById('tour-card-desc').innerHTML = step.desc;
         document.getElementById('tour-card-tip').innerHTML = step.tip;
 
         // Render Dots
         const dotsContainer = document.getElementById('tour-dots-row');
-        dotsContainer.innerHTML = TOUR_STEPS.map((_, i) => `
-            <div style="
-                width: ${i === currentStep ? '18px' : '7px'};
-                height: 7px;
-                border-radius: 9999px;
-                background: ${i === currentStep ? '#2563eb' : '#cbd5e1'};
-                transition: all 0.2s ease;
-                cursor: pointer;
-            " onclick="window.goToTourStep(${i})"></div>
-        `).join('');
+        if (dotsContainer) {
+            dotsContainer.innerHTML = steps.map((_, i) => {
+                const active = i === currentStep;
+                return `<div onclick="window.goToTourStep(${i})" style="width:${active ? 16 : 6}px; height:6px; border-radius:999px; background:${active ? '#2563eb' : '#cbd5e1'}; cursor:pointer; transition:all 0.2s;"></div>`;
+            }).join('');
+        }
 
-        // Buttons state
+        // Update Prev / Next Buttons
         const prevBtn = document.getElementById('tour-btn-prev');
         const nextBtn = document.getElementById('tour-btn-next');
 
@@ -385,7 +507,7 @@
             prevBtn.style.pointerEvents = 'auto';
         }
 
-        if (currentStep === TOUR_STEPS.length - 1) {
+        if (currentStep === steps.length - 1) {
             nextBtn.innerText = "Finish Tour 🚀";
             nextBtn.style.background = '#10b981';
             nextBtn.style.borderColor = '#059669';
@@ -434,7 +556,8 @@
 
     function nextTourStep() {
         if (typeof playSound === 'function') playSound('click');
-        if (currentStep >= TOUR_STEPS.length - 1) {
+        const steps = getActiveSteps();
+        if (currentStep >= steps.length - 1) {
             closeTour();
         } else {
             renderTourStep(currentStep + 1);
