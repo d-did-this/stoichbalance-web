@@ -154,3 +154,17 @@
   2. **Reduced Tablet Equation Height**: Set `.grid-section.section-equation` on tablet to `height: 46px !important; min-height: 44px !important; padding: 4px 10px !important;` with compact `0.95rem` typography, reducing height by 49% with zero overflow.
   3. **Increased Laptop Scale & Bar Height**: Increased `.section-scale` and `#section-bar-graph` height from `160px` to `195px` (`margin-bottom: 16px;`), and updated `calcBarHeight()` to allow reactant and product bars to grow up to 105px.
   4. **In-Place Fullscreen Persistence**: Re-architected `window.slideTransitionTo()` and `window.transitionTo()` for inter-level navigation: when navigating between levels within `game.html`, the engine pushes the new URL via `history.pushState(null, '', url)` and calls `initEngine()` directly in-place. The document stays alive in memory, keeping HTML5 Fullscreen 100% continuous and uninterrupted.
+
+
+## 11. Pedagogical Clue Density, MINOH Strategic Sequencing, and Intact Polyatomic Ion Balancing
+* **Symptom**:
+  1. The guided clue card was visually crowded because both a MINOH Rule callout and a 'Tap again for exact answer' prompt were crammed into the footer, causing awkward multi-line text wrapping.
+  2. Students did not know which elements were metals or polyatomic ions when balancing equations.
+  3. Equations containing polyatomic ions (such as NO3 in AgNO3 or SO4 in H2SO4) confused students when balanced atom-by-atom.
+* **Root Causes**:
+  - Two competing flex-items in the clue card footer forced line wraps on compact cards. The primary action button underneath already dynamically changed its label to 'Give me answer!'.
+  - Hover tooltips only provided atomic facts rather than balancing role guidance.
+* **Solution**:
+  1. Removed redundant 'Tap again for exact answer' text and gave the MINOH Rule a centered, padded highlight callout.
+  2. Implemented `getMinohElementClassification(sym)` across all element tokens, molecule cards, and drawer tracker cards, displaying explicit badges: `[M] Metal`, `[I] Polyatomic Ion`, `[N] Non-Metal`, `[O] Oxygen`, and `[H] Hydrogen`.
+  3. Built `window.buildLevelMinohPlanCard(levelData)` to analyze any reaction and post a tailored MINOH balancing attack order right after the welcome greeting. Intact polyatomic ions are detected and prioritized as single units.
