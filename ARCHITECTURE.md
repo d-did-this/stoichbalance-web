@@ -156,3 +156,19 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
 * **Snappy Tablet Info Card Touch & Hold Engine**:
   - Long-press delay reduced to 320ms with active `.sic-touch-holding` CSS animation (`scale(0.95)` with brightness dip).
   - Explicit touch dismiss pill (`👆 Tap anywhere to close`) and updated tooltips across all buttons.
+
+
+## 10. Single-Line Auto-Fit Equation Engine & Instant Audio Assets
+* **Proportional Single-Line Auto-Fit Loop (`js/game.js`)**:
+  - Eliminates vertical wrapping and 3-row layout clutter on long multi-compound reactions (e.g. Sodium-Water, Hydrocarbon combustion).
+  - Enforces `white-space: nowrap !important; flex-wrap: nowrap !important;` on the equation row.
+  - `window.autoFitEquation()`: Measures `scrollWidth` against container `clientWidth`. When content exceeds container width, it scales font size, coefficient box dimensions, and padding proportionally down to 0.52x, guaranteeing complete single-line fit on any display.
+* **Pre-Rendered In-Memory Instant Audio Delivery (`js/audio_assets.js`)**:
+  - Eliminates network fetch latency and silent audio drops on cloud CDNs and mobile Safari/Chrome.
+  - Bundles pre-rendered uncompressed 16-bit PCM WAV Data URIs for critical sound effects:
+    1. `start`: Rich laboratory power chord (C4, G4, C5, E5 harmonic blend with 420ms exponential decay).
+    2. `retro-select`: High-register arcade sparkle arpeggio (F5 -> A5 -> C6 -> E6 glide).
+  - Direct HTML5 Audio playback with synchronous fallback to the Web Audio API synthesis engine.
+* **Prof. Bunsen Reaction Architect & Keypad Ergonomics**:
+  - Replaced ambiguous dual clear buttons with a single unified Backspace button inside the formula display bar and an action Clear button on the numpad.
+  - Hover info cards provide clear context regarding Prof. Bunsen's AI chemical synthesis capabilities.
