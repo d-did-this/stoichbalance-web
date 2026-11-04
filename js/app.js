@@ -959,7 +959,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.interactive').forEach(el => {
         el.addEventListener('mousedown', (e) => {
             // Only play if it's not a molecule (they have their own logic now)
-            if(!el.classList.contains('molecule')) playSoftClick();
+            if(!el.classList.contains('molecule')) {
+                if (typeof window.playSound === 'function') window.playSound('click');
+            }
         });
     });
     
@@ -1022,12 +1024,17 @@ window.vkType = function(char) {
     let disp = document.getElementById('vk-display');
     document.getElementById('vk-feedback').style.display = 'none';
 
-    if(char === '->') {
-        disp.innerText += '  ';
-        document.getElementById('vk-arrow-btn').disabled = true;
-        document.getElementById('vk-arrow-btn').style.opacity = '0.5';
-    } else if (char === '+') {
+    if(char === '->' || char === '→') {
+        disp.innerText += ' → ';
+        let arrowBtn = document.getElementById('vk-arrow-btn');
+        if (arrowBtn) {
+            arrowBtn.disabled = true;
+            arrowBtn.style.opacity = '0.5';
+        }
+    } else if (char === '+' || char === '=') {
         disp.innerText += ' + ';
+    } else if (char === '(' || char === ')') {
+        disp.innerText += char;
     } else if (/[0-9]/.test(char)) {
         const subs = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
         disp.innerText += subs[char];
@@ -1042,10 +1049,13 @@ window.vkBackspace = function() {
     let text = disp.innerText;
     if(text.length === 0) return;
 
-    if(text.endsWith('  ')) {
+    if(text.endsWith(' → ') || text.endsWith(' -> ')) {
         disp.innerText = text.slice(0, -3);
-        document.getElementById('vk-arrow-btn').disabled = false;
-        document.getElementById('vk-arrow-btn').style.opacity = '1';
+        let arrowBtn = document.getElementById('vk-arrow-btn');
+        if (arrowBtn) {
+            arrowBtn.disabled = false;
+            arrowBtn.style.opacity = '1';
+        }
     } else if (text.endsWith(' + ')) {
         disp.innerText = text.slice(0, -3);
     } else {
@@ -1057,15 +1067,52 @@ window.vkBackspace = function() {
 window.vkCheck = function() {
     if(typeof window.playSound==="function") window.playSound("click");
     let feedback = document.getElementById('vk-feedback');
-    let eq = document.getElementById('vk-display').innerText.trim();
+    let disp = document.getElementById('vk-display');
+    let eq = (disp.innerText || disp.value || '').trim();
 
-    // Skip validation for now, just save and go
-    localStorage.setItem('stoich_sandbox_level', eq);
+    if (!eq) {
+        feedback.style.display = 'block';
+        feedback.style.background = '#fef2f2';
+        feedback.style.color = '#b91c1c';
+        feedback.style.border = '2px solid #ef4444';
+        feedback.innerText = 'Please enter an equation (e.g. H2 + O2 -> H2O).';
+        return;
+    }
+
+    let res = window.validateAndSolveEquation ? window.validateAndSolveEquation(eq) : { valid: false, error: 'Validator loading...' };
+    feedback.style.display = 'block';
+
+    if (res.valid) {
+        feedback.style.background = '#ecfdf5';
+        feedback.style.color = '#065f46';
+        feedback.style.border = '2px solid #10b981';
+        feedback.innerHTML = `✅ <b>Valid Reaction!</b> Balanced target: <b>${res.balancedString}</b>`;
+        
+        window.validSandboxLevel = res;
+        localStorage.setItem('stoich_custom_sandbox', JSON.stringify(res));
+        localStorage.setItem('stoich_sandbox_level', res.equation);
+
+        let launchBtn = document.getElementById('vk-launch-btn');
+        if (launchBtn) {
+            launchBtn.style.display = 'block';
+            launchBtn.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else {
+        feedback.style.background = '#fef2f2';
+        feedback.style.color = '#b91c1c';
+        feedback.style.border = '2px solid #ef4444';
+        feedback.innerHTML = `❌ <b>Cannot Balance:</b> ${res.error}`;
+        let launchBtn = document.getElementById('vk-launch-btn');
+        if (launchBtn) launchBtn.style.display = 'none';
+    }
+};
+
+window.vkLaunchGame = function() {
+    if(typeof window.playSound==="function") window.playSound("start");
     document.getElementById('sandbox-virtual-modal').style.display = 'none';
-    
-    // We will pass it via URL
     let nameParam = encodeURIComponent(document.getElementById('player-name').value.trim() || 'Student');
-    window.transitionTo(`game.html?level=sandbox&name=${nameParam}&eq=${encodeURIComponent(eq)}`);
+    let eqParam = encodeURIComponent((window.validSandboxLevel && window.validSandboxLevel.equation) || 'H2 + O2 -> H2O');
+    window.transitionTo(`game.html?level=sandbox&name=${nameParam}&eq=${eqParam}`);
 };
 
 // Builder Mode
