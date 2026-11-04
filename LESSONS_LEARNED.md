@@ -201,3 +201,23 @@
   2. Upgraded the home page Help button to `startHomeSpotlightTour()`, featuring spotlight focus across Player Name, Game Modes, and a 1-click launchpad into `TUT0`.
   3. Implemented a universal chemical formula parser and stoichiometric matrix solver (`js/element_data.js`) supporting parentheses, physical typing, and virtual periodic table input with instant chemical validity feedback and balanced equation outputs.
   4. Tuned tablet hold threshold to 320ms, added `.sic-touch-holding` physical press feedback, and added an explicit tap-anywhere dismiss hint.
+
+
+## 14. Non-Dimming Spotlight Guidance, 118-Element Chemistry Keyboard, and Study Room Viewport Lifecycle
+* **Symptom**:
+  1. The tutorial level previously darkened the whole viewport with heavy blackout blocker divs, obscuring the chemical laboratory and making it difficult for students to see the beakers and scales.
+  2. Clicking "Study Room" during the tutorial opened a full-screen modal that trapped the student and blocked subsequent gameboard tutorial steps because the close button was unreachable behind tutorial masks.
+  3. The tutorial did not walk students through the actual stoichiometric math required to balance the water reaction.
+  4. The main menu Help tour omitted the interactive periodic table, career records/stats, and challenge mode modifiers.
+  5. The Sandbox keyboard lacked a full periodic table and custom equation numpad with presets.
+* **Root Causes**:
+  - Blocker div styling used high-opacity slate fills (`rgba(15, 23, 42, 0.82)`) with `pointer-events: auto`, intercepting modal clicks and dimming ambient game context.
+  - Tutorial steps lacked modal lifecycle awareness: navigating away from `#btn-open-study-room` failed to dismiss `#study-room-modal`.
+  - The previous virtual keyboard was truncated to 36 elements and lacked dedicated equation operators and presets.
+* **Solution**:
+  1. Converted all tutorial and spotlight blocker overlays to transparent backgrounds (`background: transparent; pointer-events: none;`) with animated, vibrant pulsing rings (`#tour-pulse-ring` and `#home-tour-pulse`) and bouncing indicator pills.
+  2. Implemented modal lifecycle cleanup: `renderTourStep` automatically closes `#study-room-modal` on non-study-room steps, and explicitly spotlights `#study-room-close-btn` during inspection.
+  3. Built active state polling in `js/tutorial.js` that detects real student actions ($H_2$, $O_2$, $H_2O$ beaker counts, tray drawer open, study room close) before auto-advancing.
+  4. Scripted pedagogical solving steps that teach the MINOH logic for water synthesis: balancing Oxygen first ($H_2 + O_2 \rightarrow 2H_2O$) and then Hydrogen ($2H_2 + O_2 \rightarrow 2H_2O$).
+  5. Expanded the main menu Help tour to 7 rich steps showcasing Player Profiles, Career Stats & Badges, Interactive Periodic Table, SPM Class Modes, Challenge Modifiers (No Scale, No Hints, 90s Rush, 2.5x multiplier), Sandbox Mode, and the Tutorial launchpad.
+  6. Duplicated the full 118-element Interactive Periodic Table inside the Chemistry Keyboard with atomic numbers, symbols, names, group colors, and legend, flanked by a dedicated Equation Keypad (numbers 0-9, parentheses, `+`, `→`, Backspace, Clear, Check & Solve, and Quick Preset chips).
