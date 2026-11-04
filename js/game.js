@@ -1018,6 +1018,8 @@ window.resetIdleGuidanceTimer = function() {
     if (window.idleGuidanceTimer) clearTimeout(window.idleGuidanceTimer);
     if (window.isChallengeMode) return;
     window.idleGuidanceTimer = setTimeout(() => {
+        // If student is already actively chatting, don't interrupt with idle cards
+        if (window.beakerChatHistory && window.beakerChatHistory.length > 0) return;
         if (!window.proactiveBeakerTriggeredForLevel && window.counts && !window.counts.isEmpty) {
             let rCounts = window.counts.rCounts || {};
             let pCounts = window.counts.pCounts || {};
@@ -1052,7 +1054,7 @@ window.resetIdleGuidanceTimer = function() {
                 window.addChatMessage(cardHtml, "Prof. Beaker", "assistant");
             }
         }
-    }, 25000);
+    }, 50000);
 };
 
 window.checkProactiveBeakerGuidance = function(rCounts, pCounts, isBalanced) {
@@ -1080,7 +1082,7 @@ window.checkProactiveBeakerGuidance = function(rCounts, pCounts, isBalanced) {
     }
     window.lastBalanceScore = totalImbalance;
     
-    if (window.unproductiveMovesCount >= 3 && !window.proactiveBeakerTriggeredForLevel && worstElement) {
+    if (window.unproductiveMovesCount >= 5 && !window.proactiveBeakerTriggeredForLevel && worstElement) {
         window.proactiveBeakerTriggeredForLevel = true;
         window.unproductiveMovesCount = 0;
         let elName = ELEM_NAMES[worstElement] || worstElement;
@@ -1246,6 +1248,61 @@ window.clearChat = function(userInitiated) {
     if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
 };
 
+
+window.getLocalProfBeakerReply = function(userPrompt, lvl, rCounts, pCounts) {
+    const p = (userPrompt || '').toLowerCase();
+    
+    // 1. Greetings
+    if (/\b(hi|hello|hey|halo|salam|morning|afternoon|evening|yo)\b/.test(p)) {
+        return "Hello there! Professor Beaker here, glad to have you in the lab. Take a look at the seesaw scale in the center. Let us balance this equation together!";
+    }
+    
+    // 2. Ready / Start / Let's go
+    if (/\b(let|lets|let's|start|begin|ready|go|ok|okay)\b/.test(p)) {
+        return "Let's do this! Check the element trays on the left to spot which atoms are uneven, and add molecules using the plus buttons to level the seesaw.";
+    }
+    
+    // 3. Coefficients and Subscripts
+    if (/\b(coeff|coefficient|subscript|number|numbers)\b/.test(p)) {
+        return "Great question! The big numbers in front are **coefficients** (how many molecule bundles you have). The small numbers like the ₂ in N₂ are **subscripts** (atoms bonded inside). You can change coefficients, but never subscripts!";
+    }
+    
+    // 4. Starting Over / Reset
+    if (/\b(reset|start over|clear|restart|trash|undo)\b/.test(p)) {
+        return "To start fresh, tap the red **trash can button** (🗑️) next to the hint button below to reset all coefficients to 1, or click any molecule block in the drop zones to remove it!";
+    }
+    
+    // 5. How to balance / MINOH rule / Stuck
+    if (/\b(how|what|balance|minoh|rule|stuck|help|clue|hint|guide|next)\b/.test(p)) {
+        let worstEl = null;
+        let maxDiff = 0;
+        for (let el in rCounts) {
+            let diff = Math.abs((rCounts[el] || 0) - (pCounts[el] || 0));
+            if (diff > maxDiff) { maxDiff = diff; worstEl = el; }
+        }
+        if (worstEl && maxDiff > 0) {
+            let elName = (window.ELEM_NAMES && window.ELEM_NAMES[worstEl]) || worstEl;
+            let lighterSide = (rCounts[worstEl] || 0) < (pCounts[worstEl] || 0) ? "Reactants (Left)" : "Products (Right)";
+            return `Follow the **MINOH** strategy! Right now, **${elName}** is uneven (${rCounts[worstEl] || 0} Left vs ${pCounts[worstEl] || 0} Right). Try adding a molecule with **${worstEl}** to the **${lighterSide}** side, or tap **I am Stuck! Help!** below for the exact step!`;
+        }
+        return "Follow the **MINOH** strategy: Metals first, then Polyatomic ions, Non-metals next, Oxygen near the end, and Hydrogen last! Tap **I am Stuck! Help!** below for step-by-step guidance.";
+    }
+    
+    // 6. Generic friendly contextual reply
+    let worstEl = null;
+    let maxDiff = 0;
+    for (let el in rCounts) {
+        let diff = Math.abs((rCounts[el] || 0) - (pCounts[el] || 0));
+        if (diff > maxDiff) { maxDiff = diff; worstEl = el; }
+    }
+    if (worstEl && maxDiff > 0) {
+        let elName = (window.ELEM_NAMES && window.ELEM_NAMES[worstEl]) || worstEl;
+        return `I am here to help! Looking at the scales, **${elName}** is currently off balance. Try adjusting the coefficient for molecules containing **${worstEl}**, or click **I am Stuck! Help!** below for a direct clue.`;
+    }
+    
+    return "You are doing great! Keep comparing the atom counts on both sides of the reaction arrow. If you need a hint, tap the yellow button below!";
+};
+
 window.askProfBeaker = async function(userPrompt) {
     if (!userPrompt || !userPrompt.trim()) return;
     if (window.isBeakerThinking) return;
@@ -1332,12 +1389,25 @@ Current Product Atom Totals: ${JSON.stringify(pCounts)}`;
             window.beakerChatHistory.push({ role: 'assistant', content: cleanReply });
             if (typeof playSound === 'function') playSound('pop');
         } else {
-            let errMsg = data.error || 'I could not process that request right now. Try checking the element trays on the left!';
-            window.addChatMessage(errMsg, 'Prof. Beaker', 'assistant');
+            const rCounts = window.counts?.rCounts || {};
+            const pCounts = window.counts?.pCounts || {};
+            let fallbackReply = window.getLocalProfBeakerReply(userPrompt, currentLevelData, rCounts, pCounts);
+            window.addChatMessage(fallbackReply, 'Prof. Beaker', 'assistant');
+            window.beakerChatHistory = window.beakerChatHistory || [];
+            window.beakerChatHistory.push({ role: 'user', content: userPrompt });
+            window.beakerChatHistory.push({ role: 'assistant', content: fallbackReply });
+            if (typeof playSound === 'function') playSound('pop');
         }
     } catch (err) {
         document.querySelectorAll('#' + typingId).forEach(el => el.remove());
-        window.addChatMessage('Connection interrupted. Let us check the scales on the left to see what needs balancing!', 'Prof. Beaker', 'assistant');
+        const rCounts = window.counts?.rCounts || {};
+        const pCounts = window.counts?.pCounts || {};
+        let fallbackReply = window.getLocalProfBeakerReply(userPrompt, currentLevelData, rCounts, pCounts);
+        window.addChatMessage(fallbackReply, 'Prof. Beaker', 'assistant');
+        window.beakerChatHistory = window.beakerChatHistory || [];
+        window.beakerChatHistory.push({ role: 'user', content: userPrompt });
+        window.beakerChatHistory.push({ role: 'assistant', content: fallbackReply });
+        if (typeof playSound === 'function') playSound('pop');
     } finally {
         window.isBeakerThinking = false;
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = '1'; }
