@@ -292,7 +292,34 @@ function initEngine() {
     // Remove quotes if present
     levelId = levelId.replace(/['"]/g, '');
     
-    currentLevelData = LEVELS[levelId];
+    if (levelId === 'sandbox') {
+        let stored = localStorage.getItem('stoich_custom_sandbox');
+        let customData = null;
+        if (stored) {
+            try { customData = JSON.parse(stored); } catch (_) {}
+        }
+        if (!customData || !customData.reactants || customData.reactants.length === 0) {
+            let eqParam = params.get('eq') || localStorage.getItem('stoich_sandbox_level') || 'H2 + O2 -> H2O';
+            customData = (typeof window.buildSandboxLevelData === 'function') ? window.buildSandboxLevelData(eqParam) : null;
+        }
+        if (customData) {
+            currentLevelData = {
+                id: 'sandbox',
+                title: 'Sandbox : ' + (customData.equation || 'Custom Reaction'),
+                form: 'Sandbox',
+                equation: customData.equation || 'Custom Reaction',
+                reactants: customData.reactants,
+                products: customData.products,
+                elements: customData.elements,
+                balanced: customData.balanced
+            };
+            LEVELS['sandbox'] = currentLevelData;
+        } else {
+            currentLevelData = LEVELS['F4L1'];
+        }
+    } else {
+        currentLevelData = LEVELS[levelId];
+    }
     window.proEquationRendered = false;
 
     if (!currentLevelData) {
@@ -314,6 +341,11 @@ function initEngine() {
     if (existingReviewBtn) existingReviewBtn.remove();
 
     window.hardFloorOfOne = (!window.isChallengeMode && levelId !== 'TUT0' && levelId !== 'tutorial');
+    if (levelId === 'TUT0' || levelId === 'tutorial') {
+        setTimeout(() => {
+            if (typeof window.openTutorial === 'function') window.openTutorial(0);
+        }, 320);
+    }
     
     window.unproductiveMovesCount = 0;
     window.lastBalanceScore = 999;
@@ -475,7 +507,7 @@ function renderBoard() {
         btnReactContainer.innerHTML = '';
         currentLevelData.reactants.forEach(m => {
             let btn = document.createElement('div');
-            btn.className = 'mol-btn btn-react has-chem-info'; btn.setAttribute('data-info', 'btn-react'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'react'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
+            btn.id = 'btn-add-react-' + m.id; btn.className = 'mol-btn btn-react has-chem-info'; btn.setAttribute('data-info', 'btn-react'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'react'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
             btn.innerHTML = `<span style="font-size: 1.5rem; margin-right: 4px;">+</span> <span>${m.displayHtml}</span>`;
             
               btn.onclick = () => window.addMolecule('react', m.id);
@@ -490,7 +522,7 @@ function renderBoard() {
         const isDenseProd = currentLevelData.products.length >= 3;
         currentLevelData.products.forEach(m => {
             let btn = document.createElement('div');
-            btn.className = 'mol-btn btn-prod has-chem-info'; btn.setAttribute('data-info', 'btn-prod'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'prod'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
+            btn.id = 'btn-add-prod-' + m.id; btn.className = 'mol-btn btn-prod has-chem-info'; btn.setAttribute('data-info', 'btn-prod'); btn.setAttribute('data-mol-name', m.name); btn.setAttribute('data-mol-id', m.id); btn.setAttribute('data-side', 'prod'); btn.setAttribute('data-composition', JSON.stringify(m.composition));
             if (isDenseProd) {
                 btn.style.padding = '8px 8px';
                 btn.style.fontSize = '0.95rem';
@@ -2006,7 +2038,7 @@ window.showWinPopup = function(isPerfect) {
     let shadowColor = isPerfect ? "#047857" : "#b45309";
     let titleColor = isPerfect ? "#059669" : "#d97706";
     let titleText = isPerfect ? "PERFECT BALANCE!" : "BALANCED!";
-    let subText = isPerfect ? "Flawless work! The equation is in its simplest form." : "Nice job! The equation is balanced, but the coefficients can be simplified further.";
+    let subText = (levelId === "TUT0") ? "Awesome job! You balanced your first reaction: 2H₂ + O₂ → 2H₂O. You are ready for Form 4!" : (isPerfect ? "Flawless work! The equation is in its simplest form." : "Nice job! The equation is balanced, but the coefficients can be simplified further.");
     let badgeText = isPerfect ? "3 STARS" : "1.5 STARS";
     
     let svgFull = `<svg width="40" height="40" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 4px; filter:drop-shadow(0 4px 0 rgba(0,0,0,0.15));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
@@ -2079,7 +2111,8 @@ window.showWinPopup = function(isPerfect) {
     buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.enterReviewMode('${nextLevel || ''}');" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">REVIEW</button>`;
     
     if (nextLevel) {
-        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">NEXT LEVEL</button>`;
+        let nextBtnLabel = (levelId === "TUT0") ? "START FORM 4 ▶" : "NEXT LEVEL";
+        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">${nextBtnLabel}</button>`;
     }
     
     buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">MAIN MENU</button>`;
