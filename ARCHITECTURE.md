@@ -107,3 +107,18 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
 * **In-Place Inter-Level Navigation & Fullscreen Continuity Invariant**:
   - Transitioning between levels (`window.slideTransitionTo()` and `window.transitionTo()`) updates the browser history via `history.pushState(null, '', url)` and triggers `initEngine()` in-place.
   - By avoiding document destruction and page reloads (`window.location.href`), HTML5 Fullscreen is continuously preserved without exiting across all level completions.
+
+
+## 8. MINOH Balancing Strategy & Interactive Pedagogical Tooling Engine
+* **Level Start MINOH Attack Plan (`window.buildLevelMinohPlanCard`)**:
+  - Automatically calculates the optimal balancing sequence for any chemical equation based on the MINOH heuristic:
+    1. Metals (M) first (e.g. Na, K, Ca, Mg, Al, Zn, Fe, Pb, Cu, Ag).
+    2. Polyatomic Ions (I) next if appearing unchanged on both sides (e.g. SO4, NO3, CO3, OH).
+    3. Non-Metals (N) next (e.g. C, N, Cl, S, P, Br, I).
+    4. Oxygen (O) near the end.
+    5. Hydrogen (H) always last.
+  - Generates a structured strategy card posted by Prof. Beaker directly following the initial welcome greeting.
+* **Interactive Chemistry Hover Classification (`js/info_cards.js`)**:
+  - Every element token, tracker drawer card, and molecule compound provides instant MINOH category context (`[M] Metal`, `[I] Polyatomic Ion`, `[N] Non-Metal`, `[O] Oxygen`, `[H] Hydrogen`) and balancing priority.
+* **Uncrowded Clue Card Architecture**:
+  - Socratic guidance card in Stage 1 features a centered MINOH Rule callout with zero secondary button text collision. Stage 2 provides step solutions with full chemical reasoning.
