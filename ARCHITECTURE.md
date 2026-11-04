@@ -122,3 +122,37 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
   - Every element token, tracker drawer card, and molecule compound provides instant MINOH category context (`[M] Metal`, `[I] Polyatomic Ion`, `[N] Non-Metal`, `[O] Oxygen`, `[H] Hydrogen`) and balancing priority.
 * **Uncrowded Clue Card Architecture**:
   - Socratic guidance card in Stage 1 features a centered MINOH Rule callout with zero secondary button text collision. Stage 2 provides step solutions with full chemical reasoning.
+
+
+## 9. Scripted Tutorial Level (TUT0), Home Spotlight Tour, and Sandbox Reaction Builder
+* **Dedicated Scripted Tutorial Level (`TUT0`)**:
+  - Reaction: Water Synthesis ($2H_2 + O_2 \rightarrow 2H_2O$).
+  - Starting Floor: Explicitly initialized with 0 molecules (`window.hardFloorOfOne = false`) so students begin with empty beakers.
+  - 13-Step Physical Spotlight Walkthrough (`js/tutorial.js`):
+    - Dims the entire viewport using four opaque blocker divs (`#tut-mask-top`, `#tut-mask-bottom`, `#tut-mask-left`, `#tut-mask-right`) framing an unmasked interactive cutout.
+    - Systematically guides the student through:
+      1. Chemical Equation reading.
+      2. Element info cards (hover and tablet hold mechanics).
+      3. Adding reactant molecules ($H_2$ and $O_2$).
+      4. Mini balance scales and atom tracking.
+      5. Removing mistakes using element trash cans.
+      6. Adding product molecules ($H_2O$).
+      7. Using Professor Beaker and MINOH rules for advice.
+      8. Study Room reference notes.
+      9. Final balancing to $2H_2 + O_2 \rightarrow 2H_2O$.
+      10. Custom victory celebration and direct transition into Form 4 curriculum.
+* **Home Page Interactive Spotlight Tour (`startHomeSpotlightTour`)**:
+  - Accessible via the top-left Help button on the main menu.
+  - Spotlight sequences through Player Name personalization, Game Modes, and an action card offering a direct one-click launchpad into `game.html?level=TUT0`.
+* **Universal Chemical Equation Parser & Stoichiometric Solver (`js/element_data.js`)**:
+  - `parseChemicalFormula(formula)`: Handles compound parsing with nested parentheses (e.g. $Ca(OH)_2$, $(NH_4)_2SO_4$).
+  - `validateAndSolveEquation(equation)`: Validates element existence against `FULL_ELEMENT_DB`, ensures elemental balance, and computes lowest integer stoichiometric coefficients.
+  - `buildSandboxLevelData(equation)`: Generates valid level objects on the fly with custom reactant/product inventories.
+* **Interactive Sandbox Reaction Builder & Virtual Chemistry Keyboard**:
+  - Dual input modalities:
+    1. Virtual periodic table keyboard with formula buttons, parenthetical inputs, and reaction arrows.
+    2. Physical keyboard typing and pasting directly into `#vk-display` with real-time Enter-key submission and live validation feedback.
+  - Launches into sandbox game board with a guaranteed floor of 1 molecule per compound.
+* **Snappy Tablet Info Card Touch & Hold Engine**:
+  - Long-press delay reduced to 320ms with active `.sic-touch-holding` CSS animation (`scale(0.95)` with brightness dip).
+  - Explicit touch dismiss pill (`👆 Tap anywhere to close`) and updated tooltips across all buttons.
