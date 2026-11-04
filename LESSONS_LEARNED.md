@@ -221,3 +221,144 @@
   4. Scripted pedagogical solving steps that teach the MINOH logic for water synthesis: balancing Oxygen first ($H_2 + O_2 \rightarrow 2H_2O$) and then Hydrogen ($2H_2 + O_2 \rightarrow 2H_2O$).
   5. Expanded the main menu Help tour to 7 rich steps showcasing Player Profiles, Career Stats & Badges, Interactive Periodic Table, SPM Class Modes, Challenge Modifiers (No Scale, No Hints, 90s Rush, 2.5x multiplier), Sandbox Mode, and the Tutorial launchpad.
   6. Duplicated the full 118-element Interactive Periodic Table inside the Chemistry Keyboard with atomic numbers, symbols, names, group colors, and legend, flanked by a dedicated Equation Keypad (numbers 0-9, parentheses, `+`, `→`, Backspace, Clear, Check & Solve, and Quick Preset chips).
+
+
+## 15. Home Spotlight Target Alignment and Permanent Stats Trophy Access
+* **Symptom**:
+  1. Step 4 ("4/7 Syllabus") in the main menu tour was severely unaligned, highlighting an empty area in the top corner of the screen.
+  2. Step 2 ("2/7 Records") failed to highlight the trophy button properly because the trophy was missing on default page load.
+* **Root Causes**:
+  1. `HOME_STEPS[3]` used selector `#mode-form4`, which did not exist in the DOM (the actual element ID is `#mode-class`). When `document.querySelector` returned `null`, the spotlight calculation fell back to hardcoded coordinates `(150, 100)`.
+  2. The Career Records trophy button (`#challenge-stats-btn`) was styled as `display: none` in `css/style.css` and explicitly hidden in `js/app.js` when `currentMode === 'class'`, returning `0x0` bounding coordinates on page load.
+* **Solution**:
+  1. Corrected `HOME_STEPS[3].selector` to `#mode-class`, which spotlights the Class Mode card with both Form 4 and Form 5 options.
+  2. Changed `.btn-stats` in `css/style.css` and `js/app.js` to permanent `display: inline-flex`. The golden trophy button now sits alongside the player name input across all modes, enabling students to access their records and trophies at any time.
+  3. Added `scrollIntoView({ behavior: 'smooth', block: 'nearest' })` and safe viewport-centering fallback inside `positionHomeSpotlight` to prevent misplaced cutout frames.
+
+
+## 16. Detailed 16-Step Pedagogical Tutorial Flow with Side, Bottom, and Hint Checks
+* **Symptom**:
+  - The tutorial felt too fast and mechanical. Students were asked to click buttons without understanding intermediate atom tallies, without opening side drawers, without checking bottom counters, and without learning how to use the hint system.
+* **Root Causes**:
+  - The sequence skipped the intermediate checks where students see that balancing Oxygen ($H_2 + O_2 \rightarrow 2H_2O$) shifts Hydrogen from 2 to 4.
+  - The tutorial never prompted the student to interact with the hint button ("I am Stuck! Help!") or observe the Element Tray mini-scales.
+* **Solution**:
+  1. Expanded `TUT0_STEPS` in `js/tutorial.js` into an ordered 16-step flow:
+     - Steps 1-2: Mission goal ($H_2 + O_2 \rightarrow H_2O$) and formula inspector.
+     - Steps 3-4: Add $+ H_2$ and check the left bottom counter ($H=2, O=0$).
+     - Steps 5-6: Add $+ O_2$ and observe the center seesaw scale tilting down to the left.
+     - Steps 7-8: Add $+ H_2O$ and check the right bottom counter ($H=2, O=1$).
+     - Step 9: Compare the scale (Hydrogen even, Oxygen uneven).
+     - Step 10: Slide open the left Element Tray to inspect the MINOH mini-scales.
+     - Step 11: Interactive prompt to click "I am Stuck! Help!" (`#btn-guided-hint`).
+     - Step 12: Spotlight Prof. Beaker's speech bubble containing the MINOH clue.
+     - Step 13: Apply the clue by adding a second $+ H_2O$.
+     - Step 14: Check bottom and side again to notice Hydrogen has shifted to 4 on the right while left only has 2.
+     - Step 15: Explain mistake correction (clicking placed cards in the drop zone).
+     - Step 16: Balance Hydrogen by adding a second $+ H_2$, reaching equilibrium and cleanly triggering the victory celebration.
+  2. Implemented side-docked and bottom-docked card layout rules in `positionSpotlight` so the popover card never obstructs active hints, bottom counters, or side drawers.
+
+
+## 17. Redesigned Tactile Laboratory Numpad and In-Keypad AI Auto-Complete
+* **Symptom**:
+  - The sandbox numpad looked like a generic, plain grid of grey buttons with poor visual contrast and no tactile feedback.
+  - Teachers and students had to manually look up products and balance equations by hand before testing custom levels.
+* **Root Causes**:
+  - The previous virtual keyboard used basic form buttons without depth, active feedback, or clear semantic grouping.
+  - The system lacked an automated chemistry auto-complete tool to deduce products when only reactants were entered.
+* **Solution**:
+  1. Redesigned the virtual keyboard numpad into a laboratory control keypad with dark navy borders (`3.5px solid #1e293b`), physical 3D button press depth (`box-shadow: 0 4px 0 #1e293b`), lilac parentheses, royal blue plus, emerald yields, ruby backspace, and amber solve buttons.
+  2. Integrated an in-keypad `✨ AI Auto-Complete Equation` button powered by `window.resolveReactionFromPrompt` and `window.vkAiAutoComplete`.
+  3. Added unicode subscript normalization (`[₀-₉]` to `[0-9]`) so typed formulas like `Fe + O₂` reliably match chemical database entries.
+  4. Added `💾 Save This Level` right beside the launch button, allowing users to save validated equations to their custom level collection in `localStorage`.
+
+
+## 18. AI Natural Language Reaction Builder and Non-Overlapping Victory Lifecycle
+* **Symptom**:
+  - Building custom levels was tedious for users who did not remember exact chemical formulas.
+  - On completing the interactive tutorial (TUT0), the victory popup appeared behind or underneath the tour dialog, creating an overlapping interface mess.
+* **Root Causes**:
+  - The sandbox lacked a natural language creator to interpret informal queries like "rusting iron", "burning methane", or "acid base".
+  - The victory modal (`#win-popup` at `z-index: 10000`) and the tutorial tour card (`#tour-card` at `z-index: 99995`) had separate lifecycles without mutual dismissal hooks.
+* **Solution**:
+  1. Built the AI Reaction & Level Generator modal (`#sandbox-ai-modal`) with 8 one-click suggestion chips and an input bar that accepts natural language descriptions, informal phrases, or messy chemical formulas.
+  2. The AI parses the prompt, solves the equation, displays a preview card with MINOH guidance, and prompts: *"Save this level to your collection?"* with `💾 Save Level`, `🚀 Play Level Now`, and `✏️ Edit in Keypad`.
+  3. Hooked `window.closeTutorial()` directly into `window.showWinPopup` in `js/game.js` and added a `MutationObserver` on `document.body` in `js/tutorial.js` that automatically closes the tutorial card the instant `#win-popup` is created, ensuring the victory screen remains clean and unobstructed.
+
+
+
+## 19. Hands-On 20-Step Gating, Mistake Erasure Exercise, Element Tray Mini-Scales, and Deferred Tutorial Victory
+* **Symptom**:
+  1. Students could bypass interactive tutorial steps without hovering, clicking, or understanding the tools.
+  2. The tutorial previously lacked practice in error recovery, element mini-scale inspection, chat interaction, and bar view mode.
+  3. In `TUT0`, completing the reaction prematurely triggered the victory popup while the tutorial card was still giving final instructions, causing a visual collision between the tour card and the 3-star victory modal (as seen in Image 1).
+* **Root Causes**:
+  - The "Next →" button remained clickable regardless of whether the student had actually performed the required physical action.
+  - `updateSimulation()` fired `showWinPopup(true)` immediately after 300ms on detecting `isBalanced && isSimplified`, not realizing the user was actively inside a guided walkthrough that had not reached its final conclusion.
+* **Solution**:
+  1. Implemented strict hands-on gating via `setNextButtonState(enabled)`:
+     - On interactive steps, the Next button is disabled (`opacity: 0.35`, `pointer-events: none`, `filter: grayscale(1)`).
+     - Hovering formula cards, clicking reactants/products, toggling views, opening drawers, typing in chat, making deliberate mistakes, and deleting cards dynamically unlocks Next or auto-advances.
+  2. Incorporated deliberate mistake training:
+     - Step 18 instructs the student to add an extra $H_2$ block to reach 3 blocks ($H=6$).
+     - Step 19 teaches error recovery by requiring the student to click the placed block in the beaker to delete it back to 2 blocks ($H=4$).
+  3. Integrated Element Tray drawer inspection (live counters and mini-scales) and Bar View mode comparisons.
+  4. Deferred the victory celebration modal in `TUT0`: `updateSimulation()` suppresses auto-popup during `TUT0` until the student reaches Step 20 and clicks "Finish 🚀", which closes the tour immediately and presents the victory celebration modal in full glory with zero visual overlap.
+
+## Section 21: Modal Collision Protection, Spotlight Targeting & Cache Invariants (11/04/2026)
+
+### 1. Tutorial vs Victory Modal Collision (TUT0)
+- **Problem**: When completing TUT0, both the victory celebration overlay and the tutorial card rendered simultaneously, colliding with overlapping z-indexes.
+- **Fix**:
+  1. `js/game.js` checks `const isTutLevel = currentParamLvl.startsWith('TUT')` and delays `showWinPopup` until `window.tutorialFinished` is set upon clicking Finish Tour.
+  2. `window.showWinPopup` explicitly removes `stoich-spotlight-tour` from the DOM and elevates `#win-popup` to `z-index: 999999`.
+  3. `js/tutorial.js` registers a `MutationObserver` that instantly destroys `tourContainer` if `#win-popup` is injected into the DOM.
+
+### 2. Elimination of Visual Gimmicks & Resilient Spotlight Positioning
+- **Problem**: A yellow oval badge (`#ht-spotlight-pill`) labeled "SPOTLIGHT" was sticking out awkwardly from behind cards, and Step 4 targeting was pointing to a non-existent selector (`#mode-form4`), causing the highlight to drop to fallback coordinates at the screen corner.
+- **Fix**:
+  1. Permanently removed `#ht-spotlight-pill`. Focus states use a clean glowing blue focus ring.
+  2. Aligned Step 4 selector to `#mode-class` and added bounding checks so fallbacks center cleanly in the viewport.
+
+### 3. Local Development Cache Immunity
+- **Problem**: Browsers aggressively cache local static `.js` and `.css` assets, resulting in stale UI runs after code changes.
+- **Fix**:
+  1. Configured `server.js` with explicit HTTP headers: `Cache-Control: no-store, no-cache, must-revalidate`, `Pragma: no-cache`, `Expires: 0`.
+  2. Injected cache-busting version query parameters (`?v=timestamp`) across all script tags in `game.html` and `index.html`.
+
+## Section 22: Direct Periodic Table Keypad Entry & Dedicated Sandbox Levels View (11/04/2026)
+
+### 1. Direct Periodic Table Entry (Elimination of Intermediate Friction)
+- **Problem**: When selecting Sandbox Mode, an intermediate choice modal ("How do you want to build?") added unwanted friction and cluttered the user flow.
+- **Fix**:
+  1. `#mode-sandbox` inside `index.html` was upgraded with two tactile sub-buttons: `Create` (default) and `Levels`, visually mirroring `Form 4` and `Form 5` in Class mode.
+  2. Selecting `Create` sets the main launch button to `Create Level` and triggers `window.openVirtualKeyboard()` directly, bringing students straight into the 118-element periodic table and custom equation numpad with zero intermediate screens.
+
+### 2. Dedicated Sandbox Levels Screen (`levels.html?mode=sandbox`)
+- **Problem**: Custom levels were previously only viewable inside small drawers in modals rather than enjoying their own dedicated level select screen.
+- **Fix**:
+  1. Implemented `window.renderSandboxLevelsScreen(params)` in `levels.html`, activated whenever `mode=sandbox` is detected in URL parameters.
+  2. Applied `.is-sandbox-mode` purple laboratory background (`#7c3aed`), arcade custom reaction cards with `🚀 PLAY` and `🗑️ DELETE` buttons, and a prominent `✨ + Create Level` header button.
+  3. Added an empty state with a call-to-action to craft a first reaction if `stoich_saved_custom_levels` is empty.
+  4. Selecting `Levels` in the main menu sets the launch button to `Select Levels` and transitions directly to `levels.html?mode=sandbox`.
+
+
+## Section 23: Single-Line Equation Auto-Fit, In-Memory Audio & Layout Resilience (11/05/2026)
+
+### 1. Single-Line Equation Auto-Fit Loop (`game.html`)
+- **Problem**: Splitting long chemical reactions into 3 stacked rows compromised glanceable readability and took vertical space away from the balance beam.
+- **Root Cause**: Fixed font sizes and flex-wrapping forced equations like $1\text{Na} + 1\text{H}_2\text{O} \rightarrow 1\text{NaOH} + 1\text{H}_2$ onto multiple wrapped lines.
+- **Solution**: Removed 3-row wrapping rules and implemented `window.autoFitEquation()`. The engine compares `scrollWidth` vs. `clientWidth` and dynamically computes a scaling factor between 1.0 and 0.52, guaranteeing that every reaction remains strictly on a single horizontal row across all screen sizes.
+
+### 2. Zero-Latency Audio Delivery Engine (`js/audio_assets.js`)
+- **Problem**: Audio effects for level selection and game start occasionally failed to play or experienced audio lag due to network round-trips for external `.mp3` files.
+- **Solution**: Generated uncompressed 16-bit PCM WAV Data URIs preloaded directly into memory in `js/audio_assets.js`. Wired into both `index.html` and `levels.html` with 480ms transition buffers, ensuring instantaneous sound feedback on first click.
+
+### 3. Rogue Closing Tag Layout Collapse (`index.html`)
+- **Problem**: On 1080p widescreen monitors, the main landing container squished to an 92px wide sliver pinned to the left edge of the screen.
+- **Root Cause**: A premature `</style>` tag inside an embedded style block leaked subsequent CSS rules into `<body>` as plain text nodes. The flex layout treated these loose text nodes as anonymous flex items, robbing the container of width.
+- **Solution**: Removed the premature tag and applied `flex-shrink: 0;` to `.main-container` as an architectural safeguard.
+
+### 4. Lab Keypad & Prof. Bunsen Assistant Polish
+- **Problem**: Duplicate clear buttons confused students, and saved custom levels rendered redundant duplicate titles (e.g. "Custom: Mg + O2 -> MgO" repeated twice).
+- **Solution**: Streamlined keypad inputs with a dedicated red SVG Backspace button in the input field, moved Clear to the numpad, and introduced deduplication logic that automatically displays genuine chemical names (e.g. "Magnesium Oxidation") alongside monospace formula chips.
