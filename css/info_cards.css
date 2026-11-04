@@ -504,3 +504,10 @@
     border-radius: 12px !important;
     box-shadow: 0 4px 0 #0f172a !important;
 }
+
+/* Touch Hold Feedback for Tablets */
+.sic-touch-holding {
+    transform: scale(0.95) !important;
+    filter: brightness(0.92) !important;
+    transition: transform 0.12s ease-out, filter 0.12s ease-out !important;
+}
