@@ -994,29 +994,68 @@ window.openVirtualKeyboard = function() {
     document.getElementById('sandbox-virtual-modal').style.display = 'flex';
     document.getElementById('vk-display').innerText = '';
     
-    // Generate PT Grid if not already done
+    // Generate PT Grid if not already done - uses full 118 elements and group colors!
     let grid = document.getElementById('vk-pt-grid');
     if(grid && grid.children.length === 0) {
-        const groups = {
-            'alkali': '#ef4444', 'alkaline': '#f97316', 'transition': '#f59e0b',
-            'post': '#84cc16', 'metalloid': '#10b981', 'nonmetal': '#06b6d4',
-            'halogen': '#3b82f6', 'noble': '#8b5cf6', 'lanthanide': '#d946ef',
-            'actinide': '#f43f5e', 'unknown': '#64748b'
-        };
-        const rawElements = [
-            [1,'H','Hydrogen','nonmetal',1,1], [2,'He','Helium','noble',18,1],
-            [3,'Li','Lithium','alkali',1,2], [4,'Be','Beryllium','alkaline',2,2], [5,'B','Boron','metalloid',13,2], [6,'C','Carbon','nonmetal',14,2], [7,'N','Nitrogen','nonmetal',15,2], [8,'O','Oxygen','nonmetal',16,2], [9,'F','Fluorine','halogen',17,2], [10,'Ne','Neon','noble',18,2],
-            [11,'Na','Sodium','alkali',1,3], [12,'Mg','Magnesium','alkaline',2,3], [13,'Al','Aluminum','post',13,3], [14,'Si','Silicon','metalloid',14,3], [15,'P','Phosphorus','nonmetal',15,3], [16,'S','Sulfur','nonmetal',16,3], [17,'Cl','Chlorine','halogen',17,3], [18,'Ar','Argon','noble',18,3],
-            [19,'K','Potassium','alkali',1,4], [20,'Ca','Calcium','alkaline',2,4], [21,'Sc','Scandium','transition',3,4], [22,'Ti','Titanium','transition',4,4], [23,'V','Vanadium','transition',5,4], [24,'Cr','Chromium','transition',6,4], [25,'Mn','Manganese','transition',7,4], [26,'Fe','Iron','transition',8,4], [27,'Co','Cobalt','transition',9,4], [28,'Ni','Nickel','transition',10,4], [29,'Cu','Copper','transition',11,4], [30,'Zn','Zinc','transition',12,4], [31,'Ga','Gallium','post',13,4], [32,'Ge','Germanium','metalloid',14,4], [33,'As','Arsenic','metalloid',15,4], [34,'Se','Selenium','nonmetal',16,4], [35,'Br','Bromine','halogen',17,4], [36,'Kr','Krypton','noble',18,4]
-        ]; // Shortened for space, but valid for basic testing
-
         let ptHtml = '';
+        const rawElements = (typeof PT_RAW_ELEMENTS !== 'undefined') ? PT_RAW_ELEMENTS : [];
+        const groups = (typeof PT_GROUPS !== 'undefined') ? PT_GROUPS : {};
+
         rawElements.forEach(el => {
             let col = groups[el[3]] || '#94a3b8';
-            ptHtml += `<button class="vk-pt-btn interactive" onclick="window.vkType('${el[1]}')" style="grid-column:${el[4]}; grid-row:${el[5]}; background:${col}; color:white; border:none; border-radius:8px; font-weight:900; box-shadow:0 4px 0 rgba(0,0,0,0.2); cursor:pointer;" title="${el[2]}">${el[1]}</button>`;
+            let grpClass = 'pt-group-' + el[3];
+            ptHtml += `
+            <button class="vk-pt-btn pt-element interactive ${grpClass}" data-group="${el[3]}" 
+                style="grid-column:${el[4]}; grid-row:${el[5]}; background:${col}; color:white; 
+                       border: 2px solid rgba(0,0,0,0.18); border-radius:8px; 
+                       box-shadow: 0 2px 0 rgba(0,0,0,0.25); cursor:pointer; 
+                       position:relative; display:flex; flex-direction:column; 
+                       justify-content:center; align-items:center; padding: 2px;
+                       aspect-ratio: 1/1; overflow:hidden;" 
+                title="${el[0]} - ${el[2]} (${el[1]})" 
+                onclick="window.vkType('${el[1]}')">
+                <div class="el-num" style="position:absolute; top:2%; left:5%; font-size:clamp(6px, 0.55vw, 9.5px); font-weight:900; opacity:0.85;">${el[0]}</div>
+                <div class="el-symbol" style="font-size:clamp(11px, 1.25vw, 19px); font-weight:900; line-height:1; margin-top:5%;">${el[1]}</div>
+                <div class="el-name" style="font-size:clamp(4.5px, 0.42vw, 8px); font-weight:800; opacity:0.9; text-transform:capitalize; width:95%; white-space:nowrap; text-align:center; overflow:hidden; text-overflow:ellipsis;">${el[2]}</div>
+            </button>`;
         });
-        grid.innerHTML = ptHtml;
+        
+        // Add legend bar
+        let legendHtml = `<div style="grid-column:1 / -1; margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; padding:5px 10px; background:#f8fafc; border-radius:10px; border:2px solid #e2e8f0;">`;
+        Object.keys(groups).forEach(g => {
+            let name = g.charAt(0).toUpperCase() + g.slice(1);
+            legendHtml += `<div style="display:flex; align-items:center; gap:4px; font-size:10px; font-weight:800; color:#334155;"><div style="width:10px; height:10px; border-radius:3px; background:${groups[g]}; border:1px solid rgba(0,0,0,0.15);"></div>${name}</div>`;
+        });
+        legendHtml += `</div>`;
+        grid.innerHTML = ptHtml + legendHtml;
     }
+};
+
+window.vkClear = function() {
+    if(typeof window.playSound==="function") window.playSound("click");
+    let disp = document.getElementById('vk-display');
+    if (disp) disp.innerText = '';
+    let arrowBtn = document.getElementById('vk-arrow-btn');
+    if (arrowBtn) {
+        arrowBtn.disabled = false;
+        arrowBtn.style.opacity = '1';
+    }
+    let feedback = document.getElementById('vk-feedback');
+    if (feedback) feedback.style.display = 'none';
+    let launchBtn = document.getElementById('vk-launch-btn');
+    if (launchBtn) launchBtn.style.display = 'none';
+};
+
+window.vkLoadPreset = function(presetEq) {
+    if(typeof window.playSound==="function") window.playSound("click");
+    let disp = document.getElementById('vk-display');
+    if (disp) disp.innerText = presetEq;
+    let arrowBtn = document.getElementById('vk-arrow-btn');
+    if (arrowBtn) {
+        arrowBtn.disabled = true;
+        arrowBtn.style.opacity = '0.5';
+    }
+    window.vkCheck();
 };
 
 window.vkType = function(char) {
