@@ -1,7 +1,7 @@
 /**
  * Stoichbalance V2 - Interactive Spotlight Onboarding Tour & Tutorial Level Engine
- * Uses 4 surrounding dim blockers to physically expose each targeted button,
- * allowing students to interactively click and press the highlighted feature.
+ * Keeps the board 100% bright and clear (no dark dimming) while highlighting target
+ * elements with high-visibility animated pulse rings and interactive state gating.
  */
 (function() {
     let currentStep = 0;
@@ -10,6 +10,7 @@
     let highlightPulseEl = null;
     let activeClickListener = null;
     let activeTargetEl = null;
+    let actionCheckInterval = null;
 
     // 1. Scripted Interactive Tutorial Level (TUT0: Water Synthesis)
     const TUT0_STEPS = [
@@ -18,109 +19,121 @@
             fallbackSelector: "#dynamic-sleek-equation",
             badge: "Tutorial 1/13",
             title: "Welcome! Your First Reaction",
-            desc: "Chemical equations show how atoms rearrange. The Law of Conservation of Mass states that atoms cannot be created or destroyed. What goes in must equal what comes out!",
-            tip: "🎯 Mission: Equalize Hydrogen (H) and Oxygen (O) to make Water."
+            desc: "Chemical equations show how atoms rearrange. The Law of Conservation of Mass states that atoms cannot be created or destroyed: every atom on the Reactants (left) side must equal the Products (right) side!",
+            tip: "🎯 Mission: Balance Water Synthesis (H₂ + O₂ → H₂O) step-by-step."
         },
         {
             selector: "#dynamic-sleek-equation",
             fallbackSelector: ".sleek-equation-card",
             badge: "Touch & Inspect",
             title: "Chemistry Info Cards",
-            desc: "Hover over any chemical symbol or formula to inspect its atomic composition and states of matter. <b>On tablet/touchscreen: press and hold for half a second</b> to open its interactive Chemistry Info Card!",
+            desc: "Hover over any chemical symbol or formula to inspect its atomic composition and states of matter. <b>On tablet/touchscreen: press and hold for 300ms</b> to open its interactive Chemistry Info Card!",
             tip: "📱 Tablet Tip: Tap and hold any element to inspect its card."
         },
         {
             selector: "#btn-add-react-H2",
             fallbackSelector: '[data-info="btn-react"][data-mol-id="H2"], [data-info="btn-react"]',
-            badge: "Add Reactants",
-            title: "Step 1: Add Reactant H₂",
+            badge: "Step 1: Add Reactants",
+            title: "Drop Hydrogen (H₂)",
             desc: "Tap the glowing <b>+ H₂</b> button to drop your first Hydrogen gas molecule into the left beaker. Notice that each molecule brings 2 Hydrogen atoms!",
             tip: "👉 Tap + H₂ to drop Hydrogen into the beaker!",
+            action: 'add-H2',
+            targetCount: 1,
             interactiveClick: true
         },
         {
             selector: "#btn-add-react-O2",
             fallbackSelector: '[data-info="btn-react"][data-mol-id="O2"]',
-            badge: "Add Reactants",
-            title: "Step 2: Add Reactant O₂",
+            badge: "Step 2: Add Reactants",
+            title: "Drop Oxygen (O₂)",
             desc: "Now tap <b>+ O₂</b> to drop an Oxygen gas molecule into the left beaker. It brings 2 Oxygen atoms.",
             tip: "👉 Tap + O₂ to add Oxygen!",
+            action: 'add-O2',
+            targetCount: 1,
             interactiveClick: true
         },
         {
             selector: "#btn-add-prod-H2O",
             fallbackSelector: '[data-info="btn-prod"][data-mol-id="H2O"], [data-info="btn-prod"]',
-            badge: "Add Products",
-            title: "Step 3: Create Water (H₂O)",
+            badge: "Step 3: Add Products",
+            title: "Create Water (H₂O)",
             desc: "Now tap <b>+ H₂O</b> on the right side to add one Water molecule into the products beaker.",
             tip: "👉 Tap + H₂O to create Water!",
+            action: 'add-H2O',
+            targetCount: 1,
             interactiveClick: true
         },
         {
             selector: ".scale-section",
             fallbackSelector: "#adv-giant-plank, .mini-seesaw",
-            badge: "Reading the Scales",
-            title: "Step 4: Check the Seesaw Scale",
-            desc: "Look at the seesaw scale! We have 2 Hydrogens on each side (balanced!), but we have <b>2 Oxygens on the left</b> and only <b>1 on the right</b>. The scale is tilted because the reactants side is heavier!",
-            tip: "⚖️ The red badge (-1) warns you which side is lacking atoms."
+            badge: "Step 4: Check Scales",
+            title: "Reading the Seesaw Scale",
+            desc: "Look at the seesaw scale! We currently have: <br>• Left: <b>2 H, 2 O</b><br>• Right: <b>2 H, 1 O</b><br>The scale tilts down on the left because the Products side is missing <b>1 Oxygen atom</b>!",
+            tip: "⚖️ The red badge warns you which atom is unbalanced."
         },
         {
             selector: '[data-info="btn-tray"]',
             fallbackSelector: "#btn-toggle-tray, .rect-btn",
-            badge: "Element Tray",
-            title: "Step 5: Open the Element Tray",
-            desc: "Tap the <b>Element Tray</b> on the left. It slides open a drawer tracking each atom individually and showing the MINOH balancing order.",
+            badge: "Step 5: Element Tray",
+            title: "Open the Element Tray",
+            desc: "Tap the <b>Element Tray</b> on the left. It slides open a drawer tracking each element on its own mini-scale and shows the MINOH balancing order.",
             tip: "👉 Tap the Element Tray button to slide open the drawer!",
+            action: 'open-tray',
             interactiveClick: true
         },
         {
             selector: "#react-drop-container",
             fallbackSelector: ".drop-zone",
-            badge: "Correction Tool",
-            title: "Step 6: Fixing Mistakes",
-            desc: "If you ever drop too many molecules, hover over any molecule card in the beaker (or tap it directly on tablet) to remove it. You never have to restart the whole level!",
+            badge: "Step 6: Correction Tool",
+            title: "Fixing Mistakes",
+            desc: "If you ever drop too many molecules, hover over any molecule card in the beaker (or tap it directly on tablet) to reveal the trash button to remove it. You never have to restart!",
             tip: "💡 Click or tap any placed molecule card to remove it."
         },
         {
             selector: "#prof-beaker-card",
             fallbackSelector: '[data-info="btn-hint"], #chat-toggle-btn',
-            badge: "AI Chemistry Tutor",
-            title: "Step 7: Ask Prof. Beaker",
-            desc: "Stuck on a tricky reaction? Prof. Beaker uses the MINOH rule (Metals, Polyatomic Ions, Non-metals, Oxygen, Hydrogen) to give guided clues. Notice his advice: balance Oxygen first before Hydrogen!",
+            badge: "Step 7: AI Chemistry Tutor",
+            title: "Prof. Beaker & MINOH Rule",
+            desc: "Stuck on a tricky reaction? Prof. Beaker uses the <b>MINOH Rule</b> (Metals first, Polyatomic Ions next, Non-metals, then <b>Oxygen</b>, and <b>Hydrogen last</b>)! Notice his advice: balance Oxygen first before Hydrogen!",
             tip: "💡 Always follow the MINOH attack sequence!"
         },
         {
             selector: "#btn-open-study-room",
             fallbackSelector: '[data-info="btn-study-room"], .study-room-pill-btn',
-            badge: "Study Room",
-            title: "Step 8: Visual Study Room",
-            desc: "Need a full overview? Tap the <b>Study Room</b> button to inspect real-time comparison bars and stoichiometry formulas across the screen.",
-            tip: "🔍 Tap the button to open or press Next to continue!"
+            badge: "Step 8: Study Room",
+            title: "Visual Study Room",
+            desc: "Need full stoichiometric notes or mass comparison bars? Tap the <b>Study Room</b> button. When done inspecting, click the <b>✕ button</b> at the top right of the Study Room to return to balancing!",
+            tip: "🔍 Tap Study Room to inspect notes, or click Next to solve!",
+            action: 'study-room'
         },
         {
             selector: "#btn-add-prod-H2O",
             fallbackSelector: '[data-info="btn-prod"][data-mol-id="H2O"], [data-info="btn-prod"]',
-            badge: "Executing Strategy",
-            title: "Step 9: Balance Oxygen",
-            desc: "Following MINOH, let's fix Oxygen! The right side has 1 Oxygen, but needs 2. Tap <b>+ H₂O</b> to drop a second Water molecule.",
-            tip: "👉 Tap + H₂O now!",
+            badge: "Step 9: Solve Oxygen",
+            title: "Solve Step 1: Balance Oxygen",
+            desc: "Following the MINOH rule, let us balance Oxygen first! <br>Reactants has <b>2 Oxygen atoms</b>, but Products only has <b>1</b>. Tap <b>+ H₂O</b> to drop a second Water molecule so Oxygen reaches 2 on both sides!",
+            tip: "👉 Tap + H₂O to equalize Oxygen!",
+            action: 'add-H2O',
+            targetCount: 2,
             interactiveClick: true
         },
         {
             selector: "#btn-add-react-H2",
             fallbackSelector: '[data-info="btn-react"][data-mol-id="H2"], [data-info="btn-react"]',
-            badge: "Final Balance",
-            title: "Step 10: Balance Hydrogen",
-            desc: "Look closely: Oxygen is now balanced (2 vs 2)! But the new Water molecule brought 4 Hydrogens on the right, while we only have 2 on the left. Tap <b>+ H₂</b> one more time to finish balancing!",
+            badge: "Step 10: Solve Hydrogen",
+            title: "Solve Step 2: Balance Hydrogen",
+            desc: "Look closely at Hydrogen now: The two Water molecules brought <b>4 Hydrogen atoms</b> (2 × 2) to the right side, while the left only has <b>2</b>. Tap <b>+ H₂</b> to add a second Hydrogen molecule so both sides have 4!",
             tip: "👉 Tap + H₂ to achieve perfect balance!",
+            action: 'add-H2',
+            targetCount: 2,
             interactiveClick: true
         },
         {
             selector: ".status-bar-shared",
             fallbackSelector: "#status-container, .status-left",
-            badge: "Mastery",
-            title: "Step 11: Perfect Balance!",
-            desc: "Both status bars shine green: <b>BALANCED</b> and <b>SIMPLIFIED</b>! You just balanced <b>2H₂ + O₂ → 2H₂O</b> using the Law of Conservation of Mass. You are now fully prepared for Form 4 and Form 5!",
+            badge: "Step 11: Perfect Balance",
+            title: "Reaction Balanced & Simplified!",
+            desc: "Both status bars shine bright green: <b>BALANCED</b> and <b>SIMPLIFIED</b>!<br>Reactants: <b>4 H, 2 O</b> | Products: <b>4 H, 2 O</b>.<br>You just balanced <b>2H₂ + O₂ → 2H₂O</b> using the Law of Conservation of Mass. You are now fully prepared for Form 4 and Form 5!",
             tip: "🎉 Tap Finish Tour to celebrate your victory!"
         }
     ];
@@ -138,7 +151,7 @@
             selector: "#dynamic-sleek-equation",
             badge: "Equation & Hover Cards",
             title: "Hover (or Hold on Tablet) Any Element",
-            desc: "This is your chemical equation. Hover over any coefficient, chemical formula, or subscript (or press and hold on tablet) to inspect real-time atom calculations, bonding groups, and element facts.",
+            desc: "This is your chemical equation. Hover over any coefficient, chemical formula, or subscript (or press and hold for 300ms on tablet) to inspect real-time atom calculations, bonding groups, and element facts.",
             tip: "💡 Try hovering over coefficients to see how groups multiply atoms!"
         },
         {
@@ -196,8 +209,27 @@
         return TOUR_STEPS;
     }
 
+    function ensureTourStyles() {
+        if (document.getElementById('stoich-tour-injected-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'stoich-tour-injected-styles';
+        style.textContent = `
+            @keyframes stoichTourRingPulse {
+                0% { box-shadow: 0 0 0 4px #2563eb, 0 0 0 8px rgba(37, 99, 235, 0.45), 0 0 25px rgba(37, 99, 235, 0.7); transform: scale(1); }
+                50% { box-shadow: 0 0 0 6px #3b82f6, 0 0 0 14px rgba(59, 130, 246, 0.25), 0 0 40px rgba(59, 130, 246, 0.85); transform: scale(1.02); }
+                100% { box-shadow: 0 0 0 4px #2563eb, 0 0 0 8px rgba(37, 99, 235, 0.45), 0 0 25px rgba(37, 99, 235, 0.7); transform: scale(1); }
+            }
+            @keyframes stoichTourBouncePill {
+                0% { transform: translate(-50%, 0); }
+                100% { transform: translate(-50%, -6px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     function createTourDOM() {
         if (tourContainer) return;
+        ensureTourStyles();
 
         tourContainer = document.createElement('div');
         tourContainer.id = 'stoich-spotlight-tour';
@@ -210,37 +242,47 @@
             z-index: 99990;
             display: none;
             opacity: 0;
-            transition: opacity 0.25s ease-out;
+            transition: opacity 0.22s ease-out;
             pointer-events: none;
             font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
         `;
 
-        const blockerStyle = `
-            position: fixed;
-            background: rgba(15, 23, 42, 0.82);
-            pointer-events: auto;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
-            z-index: 99990;
-        `;
-
         tourContainer.innerHTML = `
-            <!-- 4 Physical Blockers creating an unobstructed interactive hole -->
-            <div id="tour-blocker-top" style="${blockerStyle}"></div>
-            <div id="tour-blocker-bottom" style="${blockerStyle}"></div>
-            <div id="tour-blocker-left" style="${blockerStyle}"></div>
-            <div id="tour-blocker-right" style="${blockerStyle}"></div>
+            <!-- Non-dimming transparent container: Board stays 100% bright and visible -->
+            <div id="tour-blocker-top" style="position:fixed; background:transparent; pointer-events:none; z-index:99990;"></div>
+            <div id="tour-blocker-bottom" style="position:fixed; background:transparent; pointer-events:none; z-index:99990;"></div>
+            <div id="tour-blocker-left" style="position:fixed; background:transparent; pointer-events:none; z-index:99990;"></div>
+            <div id="tour-blocker-right" style="position:fixed; background:transparent; pointer-events:none; z-index:99990;"></div>
 
-            <!-- Spotlight Pulsing Ring -->
+            <!-- Spotlight Pulsing Ring: Vibrant, Eye-catching border -->
             <div id="tour-pulse-ring" style="
                 position: fixed;
-                border: 3.5px solid #38bdf8;
-                border-radius: 14px;
-                box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.35), 0 0 25px rgba(56, 189, 248, 0.6);
+                border: 3.5px solid #2563eb;
+                border-radius: 16px;
+                animation: stoichTourRingPulse 1.4s ease-in-out infinite;
                 pointer-events: none;
-                transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+                transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.15);
                 z-index: 99992;
                 display: none;
-            "></div>
+            ">
+                <div id="tour-ring-pill" style="
+                    position: absolute;
+                    top: -34px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #2563eb;
+                    color: #ffffff;
+                    font-size: 11px;
+                    font-weight: 900;
+                    padding: 3px 12px;
+                    border-radius: 999px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+                    white-space: nowrap;
+                    letter-spacing: 0.5px;
+                    border: 2px solid #ffffff;
+                    animation: stoichTourBouncePill 0.8s infinite alternate ease-in-out;
+                ">👇 INTERACT HERE</div>
+            </div>
 
             <!-- Guided Popover Card -->
             <div id="tour-popover-card" style="
@@ -248,13 +290,13 @@
                 background: #ffffff;
                 border: 4.5px solid #2563eb;
                 border-radius: 20px;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), inset 0 -4px 0 rgba(0,0,0,0.06);
-                max-width: 430px;
+                box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35), inset 0 -4px 0 rgba(0,0,0,0.06);
+                max-width: 440px;
                 width: 90vw;
                 padding: 20px 22px 18px 22px;
                 box-sizing: border-box;
                 z-index: 99995;
-                transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+                transition: all 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.15);
                 pointer-events: auto;
             ">
                 <!-- Header -->
@@ -391,46 +433,31 @@
             };
         }
 
-        // 1. Update 4 physical blockers around rect
-        const topEl = document.getElementById('tour-blocker-top');
-        const bottomEl = document.getElementById('tour-blocker-bottom');
-        const leftEl = document.getElementById('tour-blocker-left');
-        const rightEl = document.getElementById('tour-blocker-right');
-
-        if (topEl && bottomEl && leftEl && rightEl) {
-            topEl.style.top = '0px';
-            topEl.style.left = '0px';
-            topEl.style.width = '100vw';
-            topEl.style.height = `${rect.top}px`;
-
-            bottomEl.style.top = `${rect.top + rect.height}px`;
-            bottomEl.style.left = '0px';
-            bottomEl.style.width = '100vw';
-            bottomEl.style.height = `calc(100vh - ${rect.top + rect.height}px)`;
-
-            leftEl.style.top = `${rect.top}px`;
-            leftEl.style.left = '0px';
-            leftEl.style.width = `${rect.left}px`;
-            leftEl.style.height = `${rect.height}px`;
-
-            rightEl.style.top = `${rect.top}px`;
-            rightEl.style.left = `${rect.left + rect.width}px`;
-            rightEl.style.width = `calc(100vw - ${rect.left + rect.width}px)`;
-            rightEl.style.height = `${rect.height}px`;
-        }
-
-        // 2. Update Highlight Pulse Ring
+        // Update Highlight Pulse Ring
         if (highlightPulseEl) {
             highlightPulseEl.style.display = 'block';
             highlightPulseEl.style.top = `${rect.top}px`;
             highlightPulseEl.style.left = `${rect.left}px`;
             highlightPulseEl.style.width = `${rect.width}px`;
             highlightPulseEl.style.height = `${rect.height}px`;
+
+            const pill = document.getElementById('tour-ring-pill');
+            if (pill) {
+                if (rect.top < 45) {
+                    pill.style.top = 'auto';
+                    pill.style.bottom = '-32px';
+                    pill.innerText = '👆 INTERACT HERE';
+                } else {
+                    pill.style.bottom = 'auto';
+                    pill.style.top = '-34px';
+                    pill.innerText = '👇 INTERACT HERE';
+                }
+            }
         }
 
-        // 3. Position Popover Card
+        // Position Popover Card
         if (popoverCard) {
-            const cardWidth = Math.min(430, window.innerWidth - 32);
+            const cardWidth = Math.min(440, window.innerWidth - 32);
             const cardHeight = popoverCard.offsetHeight || 240;
             const viewportW = window.innerWidth;
             const viewportH = window.innerHeight;
@@ -454,13 +481,19 @@
             popoverCard.style.left = `${cardLeft}px`;
         }
 
-        // 4. Attach interactive click auto-advance if specified
+        // Clean up previous action polling and listeners
+        if (actionCheckInterval) {
+            clearInterval(actionCheckInterval);
+            actionCheckInterval = null;
+        }
+
         if (activeClickListener && activeTargetEl) {
             activeTargetEl.removeEventListener('click', activeClickListener);
             activeClickListener = null;
             activeTargetEl = null;
         }
 
+        // Setup real interaction gating
         if (step.interactiveClick && targetEl) {
             activeTargetEl = targetEl;
             activeClickListener = () => {
@@ -469,6 +502,64 @@
                 }, 400);
             };
             targetEl.addEventListener('click', activeClickListener, { once: true });
+        }
+
+        // Periodic state check for molecule counts / tray / study room
+        if (step.action) {
+            actionCheckInterval = setInterval(() => {
+                if (step.action === 'add-H2') {
+                    const count = (window.molecules?.react || []).filter(m => m.id === 'H2').length;
+                    if (count >= (step.targetCount || 1)) {
+                        clearInterval(actionCheckInterval);
+                        actionCheckInterval = null;
+                        setTimeout(nextTourStep, 350);
+                    }
+                } else if (step.action === 'add-O2') {
+                    const count = (window.molecules?.react || []).filter(m => m.id === 'O2').length;
+                    if (count >= (step.targetCount || 1)) {
+                        clearInterval(actionCheckInterval);
+                        actionCheckInterval = null;
+                        setTimeout(nextTourStep, 350);
+                    }
+                } else if (step.action === 'add-H2O') {
+                    const count = (window.molecules?.prod || []).filter(m => m.id === 'H2O').length;
+                    if (count >= (step.targetCount || 1)) {
+                        clearInterval(actionCheckInterval);
+                        actionCheckInterval = null;
+                        setTimeout(nextTourStep, 350);
+                    }
+                } else if (step.action === 'open-tray') {
+                    const tray = document.getElementById('element-tray');
+                    if (tray && tray.classList.contains('open')) {
+                        clearInterval(actionCheckInterval);
+                        actionCheckInterval = null;
+                        setTimeout(nextTourStep, 450);
+                    }
+                } else if (step.action === 'study-room') {
+                    const modal = document.getElementById('study-room-modal');
+                    if (modal && modal.style.display !== 'none') {
+                        // Modal is open! Spotlight the close button so the user can close it cleanly
+                        const closeBtn = document.getElementById('study-room-close-btn');
+                        if (closeBtn && activeTargetEl !== closeBtn) {
+                            activeTargetEl = closeBtn;
+                            const r = closeBtn.getBoundingClientRect();
+                            if (highlightPulseEl) {
+                                highlightPulseEl.style.top = `${r.top - 4}px`;
+                                highlightPulseEl.style.left = `${r.left - 4}px`;
+                                highlightPulseEl.style.width = `${r.width + 8}px`;
+                                highlightPulseEl.style.height = `${r.height + 8}px`;
+                            }
+                            const descEl = document.getElementById('tour-card-desc');
+                            if (descEl) descEl.innerHTML = "Great! This is your Study Room with notes and mass bars. Now click the <b>✕ button</b> at top right to return to balancing!";
+                            closeBtn.addEventListener('click', () => {
+                                clearInterval(actionCheckInterval);
+                                actionCheckInterval = null;
+                                setTimeout(nextTourStep, 300);
+                            }, { once: true });
+                        }
+                    }
+                }
+            }, 250);
         }
     }
 
@@ -479,6 +570,14 @@
         currentStep = index;
 
         const step = steps[currentStep];
+
+        // CRITICAL: Close study room modal if not on study-room step to prevent view blockage
+        if (step.action !== 'study-room') {
+            const modal = document.getElementById('study-room-modal');
+            if (modal && modal.style.display !== 'none' && typeof window.closeStudyRoomModal === 'function') {
+                window.closeStudyRoomModal();
+            }
+        }
 
         document.getElementById('tour-card-badge').innerText = step.badge;
         document.getElementById('tour-card-step-text').innerText = `Step ${currentStep + 1} of ${steps.length}`;
@@ -538,10 +637,21 @@
     function closeTour() {
         if (!tourContainer) return;
 
+        if (actionCheckInterval) {
+            clearInterval(actionCheckInterval);
+            actionCheckInterval = null;
+        }
+
         if (activeClickListener && activeTargetEl) {
             activeTargetEl.removeEventListener('click', activeClickListener);
             activeClickListener = null;
             activeTargetEl = null;
+        }
+
+        // Make sure study room modal is closed if open
+        const modal = document.getElementById('study-room-modal');
+        if (modal && modal.style.display !== 'none' && typeof window.closeStudyRoomModal === 'function') {
+            window.closeStudyRoomModal();
         }
 
         tourContainer.style.opacity = '0';
