@@ -69,6 +69,47 @@ const ATOM_COLORS = {
     }
 };
 const LEVELS = {
+    "TUT0": {
+        "title": "Tutorial : Water Synthesis",
+        "form": 0,
+        "equation": "H₂ + O₂ → H₂O",
+        "reactants": [
+            {
+                "id": "H2",
+                "name": "Hydrogen Gas",
+                "displayHtml": "H<span style='font-size:0.6em'>2</span>",
+                "composition": {
+                    "H": 2
+                },
+                "state": "g"
+            },
+            {
+                "id": "O2",
+                "name": "Oxygen Gas",
+                "displayHtml": "O<span style='font-size:0.6em'>2</span>",
+                "composition": {
+                    "O": 2
+                },
+                "state": "g"
+            }
+        ],
+        "products": [
+            {
+                "id": "H2O",
+                "name": "Water",
+                "displayHtml": "H<span style='font-size:0.6em'>2</span>O",
+                "composition": {
+                    "H": 2,
+                    "O": 1
+                },
+                "state": "l"
+            }
+        ],
+        "elements": [
+            "O",
+            "H"
+        ]
+    },
     "F4L1": {
         "title": "Haber Process",
         "form": 4,
