@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css?v=1792982023">
     <link rel="stylesheet" href="css/levels.css?v=1793583324">
     <script src="levels.js?v=1792981377"></script>
+    <script src="js/translations.js"></script>
     <script src="js/audio_assets.js"></script>
 
 <script>
@@ -316,17 +317,17 @@ window.addEventListener('load', () => {
         <header class="levels-header">
             <div class="header-left">
                 <button class="btn-back interactive" onclick="window.transitionTo('index.html')">
-                    <span class="back-icon">◀</span> Back
+                    <span class="back-icon">◀</span> <span data-i18n="levels_back">Back</span>
                 </button>
-                <button id="btn-levels-tutorial" class="btn-back interactive" onclick="window.transitionTo('game.html?level=TUT0')" style="background:#10b981; border-color:#047857; box-shadow:0 6px 0 #047857; margin-left:10px; color:white;" title="Interactive Tutorial: Learn to Balance">
-                    <span style="font-size:1.05rem;">🎓</span> <span>Tutorial</span>
+                <button id="btn-levels-tutorial" class="btn-back interactive" onclick="window.transitionTo('game.html?level=TUT0')" style="background:#10b981; border-color:#047857; box-shadow:0 6px 0 #047857; margin-left:10px; color:white;" title="Interactive Tutorial: Learn to Balance" data-i18n-title="levels_tutorial_title">
+                    <span style="font-size:1.05rem;">🎓</span> <span data-i18n="levels_tutorial">Tutorial</span>
                 </button>
             </div>
             
             <div class="header-titles">
-                <div class="user-greeting">Welcome, <span id="display-name">Player</span>!</div>
+                <div class="user-greeting"><span id="user-greeting-prefix" data-i18n="levels_greeting_prefix">Welcome, </span><span id="display-name">Player</span>!</div>
                 <h1 class="levels-title" id="form-title">Form 4</h1>
-                <p class="levels-subtitle">Chemical Equations</p>
+                <p class="levels-subtitle" data-i18n="levels_chemical_equations">Chemical Equations</p>
             </div>
             
             <div class="header-right">
@@ -337,9 +338,9 @@ window.addEventListener('load', () => {
                     <span class="score-text">3 / 15</span>
                 </div>
                 <div class="challenge-tier-selector" id="challenge-tier-selector" style="display:none;">
-                    <button class="tier-tab-btn interactive" data-tier="easy" type="button">EASY</button>
-                    <button class="tier-tab-btn interactive" data-tier="medium" type="button">MEDIUM</button>
-                    <button class="tier-tab-btn interactive" data-tier="hard" type="button">HARD</button>
+                    <button class="tier-tab-btn interactive" data-tier="easy" type="button" data-i18n="levels_tier_easy">EASY</button>
+                    <button class="tier-tab-btn interactive" data-tier="medium" type="button" data-i18n="levels_tier_medium">MEDIUM</button>
+                    <button class="tier-tab-btn interactive" data-tier="hard" type="button" data-i18n="levels_tier_hard">HARD</button>
                 </div>
             </div>
         </header>
@@ -453,15 +454,30 @@ window.renderChallengeScreen = function(params) {
     }
     document.body.classList.add('is-challenge-mode');
 
-    // Helper: Capitalize
+    const isBm = (typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (localStorage.getItem('stoich_lang') || window.stoich_lang)) === 'bm';
+
+    // Helper: Capitalize or translate tier name
     function formatTierName(t) {
+        if (isBm) {
+            if (t === 'hard') return 'Sukar';
+            if (t === 'medium') return 'Sederhana';
+            return 'Mudah';
+        }
         return t.charAt(0).toUpperCase() + t.slice(1);
     }
 
     // 1. Clean Header: Replace greeting, subtitle, and score widget
     const titleEl = document.getElementById('form-title');
     if (titleEl) {
-        titleEl.innerText = `${formatTierName(currentTier)} Challenge`;
+        titleEl.innerText = isBm ? `Cabaran ${formatTierName(currentTier)}` : `${formatTierName(currentTier)} Challenge`;
+    }
+    const subEl = document.querySelector('.levels-subtitle');
+    if (subEl) {
+        subEl.innerText = isBm ? 'SERANGAN MASA & KETEPATAN' : 'TIME ATTACK & ACCURACY';
+    }
+    const greetEl = document.getElementById('user-greeting-prefix');
+    if (greetEl) {
+        greetEl.innerText = isBm ? 'Selamat Datang, ' : 'Welcome, ';
     }
 
     // Activate the top-right tier selector
@@ -506,10 +522,16 @@ window.renderChallengeScreen = function(params) {
     function updateTierButtons(activeTier) {
         if (!tierSelector) return;
         tierSelector.querySelectorAll('.tier-tab-btn').forEach(b => {
-            if (b.getAttribute('data-tier') === activeTier) {
+            const t = b.getAttribute('data-tier');
+            if (t === activeTier) {
                 b.classList.add('active');
             } else {
                 b.classList.remove('active');
+            }
+            if (isBm) {
+                b.innerText = t === 'hard' ? 'SUKAR' : (t === 'medium' ? 'SEDERHANA' : 'MUDAH');
+            } else {
+                b.innerText = t.toUpperCase();
             }
         });
     }
@@ -531,6 +553,29 @@ window.renderChallengeScreen = function(params) {
     
     // Dynamic Summary Sentence
     function getSummarySentence() {
+        if (isBm) {
+            if (!challenges.speedRush) {
+                if (!challenges.hideScale && !challenges.noHints) {
+                    return 'Imbang 5 persamaan dalam <b style="color:#10b981;">masa terpantas</b> dengan neraca 3D dan 1 token petunjuk.';
+                } else if (challenges.hideScale && !challenges.noHints) {
+                    return 'Imbang 5 persamaan dalam <b style="color:#10b981;">masa terpantas</b> menggunakan <b style="color:#7e22ce;">congak mental</b>, dengan 1 token petunjuk.';
+                } else if (!challenges.hideScale && challenges.noHints) {
+                    return 'Imbang 5 persamaan dalam <b style="color:#10b981;">masa terpantas</b> dengan neraca 3D dan <b style="color:#2563eb;">tanpa petunjuk</b>.';
+                } else {
+                    return 'Imbang 5 persamaan dalam <b style="color:#10b981;">masa terpantas</b> secara <b style="color:#7e22ce;">congak mental tulen</b> <b style="color:#2563eb;">tanpa sebarang petunjuk</b>.';
+                }
+            } else {
+                if (!challenges.hideScale && !challenges.noHints) {
+                    return 'Berlumba dengan masa untuk mengimbang 5 persamaan dalam <b style="color:#d97706;">90 saat</b>, dengan neraca 3D dan 1 token petunjuk.';
+                } else if (challenges.hideScale && !challenges.noHints) {
+                    return 'Berlumba dengan masa untuk mengimbang 5 persamaan dalam <b style="color:#d97706;">90 saat</b> menggunakan <b style="color:#7e22ce;">congak mental</b>, dengan 1 token petunjuk.';
+                } else if (!challenges.hideScale && challenges.noHints) {
+                    return 'Berlumba dengan masa untuk mengimbang 5 persamaan dalam <b style="color:#d97706;">90 saat</b> dengan neraca 3D dan <b style="color:#2563eb;">tanpa petunjuk</b>.';
+                } else {
+                    return 'Cabaran muktamad: imbang 5 persamaan dalam <b style="color:#d97706;">90 saat</b> secara <b style="color:#7e22ce;">congak mental tulen</b> <b style="color:#2563eb;">tanpa sebarang petunjuk</b>.';
+                }
+            }
+        }
         if (!challenges.speedRush) {
             if (!challenges.hideScale && !challenges.noHints) {
                 return 'Balance 5 equations in the <b style="color:#10b981;">fastest possible time</b> with the 3D scale and 1 hint token.';
@@ -567,7 +612,7 @@ window.renderChallengeScreen = function(params) {
                 <!-- LEFT COLUMN: CHALLENGE MODIFIERS -->
                 <div class="deck-left-col">
                     <div class="deck-header-wrap">
-                        <h2 class="deck-main-title">Challenge Modifiers</h2>
+                        <h2 class="deck-main-title">${isBm ? "Pengubahsuai Cabaran" : "Challenge Modifiers"}</h2>
                         <span class="deck-status-pill" id="deck-status-pill">0 / 3 ACTIVE</span>
                     </div>
                     
@@ -579,7 +624,7 @@ window.renderChallengeScreen = function(params) {
                                 <span>🧠</span>
                             </div>
                             <div class="mod-content">
-                                <div class="mod-title">Hide Balance Scale</div>
+                                <div class="mod-title">${isBm ? "Sembunyi Neraca Imbang" : "Hide Balance Scale"}</div>
                                 <span class="mod-bonus-badge" id="desc-hide-scale">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-hide-scale">
@@ -595,7 +640,7 @@ window.renderChallengeScreen = function(params) {
                                 <span>🎓</span>
                             </div>
                             <div class="mod-content">
-                                <div class="mod-title">Disable Hints</div>
+                                <div class="mod-title">${isBm ? "Matikan Petunjuk" : "Disable Hints"}</div>
                                 <span class="mod-bonus-badge" id="desc-no-hints">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-no-hints">
@@ -611,7 +656,7 @@ window.renderChallengeScreen = function(params) {
                                 <span>⏳</span>
                             </div>
                             <div class="mod-content">
-                                <div class="mod-title">90s Speed Rush</div>
+                                <div class="mod-title">${isBm ? "Pecutan Masa 90s" : "90s Speed Rush"}</div>
                                 <span class="mod-bonus-badge" id="desc-rush-mode">+0.5x Multiplier</span>
                             </div>
                             <div class="tactile-switch" id="switch-rush-mode">
@@ -630,14 +675,14 @@ window.renderChallengeScreen = function(params) {
                         
                         <!-- Top Header -->
                         <div class="summary-top-bar">
-                            <h2 class="summary-main-title">Run Overview</h2>
+                            <h2 class="summary-main-title">${isBm ? "Gambaran Larian" : "Run Overview"}</h2>
                             <span class="summary-tier-badge" id="cfg-tier-pill">${currentTier.toUpperCase()} MODE</span>
                         </div>
 
                         <!-- 1. MULTIPLIER HERO BOX -->
                         <div class="multiplier-hero-box">
                             <div class="multiplier-top-row">
-                                <span class="multiplier-hero-label">⚡ Score Multiplier</span>
+                                <span class="multiplier-hero-label">${isBm ? "⚡ Pengganda Skor" : "⚡ Score Multiplier"}</span>
                                 <span class="outside-rank-badge" id="cfg-multiplier-tag">STANDARD</span>
                             </div>
                             <div class="multiplier-meter-row">
@@ -651,7 +696,7 @@ window.renderChallengeScreen = function(params) {
                         <!-- 2. RUN GOAL -->
                         <div class="summary-block">
                             <div class="block-header">
-                                <span class="block-title">🎯 Run Goal</span>
+                                <span class="block-title">${isBm ? "🎯 Matlamat Larian" : "🎯 Run Goal"}</span>
                             </div>
                             <div class="objective-text-box">
                                 <div class="objective-sentence" id="cfg-dynamic-sentence">
@@ -663,25 +708,25 @@ window.renderChallengeScreen = function(params) {
                         <!-- 3. QUALIFYING BADGES -->
                         <div class="summary-block">
                             <div class="block-header">
-                                <span class="block-title">🏅 Qualifying Badges</span>
+                                <span class="block-title">${isBm ? "🏅 Lencana Layak" : "🏅 Qualifying Badges"}</span>
                                 <span class="badges-status-pill" id="cfg-badges-count">1 / 4 QUALIFIED</span>
                             </div>
                             <div class="badges-2x2-grid">
                                 <div class="lab-badge-chip locked" id="chip-badge-mental">
                                     <span class="chip-emoji">🧠</span>
-                                    <span class="chip-name">Mental Math</span>
+                                    <span class="chip-name">${isBm ? "Congak Mental" : "Mental Math"}</span>
                                 </div>
                                 <div class="lab-badge-chip locked" id="chip-badge-solo">
                                     <span class="chip-emoji">🎓</span>
-                                    <span class="chip-name">Solo Chemist</span>
+                                    <span class="chip-name">${isBm ? "Ahli Kimia Solo" : "Solo Chemist"}</span>
                                 </div>
                                 <div class="lab-badge-chip locked" id="chip-badge-speed">
                                     <span class="chip-emoji">⏳</span>
-                                    <span class="chip-name">Speed Demon</span>
+                                    <span class="chip-name">${isBm ? "Pantas Kilat" : "Speed Demon"}</span>
                                 </div>
                                 <div class="lab-badge-chip unlocked-master" id="chip-badge-master">
                                     <span class="chip-emoji">⭐</span>
-                                    <span class="chip-name">3-Star Record</span>
+                                    <span class="chip-name">${isBm ? "Rekod 3 Bintang" : "3-Star Record"}</span>
                                 </div>
                             </div>
                         </div>
@@ -696,13 +741,13 @@ window.renderChallengeScreen = function(params) {
                 <div class="footer-brief-block">
                     <div class="footer-target-icon">🎯</div>
                     <div class="footer-brief-texts">
-                        <div class="footer-brief-title">5 Mystery Reactions • Time Attack</div>
-                        <div class="footer-brief-desc">Balance all 5 equations in a row to set your personal best.</div>
+                        <div class="footer-brief-title">${isBm ? "5 Persamaan Misteri • Serangan Masa" : "5 Mystery Reactions • Time Attack"}</div>
+                        <div class="footer-brief-desc">${isBm ? "Imbang kesemua 5 persamaan berturut-turut untuk mencatat rekod peribadi terbaik anda." : "Balance all 5 equations in a row to set your personal best."}</div>
                     </div>
                 </div>
                 
                 <button class="interactive btn-start-challenge" id="btn-launch-challenge">
-                    START CHALLENGE ➔
+                    ${isBm ? "MULA CABARAN ➔" : "START CHALLENGE ➔"}
                 </button>
             </div>
 
@@ -743,7 +788,7 @@ window.renderChallengeScreen = function(params) {
         
         const statusPill = document.getElementById('deck-status-pill');
         if (statusPill) {
-            statusPill.innerText = `${activeCount} / 3 ACTIVE`;
+            statusPill.innerText = isBm ? `${activeCount} / 3 AKTIF` : `${activeCount} / 3 ACTIVE`;
             if (activeCount > 0) {
                 statusPill.style.background = '#f3e8ff';
                 statusPill.style.color = '#7e22ce';
@@ -761,17 +806,17 @@ window.renderChallengeScreen = function(params) {
         const multTagEl = document.getElementById('cfg-multiplier-tag');
         if (multTagEl) {
             if (mult >= 2.5) {
-                multTagEl.innerText = 'LEGENDARY (+1.5x)';
+                multTagEl.innerText = isBm ? 'LEGENDA (+1.5x)' : 'LEGENDARY (+1.5x)';
                 multTagEl.style.background = '#fef3c7';
                 multTagEl.style.color = '#d97706';
                 multTagEl.style.borderColor = '#d97706';
             } else if (mult >= 2.0) {
-                multTagEl.innerText = 'EXPERT (+1.0x)';
+                multTagEl.innerText = isBm ? 'PAKAR (+1.0x)' : 'EXPERT (+1.0x)';
                 multTagEl.style.background = '#f3e8ff';
                 multTagEl.style.color = '#7e22ce';
                 multTagEl.style.borderColor = '#7e22ce';
             } else if (mult >= 1.5) {
-                multTagEl.innerText = 'VETERAN (+0.5x)';
+                multTagEl.innerText = isBm ? 'VETERAN (+0.5x)' : 'VETERAN (+0.5x)';
                 multTagEl.style.background = '#dbeafe';
                 multTagEl.style.color = '#2563eb';
                 multTagEl.style.borderColor = '#2563eb';
@@ -790,7 +835,7 @@ window.renderChallengeScreen = function(params) {
         }
         
         const countEl = document.getElementById('cfg-badges-count');
-        if (countEl) countEl.innerText = `${unlockedBadges} / 4 QUALIFIED`;
+        if (countEl) countEl.innerText = isBm ? `${unlockedBadges} / 4 LAYAK` : `${unlockedBadges} / 4 QUALIFIED`;
 
         const sentenceEl = document.getElementById('cfg-dynamic-sentence');
         if (sentenceEl) {
@@ -817,7 +862,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.add('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerText = 'ACTIVE (+0.5x)';
+                desc.innerText = isBm ? 'AKTIF (+0.5x)' : 'ACTIVE (+0.5x)';
             }
         } else {
             if (card) {
@@ -828,7 +873,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.remove('is-active', 'is-on-amber');
             }
             if (desc) {
-                desc.innerText = '+0.5x Multiplier';
+                desc.innerText = isBm ? 'Pengganda +0.5x' : '+0.5x Multiplier';
             }
         }
         
@@ -858,7 +903,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.add('is-active', 'is-on-blue');
             }
             if (desc) {
-                desc.innerText = 'ACTIVE (+0.5x)';
+                desc.innerText = isBm ? 'AKTIF (+0.5x)' : 'ACTIVE (+0.5x)';
             }
         } else {
             if (card) {
@@ -869,7 +914,7 @@ window.renderChallengeScreen = function(params) {
                 sw.classList.remove('is-active', 'is-on-blue');
             }
             if (desc) {
-                desc.innerText = '+0.5x Multiplier';
+                desc.innerText = isBm ? 'Pengganda +0.5x' : '+0.5x Multiplier';
             }
         }
         
@@ -958,10 +1003,11 @@ window.renderSandboxLevelsScreen = function(params) {
     if (nameEl) nameEl.innerText = nameParam;
 
     const titleEl = document.getElementById('form-title');
-    if (titleEl) titleEl.innerText = 'Sandbox Levels';
+    const isBm = (typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (localStorage.getItem('stoich_lang') || window.stoich_lang)) === 'bm';
+    if (titleEl) titleEl.innerText = isBm ? 'Tahap Eksperimen' : 'Sandbox Levels';
 
     const subEl = document.querySelector('.levels-subtitle');
-    if (subEl) subEl.innerText = 'CUSTOM CREATED REACTIONS';
+    if (subEl) subEl.innerText = isBm ? 'TINDAK BALAS CIPTAAN ANDA' : 'CUSTOM CREATED REACTIONS';
 
     // Hide tutorial button in sandbox mode (tutorial is only for syllabus mode)
     const tutBtn = document.getElementById('btn-levels-tutorial');
@@ -977,8 +1023,10 @@ window.renderSandboxLevelsScreen = function(params) {
     window.deleteSandboxCustomLevel = function(idx) {
         let currentSaved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
         let item = currentSaved[idx];
-        let titleStr = (item && (item.title || item.equation)) || 'this level';
-        if (confirm(`Delete level "${titleStr}"?`)) {
+        let isBmDel = (typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (localStorage.getItem('stoich_lang') || window.stoich_lang)) === 'bm';
+        let titleStr = (item && (item.title || item.equation)) || (isBmDel ? 'tahap ini' : 'this level');
+        let confirmMsg = isBmDel ? `Padam tahap "${titleStr}"?` : `Delete level "${titleStr}"?`;
+        if (confirm(confirmMsg)) {
             if (typeof window.playSound === 'function') window.playSound('trash');
             currentSaved.splice(idx, 1);
             localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(currentSaved));
@@ -992,7 +1040,8 @@ window.renderSandboxLevelsScreen = function(params) {
         let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
 
         const scoreText = document.querySelector('.score-text');
-        if (scoreText) scoreText.innerText = `${saved.length} Created`;
+        const isBmList = (typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (localStorage.getItem('stoich_lang') || window.stoich_lang)) === 'bm';
+        if (scoreText) scoreText.innerText = isBmList ? `${saved.length} Dicipta` : `${saved.length} Created`;
 
         if (saved.length === 0) {
             const emptyDiv = document.createElement('div');
@@ -1001,10 +1050,10 @@ window.renderSandboxLevelsScreen = function(params) {
             emptyDiv.innerHTML = `
                 <div style="text-align:center; padding:48px 24px; background:#ffffff; border:4px solid #1e293b; border-radius:28px; box-shadow:0 10px 0 #1e293b; max-width:540px; margin:20px auto; width:90%; box-sizing:border-box;">
                     <div style="font-size:56px; line-height:1; margin-bottom:14px;">🧪</div>
-                    <h2 style="font-size:24px; font-weight:900; color:#1e1b4b; margin:0 0 8px 0;">No Custom Levels Yet!</h2>
-                    <p style="font-size:14.5px; font-weight:700; color:#64748b; margin:0 0 22px 0; line-height:1.5;">Click below to open the Periodic Table & Numpad builder and craft your first custom reaction level.</p>
+                    <h2 style="font-size:24px; font-weight:900; color:#1e1b4b; margin:0 0 8px 0;">${isBmList ? 'Belum Ada Tahap Eksperimen!' : 'No Custom Levels Yet!'}</h2>
+                    <p style="font-size:14.5px; font-weight:700; color:#64748b; margin:0 0 22px 0; line-height:1.5;">${isBmList ? 'Ketik di bawah untuk membuka pembina Jadual Berkala & Pad Nombor bagi membina tahap tindak balas kimia pertama anda.' : 'Click below to open the Periodic Table & Numpad builder and craft your first custom reaction level.'}</p>
                     <button class="interactive" onclick="window.transitionTo('index.html?mode=sandbox&action=create')" style="background:#8b5cf6; color:#ffffff; border:3.5px solid #1e293b; border-radius:16px; padding:12px 24px; font-size:16px; font-weight:900; box-shadow:0 5px 0 #1e293b; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
-                        <span>✨</span> <span>Create Your First Level</span>
+                        <span>✨</span> <span>${isBmList ? 'Bina Tahap Pertama Anda' : 'Create Your First Level'}</span>
                     </button>
                 </div>
             `;
@@ -1044,10 +1093,10 @@ window.renderSandboxLevelsScreen = function(params) {
                         window.transitionTo(`game.html?level=sandbox&name=${encodeURIComponent(nameParam)}&eq=${encodeURIComponent(lvl.equation)}`);
                     };
 
-                    const eqText = lvl.equation || 'Custom Reaction';
+                    const eqText = lvl.equation || (isBmList ? 'Tindak Balas Ciptaan' : 'Custom Reaction');
                     let displayTitle = lvl.title;
                     if (!displayTitle || displayTitle.startsWith('Custom:') || displayTitle.trim() === eqText.trim()) {
-                        displayTitle = `Custom Reaction #${niceNum}`;
+                        displayTitle = isBmList ? `Tindak Balas Ciptaan #${niceNum}` : `Custom Reaction #${niceNum}`;
                     }
                     const iconText = (typeof getLevelIcon === 'function') ? getLevelIcon(displayTitle || lvl.equation, false) : '🧪';
 
@@ -1055,8 +1104,8 @@ window.renderSandboxLevelsScreen = function(params) {
                         <div class="card-top">
                             <span class="lvl-num">${niceNum}</span>
                             <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="lvl-diff diff-easy" style="background:#8b5cf6; color:white; border-color:#1e293b;">Custom</span>
-                                <button type="button" class="btn-card-delete interactive" title="Delete custom level" onclick="event.stopPropagation(); window.deleteSandboxCustomLevel(${i});">
+                                <span class="lvl-diff diff-easy" style="background:#8b5cf6; color:white; border-color:#1e293b;">${isBmList ? 'Ciptaan' : 'Custom'}</span>
+                                <button type="button" class="btn-card-delete interactive" title="${isBmList ? 'Padam tahap ciptaan' : 'Delete custom level'}" onclick="event.stopPropagation(); window.deleteSandboxCustomLevel(${i});">
                                     <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="3 6 5 6 21 6"/>
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -1069,7 +1118,7 @@ window.renderSandboxLevelsScreen = function(params) {
                             <h3 class="lvl-name">${displayTitle}</h3>
                             <p class="lvl-equation">${eqText}</p>
                         </div>
-                        <div class="status-banner banner-blue">PLAY</div>
+                        <div class="status-banner banner-blue">${isBmList ? 'MAIN' : 'PLAY'}</div>
                     `;
                     pageDiv.appendChild(card);
                 } else {
@@ -1090,14 +1139,14 @@ window.renderSandboxLevelsScreen = function(params) {
                     createCard.innerHTML = `
                         <div class="card-top">
                             <span class="lvl-num" style="background:#ede9fe; color:#6d28d9; font-weight:900;">+</span>
-                            <span class="lvl-diff diff-easy" style="background:#f3e8ff; color:#7e22ce; border-color:#d8b4fe;">Create</span>
+                            <span class="lvl-diff diff-easy" style="background:#f3e8ff; color:#7e22ce; border-color:#d8b4fe;">${isBmList ? 'Bina' : 'Create'}</span>
                         </div>
                         <div class="card-body">
                             <div class="card-icon">⚗️</div>
-                            <h3 class="lvl-name">Build New Level</h3>
-                            <p class="lvl-equation" style="color:#6d28d9; background:#f5f3ff; border-color:#ddd6fe;">Periodic Table & Numpad</p>
+                            <h3 class="lvl-name">${isBmList ? 'Bina Tahap Baru' : 'Build New Level'}</h3>
+                            <p class="lvl-equation" style="color:#6d28d9; background:#f5f3ff; border-color:#ddd6fe;">${isBmList ? 'Jadual Berkala & Pad Nombor' : 'Periodic Table & Numpad'}</p>
                         </div>
-                        <div class="status-banner banner-blue" style="background:#8b5cf6 !important; border-top-color:#6d28d9 !important;">+ CREATE LEVEL</div>
+                        <div class="status-banner banner-blue" style="background:#8b5cf6 !important; border-top-color:#6d28d9 !important;">${isBmList ? '+ BINA TAHAP' : '+ CREATE LEVEL'}</div>
                     `;
                     pageDiv.appendChild(createCard);
                 }
@@ -1111,7 +1160,7 @@ window.renderSandboxLevelsScreen = function(params) {
         const prevBtn = document.createElement('button');
         prevBtn.className = 'btn-page interactive';
         prevBtn.id = 'btn-prev';
-        prevBtn.innerHTML = '◀ Prev';
+        prevBtn.innerHTML = isBmList ? '◀ Sebelum' : '◀ Prev';
         prevBtn.disabled = (myCurrentPage === 1);
         prevBtn.onclick = () => {
             if (typeof window.playSound === 'function') window.playSound('page');
@@ -1130,7 +1179,7 @@ window.renderSandboxLevelsScreen = function(params) {
         const nextBtn = document.createElement('button');
         nextBtn.className = 'btn-page interactive';
         nextBtn.id = 'btn-next';
-        nextBtn.innerHTML = 'Next ▶';
+        nextBtn.innerHTML = isBmList ? 'Seterusnya ▶' : 'Next ▶';
         nextBtn.disabled = (myCurrentPage === myTotalPages);
         nextBtn.onclick = () => {
             if (typeof window.playSound === 'function') window.playSound('page');
@@ -1147,21 +1196,15 @@ window.renderSandboxLevelsScreen = function(params) {
     renderList();
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('mode') === 'challenge') {
-        window.renderChallengeScreen(params);
-        return;
-    }
-    if (params.get('mode') === 'sandbox') {
-        window.renderSandboxLevelsScreen(params);
-        return;
-    }
-    const formParam = params.get('form') || 'Form 4';
-    const nameParam = params.get('name') || 'Player';
+window.renderSyllabusLevelsScreen = function(params) {
+    const p = params || new URLSearchParams(window.location.search);
+    const formParam = p.get('form') || 'Form 4';
+    const nameParam = p.get('name') || localStorage.getItem('currentPlayer') || 'Player';
     const nameEl = document.getElementById('display-name');
     if (nameEl) nameEl.innerText = nameParam;
     const formNumber = formParam.includes('5') ? '5' : '4';
+    const isBm = (typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (localStorage.getItem('stoich_lang') || window.stoich_lang)) === 'bm';
+
     if (formNumber === '5') {
         document.documentElement.classList.add('is-form5-mode');
         document.body.classList.add('is-form5-mode');
@@ -1169,11 +1212,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bgEl) {
             bgEl.className = 'bg-layer bg-green active-bg';
         }
+    } else {
+        document.documentElement.classList.remove('is-form5-mode');
+        document.body.classList.remove('is-form5-mode');
+        const bgEl = document.getElementById('bg-levels');
+        if (bgEl) {
+            bgEl.className = 'bg-layer bg-blue active-bg';
+        }
     }
     
     // Update titles
     const titleEl = document.getElementById('form-title');
-    if(titleEl) titleEl.innerText = formParam;
+    if(titleEl) {
+        if (formNumber === '5') {
+            titleEl.innerText = isBm ? 'Tingkatan 5' : 'Form 5';
+        } else {
+            titleEl.innerText = isBm ? 'Tingkatan 4' : 'Form 4';
+        }
+    }
+
+    const subEl = document.querySelector('.levels-subtitle');
+    if (subEl) {
+        subEl.innerText = isBm ? 'Persamaan Kimia' : 'Chemical Equations';
+    }
+
+    const greetEl = document.getElementById('user-greeting-prefix');
+    if (greetEl) {
+        greetEl.innerText = isBm ? 'Selamat Datang, ' : 'Welcome, ';
+    }
+
+    const tutBtn = document.getElementById('btn-levels-tutorial');
+    if (tutBtn) {
+        tutBtn.style.display = 'inline-flex';
+        tutBtn.title = isBm ? 'Tutorial Interaktif: Belajar Mengimbang' : 'Interactive Tutorial: Learn to Balance';
+        const tutSpan = tutBtn.querySelector('span:last-child');
+        if (tutSpan) tutSpan.innerText = isBm ? 'Tutorial' : 'Tutorial';
+    }
     
     // Filter keys by form
     let keys = Object.keys(LEVELS).filter(k => k.startsWith('F' + formNumber));
@@ -1186,12 +1260,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     myTotalPages = Math.ceil(keys.length / ITEMS_PER_PAGE);
     if(myTotalPages === 0) myTotalPages = 1;
+    if (myCurrentPage > myTotalPages) myCurrentPage = 1;
     
     let gridContainer = document.querySelector('.grid-wrapper');
+    if(!gridContainer) return;
     
     // Calculate Score
     let solvedData = JSON.parse(localStorage.getItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player')) || '{}');
-    // Legacy support: if it's an array, convert it to an object temporarily for counting
     let legacySolved = JSON.parse(localStorage.getItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player')) || '[]');
     let solvedCount = 0;
     
@@ -1206,9 +1281,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
                     </svg>`;
 
-
-    if(!gridContainer) return;
-    
     const existingGrids = gridContainer.querySelectorAll('.levels-grid');
     existingGrids.forEach(g => g.remove());
     const existingPag = gridContainer.querySelector('.pagination');
@@ -1218,7 +1290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let pageDiv = document.createElement('div');
         pageDiv.className = 'levels-grid';
         pageDiv.id = 'page-' + p;
-        pageDiv.style.display = p === 1 ? '' : 'none';
+        pageDiv.style.display = (p === myCurrentPage) ? '' : 'none';
         
         let startIdx = (p - 1) * ITEMS_PER_PAGE;
         let endIdx = Math.min(startIdx + ITEMS_PER_PAGE, keys.length);
@@ -1228,19 +1300,18 @@ document.addEventListener('DOMContentLoaded', () => {
             let L = LEVELS[k];
             
             let diff = 'easy';
-            let diffLabel = 'Easy';
-            if (L.elements.length === 3) { diff = 'medium'; diffLabel = 'Medium'; }
-            if (L.elements.length >= 4) { diff = 'hard'; diffLabel = 'Hard'; }
+            let diffLabel = isBm ? 'Mudah' : 'Easy';
+            if (L.elements.length === 3) { diff = 'medium'; diffLabel = isBm ? 'Sederhana' : 'Medium'; }
+            if (L.elements.length >= 4) { diff = 'hard'; diffLabel = isBm ? 'Sukar' : 'Hard'; }
             
-            // Extract the level number, e.g. F4L1 -> 1
             let niceNum = k.replace(/F\d+L/, '');
+            let titleText = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(k, L.title) : L.title;
             
             let card = document.createElement('div');
             let solvedLevels = JSON.parse(localStorage.getItem('solvedLevels_' + (localStorage.getItem('currentPlayer')||'Player')) || '[]');
             let solvedData = JSON.parse(localStorage.getItem('solvedLevelData_' + (localStorage.getItem('currentPlayer')||'Player')) || '{}');
             let isSolved = solvedData[k] ? true : solvedLevels.includes(k);
-            let stars = solvedData[k] ? solvedData[k].stars : (isSolved ? 3 : 0); // Legacy defaults to 3
-            
+            let stars = solvedData[k] ? solvedData[k].stars : (isSolved ? 3 : 0);
             
             card.className = isSolved ? 'level-card interactive solved-card' : 'level-card interactive';
             card.onmouseenter = () => { window.playSound('tactile'); currentFocusIndex = -1; Array.from(document.querySelectorAll('.level-card')).forEach(c => c.classList.remove('kb-focus')); };
@@ -1252,7 +1323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             let bannerClass = isSolved ? 'banner-green' : 'banner-blue';
-            let bannerText = isSolved ? 'REVIEW (SOLVED)' : 'PLAY';
+            let bannerText = isSolved ? (isBm ? 'ULANGKAJI' : 'REVIEW (SOLVED)') : (isBm ? 'MAIN' : 'PLAY');
             let iconText = getLevelIcon(L.title, isSolved);
             
             let starHtml = '';
@@ -1285,7 +1356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="card-body">
                     <div class="card-icon">${iconText}</div>
-                    <h3 class="lvl-name">${L.title}</h3>
+                    <h3 class="lvl-name">${titleText}</h3>
                     <p class="lvl-equation">${L.equation}</p>
                 </div>
                 <div class="status-banner ${bannerClass}">${bannerText}</div>
@@ -1301,15 +1372,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let prevBtn = document.createElement('button');
     prevBtn.className = 'btn-page interactive';
     prevBtn.id = 'btn-prev';
-    prevBtn.innerHTML = '◀ Prev';
-    prevBtn.disabled = true;
+    prevBtn.innerHTML = isBm ? '◀ Sebelum' : '◀ Prev';
+    prevBtn.disabled = (myCurrentPage === 1);
     prevBtn.onclick = () => { window.playSound('page'); window.changePage(myCurrentPage - 1); };
     
     let dotsDiv = document.createElement('div');
     dotsDiv.className = 'page-dots';
     for(let p=1; p<=myTotalPages; p++) {
         let dot = document.createElement('span');
-        dot.className = 'dot' + (p === 1 ? ' active' : '');
+        dot.className = 'dot' + (p === myCurrentPage ? ' active' : '');
         dot.id = 'dot-' + p;
         dotsDiv.appendChild(dot);
     }
@@ -1317,8 +1388,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextBtn = document.createElement('button');
     nextBtn.className = 'btn-page interactive';
     nextBtn.id = 'btn-next';
-    nextBtn.innerHTML = 'Next ▶';
-    nextBtn.disabled = myTotalPages <= 1;
+    nextBtn.innerHTML = isBm ? 'Seterusnya ▶' : 'Next ▶';
+    nextBtn.disabled = (myCurrentPage === myTotalPages);
     nextBtn.onclick = () => { window.playSound('page'); window.changePage(myCurrentPage + 1); };
     
     pagDiv.appendChild(prevBtn);
@@ -1326,6 +1397,33 @@ document.addEventListener('DOMContentLoaded', () => {
     pagDiv.appendChild(nextBtn);
     
     gridContainer.appendChild(pagDiv);
+};
+
+window.renderCurrentView = function() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    if (mode === 'challenge') {
+        if (typeof window.renderChallengeScreen === 'function') {
+            window.renderChallengeScreen(params);
+        }
+    } else if (mode === 'sandbox') {
+        if (typeof window.renderSandboxLevelsScreen === 'function') {
+            window.renderSandboxLevelsScreen(params);
+        }
+    } else {
+        if (typeof window.renderSyllabusLevelsScreen === 'function') {
+            window.renderSyllabusLevelsScreen(params);
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.renderCurrentView();
+});
+
+// Dynamic Re-render Listener on Language Change
+window.addEventListener('stoich_lang_changed', function(e) {
+    window.renderCurrentView();
 });
 
 window.changePage = function(newPage) {
@@ -1341,5 +1439,6 @@ window.changePage = function(newPage) {
 </script>
     <script src="js/fullscreen.js"></script>
     <script src="js/autoscale.js"></script>
+
 </body>
 </html>
