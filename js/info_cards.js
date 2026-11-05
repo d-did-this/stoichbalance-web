@@ -8,6 +8,17 @@
     let currentTarget = null;
     let activeHideTimeout = null;
 
+    // Helper to format chemical subscript numbers and normalize polyatomic parenthesized groups
+    function formatFormulaSubscripts(raw) {
+        if (!raw) return '';
+        const uniMap = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
+        // Normalize IDs with underscores representing polyatomic groups, e.g. ZnNO3_2 -> Zn(NO3)2, PbNO3_2 -> Pb(NO3)2, CuOH_2 -> Cu(OH)2
+        let s = raw.replace(/([A-Z][a-z]?)(NO3|SO4|OH|CO3|ClO3)_([0-9]+)/g, (match, p1, p2, p3) => p1 + '(' + p2 + ')' + p3)
+                   .replace(/_([0-9]+)/g, (match, p1) => p1);
+        return s.replace(/([0-9]+)/g, m => m.split('').map(d => uniMap[d] || d).join(''));
+    }
+
+
     const ATOM_COLORS_LOCAL = {
         H: { bg: '#f8fafc', color: '#0f172a' },
         O: { bg: '#ef4444', color: 'white' },
@@ -458,9 +469,7 @@
                     comp = parseComposition(formula || target.innerText);
                 }
 
-                // Helper to format chemical subscript numbers
-                const uniMap = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
-                const cleanFormula = (formula || molName).replace(/([0-9]+)/g, m => m.split('').map(d => uniMap[d] || d).join(''));
+                const cleanFormula = formatFormulaSubscripts(formula || molName);
 
                 let atomsPerMol = 0;
                 for (let el in comp) {
@@ -679,9 +688,7 @@
                 const rawFormula = target.getAttribute('data-mol-formula') || text;
                 const cleanKey = rawFormula.replace(/[^A-Za-z0-9_]/g, '');
                 
-                // Helper to format chemical subscript numbers
-                const uniMap = { '0':'₀', '1':'₁', '2':'₂', '3':'₃', '4':'₄', '5':'₅', '6':'₆', '7':'₇', '8':'₈', '9':'₉' };
-                const cleanFormula = (rawFormula || molName).replace(/([0-9]+)/g, m => m.split('').map(d => uniMap[d] || d).join(''));
+                const cleanFormula = formatFormulaSubscripts(rawFormula || molName);
 
                 // Lookup compound explanation
                 const compData = COMPOUND_DESCRIPTIONS[cleanKey] 
@@ -1017,8 +1024,8 @@
                     accentColor: isBalanced ? '#10b981' : '#ef4444',
                     title: isBalanced ? 'Balanced' : 'Unbalanced',
                     desc: isBalanced
-                        ? 'Your equation is Balanced! Superb, if you are reading this, it is either not simplfied or you are reviewing'
-                        : 'Your equation is not balanced! Make sure both side have equal amount of atom for each element!'
+                        ? 'Your equation is balanced! Both sides have an equal number of atoms for each element.'
+                        : 'Your equation is not balanced! Make sure both sides have an equal count of atoms for each element!'
                 };
             }
 
@@ -1100,7 +1107,7 @@
                         badgeText: 'Simplify',
                         accentColor: '#eab308',
                         title: ratioText ? `${ratioText} Not Simplified` : 'Not Simplified',
-                        desc: 'You can simplfy this! reduce the coeffeicint of both side element atom, until it is in its lowest whole-number ratio.'
+                        desc: 'You can simplify this! Reduce the coefficients on both sides until they reach their lowest whole-number ratio.'
                     };
                 }
 
@@ -1232,11 +1239,13 @@
 
         initCard();
 
-        cardEl.style.borderTopColor = data.accentColor || '#0f172a';
         cardEl.innerHTML = `
+            <div class="sic-tail" id="sic-card-tail"></div>
             <div class="sic-header">
+                <div class="sic-badge-row">
+                    <span class="sic-badge ${data.badgeClass}">${data.badgeText}</span>
+                </div>
                 <h4 class="sic-title">${data.title}</h4>
-                <span class="sic-badge ${data.badgeClass}">${data.badgeText}</span>
             </div>
             ${data.visualHtml ? `<div class="sic-visual-box">${data.visualHtml}</div>` : ''}
             ${data.desc ? `<p class="sic-desc">${data.desc}</p>` : ''}
@@ -1268,36 +1277,44 @@
 
         const infoType = target.getAttribute('data-info') || '';
 
-        // Check if target is a setting on the left (How to play or left-docked modes)
+        // Check if target is a setting on the left (e.g. #left-bottom-hud, fab-container on left, or near left edge)
         const isLeftSettings = target.closest('#left-bottom-hud') || 
                                target.closest('#mode-switcher-sidebar') ||
                                ['settings-help'].includes(infoType) ||
-                               (rect.left < 110 && rect.bottom > window.innerHeight - 260);
+                               (rect.left < 120 && rect.bottom > window.innerHeight - 300);
 
-        // Check if target is a setting on the right (Settings gear FAB, Mute, Fullscreen, Undo, Reset)
-        const isRightSettings = target.closest('.fab-container') || 
-                                target.closest('.fab-menu') ||
-                                ['settings-mute', 'settings-fullscreen', 'settings-undo', 'settings-reset', 'settings-menu'].includes(infoType) ||
-                                (rect.right > window.innerWidth - 120 && rect.bottom > window.innerHeight - 380);
+        // Check if target is a setting on the right
+        const isRightSettings = (!isLeftSettings && (
+                                    target.closest('.fab-container') || 
+                                    target.closest('.fab-menu') ||
+                                    ['settings-mute', 'settings-fullscreen', 'settings-undo', 'settings-reset', 'settings-menu'].includes(infoType) ||
+                                    (rect.right > window.innerWidth - 120 && rect.bottom > window.innerHeight - 380)
+                                ));
 
         let top;
         let left;
+        let orientation = 'bottom'; // Which side of the card the tail sits on: 'top', 'bottom', 'left', 'right'
 
         if (isLeftSettings) {
-            // Position on the RIGHT side of the left setting button
+            // Card is placed to the RIGHT of target
             left = rect.right + gap;
             top = rect.top + (rect.height / 2) - (cardRect.height / 2);
+            orientation = 'left';
         } else if (isRightSettings) {
-            // Position on the LEFT side of the right setting button
+            // Card is placed to the LEFT of target
             left = rect.left - cardRect.width - gap;
             top = rect.top + (rect.height / 2) - (cardRect.height / 2);
+            orientation = 'right';
         } else {
-            // Default: above the target (or below if near top)
+            // Default: card is placed ABOVE target
             top = rect.top - cardRect.height - gap;
             left = rect.left + (rect.width / 2) - (cardRect.width / 2);
+            orientation = 'bottom';
 
             if (top < 10) {
+                // Not enough room above, place card BELOW target
                 top = rect.bottom + gap;
+                orientation = 'top';
             }
         }
 
@@ -1316,6 +1333,37 @@
 
         cardEl.style.top = `${Math.round(top)}px`;
         cardEl.style.left = `${Math.round(left)}px`;
+
+        // Position bubble tail pointer accurately to point towards target center
+        const tail = cardEl.querySelector('#sic-card-tail');
+        if (tail) {
+            tail.style.top = '';
+            tail.style.bottom = '';
+            tail.style.left = '';
+            tail.style.right = '';
+
+            if (orientation === 'left') {
+                tail.className = 'sic-tail sic-tail-left';
+                const targetCenterY = rect.top + rect.height / 2;
+                const tailTop = Math.max(16, Math.min(cardRect.height - 24, targetCenterY - top - 6));
+                tail.style.top = `${Math.round(tailTop)}px`;
+            } else if (orientation === 'right') {
+                tail.className = 'sic-tail sic-tail-right';
+                const targetCenterY = rect.top + rect.height / 2;
+                const tailTop = Math.max(16, Math.min(cardRect.height - 24, targetCenterY - top - 6));
+                tail.style.top = `${Math.round(tailTop)}px`;
+            } else if (orientation === 'top') {
+                tail.className = 'sic-tail sic-tail-top';
+                const targetCenterX = rect.left + rect.width / 2;
+                const tailLeft = Math.max(20, Math.min(cardRect.width - 32, targetCenterX - left - 6));
+                tail.style.left = `${Math.round(tailLeft)}px`;
+            } else {
+                tail.className = 'sic-tail sic-tail-bottom';
+                const targetCenterX = rect.left + rect.width / 2;
+                const tailLeft = Math.max(20, Math.min(cardRect.width - 32, targetCenterX - left - 6));
+                tail.style.left = `${Math.round(tailLeft)}px`;
+            }
+        }
     }
 
     let lastTouchTime = 0;
