@@ -417,7 +417,7 @@ function renderBoard() {
         sleekEq.style.flexWrap = 'nowrap';
         sleekEq.style.boxSizing = 'border-box';
 
-        let rHtml = `<div class="eq-side eq-reactants" style="display: flex; align-items: center; justify-content: flex-end; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
+        let rHtml = `<div class="eq-side eq-reactants" style="display: flex; align-items: center; justify-content: flex-start; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
         currentLevelData.reactants.forEach((m, idx) => {
             rHtml += buildMolHtml(m, 'react');
             if (idx < currentLevelData.reactants.length - 1) {
@@ -428,7 +428,7 @@ function renderBoard() {
 
         let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(4px, 1cqw, 10px); white-space: nowrap;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 9px;">&#10142;</div></div>';
 
-        let pHtml = `<div class="eq-side eq-products" style="display: flex; align-items: center; justify-content: flex-start; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
+        let pHtml = `<div class="eq-side eq-products" style="display: flex; align-items: center; justify-content: flex-end; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
         currentLevelData.products.forEach((m, idx) => {
             pHtml += buildMolHtml(m, 'prod');
             if (idx < currentLevelData.products.length - 1) {
@@ -2659,29 +2659,27 @@ window.autoFitEquation = function() {
 
     const arrowRect = arrow.getBoundingClientRect();
     const colWidth = (sleekEq.clientWidth - arrowRect.width) / 2;
-    const availableHalf = colWidth - 8; // 8px breathing buffer
+    const safeHalf = colWidth - 10; // 10px buffer before arrow
 
     let reactNatural = 0;
     Array.from(react.children).forEach((ch, i) => {
-        reactNatural += ch.offsetWidth;
-        if (i > 0) reactNatural += 8;
+        reactNatural += ch.offsetWidth + (i > 0 ? 6 : 0);
     });
 
     let prodNatural = 0;
     Array.from(prod.children).forEach((ch, i) => {
-        prodNatural += ch.offsetWidth;
-        if (i > 0) prodNatural += 8;
+        prodNatural += ch.offsetWidth + (i > 0 ? 6 : 0);
     });
 
     const maxNatural = Math.max(reactNatural, prodNatural);
 
     let scale = 1.0;
-    if (maxNatural > availableHalf && availableHalf > 0) {
-        scale = Math.max(0.48, Math.min(1.0, availableHalf / maxNatural));
+    if (maxNatural > safeHalf && safeHalf > 0) {
+        scale = Math.max(0.42, Math.min(1.0, (safeHalf / maxNatural) * 0.94));
     }
 
-    react.style.transformOrigin = 'right center';
-    prod.style.transformOrigin = 'left center';
+    react.style.transformOrigin = 'left center';
+    prod.style.transformOrigin = 'right center';
 
     if (scale < 1.0) {
         react.style.transform = `scale(${scale.toFixed(3)})`;
