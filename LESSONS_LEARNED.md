@@ -477,7 +477,7 @@
   4. The tutorial guide card lacked `flex-shrink: 1` and internal scroll capability.
 - **Solution**:
   1. Enforced hard containment on `.vk-modal-card` with `overflow: hidden;` and responsive vertical padding (`clamp(10px, 1.8vh, 20px)`).
-  2. Configured the right column `.vk-right-panel` with `min-height: 0; overflow: hidden;` and wrapped the tutorial guide into `.vk-guide-container` with `flex: 1 1 auto; min-height: 0;` containing `.vk-guide-card` with `overflow-y: auto;` and a sleek thin scrollbar.
+  2. Configured the right column `.vk-right-panel` with `min-height: 0; overflow: hidden;` and wrapped the tutorial guide into `.vk-guide-container` with `flex: 0 0 auto; height: auto;` containing `.vk-guide-card` that hugs its 4 steps snugly without vertical stretching. On compact viewports (<= 620px), `.vk-guide-card` caps at `max-height: 80px` with a sleek thin scrollbar.
   3. Set `flex-shrink: 0;` on `.vk-keypad-container` and `.vk-action-wrapper` to guarantee the numpad is never crushed or hidden.
   4. Replaced rigid `min-height: 44px` with fluid responsive formulas: `.vk-num-btn` (`height: clamp(28px, 4.4vh, 40px)`) and `.vk-op-btn` (`height: clamp(30px, 4.6vh, 40px)`).
   5. Added `@media (max-height: 780px)` and `@media (max-height: 620px)` breakpoints for compact step text, badges, and button heights down to 500px viewports.
