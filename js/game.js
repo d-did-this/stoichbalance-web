@@ -1,4 +1,5 @@
 window.buildLevelMinohPlanCard = function(levelData) {
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     if (!levelData || !levelData.elements) return '';
 
     const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
@@ -45,19 +46,19 @@ window.buildLevelMinohPlanCard = function(levelData) {
 
     const steps = [];
     if (metals.length > 0) {
-        steps.push({ letter: 'M', title: 'Metals', items: metals.map(m => (ELEM_NAMES[m] || m) + ' (' + m + ')'), priority: 1, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' });
+        steps.push({ letter: 'M', title: isBm ? 'Logam' : 'Metals', items: metals.map(m => getLocalizedElementName(m, isBm) + ' (' + m + ')'), priority: 1, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' });
     }
     if (activeIons.length > 0) {
-        steps.push({ letter: 'I', title: 'Polyatomic Ions', items: activeIons.map(i => i.name + ' (' + i.display + ')'), priority: 2, color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' });
+        steps.push({ letter: 'I', title: isBm ? 'Ion Poliatom' : 'Polyatomic Ions', items: activeIons.map(i => (isBm ? (i.key === 'NO3' ? 'Nitrat' : (i.key === 'SO4' ? 'Sulfat' : (i.key === 'CO3' ? 'Karbonat' : 'Hidroksida'))) : i.name) + ' (' + i.display + ')'), priority: 2, color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' });
     }
     if (nonMetals.length > 0) {
-        steps.push({ letter: 'N', title: 'Non-Metals', items: nonMetals.map(n => (ELEM_NAMES[n] || n) + ' (' + n + ')'), priority: 3, color: '#0369a1', bg: '#f0f9ff', border: '#bae6fd' });
+        steps.push({ letter: 'N', title: isBm ? 'Bukan Logam' : 'Non-Metals', items: nonMetals.map(n => getLocalizedElementName(n, isBm) + ' (' + n + ')'), priority: 3, color: '#0369a1', bg: '#f0f9ff', border: '#bae6fd' });
     }
     if (hasOxygen) {
-        steps.push({ letter: 'O', title: 'Oxygen', items: ['Oxygen (O)'], priority: 4, color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' });
+        steps.push({ letter: 'O', title: isBm ? 'Oksigen' : 'Oxygen', items: [isBm ? 'Oksigen (O)' : 'Oxygen (O)'], priority: 4, color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' });
     }
     if (hasHydrogen) {
-        steps.push({ letter: 'H', title: 'Hydrogen', items: ['Hydrogen (H)'], priority: 5, color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' });
+        steps.push({ letter: 'H', title: isBm ? 'Hidrogen' : 'Hydrogen', items: [isBm ? 'Hidrogen (H)' : 'Hydrogen (H)'], priority: 5, color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' });
     }
 
     if (steps.length === 0) return '';
@@ -80,9 +81,9 @@ window.buildLevelMinohPlanCard = function(levelData) {
     <div class="minoh-plan-card" style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid #e2e8f0; padding-bottom:6px;">
             <span style="font-weight:900; font-size:0.86rem; color:#1e293b; display:inline-flex; align-items:center; gap:6px;">
-                <span>🎯</span> <span>MINOH Balancing Order</span>
+                <span>🎯</span> <span>${isBm ? 'Susunan Pengimbangan MINOH' : 'MINOH Balancing Order'}</span>
             </span>
-            <span style="font-size:0.72rem; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">Best Practice</span>
+            <span style="font-size:0.72rem; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${isBm ? 'Amalan Terbaik' : 'Best Practice'}</span>
         </div>
         <div style="display:flex; flex-direction:column; gap:5px;">
             ${stepsRowsHtml}
@@ -176,6 +177,45 @@ window.handleGameBackClick = function() {
     }
 };
 
+
+
+function getLocalizedElementName(el, isBm) {
+    if (isBm === undefined) {
+        isBm = ((typeof localStorage !== 'undefined' && localStorage.getItem('stoich_lang')) || 'en') === 'bm';
+    }
+    if (typeof window.getElementName === 'function') {
+        return window.getElementName(el, isBm ? 'bm' : 'en');
+    }
+    const KSSM = {
+        H: { en: "Hydrogen", bm: "Hidrogen" },
+        O: { en: "Oxygen", bm: "Oksigen" },
+        N: { en: "Nitrogen", bm: "Nitrogen" },
+        Na: { en: "Sodium", bm: "Natrium" },
+        K: { en: "Potassium", bm: "Kalium" },
+        I: { en: "Iodine", bm: "Iodin" },
+        Zn: { en: "Zinc", bm: "Zink" },
+        S: { en: "Sulfur", bm: "Sulfur" },
+        Ag: { en: "Silver", bm: "Argentum" },
+        C: { en: "Carbon", bm: "Karbon" },
+        Pb: { en: "Lead", bm: "Plumbum" },
+        Al: { en: "Aluminium", bm: "Aluminium" },
+        Cl: { en: "Chlorine", bm: "Klorin" },
+        Mg: { en: "Magnesium", bm: "Magnesium" },
+        Fe: { en: "Iron", bm: "Ferum" },
+        Cu: { en: "Copper", bm: "Kuprum" },
+        Br: { en: "Bromine", bm: "Bromin" },
+        P: { en: "Phosphorus", bm: "Fosforus" },
+        Ca: { en: "Calcium", bm: "Kalsium" },
+        Ba: { en: "Barium", bm: "Barium" },
+        Li: { en: "Lithium", bm: "Litium" },
+        Sn: { en: "Tin", bm: "Stanum" },
+        Ni: { en: "Nickel", bm: "Nikel" },
+        Mn: { en: "Manganese", bm: "Mangan" },
+        Cr: { en: "Chromium", bm: "Kromium" }
+    };
+    if (KSSM[el]) return isBm ? KSSM[el].bm : KSSM[el].en;
+    return ELEM_NAMES[el] || el;
+}
 
 const ELEM_NAMES = { 
     H: "Hydrogen", O: "Oxygen", N: "Nitrogen", Na: "Sodium", K: "Potassium", 
@@ -274,7 +314,7 @@ let hintLevel = 1;
 let lastHintElement = null;
 
 function initEngine() {
-
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     const params = new URLSearchParams(window.location.search);
     let mode = params.get('mode');
     let formParam = params.get('form') || '';
@@ -333,10 +373,17 @@ function initEngine() {
     document.title = currentLevelData.title;
     renderBoard();
     let titleEl = document.getElementById("level-title");
-    if(titleEl && currentLevelData) {
-        let match = levelId.match(/L(\d+)/);
-        let prefix = match ? "Level " + match[1] + " : " : "";
-        titleEl.innerText = prefix + currentLevelData.title;
+    if (titleEl && currentLevelData) {
+        if (levelId === 'sandbox') {
+            titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + (currentLevelData.equation || 'Custom Reaction');
+        } else if (levelId === 'TUT0' || levelId === 'tutorial') {
+            titleEl.innerText = isBm ? "Tutorial : Sintesis Air" : "Tutorial : Water Synthesis";
+        } else {
+            let match = levelId.match(/L(\d+)/);
+            let prefix = match ? (isBm ? "Tahap " : "Level ") + match[1] + " : " : "";
+            let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(levelId, currentLevelData.title) : currentLevelData.title;
+            titleEl.innerText = prefix + transTitle;
+        }
     }
     
     // Remove any review mode top button from previous level
@@ -363,17 +410,22 @@ function initEngine() {
     }
     
     // Welcome message
-
-        setTimeout(() => { 
-            window.clearChat(); 
-            window.addChatMessage("Welcome! Let's balance <b>" + currentLevelData.title + "</b>.<br>⚖️ Equal atoms on both sides wins!", "Prof. Beaker"); 
-            let minohCardHtml = window.buildLevelMinohPlanCard(currentLevelData);
-            if (minohCardHtml) {
-                setTimeout(() => {
-                    window.addChatMessage(minohCardHtml, "MINOH Strategy");
-                }, 280);
-            }
-        }, 100);
+    setTimeout(() => { 
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+        window.clearChat(); 
+        let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(levelId, currentLevelData.title) : currentLevelData.title;
+        let welcomeMsg = isBm
+            ? "Selamat datang! Mari seimbangkan <b>" + transTitle + "</b>.<br>⚖️ Bilangan atom yang sama di kedua-dua belah pihak akan menang!"
+            : "Welcome! Let's balance <b>" + currentLevelData.title + "</b>.<br>⚖️ Equal atoms on both sides wins!";
+        window.addChatMessage(welcomeMsg, "Prof. Beaker"); 
+        let minohCardHtml = window.buildLevelMinohPlanCard(currentLevelData);
+        if (minohCardHtml) {
+            setTimeout(() => {
+                const isBmCurrent = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+                window.addChatMessage(minohCardHtml, isBmCurrent ? "Strategi MINOH" : "MINOH Strategy");
+            }, 280);
+        }
+    }, 100);
 }
 
 function getAtomMarble(element) {
@@ -403,7 +455,11 @@ function renderBoard() {
         const buildMolHtml = (m, side) => {
             let formula = tokenizeChemicalFormula(m.displayHtml);
             let coeffHtml = `<div id="coeff-eq-${side}-${m.id}" class="sci-coeff img-coeff has-chem-info" data-info="coeff" data-mol-name="${m.name}" data-mol-formula="${m.id}" data-composition='${JSON.stringify(m.composition)}'>1</div>`;
-            let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${m.state || 'aq'}">(${m.state || 'aq'})</span>`;
+            const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+            const rawState = m.state || 'aq';
+            const stateMap = { s: 'p', l: 'ce', g: 'g', aq: 'ak' };
+            const displayState = isBm ? (stateMap[rawState.toLowerCase()] || rawState) : rawState;
+            let stateHtml = `<span class="state-label sci-state-token has-chem-info" data-info="state" data-state="${rawState}">(${displayState})</span>`;
             return `<div class="sci-mol">${coeffHtml}<div class="sci-formula has-chem-info" data-info="molecule" data-mol-name="${m.name}" data-mol-formula="${m.id}">${formula}${stateHtml}</div></div>`;
         };
 
@@ -802,11 +858,13 @@ window.updateSimulation = function() {
                 visualGlow = "animation: flashHintBox 1s infinite; z-index: 5;";
             }
 
+            const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+            let elName = getLocalizedElementName(el, isBm);
+
             html += `
             <div class="pro-scale-card ${colorClass} has-chem-info" data-info="tracker-card" data-element="${el}" data-rcount="${rCount}" data-pcount="${pCount}" style="position: relative; ${visualGlow}">${diffBadge}
-                <h3>${ELEM_NAMES[el] || el} (${el})</h3>
-                <div class="scale-labels"><span>REACTANTS</span><span>PRODUCTS</span></div>
-
+                <h3>${elName} (${el})</h3>
+                <div class="scale-labels"><span>${isBm ? 'BAHAN' : 'REACTANTS'}</span><span>${isBm ? 'HASIL' : 'PRODUCTS'}</span></div>
 
                 <div class="mini-seesaw">
                     <div class="mini-plank" style="transform: rotate(${angle}deg); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
@@ -949,21 +1007,23 @@ window.updateSimulation = function() {
             isSimplified = (gcd === 1);
         }
 
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+
         if (isBalanced) {
-            statusLeft.innerHTML = "BALANCED"; statusLeft.style.background = "#22c55e";
+            statusLeft.innerHTML = isBm ? "SEIMBANG" : "BALANCED"; statusLeft.style.background = "#22c55e";
         } else {
-            statusLeft.innerHTML = "UNBALANCED"; statusLeft.style.background = "#ef4444";
+            statusLeft.innerHTML = isBm ? "BELUM SEIMBANG" : "UNBALANCED"; statusLeft.style.background = "#ef4444";
         }
 
         if (isEmpty) {
-            statusRight.innerHTML = "NO ATOMS"; statusRight.style.background = "#94a3b8";
-            statusLeft.innerHTML = "EMPTY"; statusLeft.style.background = "#94a3b8";
+            statusRight.innerHTML = isBm ? "TIADA ATOM" : "NO ATOMS"; statusRight.style.background = "#94a3b8";
+            statusLeft.innerHTML = isBm ? "KOSONG" : "EMPTY"; statusLeft.style.background = "#94a3b8";
         } else if (!isComplete || !isBalanced) {
-            statusRight.innerHTML = "INCOMPLETE"; statusRight.style.background = "#ef4444";
+            statusRight.innerHTML = isBm ? "BELUM LENGKAP" : "INCOMPLETE"; statusRight.style.background = "#ef4444";
         } else if (isSimplified) {
-            statusRight.innerHTML = "SIMPLIFIED"; statusRight.style.background = "#22c55e";
+            statusRight.innerHTML = isBm ? "TERMUDAH" : "SIMPLIFIED"; statusRight.style.background = "#22c55e";
         } else {
-            statusRight.innerHTML = "NOT SIMPLIFIED"; statusRight.style.background = "#eab308";
+            statusRight.innerHTML = isBm ? "TIDAK TERMUDAH" : "NOT SIMPLIFIED"; statusRight.style.background = "#eab308";
         }
         
         // Handle Win State Detection
@@ -999,7 +1059,7 @@ window.updateSimulation = function() {
             if (window.clueState.boardState && window.clueState.boardState !== currentBoardState) {
                 window.clueState = { el: null, side: null, stage: 1, boardState: null };
                 let dynamicLabel = document.getElementById('clue-btn-dynamic-text');
-                if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
+                if (dynamicLabel) { const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm'; dynamicLabel.textContent = isBm ? "Saya Buntu! Tolong!" : "I am Stuck! Help!"; }
             }
         }
         }
@@ -1039,25 +1099,27 @@ window.resetIdleGuidanceTimer = function() {
             if (worstEl && maxDiff > 0) {
                 window.proactiveBeakerTriggeredForLevel = true;
                 if (typeof playSound === 'function') playSound('pop');
-                let elName = ELEM_NAMES[worstEl] || worstEl;
+                const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+                let elName = getLocalizedElementName(worstEl, isBm);
                 let leftC = rCounts[worstEl] || 0;
                 let rightC = pCounts[worstEl] || 0;
-                let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstEl) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstEl) : `<b>${worstEl}</b>`);
-                let cardHtml = `
-                <div class="chat-clue-card">
-                    <div class="chat-clue-header">
-                        ${marbleHtml}
-                        <span><b>${elName}</b> is off!</span>
-                    </div>
-                    <div class="chat-scale-row">
-                        <div class="chat-side-pill left">Left: <b>${leftC}</b></div>
-                        <div class="chat-scale-icon">⚖️</div>
-                        <div class="chat-side-pill right">Right: <b>${rightC}</b></div>
-                    </div>
-                    <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">
-                        💡 Tap <b>I am Stuck! Help!</b> below for help!
-                    </div>
-                </div>`;
+                let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstEl) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstEl) : ('<b>' + worstEl + '</b>'));
+                let cardHtml = [
+                    '<div class="chat-clue-card">',
+                    '    <div class="chat-clue-header">',
+                    '        ' + marbleHtml,
+                    '        <span><b>' + elName + '</b> ' + (isBm ? 'tidak seimbang!' : 'is off!') + '</span>',
+                    '    </div>',
+                    '    <div class="chat-scale-row">',
+                    '        <div class="chat-side-pill left">' + (isBm ? 'Kiri: ' : 'Left: ') + '<b>' + leftC + '</b></div>',
+                    '        <div class="chat-scale-icon">⚖️</div>',
+                    '        <div class="chat-side-pill right">' + (isBm ? 'Kanan: ' : 'Right: ') + '<b>' + rightC + '</b></div>',
+                    '    </div>',
+                    '    <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">',
+                    '        💡 ' + (isBm ? 'Tekan <b>Saya Buntu! Tolong!</b> di bawah untuk bantuan!' : 'Tap <b>I am Stuck! Help!</b> below for help!'),
+                    '    </div>',
+                    '</div>'
+                ].join('\n');
                 window.addChatMessage(cardHtml, "Prof. Beaker", "assistant");
             }
         }
@@ -1092,27 +1154,29 @@ window.checkProactiveBeakerGuidance = function(rCounts, pCounts, isBalanced) {
     if (window.unproductiveMovesCount >= 5 && !window.proactiveBeakerTriggeredForLevel && worstElement) {
         window.proactiveBeakerTriggeredForLevel = true;
         window.unproductiveMovesCount = 0;
-        let elName = ELEM_NAMES[worstElement] || worstElement;
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+        let elName = getLocalizedElementName(worstElement, isBm);
         let leftC = rCounts[worstElement] || 0;
         let rightC = pCounts[worstElement] || 0;
         setTimeout(() => {
             if (typeof playSound === 'function') playSound('pop');
-            let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstElement) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstElement) : `<b>${worstElement}</b>`);
-            let cardHtml = `
-            <div class="chat-clue-card">
-                <div class="chat-clue-header">
-                    ${marbleHtml}
-                    <span><b>${elName}</b> needs balance!</span>
-                </div>
-                <div class="chat-scale-row">
-                    <div class="chat-side-pill left">Left: <b>${leftC}</b></div>
-                    <div class="chat-scale-icon">⚖️</div>
-                    <div class="chat-side-pill right">Right: <b>${rightC}</b></div>
-                </div>
-                <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">
-                    💡 Tap <b>I am Stuck! Help!</b> or add <b>${worstElement}</b> to balance!
-                </div>
-            </div>`;
+            let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(worstElement) : (typeof getAtomMarble === 'function' ? getAtomMarble(worstElement) : ('<b>' + worstElement + '</b>'));
+            let cardHtml = [
+                '<div class="chat-clue-card">',
+                '    <div class="chat-clue-header">',
+                '        ' + marbleHtml,
+                '        <span><b>' + elName + '</b> ' + (isBm ? 'perlu diseimbangkan!' : 'needs balance!') + '</span>',
+                '    </div>',
+                '    <div class="chat-scale-row">',
+                '        <div class="chat-side-pill left">' + (isBm ? 'Kiri: ' : 'Left: ') + '<b>' + leftC + '</b></div>',
+                '        <div class="chat-scale-icon">⚖️</div>',
+                '        <div class="chat-side-pill right">' + (isBm ? 'Kanan: ' : 'Right: ') + '<b>' + rightC + '</b></div>',
+                '    </div>',
+                '    <div class="chat-action-box" style="background:#eff6ff; border-color:#93c5fd; color:#1e40af;">',
+                '        💡 ' + (isBm ? 'Tekan <b>Saya Buntu! Tolong!</b> atau tambah <b>' + worstElement + '</b> untuk mengimbang!' : 'Tap <b>I am Stuck! Help!</b> or add <b>' + worstElement + '</b> to balance!'),
+                '    </div>',
+                '</div>'
+            ].join('\n');
             window.addChatMessage(cardHtml, "Prof. Beaker", "assistant");
         }, 350);
     }
@@ -1252,35 +1316,44 @@ window.clearChat = function(userInitiated) {
     window.beakerChatHistory = [];
     window.clueState = { el: null, side: null, stage: 1, boardState: null };
     let dynamicLabel = document.getElementById('clue-btn-dynamic-text');
-    if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
+    if (dynamicLabel) { const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm'; dynamicLabel.textContent = isBm ? "Saya Buntu! Tolong!" : "I am Stuck! Help!"; }
 };
 
 
 window.getLocalProfBeakerReply = function(userPrompt, lvl, rCounts, pCounts) {
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     const p = (userPrompt || '').toLowerCase();
     
     // 1. Greetings
-    if (/\b(hi|hello|hey|halo|salam|morning|afternoon|evening|yo)\b/.test(p)) {
-        return "Hello there! Professor Beaker here, glad to have you in the lab. Take a look at the seesaw scale in the center. Let us balance this equation together!";
+    if (/\b(hi|hello|hey|halo|salam|morning|afternoon|evening|yo|hai)\b/.test(p)) {
+        return isBm
+            ? "Hai! Saya Profesor Beaker, gembira dapat bersama anda di makmal. Perhatikan neraca jongkang-jongkit di bahagian tengah. Mari kita seimbangkan persamaan ini bersama-sama!"
+            : "Hello there! Professor Beaker here, glad to have you in the lab. Take a look at the seesaw scale in the center. Let us balance this equation together!";
     }
     
     // 2. Ready / Start / Let's go
-    if (/\b(let|lets|let's|start|begin|ready|go|ok|okay)\b/.test(p)) {
-        return "Let's do this! Check the element trays on the left to spot which atoms are uneven, and add molecules using the plus buttons to level the seesaw.";
+    if (/\b(let|lets|let's|start|begin|ready|go|ok|okay|mula|jom|siap)\b/.test(p)) {
+        return isBm
+            ? "Mari kita mulakan! Semak dulang unsur di sebelah kiri untuk melihat atom yang belum seimbang, dan tambah molekul menggunakan butang tambah untuk meratakan neraca."
+            : "Let's do this! Check the element trays on the left to spot which atoms are uneven, and add molecules using the plus buttons to level the seesaw.";
     }
     
     // 3. Coefficients and Subscripts
-    if (/\b(coeff|coefficient|subscript|number|numbers)\b/.test(p)) {
-        return "Great question! The big numbers in front are **coefficients** (how many molecule bundles you have). The small numbers like the ₂ in N₂ are **subscripts** (atoms bonded inside). You can change coefficients, but never subscripts!";
+    if (/\b(coeff|coefficient|subscript|number|numbers|pekali|subskrip|nombor)\b/.test(p)) {
+        return isBm
+            ? "Soalan yang hebat! Nombor besar di hadapan ialah **pekali** (bilangan pakej molekul). Nombor kecil seperti ₂ dalam N₂ ialah **subskrip** (bilangan atom yang terikat dalam molekul). Anda boleh mengubah pekali, tetapi jangan sekali-kali mengubah subskrip!"
+            : "Great question! The big numbers in front are **coefficients** (how many molecule bundles you have). The small numbers like the ₂ in N₂ are **subscripts** (atoms bonded inside). You can change coefficients, but never subscripts!";
     }
     
     // 4. Starting Over / Reset
-    if (/\b(reset|start over|clear|restart|trash|undo)\b/.test(p)) {
-        return "To start fresh, tap the red **trash can button** (🗑️) next to the hint button below to reset all coefficients to 1, or click any molecule block in the drop zones to remove it!";
+    if (/\b(reset|start over|clear|restart|trash|undo|padam|semula|kosongkan)\b/.test(p)) {
+        return isBm
+            ? "Untuk bermula semula, tekan butang **tong sampah** (🗑️) di sebelah butang petunjuk untuk menetapkan semula semua pekali, atau klik mana-mana blok molekul di zon letak untuk mengeluarkannya!"
+            : "To start fresh, tap the red **trash can button** (🗑️) next to the hint button below to reset all coefficients to 1, or click any molecule block in the drop zones to remove it!";
     }
     
     // 5. How to balance / MINOH rule / Stuck
-    if (/\b(how|what|balance|minoh|rule|stuck|help|clue|hint|guide|next)\b/.test(p)) {
+    if (/\b(how|what|balance|minoh|rule|stuck|help|clue|hint|guide|next|bagaimana|macam mana|seimbang|tolong|petunjuk|buntu)\b/.test(p)) {
         let worstEl = null;
         let maxDiff = 0;
         for (let el in rCounts) {
@@ -1288,11 +1361,17 @@ window.getLocalProfBeakerReply = function(userPrompt, lvl, rCounts, pCounts) {
             if (diff > maxDiff) { maxDiff = diff; worstEl = el; }
         }
         if (worstEl && maxDiff > 0) {
-            let elName = (window.ELEM_NAMES && window.ELEM_NAMES[worstEl]) || worstEl;
-            let lighterSide = (rCounts[worstEl] || 0) < (pCounts[worstEl] || 0) ? "Reactants (Left)" : "Products (Right)";
-            return `Follow the **MINOH** strategy! Right now, **${elName}** is uneven (${rCounts[worstEl] || 0} Left vs ${pCounts[worstEl] || 0} Right). Try adding a molecule with **${worstEl}** to the **${lighterSide}** side, or tap **I am Stuck! Help!** below for the exact step!`;
+            let elName = getLocalizedElementName(worstEl, isBm);
+            let lighterSide = (rCounts[worstEl] || 0) < (pCounts[worstEl] || 0) 
+                ? (isBm ? "Bahan Tindak Balas (Kiri)" : "Reactants (Left)") 
+                : (isBm ? "Hasil Tindak Balas (Kanan)" : "Products (Right)");
+            return isBm
+                ? `Ikuti strategi **MINOH**! Sekarang, **${elName}** tidak seimbang (${rCounts[worstEl] || 0} Kiri vs ${pCounts[worstEl] || 0} Kanan). Cuba tambah molekul yang mengandungi **${worstEl}** di bahagian **${lighterSide}**, atau tekan **Saya Buntu! Tolong!** di bawah untuk langkah tepat!`
+                : `Follow the **MINOH** strategy! Right now, **${elName}** is uneven (${rCounts[worstEl] || 0} Left vs ${pCounts[worstEl] || 0} Right). Try adding a molecule with **${worstEl}** to the **${lighterSide}** side, or tap **I am Stuck! Help!** below for the exact step!`;
         }
-        return "Follow the **MINOH** strategy: Metals first, then Polyatomic ions, Non-metals next, Oxygen near the end, and Hydrogen last! Tap **I am Stuck! Help!** below for step-by-step guidance.";
+        return isBm
+            ? "Ikuti strategi **MINOH**: Logam dahulu, kemudian Ion Poliatom, Bukan Logam seterusnya, Oksigen berhampiran akhir, dan Hidrogen paling akhir! Tekan **Saya Buntu! Tolong!** di bawah untuk panduan langkah demi langkah."
+            : "Follow the **MINOH** strategy: Metals first, then Polyatomic ions, Non-metals next, Oxygen near the end, and Hydrogen last! Tap **I am Stuck! Help!** below for step-by-step guidance.";
     }
     
     // 6. Generic friendly contextual reply
@@ -1303,11 +1382,15 @@ window.getLocalProfBeakerReply = function(userPrompt, lvl, rCounts, pCounts) {
         if (diff > maxDiff) { maxDiff = diff; worstEl = el; }
     }
     if (worstEl && maxDiff > 0) {
-        let elName = (window.ELEM_NAMES && window.ELEM_NAMES[worstEl]) || worstEl;
-        return `I am here to help! Looking at the scales, **${elName}** is currently off balance. Try adjusting the coefficient for molecules containing **${worstEl}**, or click **I am Stuck! Help!** below for a direct clue.`;
+        let elName = getLocalizedElementName(worstEl, isBm);
+        return isBm
+            ? `Saya sedia membantu! Berdasarkan neraca, **${elName}** kini belum seimbang. Cuba laraskan pekali bagi molekul yang mengandungi **${worstEl}**, atau klik **Saya Buntu! Tolong!** di bawah untuk petunjuk terus.`
+            : `I am here to help! Looking at the scales, **${elName}** is currently off balance. Try adjusting the coefficient for molecules containing **${worstEl}**, or click **I am Stuck! Help!** below for a direct clue.`;
     }
     
-    return "You are doing great! Keep comparing the atom counts on both sides of the reaction arrow. If you need a hint, tap the yellow button below!";
+    return isBm
+        ? "Bagus sekali usaha anda! Teruskan membandingkan bilangan atom di kedua-dua belah anak panah tindak balas. Jika memerlukan petunjuk, tekan butang kuning di bawah!"
+        : "You are doing great! Keep comparing the atom counts on both sides of the reaction arrow. If you need a hint, tap the yellow button below!";
 };
 
 window.askProfBeaker = async function(userPrompt) {
@@ -1438,7 +1521,9 @@ window.openStudyRoomModal = function() {
     if (!modal || !currentLevelData) return;
     
     let titleEl = document.getElementById('study-room-level-name');
-    if (titleEl) titleEl.innerText = (currentLevelData.title || '') + ' • SPM Chemistry Chapter 3';
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(currentLevelData.id || '', currentLevelData.title) : currentLevelData.title;
+    if (titleEl) titleEl.innerText = (transTitle || currentLevelData.title || '') + (isBm ? ' • Kimia SPM Bab 3' : ' • SPM Chemistry Chapter 3');
     
     let eqEl = document.getElementById('study-room-equation');
     if (eqEl) {
@@ -1455,7 +1540,7 @@ window.openStudyRoomModal = function() {
         currentLevelData.elements.forEach(el => {
             let r = rCounts[el] || 0;
             let p = pCounts[el] || 0;
-            let elName = ELEM_NAMES[el] || el;
+            let elName = getLocalizedElementName(el, isBm);
             let marble = (typeof getHyperMarble === 'function') ? getHyperMarble(el) : (typeof getAtomMarble === 'function' ? getAtomMarble(el) : `<b>${el}</b>`);
             let maxCount = Math.max(r, p, 1);
             let rPct = Math.min(100, Math.round((r / maxCount) * 100));
@@ -1464,16 +1549,16 @@ window.openStudyRoomModal = function() {
             let statusBadge = '';
             let scaleIcon = '⚖️';
             if (r === p && r > 0) {
-                statusBadge = `<span style="background:#dcfce7; color:#15803d; border:1.5px solid #86efac; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚖️ Balanced (${r} = ${p})</span>`;
+                statusBadge = `<span style="background:#dcfce7; color:#15803d; border:1.5px solid #86efac; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚖️ ${isBm ? 'Seimbang' : 'Balanced'} (${r} = ${p})</span>`;
                 scaleIcon = '⚖️';
             } else if (r < p) {
-                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ Need +${p - r} on Left</span>`;
+                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ ${isBm ? 'Perlu +' + (p - r) + ' di Kiri' : 'Need +' + (p - r) + ' on Left'}</span>`;
                 scaleIcon = '⚖️';
             } else if (r > p) {
-                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ Need +${r - p} on Right</span>`;
+                statusBadge = `<span style="background:#fef2f2; color:#b91c1c; border:1.5px solid #fca5a5; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800; display:inline-flex; align-items:center; gap:4px;">⚠️ ${isBm ? 'Perlu +' + (r - p) + ' di Kanan' : 'Need +' + (r - p) + ' on Right'}</span>`;
                 scaleIcon = '⚖️';
             } else {
-                statusBadge = `<span style="background:#f1f5f9; color:#64748b; border:1.5px solid #cbd5e1; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800;">Empty (0 = 0)</span>`;
+                statusBadge = `<span style="background:#f1f5f9; color:#64748b; border:1.5px solid #cbd5e1; border-radius:8px; padding:2px 8px; font-size:0.75rem; font-weight:800;">${isBm ? 'Kosong (0 = 0)' : 'Empty (0 = 0)'}</span>`;
             }
             
             let color = ATOM_COLORS[el] || { bg: "#94a3b8", color: "white" };
@@ -1510,7 +1595,7 @@ window.openStudyRoomModal = function() {
                     <!-- Reactants LHS -->
                     <div style="display:flex; flex-direction:column; gap:4px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
-                            <span style="color:#2563eb;">Reactants</span>
+                            <span style="color:#2563eb;">${isBm ? 'Bahan' : 'Reactants'}</span>
                             <span style="background:#dbeafe; color:#1d4ed8; padding:1px 6px; border-radius:6px;">${r}</span>
                         </div>
                         <div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">
@@ -1529,7 +1614,7 @@ window.openStudyRoomModal = function() {
                     <!-- Products RHS -->
                     <div style="display:flex; flex-direction:column; gap:4px;">
                         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:800;">
-                            <span style="color:#ea580c;">Products</span>
+                            <span style="color:#ea580c;">${isBm ? 'Hasil' : 'Products'}</span>
                             <span style="background:#ffedd5; color:#c2410c; padding:1px 6px; border-radius:6px;">${p}</span>
                         </div>
                         <div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">
@@ -1572,6 +1657,7 @@ window.clueState = window.clueState || { el: null, side: null, stage: 1 };
 window.revealGuidedSolvingHint = function() {
     if(typeof playSound === "function") playSound("hint");
     if(!currentLevelData) return;
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     
     let rCounts = window.counts ? window.counts.rCounts : {};
     let pCounts = window.counts ? window.counts.pCounts : {};
@@ -1609,22 +1695,22 @@ window.revealGuidedSolvingHint = function() {
     let maxDiff = bestCandidate ? bestCandidate.diff : 0;
     
     if (window.counts && window.counts.isEmpty) {
-        window.addChatMessage("Add some molecules to the scales to begin balancing!", "Guided Step");
+        window.addChatMessage(isBm ? "Tambah beberapa molekul ke neraca untuk mula mengimbang!" : "Add some molecules to the scales to begin balancing!", isBm ? "Langkah Bimbingan" : "Guided Step");
         return;
     }
     if (!imbalancedEl || maxDiff === 0) {
-        window.addChatMessage("All atoms are currently balanced! Review your atom counters or proceed to the next challenge.", "Guided Step");
+        window.addChatMessage(isBm ? "Semua atom kini seimbang! Semak pembilang atom anda atau teruskan ke cabaran seterusnya." : "All atoms are currently balanced! Review your atom counters or proceed to the next challenge.", isBm ? "Langkah Bimbingan" : "Guided Step");
         return;
     }
     
-    let sideName = (needsMoreOn === "react") ? "Reactants" : "Products";
+    let sideName = (needsMoreOn === "react") ? (isBm ? "Bahan Tindak Balas" : "Reactants") : (isBm ? "Hasil Tindak Balas" : "Products");
     let targetMols = (needsMoreOn === "react") ? currentLevelData.reactants : currentLevelData.products;
     let bestMolObj = targetMols.find(m => m.composition[imbalancedEl]) || targetMols[0];
     
     window.activeVisualHint = { element: imbalancedEl, side: needsMoreOn };
     updateSimulation();
     
-    let elName = ELEM_NAMES[imbalancedEl] || imbalancedEl;
+    let elName = getLocalizedElementName(imbalancedEl, isBm);
     let rVal = rCounts[imbalancedEl] || 0;
     let pVal = pCounts[imbalancedEl] || 0;
     let marbleHtml = (typeof getHyperMarble === 'function') ? getHyperMarble(imbalancedEl) : (typeof getAtomMarble === 'function' ? getAtomMarble(imbalancedEl) : `<b>${imbalancedEl}</b>`);
@@ -1636,48 +1722,48 @@ window.revealGuidedSolvingHint = function() {
         <div class="chat-clue-card">
             <div class="chat-clue-header">
                 ${marbleHtml}
-                <span style="color: #1e293b;"><b>Solution Move:</b> Balance <b>${elName}</b></span>
+                <span style="color: #1e293b;"><b>${isBm ? 'Langkah Penyelesaian:' : 'Solution Move:'}</b> ${isBm ? 'Seimbangkan' : 'Balance'} <b>${elName}</b></span>
             </div>
             <div class="chat-scale-row">
-                <div class="chat-side-pill left">Left: <b>${rVal}</b></div>
+                <div class="chat-side-pill left">${isBm ? 'Kiri: ' : 'Left: '}<b>${rVal}</b></div>
                 <div class="chat-scale-icon">⚖️</div>
-                <div class="chat-side-pill right">Right: <b>${pVal}</b></div>
+                <div class="chat-side-pill right">${isBm ? 'Kanan: ' : 'Right: '}<b>${pVal}</b></div>
             </div>
             <div class="chat-action-box" style="background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; font-size: 0.98rem; font-weight: 800;">
-                👉 Tap <b>+ ${bestMolObj.displayHtml}</b> on <b>${sideName}</b>!
+                👉 ${isBm ? 'Tekan <b>+ ' + bestMolObj.displayHtml + '</b> pada <b>' + sideName + '</b>!' : 'Tap <b>+ ' + bestMolObj.displayHtml + '</b> on <b>' + sideName + '</b>!'}
             </div>
             <div style="font-size: 0.84rem; color: #475569; font-weight: 700; margin-top: 6px; line-height: 1.35; padding: 7px 10px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px;">
-                🔬 <b>Why?</b> ${bestMolObj.displayHtml} contains ${imbalancedEl}. Adding it increases ${sideName} atoms towards equal balance!
+                🔬 <b>${isBm ? 'Mengapa?' : 'Why?'}</b> ${bestMolObj.displayHtml} ${isBm ? 'mengandungi ' + imbalancedEl + '. Menambahkannya meningkatkan atom ' + sideName + ' ke arah keseimbangan!' : 'contains ' + imbalancedEl + '. Adding it increases ' + sideName + ' atoms towards equal balance!'}
             </div>
         </div>`;
-        window.addChatMessage(cardHtml, "Step Solution #" + (window.hintCounter++));
+        window.addChatMessage(cardHtml, (isBm ? "Penyelesaian Langkah #" : "Step Solution #") + (window.hintCounter++));
         window.clueState = { el: null, side: null, stage: 1 };
-        if (dynamicLabel) dynamicLabel.textContent = "I am Stuck! Help!";
+        if (dynamicLabel) dynamicLabel.textContent = isBm ? "Saya Buntu! Tolong!" : "I am Stuck! Help!";
     } else {
         // STAGE 1: Socratic Guidance (Guide the student first)
         let curState = JSON.stringify(rCounts) + JSON.stringify(pCounts);
         window.clueState = { el: imbalancedEl, side: needsMoreOn, stage: 2, boardState: curState };
-        if (dynamicLabel) dynamicLabel.textContent = "Give me answer!";
+        if (dynamicLabel) { const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm'; dynamicLabel.textContent = isBm ? "Beri saya jawapan!" : "Give me answer!"; }
         
         let cardHtml = `
         <div class="chat-clue-card">
             <div class="chat-clue-header">
                 ${marbleHtml}
-                <span><b>${elName}</b> is uneven!</span>
+                <span><b>${elName}</b> ${isBm ? 'tidak seimbang!' : 'is uneven!'}</span>
             </div>
             <div class="chat-scale-row">
-                <div class="chat-side-pill left">Left: <b>${rVal}</b></div>
+                <div class="chat-side-pill left">${isBm ? 'Kiri: ' : 'Left: '}<b>${rVal}</b></div>
                 <div class="chat-scale-icon">⚖️</div>
-                <div class="chat-side-pill right">Right: <b>${pVal}</b></div>
+                <div class="chat-side-pill right">${isBm ? 'Kanan: ' : 'Right: '}<b>${pVal}</b></div>
             </div>
             <div class="chat-action-box" style="background: #fffbeb; border: 2px dashed #f59e0b; color: #92400e;">
-                🤔 The <b>${sideName}</b> side is lighter on <b>${elName}</b>. Can you spot a molecule with <b>${imbalancedEl}</b> on ${sideName} to even it out?
+                🤔 ${isBm ? 'Bahagian <b>' + sideName + '</b> kekurangan atom <b>' + elName + '</b>. Bolehkah anda cari molekul yang mengandungi <b>' + imbalancedEl + '</b> di bahagian ' + sideName + ' untuk mengimbanginya?' : 'The <b>' + sideName + '</b> side is lighter on <b>' + elName + '</b>. Can you spot a molecule with <b>' + imbalancedEl + '</b> on ' + sideName + ' to even it out?'}
             </div>
             <div style="font-size: 0.82rem; color: #b45309; font-weight: 800; margin-top: 6px; text-align: center; background: rgba(254, 243, 199, 0.7); padding: 5px 10px; border-radius: 8px; border: 1.5px solid rgba(245, 158, 11, 0.35);">
-                ✨ <b>MINOH Rule:</b> ${bestCandidate && bestCandidate.weight === 1 ? 'Metals first!' : (bestCandidate && bestCandidate.weight === 2 ? 'Non-metals before O & H!' : (bestCandidate && bestCandidate.weight === 3 ? 'Balance Oxygen now!' : 'Hydrogen finishes last!'))}
+                ✨ <b>${isBm ? 'Peraturan MINOH:' : 'MINOH Rule:'}</b> ${isBm ? (bestCandidate && bestCandidate.weight === 1 ? 'Logam dahulu!' : (bestCandidate && bestCandidate.weight === 2 ? 'Bukan logam sebelum O & H!' : (bestCandidate && bestCandidate.weight === 3 ? 'Seimbangkan Oksigen sekarang!' : 'Hidrogen selesai paling akhir!'))) : (bestCandidate && bestCandidate.weight === 1 ? 'Metals first!' : (bestCandidate && bestCandidate.weight === 2 ? 'Non-metals before O & H!' : (bestCandidate && bestCandidate.weight === 3 ? 'Balance Oxygen now!' : 'Hydrogen finishes last!')))}
             </div>
         </div>`;
-        window.addChatMessage(cardHtml, "Step Guide #" + (window.hintCounter++));
+        window.addChatMessage(cardHtml, (isBm ? "Panduan Langkah #" : "Step Guide #") + (window.hintCounter++));
     }
 };
 window.revealHeuristicHint = window.revealGuidedSolvingHint;
@@ -2027,9 +2113,18 @@ window.showWinPopup = function(isPerfect) {
     let borderColor = isPerfect ? "#10b981" : "#f59e0b"; // Modern emerald or amber
     let shadowColor = isPerfect ? "#047857" : "#b45309";
     let titleColor = isPerfect ? "#059669" : "#d97706";
-    let titleText = isPerfect ? "PERFECT BALANCE!" : "BALANCED!";
-    let subText = (levelId === "TUT0") ? "Awesome job! You balanced your first reaction: 2H₂ + O₂ → 2H₂O. You are ready for Form 4!" : (isPerfect ? "Flawless work! The equation is in its simplest form." : "Nice job! The equation is balanced, but the coefficients can be simplified further.");
-    let badgeText = isPerfect ? "3 STARS" : "1.5 STARS";
+    let isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    let titleText = isPerfect 
+        ? (isBm ? "SEIMBANG SEMPURNA!" : "PERFECT BALANCE!") 
+        : (isBm ? "SEIMBANG!" : "BALANCED!");
+    let subText = (levelId === "TUT0") 
+        ? (isBm ? "Syabas! Anda telah berjaya mengimbangi tindak balas pertama: 2H₂ + O₂ → 2H₂O. Anda kini bersedia untuk Tingkatan 4!" : "Awesome job! You balanced your first reaction: 2H₂ + O₂ → 2H₂O. You are ready for Form 4!") 
+        : (isPerfect 
+            ? (isBm ? "Tahniah! Persamaan kimia berada dalam nisbah teringkas." : "Flawless work! The equation is in its simplest form.") 
+            : (isBm ? "Bagus! Persamaan telah seimbang, tetapi pekali masih boleh dipermudahkan lagi." : "Nice job! The equation is balanced, but the coefficients can be simplified further."));
+    let badgeText = isPerfect 
+        ? (isBm ? "3 BINTANG" : "3 STARS") 
+        : (isBm ? "1.5 BINTANG" : "1.5 STARS");
     
     let svgFull = `<svg width="40" height="40" viewBox="0 0 24 24" fill="#facc15" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 4px; filter:drop-shadow(0 4px 0 rgba(0,0,0,0.15));"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
     let svgHalf = `<svg width="40" height="40" viewBox="0 0 24 24" stroke="#ca8a04" stroke-width="2" stroke-linejoin="round" style="margin:0 4px; filter:drop-shadow(0 4px 0 rgba(0,0,0,0.15));"><defs><linearGradient id="hgPopupRedesign" x1="0" x2="1" y1="0" y2="0"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#e2e8f0"/></linearGradient></defs><polygon fill="url(#hgPopupRedesign)" points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`;
@@ -2064,7 +2159,7 @@ window.showWinPopup = function(isPerfect) {
     window.slideTransitionTo = function(url) {
         let slideOverlay = document.createElement('div');
         slideOverlay.style.cssText = "position: fixed; top: 0; left: 100vw; width: 100vw; height: 100vh; background: #2563eb; z-index: 9999999; transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; justify-content: center; align-items: center;";
-        slideOverlay.innerHTML = `<h1 style="color: white; font-size: 4rem; font-weight: 900; text-shadow: 0 6px 0 #1e3a8a; font-family: system-ui, sans-serif;">NEXT LEVEL</h1>`;
+        slideOverlay.innerHTML = `<h1 style="color: white; font-size: 4rem; font-weight: 900; text-shadow: 0 6px 0 #1e3a8a; font-family: system-ui, sans-serif;">${isBm ? 'TAHAP SETERUSNYA' : 'NEXT LEVEL'}</h1>`;
         document.body.appendChild(slideOverlay);
         if(typeof playSound==='function') playSound('start');
         setTimeout(() => { slideOverlay.style.left = "0"; }, 10);
@@ -2095,17 +2190,17 @@ window.showWinPopup = function(isPerfect) {
     let buttonsHtml = `<div style="display: flex; gap: 16px; margin-top: 35px; flex-wrap: wrap; justify-content:center;">`;
     
     if (!isPerfect) {
-        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #f59e0b; color: white; border: 4px solid #b45309; box-shadow: 0 8px 0 #92400e;">RETRY</button>`;
+        buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); document.getElementById('win-popup').remove();" style=" background: #f59e0b; color: white; border: 4px solid #b45309; box-shadow: 0 8px 0 #92400e;">${isBm ? 'CUBA LAGI' : 'RETRY'}</button>`;
     }
     
-    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.enterReviewMode('${nextLevel || ''}');" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">REVIEW</button>`;
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.enterReviewMode('${nextLevel || ''}');" style=" background: #64748b; color: white; border: 4px solid #475569; box-shadow: 0 8px 0 #334155;">${isBm ? 'ULANGKAJI' : 'REVIEW'}</button>`;
     
     if (nextLevel) {
-        let nextBtnLabel = (levelId === "TUT0") ? "START FORM 4 ▶" : "NEXT LEVEL";
+        let nextBtnLabel = (levelId === "TUT0") ? (isBm ? "MULA TINGKATAN 4 ▶" : "START FORM 4 ▶") : (isBm ? "TAHAP SETERUSNYA ▶" : "NEXT LEVEL");
         buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">${nextBtnLabel}</button>`;
     }
     
-    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">MAIN MENU</button>`;
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">${isBm ? 'MENU UTAMA' : 'MAIN MENU'}</button>`;
     buttonsHtml += `</div>`;
 
     let modal = document.createElement("div");
@@ -2348,12 +2443,13 @@ window.handleChallengeRoundComplete = function(isPerfect) {
             timeStr = `${m}m ${s}s`;
         }
         
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
         card.innerHTML = `
             <div style="font-size:3rem; margin-bottom:8px;">⚡</div>
-            <h2 style="margin:0; font-size:2rem; font-weight:900; color:#065f46;">ROUND ${window.challengeCurrentRound + 1} BALANCED!</h2>
-            <p style="margin:8px 0 20px; font-weight:800; color:#475569; font-size:1.1rem;">Clock: <span style="color:#059669;">${timeStr}</span></p>
+            <h2 style="margin:0; font-size:2rem; font-weight:900; color:#065f46;">${isBm ? 'PUSINGAN ' + (window.challengeCurrentRound + 1) + ' SEIMBANG!' : 'ROUND ' + (window.challengeCurrentRound + 1) + ' BALANCED!'}</h2>
+            <p style="margin:8px 0 20px; font-weight:800; color:#475569; font-size:1.1rem;">${isBm ? 'Jam: ' : 'Clock: '}<span style="color:#059669;">${timeStr}</span></p>
             <button id="next-challenge-btn" class="interactive" style="width:100%; padding:16px; background:#10b981; color:white; border:4px solid #047857; border-radius:18px; font-weight:900; font-size:1.2rem; cursor:pointer; box-shadow:0 6px 0 #064e3b; transition:all 0.1s;" onmousedown="this.style.transform='translateY(6px)'; this.style.boxShadow='none';" onmouseup="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 0 #064e3b';">
-                NEXT REACTION ➔
+                ${isBm ? 'TINDAK BALAS SETERUSNYA ➔' : 'NEXT REACTION ➔'}
             </button>
         `;
         
@@ -2461,21 +2557,24 @@ window.handleChallengeRoundComplete = function(isPerfect) {
     let card = document.createElement("div");
     card.style.cssText = "background:white; border:8px solid #8b5cf6; border-radius:36px; padding:45px 35px; text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.5); max-width:620px; width:92%; animation:slideUpFade 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); position:relative;";
     
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    let challengeTierBm = window.challengeTier === 'easy' ? 'Mudah' : (window.challengeTier === 'medium' ? 'Sederhana' : 'Sukar');
+    
     card.innerHTML = `
         <div style="font-size:3.5rem; margin-bottom:4px;">🏆</div>
-        <h1 style="margin:0; font-size:2.4rem; font-weight:900; color:#581c87; letter-spacing:-1px;">CHALLENGE COMPLETE!</h1>
-        <p style="margin:6px 0 15px; font-weight:800; color:#64748b; font-size:1.1rem; text-transform:uppercase;">${window.challengeTier} Tier • 5/5 Reactions Balanced</p>
+        <h1 style="margin:0; font-size:2.4rem; font-weight:900; color:#581c87; letter-spacing:-1px;">${isBm ? 'CABARAN SELESAI!' : 'CHALLENGE COMPLETE!'}</h1>
+        <p style="margin:6px 0 15px; font-weight:800; color:#64748b; font-size:1.1rem; text-transform:uppercase;">${isBm ? challengeTierBm + ' • 5/5 Tindak Balas Seimbang' : window.challengeTier + ' Tier • 5/5 Reactions Balanced'}</p>
         
         <div style="display:flex; justify-content:center; margin-bottom:15px;">${starSVGs}</div>
         
         <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:20px; padding:16px; display:flex; justify-content:space-around; align-items:center;">
             <div>
-                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">Total Time</div>
+                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">${isBm ? 'Jumlah Masa' : 'Total Time'}</div>
                 <div style="font-size:1.8rem; font-weight:900; color:#1e293b;">${timeStr}</div>
             </div>
             <div style="width:2px; height:40px; background:#e2e8f0;"></div>
             <div>
-                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">Solved By</div>
+                <div style="font-size:0.8rem; font-weight:900; color:#94a3b8; text-transform:uppercase;">${isBm ? 'Diselesaikan Oleh' : 'Solved By'}</div>
                 <div style="font-size:1.5rem; font-weight:900; color:#8b5cf6;">${player}</div>
             </div>
         </div>
@@ -2490,17 +2589,16 @@ window.handleChallengeRoundComplete = function(isPerfect) {
                     <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
                     <path d="M16 21h5v-5"></path>
                 </svg>
-                <span>PLAY AGAIN</span>
+                <span>${isBm ? 'MAIN SEMULA' : 'PLAY AGAIN'}</span>
             </button>
             <button class="btn-modal-action btn-main-menu-pink interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('index.html');">
                 <svg class="modal-icon modal-icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <span>MAIN MENU</span>
+                <span>${isBm ? 'MENU UTAMA' : 'MAIN MENU'}</span>
             </button>
-        </div>
-    `;
+        </div>`;
     
     overlay.appendChild(card);
     document.body.appendChild(overlay);
@@ -2510,6 +2608,7 @@ window.handleChallengeTimeout = function() {
     if (window.challengeInterval) clearInterval(window.challengeInterval);
     if (typeof playSound === 'function') playSound('error');
 
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     let player = window.challengePlayer || localStorage.getItem('currentPlayer') || 'Student';
     let roundsCleared = window.challengeCurrentRound || 0;
     let tierClean = (window.challengeTier || 'easy').toLowerCase();
@@ -2554,31 +2653,31 @@ window.handleChallengeTimeout = function() {
         </div>
         
         <span style="display:inline-block; font-size:0.82rem; font-weight:900; letter-spacing:1.5px; color:#ef4444; background:#fef2f2; border:2px solid #fecaca; border-radius:10px; padding:5px 14px; text-transform:uppercase; margin-bottom:10px;">
-            TIME HAS RUN OUT
+            ${isBm ? 'MASA TELAH TAMAT' : 'TIME HAS RUN OUT'}
         </span>
 
         <h1 style="margin:2px 0 10px; font-size:2.4rem; font-weight:900; color:#0f172a; letter-spacing:-0.5px; line-height:1.1;">
-            Reaction Overheated!
+            ${isBm ? 'Tindak Balas Terlampau Panas!' : 'Reaction Overheated!'}
         </h1>
         
         <p style="margin:0 auto 24px; font-size:1.05rem; font-weight:700; color:#64748b; line-height:1.45; max-width:440px;">
-            The 90-second countdown expired before balancing all 5 reactions. This attempt was logged into your career records.
+            ${isBm ? 'Kiraan detik 90 saat telah tamat sebelum kesemua 5 tindak balas diseimbangkan. Percubaan ini telah direkodkan dalam rekod kerjaya anda.' : 'The 90-second countdown expired before balancing all 5 reactions. This attempt was logged into your career records.'}
         </p>
         
         <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:20px; padding:16px 20px; display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:28px; text-align:center;">
             <div>
-                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Progress</div>
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">${isBm ? 'Kemajuan' : 'Progress'}</div>
                 <div style="font-size:1.5rem; font-weight:900; color:#0f172a; margin-top:2px;">${roundsCleared} / 5</div>
-                <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">Round ${roundsCleared + 1} Reached</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#ef4444;">${isBm ? 'Pusingan Dicapai ' + (roundsCleared + 1) : 'Round ' + (roundsCleared + 1) + ' Reached'}</div>
             </div>
             <div style="border-left:2px solid #e2e8f0; border-right:2px solid #e2e8f0;">
-                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Time Elapsed</div>
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">${isBm ? 'Masa Berlalu' : 'Time Elapsed'}</div>
                 <div style="font-size:1.5rem; font-weight:900; color:#dc2626; margin-top:2px;">90s</div>
-                <div style="font-size:0.75rem; font-weight:800; color:#64748b;">90s Rush Limit</div>
+                <div style="font-size:0.75rem; font-weight:800; color:#64748b;">${isBm ? 'Had Laju 90s' : '90s Rush Limit'}</div>
             </div>
             <div>
-                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Attempt Logged</div>
-                <div style="font-size:1.5rem; font-weight:900; color:#7e22ce; margin-top:2px;">Recorded</div>
+                <div style="font-size:0.75rem; font-weight:900; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">${isBm ? 'Cubaan Direkod' : 'Attempt Logged'}</div>
+                <div style="font-size:1.5rem; font-weight:900; color:#7e22ce; margin-top:2px;">${isBm ? 'Direkod' : 'Recorded'}</div>
                 <div style="font-size:0.75rem; font-weight:800; color:#64748b;">${player}</div>
             </div>
         </div>
@@ -2591,14 +2690,14 @@ window.handleChallengeTimeout = function() {
                     <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
                     <path d="M16 21h5v-5"></path>
                 </svg>
-                <span>TRY AGAIN</span>
+                <span>${isBm ? 'CUBA LAGI' : 'TRY AGAIN'}</span>
             </button>
             <button class="btn-modal-action btn-main-menu interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('index.html');">
                 <svg class="modal-icon modal-icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <span>MAIN MENU</span>
+                <span>${isBm ? 'MENU UTAMA' : 'MAIN MENU'}</span>
             </button>
         </div>
     `;
@@ -2644,7 +2743,8 @@ window.enterReviewMode = function(nextLvl) {
         btn.id = 'btn-top-next-level';
         btn.className = 'btn-back btn-next-action interactive';
         btn.style.cssText = 'position: absolute; right: 18px; left: auto; background: #10b981; border-color: #065f46; box-shadow: 0 4px 0 #065f46; display: inline-flex; align-items: center; justify-content: center; gap: 6px; top: 50%; transform: translateY(-50%);';
-        btn.innerHTML = '<span>Next</span> <span class="next-icon" style="font-size: 0.92em; line-height: 1;">▶</span>';
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+        btn.innerHTML = `<span>${isBm ? 'Seterusnya' : 'Next'}</span> <span class="next-icon" style="font-size: 0.92em; line-height: 1;">▶</span>`;
         btn.onmouseover = function() { this.style.transform = 'translateY(-2px)'; this.style.boxShadow = '0 8px 0 #065f46'; };
         btn.onmouseout = function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = '0 6px 0 #065f46'; };
         btn.onmousedown = function() { this.style.transform = 'translateY(6px)'; this.style.boxShadow = '0 0 0 transparent'; };
@@ -2657,7 +2757,11 @@ window.enterReviewMode = function(nextLvl) {
 
     if (typeof window.addChatMessage === 'function') {
         setTimeout(() => {
-            window.addChatMessage("Great work balancing this reaction! Take your time to review the beakers and atom counts, or click <b>Next ▶</b> on the top right when you are ready to continue.", "Prof. Beaker");
+            const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+            const reviewMsg = isBm
+                ? "Syabas mengimbangi tindak balas ini! Ambil masa untuk menyemak bikar dan bilangan atom, atau klik <b>Seterusnya ▶</b> di bahagian atas kanan apabila bersedia untuk meneruskan."
+                : "Great work balancing this reaction! Take your time to review the beakers and atom counts, or click <b>Next ▶</b> on the top right when you are ready to continue.";
+            window.addChatMessage(reviewMsg, "Prof. Beaker");
         }, 150);
     }
 };
@@ -2722,5 +2826,111 @@ window.autoFitEquation = function() {
 window.addEventListener('resize', () => {
     if (typeof window.autoFitEquation === 'function') {
         window.autoFitEquation();
+    }
+});
+
+// Bilingual Live State Listener (EN / BM)
+window.addEventListener('stoich_lang_changed', () => {
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    
+    // 1. Update Level Title (Form 4, Form 5, Tutorial, Sandbox, Challenge)
+    let titleEl = document.getElementById("level-title");
+    if (titleEl && typeof currentLevelData !== 'undefined' && currentLevelData) {
+        if (window.isChallengeMode && typeof window.challengeCurrentRound !== 'undefined') {
+            let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(currentLevelData.id || '', currentLevelData.title) : currentLevelData.title;
+            titleEl.innerText = (isBm ? ("Pusingan " + (window.challengeCurrentRound + 1) + "/5 : ") : ("Round " + (window.challengeCurrentRound + 1) + "/5 : ")) + transTitle;
+        } else {
+            const lvlId = currentLevelData.id || (new URLSearchParams(window.location.search).get('level') || 'F4L1');
+            let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(lvlId, currentLevelData.title) : currentLevelData.title;
+            if (lvlId === 'sandbox') {
+                titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + (currentLevelData.equation || 'Custom Reaction');
+            } else if (lvlId === 'TUT0' || lvlId === 'tutorial') {
+                titleEl.innerText = isBm ? "Tutorial : Sintesis Air" : "Tutorial : Water Synthesis";
+            } else {
+                let match = lvlId.match(/L(\d+)/);
+                let prefix = match ? (isBm ? "Tahap " : "Level ") + match[1] + " : " : "";
+                titleEl.innerText = prefix + transTitle;
+            }
+        }
+    }
+
+    // 2. Update Reactants / Products Headers & Placeholders
+    const hReact = document.querySelector('.header-react');
+    const hProd = document.querySelector('.header-prod');
+    if (hReact) hReact.innerText = isBm ? "BAHAN TINDAK BALAS" : "REACTANTS";
+    if (hProd) hProd.innerText = isBm ? "HASIL TINDAK BALAS" : "PRODUCTS";
+
+    const pReact = document.getElementById('placeholder-react');
+    const pProd = document.getElementById('placeholder-prod');
+    if (pReact) pReact.innerText = isBm ? "Letak Bahan di Sini" : "Drop Reactants Here";
+    if (pProd) pProd.innerText = isBm ? "Letak Hasil di Sini" : "Drop Products Here";
+
+    // 3. Update Equation State Tokens ((s)->(p), (l)->(ce), (g)->(g), (aq)->(ak))
+    const stateMap = { s: 'p', l: 'ce', g: 'g', aq: 'ak' };
+    document.querySelectorAll('.state-label').forEach(el => {
+        let raw = el.getAttribute('data-state');
+        if (!raw) {
+            raw = el.textContent.replace(/[()]/g, '').trim();
+            el.setAttribute('data-state', raw);
+        }
+        el.textContent = '(' + (isBm ? (stateMap[raw.toLowerCase()] || raw) : raw) + ')';
+    });
+
+    // 4. Update Element Trays Button Text & Back Button
+    const btnTrayText = document.querySelector('.block-left .btn-text-full');
+    if (btnTrayText) {
+        btnTrayText.innerHTML = '<svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> ' + (isBm ? 'Dulang Unsur' : 'Element Trays');
+    }
+
+    const btnBack = document.querySelector('.block-top .btn-back:not(#btn-top-next-level)');
+    if (btnBack) {
+        btnBack.innerHTML = '<span class="back-icon">◀</span> <span data-i18n="game_back">' + (isBm ? 'Kembali' : 'Back') + '</span>';
+    }
+
+    // 5. Update Side Mode Switcher (SCALE / NERACA, BAR / GRAF PALANG)
+    const scaleBtnSpan = document.querySelector('#btn-side-scale span');
+    if (scaleBtnSpan) scaleBtnSpan.innerText = isBm ? 'NERACA' : 'SCALE';
+    const barBtnSpan = document.querySelector('#btn-side-bar span');
+    if (barBtnSpan) barBtnSpan.innerText = isBm ? 'GRAF PALANG' : 'BAR';
+
+    // 6. Update Challenge HUD pills
+    const diffPill = document.getElementById('challenge-diff-pill');
+    if (diffPill) {
+        let tierClean = (window.challengeTier || 'easy').toLowerCase();
+        diffPill.innerText = isBm 
+            ? (tierClean === 'easy' ? 'Mudah' : (tierClean === 'medium' ? 'Sederhana' : 'Sukar'))
+            : (tierClean.charAt(0).toUpperCase() + tierClean.slice(1));
+    }
+    const testTimeoutSpan = document.querySelector('#challenge-test-timeout-btn span:last-child');
+    if (testTimeoutSpan) {
+        testTimeoutSpan.innerText = isBm ? 'Uji Masa Tamat' : 'Test Timeout';
+    }
+
+    // 7. Update Socratic Clue Button label
+    const clueBtnLabel = document.getElementById('clue-btn-dynamic-text');
+    if (clueBtnLabel) {
+        if (window.clueState && window.clueState.stage === 2) {
+            clueBtnLabel.textContent = isBm ? "Beri saya jawapan!" : "Give me answer!";
+        } else {
+            clueBtnLabel.textContent = isBm ? "Saya Buntu! Tolong!" : "I am Stuck! Help!";
+        }
+    }
+
+    // 8. Update Active Review Mode button if present
+    const reviewBtn = document.getElementById('btn-top-next-level');
+    if (reviewBtn) {
+        reviewBtn.innerHTML = '<span>' + (isBm ? 'Seterusnya' : 'Next') + '</span> <span class="next-icon" style="font-size: 0.92em; line-height: 1;">▶</span>';
+    }
+
+    // 9. Update Study Room Modal Subtitle if present
+    const studySub = document.getElementById('study-room-level-name');
+    if (studySub && typeof currentLevelData !== 'undefined' && currentLevelData) {
+        let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(currentLevelData.id || '', currentLevelData.title) : currentLevelData.title;
+        studySub.innerText = (transTitle || currentLevelData.title || '') + (isBm ? ' • Kimia SPM Bab 3' : ' • SPM Chemistry Chapter 3');
+    }
+
+    // 10. Re-run simulation to refresh tray element names & status indicators
+    if (typeof updateSimulation === 'function') {
+        updateSimulation();
     }
 });
