@@ -408,15 +408,16 @@ function renderBoard() {
             eqSection.style.minHeight = '';
             eqSection.style.padding = '8px 14px';
         }
-        sleekEq.style.display = 'flex';
-        sleekEq.style.justifyContent = 'center';
+        sleekEq.style.display = 'grid';
+        sleekEq.style.gridTemplateColumns = 'minmax(0, 1fr) auto minmax(0, 1fr)';
         sleekEq.style.alignItems = 'center';
         sleekEq.style.width = '100%';
+        sleekEq.style.height = '100%';
         sleekEq.style.whiteSpace = 'nowrap';
         sleekEq.style.flexWrap = 'nowrap';
-        sleekEq.style.gap = 'clamp(4px, 1cqw, 12px)';
+        sleekEq.style.boxSizing = 'border-box';
 
-        let rHtml = `<div class="eq-side eq-reactants" style="display: flex; align-items: center; justify-content: flex-end; gap: clamp(4px, 1cqw, 12px); white-space: nowrap; flex-wrap: nowrap; flex-shrink: 0;">`;
+        let rHtml = `<div class="eq-side eq-reactants" style="display: flex; align-items: center; justify-content: flex-end; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
         currentLevelData.reactants.forEach((m, idx) => {
             rHtml += buildMolHtml(m, 'react');
             if (idx < currentLevelData.reactants.length - 1) {
@@ -425,9 +426,9 @@ function renderBoard() {
         });
         rHtml += '</div>';
 
-        let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(6px, 1.2vw, 16px); white-space: nowrap;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 12px;">&#10142;</div></div>';
+        let arrowHtml = '<div class="eq-arrow-wrapper" style="flex-shrink: 0; display: flex; justify-content: center; align-items: center; padding: 0 clamp(4px, 1cqw, 10px); white-space: nowrap;"><div class="sci-arrow-box has-chem-info" data-info="arrow" style="border-radius: 9px;">&#10142;</div></div>';
 
-        let pHtml = `<div class="eq-side eq-products" style="display: flex; align-items: center; justify-content: flex-start; gap: clamp(4px, 1cqw, 12px); white-space: nowrap; flex-wrap: nowrap; flex-shrink: 0;">`;
+        let pHtml = `<div class="eq-side eq-products" style="display: flex; align-items: center; justify-content: flex-start; gap: clamp(3px, 0.8cqw, 8px); white-space: nowrap; flex-wrap: nowrap; min-width: 0; width: 100%;">`;
         currentLevelData.products.forEach((m, idx) => {
             pHtml += buildMolHtml(m, 'prod');
             if (idx < currentLevelData.products.length - 1) {
@@ -2647,16 +2648,44 @@ window.autoFitEquation = function() {
     const eqSection = sleekEq.closest('.section-equation') || sleekEq.parentElement;
     if (!eqSection) return;
 
-    sleekEq.style.transform = 'none';
-    sleekEq.style.transformOrigin = 'center center';
+    const react = sleekEq.querySelector('.eq-reactants');
+    const prod = sleekEq.querySelector('.eq-products');
+    const arrow = sleekEq.querySelector('.eq-arrow-wrapper');
+    if (!react || !prod || !arrow) return;
 
-    const paddingAllowance = 24;
-    const availableWidth = eqSection.clientWidth - paddingAllowance;
-    const naturalWidth = sleekEq.scrollWidth;
+    // Reset transforms to measure natural unscaled dimensions
+    react.style.transform = 'none';
+    prod.style.transform = 'none';
 
-    if (naturalWidth > availableWidth && availableWidth > 0) {
-        const scale = Math.max(0.52, Math.min(1.0, (availableWidth / naturalWidth) * 0.98));
-        sleekEq.style.transform = `scale(${scale.toFixed(3)})`;
+    const arrowRect = arrow.getBoundingClientRect();
+    const colWidth = (sleekEq.clientWidth - arrowRect.width) / 2;
+    const availableHalf = colWidth - 8; // 8px breathing buffer
+
+    let reactNatural = 0;
+    Array.from(react.children).forEach((ch, i) => {
+        reactNatural += ch.offsetWidth;
+        if (i > 0) reactNatural += 8;
+    });
+
+    let prodNatural = 0;
+    Array.from(prod.children).forEach((ch, i) => {
+        prodNatural += ch.offsetWidth;
+        if (i > 0) prodNatural += 8;
+    });
+
+    const maxNatural = Math.max(reactNatural, prodNatural);
+
+    let scale = 1.0;
+    if (maxNatural > availableHalf && availableHalf > 0) {
+        scale = Math.max(0.48, Math.min(1.0, availableHalf / maxNatural));
+    }
+
+    react.style.transformOrigin = 'right center';
+    prod.style.transformOrigin = 'left center';
+
+    if (scale < 1.0) {
+        react.style.transform = `scale(${scale.toFixed(3)})`;
+        prod.style.transform = `scale(${scale.toFixed(3)})`;
     }
 };
 
