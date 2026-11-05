@@ -23,6 +23,22 @@
             btn.setAttribute('aria-label', btn.title);
         });
 
+        // Sync Fullscreen Nudge Bubble Visibility
+        const nudge = document.getElementById('fullscreen-nudge-bubble');
+        if (nudge) {
+            if (isFs) {
+                nudge.classList.add('is-hidden');
+                nudge.style.display = 'none';
+            } else {
+                if (typeof window.updateFullscreenNudgeState === 'function') {
+                    window.updateFullscreenNudgeState();
+                } else {
+                    nudge.classList.remove('is-hidden');
+                    nudge.style.display = 'flex';
+                }
+            }
+        }
+
         // If top window has an active iframe, notify it too
         if (isTopWindow()) {
             const frame = document.getElementById('stoich-fullscreen-viewport');
@@ -314,4 +330,110 @@
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         initFrameState();
     }
+
+    // =========================================================================
+    // FULLSCREEN NUDGE ROTATOR ENGINE (INDEX.HTML ONLY)
+    // =========================================================================
+    (function initFullscreenNudgeRotator() {
+        const phrases = [
+            "✨ Hey, click me!",
+            "🖥️ Fullscreen?",
+            "😎 I bet you will like this!",
+            "👉 Come on!",
+            "🚀 Just try!",
+            "🔍 Much better view!",
+            "🧪 Expand the lab!",
+            "👀 Try full size!",
+            "🎉 Click for full view!",
+            "⭐ You will love this!",
+            "✨ Fullscreen feels great!",
+            "👆 Go on, tap here!"
+        ];
+
+        let currentIndex = 0;
+        let rotationTimer = null;
+
+        function checkFs() {
+            try {
+                const doc = (window === window.top) ? document : window.top.document;
+                return !!(doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement);
+            } catch(e) {
+                return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+            }
+        }
+
+        function shouldHideNudge() {
+            if (checkFs()) return true;
+            const tour = document.getElementById('home-spotlight-tour');
+            if (tour && window.getComputedStyle(tour).display !== 'none') return true;
+            const aiModal = document.getElementById('sandbox-ai-modal');
+            if (aiModal && window.getComputedStyle(aiModal).display !== 'none') return true;
+            const ptModal = document.getElementById('periodic-table-modal');
+            if (ptModal && window.getComputedStyle(ptModal).display !== 'none') return true;
+            const tgModal = document.getElementById('teacher-guide-modal');
+            if (tgModal && window.getComputedStyle(tgModal).display !== 'none') return true;
+            return false;
+        }
+
+        function updateNudgeState() {
+            const bubble = document.getElementById('fullscreen-nudge-bubble');
+            if (!bubble) return;
+            if (shouldHideNudge()) {
+                bubble.classList.add('is-hidden');
+                bubble.style.display = 'none';
+            } else {
+                bubble.classList.remove('is-hidden');
+                bubble.style.display = 'flex';
+            }
+        }
+        window.updateFullscreenNudgeState = updateNudgeState;
+
+        function cyclePhrase() {
+            if (shouldHideNudge()) return;
+            const bubble = document.getElementById('fullscreen-nudge-bubble');
+            if (!bubble || bubble.classList.contains('is-hidden') || window.getComputedStyle(bubble).display === 'none') return;
+            const textEl = document.getElementById('fs-nudge-text');
+            if (!textEl) return;
+
+            currentIndex = (currentIndex + 1) % phrases.length;
+            const container = textEl.parentElement;
+            if (container) {
+                container.classList.remove('pop-in');
+                void container.offsetWidth; // trigger reflow
+                textEl.innerText = phrases[currentIndex];
+                container.classList.add('pop-in');
+            }
+        }
+
+        function start() {
+            updateNudgeState();
+            if (!rotationTimer) {
+                rotationTimer = setInterval(cyclePhrase, 2600);
+            }
+
+            // Observe modal visibility changes so nudge updates instantly
+            try {
+                const observer = new MutationObserver(() => {
+                    updateNudgeState();
+                });
+                ['sandbox-ai-modal', 'periodic-table-modal', 'teacher-guide-modal', 'home-spotlight-tour'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        observer.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+                    }
+                });
+            } catch(e) {}
+        }
+
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(ev => {
+            document.addEventListener(ev, updateNudgeState);
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', start);
+        } else {
+            start();
+        }
+    })();
+
 })();
