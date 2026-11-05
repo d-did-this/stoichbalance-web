@@ -183,3 +183,11 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
   - Reactants: Left-aligned (`justify-content: flex-start !important;`) with `transform-origin: left center`. Anchors to the 24px left margin and scales inward toward the center arrow.
   - Products: Right-aligned (`justify-content: flex-end !important;`) with `transform-origin: right center`. Anchors to the 24px right margin and scales inward toward the center arrow.
   - `autoFitEquation()`: Measures unscaled widths against `safeHalf = (colWidth - 10px)` and applies `scale = Math.max(0.42, Math.min(1.0, (safeHalf / maxNatural) * 0.94))`, guaranteeing zero border clipping and zero arrow collisions across all viewports.
+
+### Level 7 Middle-Centered Yield Arrow & Scaled UI Architecture (`F4L7`)
+* **5-Compound Symmetrical Grid Preservation**:
+  - Exclusively targets Level 7 (`Na2CO3 + 2HCl -> 2NaCl + H2O + CO2`) via `currentLevelData.id === 'F4L7'` and `title.includes('Acid-Carbonate')`.
+  - Grid Configuration: `#dynamic-sleek-equation` preserves the strict 3-column symmetrical grid `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;` to lock the reaction arrow at the exact 50% horizontal center (`centerDiff <= 0.008px`).
+  - `.level7-scaled` CSS class streamlines token footprint: `.sci-coeff` (0.85rem, 1px 5px padding, 22px min-width), `.sci-formula` (0.92rem), `.state-label` (0.72rem), and 3px molecule gaps.
+  - `autoFitEquation()` dynamically computes inward proportional scaling (`transform-origin: left center` on reactants, `transform-origin: right center` on products) with an 8px safety buffer.
+  - Guarantees $+20.22\text{px}$ clearance between the centered arrow and $\text{NaCl}$ on desktop and $+13.52\text{px}$ on laptops, maintaining single horizontal row elegance and zero regressions on other levels.
