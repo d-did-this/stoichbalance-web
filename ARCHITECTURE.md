@@ -219,3 +219,11 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
   - Fixed Core Numpad: `.vk-keypad-container` and `.vk-action-wrapper` enforce `flex-shrink: 0;` so the keypad buttons and dynamic action button (`#vk-check-btn`) are never compressed or pushed off-screen.
   - Fluid Button Sizing: `.vk-num-btn` utilizes `height: clamp(28px, 4.4vh, 40px)` and `.vk-op-btn` utilizes `height: clamp(30px, 4.6vh, 40px)` with responsive font sizes, scaling smoothly across resolutions without hardcoded `min-height` locks.
   - Compact Media Breakpoints: `@media (max-height: 780px)` and `@media (max-height: 620px)` adjust padding, step description sizing, and button heights for tight viewports down to 500px.
+
+### 23. MINOH Pedagogical Guidance Components
+- **Hover Info Card (`#sci-info-card`)**:
+  - Module: [js/info_cards.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/js/info_cards.js)
+  - Display: Option 1 (Pipeline Stepper) featuring atom counter (`Reactants: X ⚖️ Products: Y`) and 5-stage horizontal MINOH track (`M ➔ I ➔ [N] ➔ O ➔ H`).
+- **Chat MINOH Strategy (`window.buildLevelMinohPlanCard`)**:
+  - Module: [js/game.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/js/game.js)
+  - Display: Option 3 (Lab Checklist) featuring mission briefing checklist items, item count badge, and advice footer without redundant duplicate sequence boxes.
