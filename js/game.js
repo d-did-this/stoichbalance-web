@@ -4,10 +4,10 @@ window.buildLevelMinohPlanCard = function(levelData) {
 
     const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
     const KNOWN_POLYATOMIC = [
-        { key: 'NO3', display: 'NO₃', name: 'Nitrate', elements: ['N', 'O'] },
-        { key: 'SO4', display: 'SO₄', name: 'Sulfate', elements: ['S', 'O'] },
-        { key: 'CO3', display: 'CO₃', name: 'Carbonate', elements: ['C', 'O'] },
-        { key: 'OH', display: 'OH', name: 'Hydroxide', elements: ['O', 'H'] }
+        { key: 'NO3', display: 'NO₃', name: 'Nitrate', nameBm: 'Nitrat', elements: ['N', 'O'] },
+        { key: 'SO4', display: 'SO₄', name: 'Sulfate', nameBm: 'Sulfat', elements: ['S', 'O'] },
+        { key: 'CO3', display: 'CO₃', name: 'Carbonate', nameBm: 'Karbonat', elements: ['C', 'O'] },
+        { key: 'OH', display: 'OH', name: 'Hydroxide', nameBm: 'Hidroksida', elements: ['O', 'H'] }
     ];
 
     const rRaw = (levelData.reactants || []).map(r => r.id).join(' ');
@@ -46,51 +46,67 @@ window.buildLevelMinohPlanCard = function(levelData) {
 
     const steps = [];
     if (metals.length > 0) {
-        steps.push({ letter: 'M', title: isBm ? 'Logam' : 'Metals', items: metals.map(m => getLocalizedElementName(m, isBm) + ' (' + m + ')'), priority: 1, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' });
+        steps.push({ letter: 'M', title: isBm ? 'Logam' : 'Metals', singular: isBm ? 'Logam' : 'Metal', items: metals.map(m => getLocalizedElementName(m, isBm) + ' (' + m + ')'), priority: 1, color: '#1d4ed8', bg: '#eff6ff', border: '#bfdbfe' });
     }
     if (activeIons.length > 0) {
-        steps.push({ letter: 'I', title: isBm ? 'Ion Poliatom' : 'Polyatomic Ions', items: activeIons.map(i => (isBm ? (i.key === 'NO3' ? 'Nitrat' : (i.key === 'SO4' ? 'Sulfat' : (i.key === 'CO3' ? 'Karbonat' : 'Hidroksida'))) : i.name) + ' (' + i.display + ')'), priority: 2, color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' });
+        steps.push({ letter: 'I', title: isBm ? 'Ion Poliatom' : 'Polyatomic Ions', singular: isBm ? 'Ion' : 'Ion', items: activeIons.map(i => (isBm ? i.nameBm : i.name) + ' (' + i.display + ')'), priority: 2, color: '#6d28d9', bg: '#f5f3ff', border: '#ddd6fe' });
     }
     if (nonMetals.length > 0) {
-        steps.push({ letter: 'N', title: isBm ? 'Bukan Logam' : 'Non-Metals', items: nonMetals.map(n => getLocalizedElementName(n, isBm) + ' (' + n + ')'), priority: 3, color: '#0369a1', bg: '#f0f9ff', border: '#bae6fd' });
+        steps.push({ letter: 'N', title: isBm ? 'Bukan Logam' : 'Non-Metals', singular: isBm ? 'Bukan Logam' : 'Non-Metal', items: nonMetals.map(n => getLocalizedElementName(n, isBm) + ' (' + n + ')'), priority: 3, color: '#0369a1', bg: '#f0f9ff', border: '#bae6fd' });
     }
     if (hasOxygen) {
-        steps.push({ letter: 'O', title: isBm ? 'Oksigen' : 'Oxygen', items: [isBm ? 'Oksigen (O)' : 'Oxygen (O)'], priority: 4, color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' });
+        steps.push({ letter: 'O', title: isBm ? 'Oksigen' : 'Oxygen', singular: isBm ? 'Oksigen' : 'Oxygen', items: [isBm ? 'Oksigen (O)' : 'Oxygen (O)'], priority: 4, color: '#b91c1c', bg: '#fef2f2', border: '#fecaca' });
     }
     if (hasHydrogen) {
-        steps.push({ letter: 'H', title: isBm ? 'Hidrogen' : 'Hydrogen', items: [isBm ? 'Hidrogen (H)' : 'Hydrogen (H)'], priority: 5, color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' });
+        steps.push({ letter: 'H', title: isBm ? 'Hidrogen' : 'Hydrogen', singular: isBm ? 'Hidrogen' : 'Hydrogen', items: [isBm ? 'Hidrogen (H)' : 'Hydrogen (H)'], priority: 5, color: '#047857', bg: '#ecfdf5', border: '#a7f3d0' });
     }
 
     if (steps.length === 0) return '';
 
-    // Summary order string
-    let orderBadges = steps.map(s => `<span style="background:${s.bg}; color:${s.color}; border:1px solid ${s.border}; border-radius:6px; padding:2px 7px; font-weight:900; font-size:0.78rem;">[${s.letter}] ${s.items.map(it => it.replace(/\s*\([^)]*\)/, '')).join(', ')}</span>`).join(' <span style="color:#94a3b8; font-size:0.75rem;">➔</span> ');
+    // Option 3: Lab Mission Checklist (Zero duplicate sequence box, zero line wraps)
+    const checklistItemsHtml = steps.map((s, idx) => {
+        const stepNum = idx + 1;
+        const isFirst = (idx === 0);
+        const isLast = (idx === steps.length - 1 && steps.length > 1);
+        let orderHint = '';
+        if (isFirst) {
+            orderHint = isBm ? `Imbangkan ${s.singular} Dahulu` : `Balance ${s.singular} First`;
+        } else if (isLast) {
+            orderHint = isBm ? `Imbangkan ${s.singular} Terakhir` : `Balance ${s.singular} Last`;
+        } else {
+            orderHint = isBm ? `Langkah ${stepNum}: Imbangkan ${s.singular}` : `Step ${stepNum}: Balance ${s.singular}`;
+        }
 
-    // Steps list rows
-    let stepsRowsHtml = steps.map((s, idx) => `
-        <div style="display:flex; align-items:center; justify-content:space-between; background:${s.bg}; border:1px solid ${s.border}; border-radius:8px; padding:5px 9px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span style="background:${s.color}; color:#ffffff; width:20px; height:20px; border-radius:50%; font-size:0.72rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">${idx + 1}</span>
-                <span style="font-weight:900; font-size:0.84rem; color:${s.color};">[${s.letter}] ${s.title}:</span>
+        return `
+            <div style="display:flex; align-items:center; gap:8px; padding:6px 9px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px;">
+                <div style="width:20px; height:20px; border-radius:5px; border:2px solid ${s.color}; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:900; color:${s.color}; background:#ffffff; flex-shrink:0;">✓</div>
+                <div style="flex:1; min-width:0; text-align:left;">
+                    <div style="font-weight:900; font-size:0.82rem; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${isBm ? 'Langkah' : 'Step'} ${stepNum}: ${s.items.join(', ')}
+                    </div>
+                    <div style="font-weight:800; font-size:0.72rem; color:${s.color};">
+                        [${s.letter}] ${orderHint}
+                    </div>
+                </div>
             </div>
-            <span style="font-weight:800; font-size:0.82rem; color:#1e293b;">${s.items.join(', ')}</span>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     return `
     <div class="minoh-plan-card" style="display:flex; flex-direction:column; gap:8px;">
         <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1.5px solid #e2e8f0; padding-bottom:6px;">
             <span style="font-weight:900; font-size:0.86rem; color:#1e293b; display:inline-flex; align-items:center; gap:6px;">
-                <span>🎯</span> <span>${isBm ? 'Susunan Pengimbangan MINOH' : 'MINOH Balancing Order'}</span>
+                <span>🧪</span> <span>${isBm ? 'Senarai Semak Imbangan' : 'Balancing Checklist'}</span>
             </span>
-            <span style="font-size:0.72rem; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 6px; border-radius:4px;">${isBm ? 'Amalan Terbaik' : 'Best Practice'}</span>
+            <span style="font-size:0.72rem; font-weight:900; color:#6d28d9; background:#f5f3ff; border:1px solid #ddd6fe; padding:2px 7px; border-radius:5px;">
+                ${steps.length} ${isBm ? 'Langkah' : (steps.length > 1 ? 'Steps' : 'Step')}
+            </span>
         </div>
-        <div style="display:flex; flex-direction:column; gap:5px;">
-            ${stepsRowsHtml}
+        <div style="display:flex; flex-direction:column; gap:6px;">
+            ${checklistItemsHtml}
         </div>
-        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:8px; padding:6px 8px; margin-top:2px;">
-            <span style="font-size:0.72rem; font-weight:900; color:#475569; text-transform:uppercase;">Sequence:</span>
-            ${orderBadges}
+        <div style="font-size:0.74rem; font-weight:800; color:#581c87; background:#faf5ff; border:1px solid #e9d5ff; border-radius:7px; padding:6px 10px; text-align:center; line-height:1.35;">
+            💡 ${isBm ? 'Ikut turutan MINOH untuk mengelakkan kitaran pengimbangan berulang!' : 'Follow the MINOH order to avoid cyclic re-balancing!'}
         </div>
     </div>`;
 };
@@ -179,6 +195,7 @@ window.handleGameBackClick = function() {
 
 
 
+window.getLocalizedElementName = getLocalizedElementName;
 function getLocalizedElementName(el, isBm) {
     if (isBm === undefined) {
         isBm = ((typeof localStorage !== 'undefined' && localStorage.getItem('stoich_lang')) || 'en') === 'bm';
@@ -422,7 +439,7 @@ function initEngine() {
         if (minohCardHtml) {
             setTimeout(() => {
                 const isBmCurrent = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
-                window.addChatMessage(minohCardHtml, isBmCurrent ? "Strategi MINOH" : "MINOH Strategy");
+                window.addChatMessage(minohCardHtml, isBmCurrent ? "Taklimat Misi" : "Mission Briefing");
             }, 280);
         }
     }, 100);
