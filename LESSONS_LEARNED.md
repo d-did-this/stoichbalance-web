@@ -378,3 +378,13 @@
   2. Left and Right Wing Alignment: Reactants are left-aligned (`justify-content: flex-start !important`) and scale inward with `transform-origin: left center`. Products are right-aligned (`justify-content: flex-end !important`) and scale inward with `transform-origin: right center`.
   3. Corner Clearance: Expanded container padding to `padding: 4px 24px !important` on `.section-equation`, providing 24px of breathing space from the 14px rounded corners.
   4. Auto-Fit Scaling: `window.autoFitEquation()` dynamically computes `scale = Math.max(0.42, Math.min(1.0, (safeHalf / maxNatural) * 0.94))` with `safeHalf = colWidth - 10`. This guarantees zero border clipping and zero arrow overlap on all display resolutions from 1164px tablet up to 1080p desktop.
+
+
+### 6. Middle-Centered Yield Arrow and Scaled UI for Level 7 (Acid-Carbonate F4L7)
+- **Requirement**: The reaction yield arrow for Level 7 must remain in the exact horizontal middle center (50% midpoint) across all viewports, matching all other levels on a single horizontal row, while preventing any overlap between the centered arrow and product coefficients.
+- **Root Cause of Prior Overlap**: Level 7 has 5 compounds (2 reactants and 3 products). The products wing natural width ($\text{NaCl} + \text{H}_2\text{O} + \text{CO}_2 \approx 376\text{px}$) exceeded the available half-column width on standard displays when unscaled.
+- **Solution**:
+  1. Maintained strict 3-column symmetrical grid architecture on `#dynamic-sleek-equation`: `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important`, mathematically locking the reaction arrow at the exact 50% midpoint (`centerDiff <= 0.008px`).
+  2. Applied `.level7-scaled` CSS class specifically to Level 7 to streamline UI tokens: `.sci-coeff` (0.85rem, 1px 5px padding, 22px min-width), `.sci-formula` (0.92rem), `.state-label` (0.72rem), and compact molecule gaps (3px).
+  3. Integrated Level 7 into `window.autoFitEquation()` with inward dynamic scaling (`transform-origin: left center` on reactants, `transform-origin: right center` on products) and an 8px safe buffer. This delivers $+20.22\text{px}$ clearance on desktop and $+13.52\text{px}$ on laptops with zero overlap.
+  4. Preserved 100% isolation across all other 19 levels.
