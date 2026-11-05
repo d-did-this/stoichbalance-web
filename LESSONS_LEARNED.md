@@ -362,3 +362,18 @@
 ### 4. Lab Keypad & Prof. Bunsen Assistant Polish
 - **Problem**: Duplicate clear buttons confused students, and saved custom levels rendered redundant duplicate titles (e.g. "Custom: Mg + O2 -> MgO" repeated twice).
 - **Solution**: Streamlined keypad inputs with a dedicated red SVG Backspace button in the input field, moved Clear to the numpad, and introduced deduplication logic that automatically displays genuine chemical names (e.g. "Magnesium Oxidation") alongside monospace formula chips.
+
+
+### 5. Centered Yields Arrow & Asymmetrical Reaction Overflow (11/05/2026)
+- **Problem**: In multi-compound asymmetrical reactions (such as $Na_2CO_3 + 2HCl \rightarrow 2NaCl + H_2O + CO_2$ with 2 reactants and 3 products):
+  1. The reaction arrow was pulled off-center toward the left by 43px.
+  2. The leftmost molecule ($Na_2CO_3$) was clipped off at the left border of the grey equation box.
+  3. The rightmost molecule ($CO_2$) was clipped off at the right border.
+- **Root Cause**:
+  1. `#dynamic-sleek-equation` was set to a centered flex row. Because the 3 products occupied 449px while the 2 reactants occupied 330px, centering the entire flex container shifted the arrow 43px to the left of the container's center.
+  2. CSS rules in `game.html` enforced `justify-content: flex-start !important` on reactants and `justify-content: flex-end !important` on products, pushing products to the far right wall and forcing overflow into the arrow.
+- **Solution**:
+  1. Replaced the flex row with a strict 3-column grid: `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)`. Both side tracks have identical width, mathematically guaranteeing that the arrow in track 2 is at the exact 50% horizontal center.
+  2. Corrected alignments: Reactants align to `flex-end` (against the arrow), and Products align to `flex-start` (against the arrow).
+  3. Sized down coefficient badges and formula typography to clean, balanced dimensions (`clamp(1rem, 2cqw, 1.35rem)`).
+  4. Configured `window.autoFitEquation()` with symmetric inward scaling (`transform-origin: right center` for reactants, `transform-origin: left center` for products), eliminating all clipping.
