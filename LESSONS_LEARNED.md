@@ -482,3 +482,19 @@
   4. Replaced rigid `min-height: 44px` with fluid responsive formulas: `.vk-num-btn` (`height: clamp(28px, 4.4vh, 40px)`) and `.vk-op-btn` (`height: clamp(30px, 4.6vh, 40px)`).
   5. Added `@media (max-height: 780px)` and `@media (max-height: 620px)` breakpoints for compact step text, badges, and button heights down to 500px viewports.
   6. Incorporated 32-suite adversarial browser tests in `gatekeeper_deploy.js` verifying 100% containment across 1080p, 900p, 768p, 700p, 650p, 600p, 550p, and 500p heights in both empty and active equation states.
+
+---
+
+### 38. Pedagogical Guidance Card Modernization (Hover Pipeline Stepper & Chat Lab Checklist)
+
+- **Hover Info Card (`#sci-info-card`) - Option 1 (Pipeline Stepper)**:
+  1. Replaced the nested callout box and awkward line-wrapping labels (`Non-` / `Metal`) with a structured 5-step horizontal MINOH track (`M ➔ I ➔ [N] ➔ O ➔ H`).
+  2. Integrated a live atom scale counter (`Reactants: X ⚖️ Products: Y`) directly above the stepper.
+  3. Formatted status hints (`Needs +X on Products side`) and unified advice tips cleanly without nested double-borders.
+  4. Full bilingual localization support for both English and Bahasa Melayu (`stoich_lang`).
+
+- **Chat MINOH Balancing Strategy (`window.buildLevelMinohPlanCard`) - Option 3 (Lab Checklist)**:
+  1. Eliminated the redundant duplicate `SEQUENCE:` box that caused narrow sidebar line-wrapping overflows.
+  2. Implemented structured mission briefing checklist rows with clear checkbox status badges (`[✓] Step X: Element / [Category] Guidance`).
+  3. Integrated a step counter badge (`2 Steps` / `2 Langkah`) and clean footer reminder (`💡 Follow the MINOH order to avoid cyclic re-balancing!`).
+  4. Fully localized across Form 4 and Form 5 equations in both English and Bahasa Melayu.
