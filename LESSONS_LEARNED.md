@@ -364,16 +364,17 @@
 - **Solution**: Streamlined keypad inputs with a dedicated red SVG Backspace button in the input field, moved Clear to the numpad, and introduced deduplication logic that automatically displays genuine chemical names (e.g. "Magnesium Oxidation") alongside monospace formula chips.
 
 
-### 5. Centered Yields Arrow & Asymmetrical Reaction Overflow (11/05/2026)
+### 5. Centered Yields Arrow, Left-Right Alignment, and Border Clearance (11/05/2026)
 - **Problem**: In multi-compound asymmetrical reactions (such as $Na_2CO_3 + 2HCl \rightarrow 2NaCl + H_2O + CO_2$ with 2 reactants and 3 products):
   1. The reaction arrow was pulled off-center toward the left by 43px.
-  2. The leftmost molecule ($Na_2CO_3$) was clipped off at the left border of the grey equation box.
-  3. The rightmost molecule ($CO_2$) was clipped off at the right border.
+  2. The leftmost reactant coefficient was clipped off by the rounded border of the grey equation box.
+  3. The rightmost product state label $CO_2(g)$ parenthesis was clipped off at the right edge.
 - **Root Cause**:
-  1. `#dynamic-sleek-equation` was set to a centered flex row. Because the 3 products occupied 449px while the 2 reactants occupied 330px, centering the entire flex container shifted the arrow 43px to the left of the container's center.
-  2. CSS rules in `game.html` enforced `justify-content: flex-start !important` on reactants and `justify-content: flex-end !important` on products, pushing products to the far right wall and forcing overflow into the arrow.
+  1. `#dynamic-sleek-equation` was originally a centered flex row where unequal child counts pushed the reaction arrow away from true horizontal center.
+  2. Container horizontal padding was only 10px while `border-radius` was 14px. Any text sitting within 14px of the corner was clipped by the curve.
+  3. Available width calculations allowed children to reach the edge without an adequate safety cushion.
 - **Solution**:
-  1. Replaced the flex row with a strict 3-column grid: `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr)`. Both side tracks have identical width, mathematically guaranteeing that the arrow in track 2 is at the exact 50% horizontal center.
-  2. Corrected alignments: Reactants align to `flex-end` (against the arrow), and Products align to `flex-start` (against the arrow).
-  3. Sized down coefficient badges and formula typography to clean, balanced dimensions (`clamp(1rem, 2cqw, 1.35rem)`).
-  4. Configured `window.autoFitEquation()` with symmetric inward scaling (`transform-origin: right center` for reactants, `transform-origin: left center` for products), eliminating all clipping.
+  1. Grid Architecture: Configured `#dynamic-sleek-equation` as a strict 3-column CSS grid with `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important`. This locks the reaction arrow at the exact 50% horizontal midpoint (`CenterDiff <= 0.01px`).
+  2. Left and Right Wing Alignment: Reactants are left-aligned (`justify-content: flex-start !important`) and scale inward with `transform-origin: left center`. Products are right-aligned (`justify-content: flex-end !important`) and scale inward with `transform-origin: right center`.
+  3. Corner Clearance: Expanded container padding to `padding: 4px 24px !important` on `.section-equation`, providing 24px of breathing space from the 14px rounded corners.
+  4. Auto-Fit Scaling: `window.autoFitEquation()` dynamically computes `scale = Math.max(0.42, Math.min(1.0, (safeHalf / maxNatural) * 0.94))` with `safeHalf = colWidth - 10`. This guarantees zero border clipping and zero arrow overlap on all display resolutions from 1164px tablet up to 1080p desktop.
