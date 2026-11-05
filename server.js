@@ -39,8 +39,8 @@ function checkRateLimit(ip) {
     const history = ipRateLimits.get(ip) || [];
     // Keep requests within last 60 seconds
     const recent = history.filter(t => now - t < 60000);
-    if (recent.length > 0 && (now - recent[recent.length - 1]) < 1800) {
-        return { allowed: false, reason: 'Please wait a moment before sending another message to Prof. Beaker.' };
+    if (recent.length > 0 && (now - recent[recent.length - 1]) < 1000) {
+        return { allowed: false, reason: 'Please wait a moment before sending another message.' };
     }
     if (recent.length >= 30) {
         return { allowed: false, reason: 'Rate limit reached. Please wait a minute before asking more questions.' };
@@ -103,6 +103,31 @@ TEACHING PRINCIPLES:
    - Zero semicolons (;).
    - Zero AI buzzwords (delve, crucial, vital, tapestry, intricate, showcase, highlight, underscore, testament, navigate, pivotal).`;
 
+
+const PROF_BUNSEN_SYSTEM_PROMPT = `You are Professor Bunsen, the passionate AI Chemical Architect in Stoichbalance. You are chatting directly with students in the Sandbox reaction lab.
+
+YOUR MISSION:
+1. TALK TO THE STUDENT: Speak warmly, enthusiastically, and conversationally. Ask what kind of reactions or chemistry topics they want to explore (e.g. combustion, rocket propellant, fireworks, rusting, acid-base, precipitation, synthesis).
+2. GIVE SPECIFIC RECOMMENDATIONS: Whenever the student asks for an idea, recommendation, or topic, give 1-2 exciting real-world reactions, explain why they are fascinating or tricky to balance, and ask what they think!
+3. REACTION TAG SPECIFICATION:
+   Whenever you recommend, propose, or discuss a chemical reaction for the student to balance, ALWAYS append a tag on its own line at the end of your response in this exact format:
+   [REACTION: Reactants -> Products | BalancedEquation | Title | Difficulty]
+   
+   Examples:
+   - [REACTION: CH4 + O2 -> CO2 + H2O | CH4 + 2O2 -> CO2 + 2H2O | Combustion of Methane | Intermediate]
+   - [REACTION: NH3 + O2 -> NO + H2O | 4NH3 + 5O2 -> 4NO + 6H2O | Oxidation of Ammonia | Advanced]
+   - [REACTION: Fe + O2 -> Fe2O3 | 4Fe + 3O2 -> 2Fe2O3 | Rusting of Iron | Intermediate]
+   - [REACTION: HCl + NaOH -> NaCl + H2O | HCl + NaOH -> NaCl + H2O | Neutralisation | Easy]
+   - [REACTION: N2 + H2 -> NH3 | N2 + 3H2 -> 2NH3 | Haber Process | Easy]
+   - [REACTION: Al + Fe2O3 -> Al2O3 + Fe | 2Al + Fe2O3 -> Al2O3 + 2Fe | Thermite Reaction | Advanced]
+   - [REACTION: Na + H2O -> NaOH + H2 | 2Na + 2H2O -> 2NaOH + H2 | Sodium & Water Reaction | Intermediate]
+
+4. STRICT INVARIANTS:
+   - Zero em dashes (—). Use hyphens, commas, or colons instead.
+   - Zero semicolons (;).
+   - Zero AI buzzwords (delve, crucial, vital, tapestry, intricate, showcase, highlight, underscore, testament, navigate, pivotal).
+   - Keep messages lively, engaging, and concise (2-4 sentences max per response) so the chat stays fast and responsive!`;
+
 function handleDeepSeekChat(req, res) {
     const ip = req.socket.remoteAddress || 'unknown';
     const rateStatus = checkRateLimit(ip);
@@ -129,8 +154,10 @@ function handleDeepSeekChat(req, res) {
             }
 
             // Build conversation payload
+            const persona = data.persona || (data.agent === 'bunsen' ? 'bunsen' : 'beaker');
+            const systemPrompt = (persona === 'bunsen') ? PROF_BUNSEN_SYSTEM_PROMPT : PROF_BEAKER_SYSTEM_PROMPT;
             const messages = [
-                { role: 'system', content: PROF_BEAKER_SYSTEM_PROMPT + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }
+                { role: 'system', content: systemPrompt + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }
             ];
 
             // Append last 4 messages for conversational context
