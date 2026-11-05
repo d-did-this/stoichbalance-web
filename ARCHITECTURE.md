@@ -215,7 +215,7 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
 * **Structural Flex Architecture**:
   - Card Boundary: `.vk-modal-card` enforces `overflow: hidden;` and fluid padding `clamp(10px, 1.8vh, 20px) clamp(12px, 1.8vw, 24px)` with max dimensions bounded by `min(94vh, 920px)`.
   - Right Control Panel: `.vk-right-panel` uses `flex: 1.15; min-height: 0; overflow: hidden;` to ensure flex children scale accurately inside the column.
-  - Scrollable Quick Tutorial Card: `.vk-guide-container` uses `flex: 1 1 auto; min-height: 0; overflow: hidden;` containing `.vk-guide-card` with `overflow-y: auto;` and a thin scrollbar. On shorter screens, the tutorial card flexes down and scrolls internally rather than pushing the numpad downward.
+  - Snug Quick Tutorial Card: `.vk-guide-container` and `.vk-guide-card` enforce `flex: 0 0 auto; height: auto;` to hug their 4 steps snugly without stretching vertically or creating empty void space. On compact screens with height <= 620px, `.vk-guide-card` caps at `max-height: 80px` with a thin internal scrollbar, preventing displacement of the keypad.
   - Fixed Core Numpad: `.vk-keypad-container` and `.vk-action-wrapper` enforce `flex-shrink: 0;` so the keypad buttons and dynamic action button (`#vk-check-btn`) are never compressed or pushed off-screen.
   - Fluid Button Sizing: `.vk-num-btn` utilizes `height: clamp(28px, 4.4vh, 40px)` and `.vk-op-btn` utilizes `height: clamp(30px, 4.6vh, 40px)` with responsive font sizes, scaling smoothly across resolutions without hardcoded `min-height` locks.
   - Compact Media Breakpoints: `@media (max-height: 780px)` and `@media (max-height: 620px)` adjust padding, step description sizing, and button heights for tight viewports down to 500px.
