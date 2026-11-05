@@ -172,3 +172,13 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
 * **Prof. Bunsen Reaction Architect & Keypad Ergonomics**:
   - Replaced ambiguous dual clear buttons with a single unified Backspace button inside the formula display bar and an action Clear button on the numpad.
   - Hover info cards provide clear context regarding Prof. Bunsen's AI chemical synthesis capabilities.
+
+### Centered Yields Arrow & Symmetric Proportional Scaling
+* **3-Column Strict Grid Architecture (`#dynamic-sleek-equation`)**:
+  - `grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;`
+  - Guarantees Column 1 (Reactants) and Column 3 (Products) are strictly identical in width regardless of element count asymmetry (e.g. 2 reactants vs 3 products in Acid-Carbonate reactions).
+  - Positions Column 2 (the reaction arrow `➔`) at the exact 50% horizontal center of `.section-equation` (`CenterDiff <= 1px`).
+* **Symmetric Inward Scaling Engine**:
+  - Reactants: Aligned to the right (`justify-content: flex-end`) with `transform-origin: right center`. Shrinks inward toward the arrow, eliminating left-border clipping.
+  - Products: Aligned to the left (`justify-content: flex-start`) with `transform-origin: left center`. Shrinks inward toward the arrow, eliminating right-border clipping.
+  - `autoFitEquation()`: Measures unscaled widths against `availableHalf = (colWidth - 8px)` and computes `scale = Math.min(1.0, availableHalf / maxNatural)`.
