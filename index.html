@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/levels.css?v=1792981377">
     <link rel="stylesheet" href="css/style.css?v=1793787661">
+    <script src="js/translations.js"></script>
     <script src="js/audio_assets.js"></script>
     <!-- EXPERIMENTAL DEPTH LAYER (Remove to revert) -->
     <link rel="stylesheet" href="css/experimental_depth.css">
@@ -236,14 +237,14 @@ window.addEventListener('load', () => {
     <div id="particle-canvas"></div>
 
     <!-- Fun Chunky Widgets -->
-    <button class="fun-widget widget-left interactive" onclick="startHomeSpotlightTour()" title="Interactive Tour & Guide" aria-label="Interactive Tour & Guide">
+    <button class="fun-widget widget-left interactive" onclick="startHomeSpotlightTour()" title="Interactive Tour & Guide" aria-label="Interactive Tour & Guide" data-i18n-title="tour_guide_btn">
         <svg viewBox="0 0 48 48" width="44" height="44" fill="none" style="display:block;">
             <path d="M16 17.5C16 13.3579 19.5817 10 24 10C28.4183 10 32 13.3579 32 17.5C32 20.8 29.8 23 26.5 25.2C24.5 26.6 23.5 28 23.5 31" stroke="#1e293b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="23.5" cy="38" r="3.4" fill="#1e293b"/>
         </svg>
     </button>
 
-    <button id="btn-periodic-widget" class="fun-widget widget-right interactive" onclick="handlePeriodicWidgetClick()" title="Interactive Periodic Table" aria-label="Interactive Periodic Table">
+    <button id="btn-periodic-widget" class="fun-widget widget-right interactive" onclick="handlePeriodicWidgetClick()" title="Interactive Periodic Table" aria-label="Interactive Periodic Table" data-i18n-title="interactive_pt_btn">
         <svg viewBox="0 0 48 48" width="46" height="46" fill="none" style="display:block;">
             <g transform="rotate(-11 24 24)">
                 <!-- Lip -->
@@ -266,16 +267,16 @@ window.addEventListener('load', () => {
             <div class="brand-wrapper">
                 <div class="logo-icon bounce-anim">⚖️</div>
                 <h1 class="logo-title">Stoichbalance</h1>
-                <p class="logo-subtitle">Chemistry Made Fun!</p>
+                <p class="logo-subtitle" data-i18n="tagline">Chemistry Made Fun!</p>
             </div>
             
             <div class="launch-wrapper">
                 <div class="input-group" style="position: relative;">
-                    <label>PLAYER NAME</label>
+                    <label data-i18n="player_name_label">PLAYER NAME</label>
                     <div style="display: flex; gap: 12px; width: 100%; align-items: center;">
                         <div class="player-input-wrapper">
-                            <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." value="" autocomplete="off" onclick="window.handlePlayerNameClick(event)" onfocus="window.handlePlayerNameFocus(event)" onkeyup="filterProfiles()" style="width: 100%; text-align: left; height: 74px; box-sizing: border-box; padding: 0 3.8rem 0 1.4rem;">
-                            <button type="button" id="player-dropdown-toggle-btn" class="player-dropdown-btn interactive" onclick="togglePlayerDropdown(event)" aria-label="Select saved player profile" title="Select saved player profile" style="display: none;">
+                            <input type="text" class="name-input interactive" id="player-name" placeholder="Type your name..." data-i18n-placeholder="player_name_placeholder" value="" autocomplete="off" onclick="window.handlePlayerNameClick(event)" onfocus="window.handlePlayerNameFocus(event)" onkeyup="filterProfiles()" style="width: 100%; text-align: left; height: 74px; box-sizing: border-box; padding: 0 3.8rem 0 1.4rem;">
+                            <button type="button" id="player-dropdown-toggle-btn" class="player-dropdown-btn interactive" onclick="togglePlayerDropdown(event)" aria-label="Select saved player profile" title="Select saved player profile" data-i18n-title="player_profile_tooltip" style="display: none;">
                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="6 9 12 15 18 9"/>
                                 </svg>
@@ -285,7 +286,7 @@ window.addEventListener('load', () => {
                                 <!-- JS injected profiles -->
                             </div>
                         </div>
-                        <button class="btn-stats interactive" id="challenge-stats-btn" onclick="openStatsModal()" title="Career Records & Achievements" aria-label="Career Records">
+                        <button class="btn-stats interactive" id="challenge-stats-btn" onclick="openStatsModal()" title="Career Records & Achievements" data-i18n-title="career_records_tooltip" aria-label="Career Records">
                             <svg class="stats-btn-svg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v3h10v-3c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34M18 4H6v7a6 6 0 0 0 12 0V4z"/>
                             </svg>
@@ -301,7 +302,7 @@ window.addEventListener('load', () => {
 
         <!-- RIGHT PANEL: MODE SELECTION -->
         <div class="panel right-panel">
-            <h2 class="panel-title">Choose Activity</h2>
+            <h2 class="panel-title" data-i18n="choose_activity">Choose Activity</h2>
             
             <div class="modes-list">
                 
@@ -310,15 +311,15 @@ window.addEventListener('load', () => {
                     <div class="mode-header">
                         <div class="mode-icon">📚</div>
                         <div class="mode-info">
-                            <h3 class="mode-name">Class Mode</h3>
-                            <p class="mode-desc">Standard curriculum progression.</p>
+                            <h3 class="mode-name" data-i18n="class_mode">Class Mode</h3>
+                            <p class="mode-desc" data-i18n="class_desc">Standard curriculum progression.</p>
                         </div>
                     </div>
                     <div class="mode-options-wrapper">
                         <div class="mode-options-inner">
                             <div class="mode-options-content">
-                                <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'class', 'Form 4')">Form 4</button>
-                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'class', 'Form 5')">Form 5</button>
+                                <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'class', 'Form 4')" data-i18n="form4">Form 4</button>
+                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'class', 'Form 5')" data-i18n="form5">Form 5</button>
                             </div>
                         </div>
                     </div>
@@ -329,8 +330,8 @@ window.addEventListener('load', () => {
                     <div class="mode-header">
                         <div class="mode-icon">⏱️</div>
                         <div class="mode-info">
-                            <h3 class="mode-name">Challenge Mode</h3>
-                            <p class="mode-desc">Test your balancing speed and accuracy.</p>
+                            <h3 class="mode-name" data-i18n="challenge_mode">Challenge Mode</h3>
+                            <p class="mode-desc" data-i18n="challenge_desc">Test your balancing speed and accuracy.</p>
                         </div>
                     </div>
                     <div class="mode-options-wrapper">
@@ -338,15 +339,15 @@ window.addEventListener('load', () => {
                             <div class="challenge-options-container">
                                 <!-- Row 1: Difficulty Tiers -->
                                 <div class="challenge-tiers-row">
-                                    <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'challenge', 'Easy')">Easy</button>
-                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Medium')">Medium</button>
-                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Hard')">Hard</button>
+                                    <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'challenge', 'Easy')" data-i18n="easy">Easy</button>
+                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Medium')" data-i18n="medium">Medium</button>
+                                    <button class="sub-btn interactive" onclick="selectSubOption(event, 'challenge', 'Hard')" data-i18n="hard">Hard</button>
                                 </div>
                                 
                                 <!-- Row 2: Challenge Modifiers -->
                                 <div class="home-modifiers-section" onclick="event.stopPropagation();">
                                     <div class="home-modifiers-header">
-                                        <span class="home-modifiers-label">
+                                        <span class="home-modifiers-label" data-i18n="modifiers">
     <svg class="header-bolt-svg" viewBox="0 0 24 24" width="15" height="15" fill="#facc15">
         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
     </svg>
@@ -355,28 +356,28 @@ window.addEventListener('load', () => {
                                         <span class="home-multiplier-pill" id="home-multiplier-tag">1.0x STANDARD</span>
                                     </div>
                                     <div class="home-modifiers-grid">
-    <button class="home-mod-pill interactive" id="home-mod-scale" onclick="toggleHomeModifier(event, 'scale')" type="button" title="Solve without the balance beam (+0.5x)">
+    <button class="home-mod-pill interactive" id="home-mod-scale" onclick="toggleHomeModifier(event, 'scale')" type="button" title="Solve without the balance beam (+0.5x)" data-i18n-title="mod_scale_desc">
         <svg class="mod-icon-svg icon-scale" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3v17M5 8l7-3 7 3"/>
             <path d="M2 14l3-6 3 6a3 3 0 0 1-6 0zm14 0l3-6 3 6a3 3 0 0 1-6 0z"/>
             <path d="M8 21h8"/>
             <line x1="3" y1="3" x2="21" y2="21" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
-        <span class="pill-text">No Scale</span>
+        <span class="pill-text" data-i18n="mod_scale_name">No Scale</span>
     </button>
-    <button class="home-mod-pill interactive" id="home-mod-hints" onclick="toggleHomeModifier(event, 'hints')" type="button" title="Solve without hints (+0.5x)">
+    <button class="home-mod-pill interactive" id="home-mod-hints" onclick="toggleHomeModifier(event, 'hints')" type="button" title="Solve without hints (+0.5x)" data-i18n-title="mod_hints_desc">
         <svg class="mod-icon-svg icon-hints" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18h6m-4 3h2m-5-8a6 6 0 1 1 8 0c-.8.8-1.5 2-1.5 3h-5c0-1-.7-2.2-1.5-3z"/>
             <line x1="3" y1="3" x2="21" y2="21" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
         </svg>
-        <span class="pill-text">No Hints</span>
+        <span class="pill-text" data-i18n="mod_hints_name">No Hints</span>
     </button>
-    <button class="home-mod-pill interactive" id="home-mod-rush" onclick="toggleHomeModifier(event, 'rush')" type="button" title="90-second countdown rush (+0.5x)">
+    <button class="home-mod-pill interactive" id="home-mod-rush" onclick="toggleHomeModifier(event, 'rush')" type="button" title="90-second countdown rush (+0.5x)" data-i18n-title="mod_rush_desc">
         <svg class="mod-icon-svg icon-rush" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="13" r="8"/>
             <path d="M12 9v4l2.5 2.5M10 2h4m-2 0v3"/>
         </svg>
-        <span class="pill-text">90s Rush</span>
+        <span class="pill-text" data-i18n="mod_rush_name">90s Rush</span>
     </button>
 </div>
 </div>
@@ -390,15 +391,15 @@ window.addEventListener('load', () => {
                     <div class="mode-header">
                         <div class="mode-icon">🧪</div>
                         <div class="mode-info">
-                            <h3 class="mode-name">Sandbox Mode</h3>
-                            <p class="mode-desc">Build & solve custom equations.</p>
+                            <h3 class="mode-name" data-i18n="sandbox_mode">Sandbox Mode</h3>
+                            <p class="mode-desc" data-i18n="sandbox_desc">Build & solve custom equations.</p>
                         </div>
                     </div>
                     <div class="mode-options-wrapper">
                         <div class="mode-options-inner">
                             <div class="mode-options-content">
-                                <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'sandbox', 'Create Level')">Create</button>
-                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'sandbox', 'Select Levels')">Levels</button>
+                                <button class="sub-btn interactive active-sub" onclick="selectSubOption(event, 'sandbox', 'Create Level')" data-i18n="create">Create</button>
+                                <button class="sub-btn interactive" onclick="selectSubOption(event, 'sandbox', 'Select Levels')" data-i18n="levels">Levels</button>
                             </div>
                         </div>
                     </div>
@@ -414,41 +415,41 @@ window.addEventListener('load', () => {
         <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none';" style="position:absolute; top:22px; right:22px; background:#f1f5f9; border:3px solid #1e293b; color:#475569; font-weight:900; border-radius:14px; cursor:pointer; font-size:22px; width:44px; height:44px; display:flex; justify-content:center; align-items:center;">&times;</button>
         
         <div>
-            <h3 style="font-size:36px; font-weight:900; color:#1e1b4b; margin:0; line-height:1.1;">How do you want to build?</h3>
-            <p style="font-size:16px; font-weight:700; color:#64748b; margin:6px 0 0 0;">Create custom chemical reactions using AI, the interactive periodic table, or manual text.</p>
+            <h3 style="font-size:36px; font-weight:900; color:#1e1b4b; margin:0; line-height:1.1;" data-i18n="sb_choice_title">How do you want to build?</h3>
+            <p style="font-size:16px; font-weight:700; color:#64748b; margin:6px 0 0 0;" data-i18n="sb_choice_subtitle">Create custom chemical reactions using AI, the interactive periodic table, or manual text.</p>
         </div>
 
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px;">
             <!-- Choice 1: AI Level Creator -->
             <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none'; window.openAiLevelModal();" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:24px 20px; background:#faf5ff; color:#5b21b6; border:3.5px solid #1e293b; border-radius:24px; font-size:20px; font-weight:900; cursor:pointer; box-shadow:0 6px 0 #1e293b; transition:all 0.12s;">
                 <div style="font-size:52px; line-height:1;">🤖</div>
-                <div style="font-size:20px; font-weight:900;">AI Reaction Builder</div>
-                <div style="font-size:13px; font-weight:700; color:#7c3aed; line-height:1.3;">Type informal text or messy formulas. AI will structure and balance the level!</div>
+                <div style="font-size:20px; font-weight:900;" data-i18n="sb_ai_title">AI Reaction Builder</div>
+                <div style="font-size:13px; font-weight:700; color:#7c3aed; line-height:1.3;" data-i18n="sb_ai_desc">Type informal text or messy formulas. AI will structure and balance the level!</div>
             </button>
 
             <!-- Choice 2: Periodic Table Keyboard & Tactile Numpad -->
             <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none'; window.openVirtualKeyboard();" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:24px 20px; background:#eff6ff; color:#1e40af; border:3.5px solid #1e293b; border-radius:24px; font-size:20px; font-weight:900; cursor:pointer; box-shadow:0 6px 0 #1e293b; transition:all 0.12s;">
                 <div style="font-size:52px; line-height:1;">📊</div>
-                <div style="font-size:20px; font-weight:900;">Periodic Table & Numpad</div>
-                <div style="font-size:13px; font-weight:700; color:#2563eb; line-height:1.3;">Full 118-element periodic grid, auto-complete, and tactile laboratory keypad.</div>
+                <div style="font-size:20px; font-weight:900;" data-i18n="sb_pt_title">Periodic Table & Numpad</div>
+                <div style="font-size:13px; font-weight:700; color:#2563eb; line-height:1.3;" data-i18n="sb_pt_desc">Full 118-element periodic grid, auto-complete, and tactile laboratory keypad.</div>
             </button>
 
             <!-- Choice 3: Manual Text Boxes -->
             <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-choice-modal').style.display='none'; document.getElementById('sandbox-input-modal').style.display='flex'; document.getElementById('builder-reactants-container').innerHTML=''; document.getElementById('builder-products-container').innerHTML=''; window.builderHideSave(); window.builderAddBox('reactants'); window.builderAddBox('products');" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:24px 20px; background:#f8fafc; color:#334155; border:3.5px solid #1e293b; border-radius:24px; font-size:20px; font-weight:900; cursor:pointer; box-shadow:0 6px 0 #1e293b; transition:all 0.12s;">
                 <div style="font-size:52px; line-height:1;">⌨️</div>
-                <div style="font-size:20px; font-weight:900;">Manual Text Boxes</div>
-                <div style="font-size:13px; font-weight:700; color:#64748b; line-height:1.3;">Classic separate input boxes for reactants and products.</div>
+                <div style="font-size:20px; font-weight:900;" data-i18n="sb_manual_title">Manual Text Boxes</div>
+                <div style="font-size:13px; font-weight:700; color:#64748b; line-height:1.3;" data-i18n="sb_manual_desc">Classic separate input boxes for reactants and products.</div>
             </button>
         </div>
 
         <!-- Saved Levels Drawer -->
         <div id="choice-saved-levels-box" style="background:#f8fafc; border:2.5px solid #1e293b; border-radius:20px; padding:16px; text-align:left; display:flex; flex-direction:column; gap:10px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:14px; font-weight:900; color:#1e293b;">📁 Saved Custom Levels (<span id="choice-saved-count">0</span>)</span>
-                <span style="font-size:12px; font-weight:700; color:#64748b;">Click any saved level to play immediately</span>
+                <span style="font-size:14px; font-weight:900; color:#1e293b;"><span data-i18n="sb_saved_title">📁 Saved Custom Levels</span> (<span id="choice-saved-count">0</span>)</span>
+                <span style="font-size:12px; font-weight:700; color:#64748b;" data-i18n="sb_saved_hint">Click any saved level to play immediately</span>
             </div>
             <div id="choice-saved-levels-list" style="display:flex; gap:8px; flex-wrap:wrap; max-height:100px; overflow-y:auto;">
-                <span style="font-size:13px; font-weight:700; color:#94a3b8;">No saved custom levels yet. Use AI or the Periodic Table to build one!</span>
+                <span style="font-size:13px; font-weight:700; color:#94a3b8;" data-i18n="sb_saved_empty">No saved custom levels yet. Use AI or the Periodic Table to build one!</span>
             </div>
         </div>
     </div>
@@ -458,15 +459,15 @@ window.addEventListener('load', () => {
         <button class="interactive" onclick="if(typeof playSound !== 'undefined') playSound('click'); document.getElementById('sandbox-input-modal').style.display='none';" style="position:absolute; top:25px; right:25px; background:#f1f5f9; border:4px solid #cbd5e1; color:#64748b; font-weight:900; border-radius:16px; cursor:pointer; font-size:24px; width:50px; height:50px; display:flex; justify-content:center; align-items:center;">&times;</button>
         
         <div style="text-align:center;">
-            <h3 style="margin:0; font-size:42px; color:#064e3b; font-weight:900; letter-spacing:-1px;">Visual Equation Builder</h3>
-            <p style="font-size:20px; color:#10b981; font-weight:800; margin-top:5px;">Type elements or click the Table icon to insert them!</p>
+            <h3 style="margin:0; font-size:42px; color:#064e3b; font-weight:900; letter-spacing:-1px;" data-i18n="builder_title">Visual Equation Builder</h3>
+            <p style="font-size:20px; color:#10b981; font-weight:800; margin-top:5px;" data-i18n="builder_subtitle">Type elements or click the Table icon to insert them!</p>
         </div>
         
         <div style="display:flex; align-items:stretch; gap:20px; width:100%;">
             <!-- Reactants -->
             <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <label style="font-size:24px; font-weight:900; color:#334155;">Reactants</label>
+                    <label style="font-size:24px; font-weight:900; color:#334155;" data-i18n="reactants">Reactants</label>
                     <button class="interactive" onclick="window.builderAddBox('reactants')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
                 </div>
                 <div id="builder-reactants-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
@@ -477,7 +478,7 @@ window.addEventListener('load', () => {
             <!-- Products -->
             <div style="flex:1; background:#f8fafc; border:4px solid #e2e8f0; border-radius:24px; padding:20px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <label style="font-size:24px; font-weight:900; color:#334155;">Products</label>
+                    <label style="font-size:24px; font-weight:900; color:#334155;" data-i18n="products">Products</label>
                     <button class="interactive" onclick="window.builderAddBox('products')" style="background:#3b82f6; color:white; border:none; border-radius:12px; width:40px; height:40px; font-size:24px; font-weight:900; cursor:pointer; box-shadow:0 4px 0 #2563eb;">+</button>
                 </div>
                 <div id="builder-products-container" style="display:flex; flex-wrap:wrap; gap:15px; align-items:center;"></div>
@@ -485,9 +486,9 @@ window.addEventListener('load', () => {
         </div>
         
         <div style="display:flex; gap:20px; align-items:center;">
-            <button class="interactive" onclick="window.openPeriodicPicker()" style="flex:0.5; background: #8b5cf6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #6d28d9;">📊 Insert Element</button>
-            <button class="interactive" onclick="window.builderCheck()" style="flex:1; background: #3b82f6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #2563eb;">🔍 Check Equation</button>
-            <button class="interactive" id="builder-save-btn" onclick="window.builderSaveAndPlay()" style="flex:1; display:none; background: #10b981; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #059669; animation: pulse 1s infinite;">✅ Save & Play!</button>
+            <button class="interactive" onclick="window.openPeriodicPicker()" style="flex:0.5; background: #8b5cf6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #6d28d9;"><span data-i18n="builder_insert_el">📊 Insert Element</span></button>
+            <button class="interactive" onclick="window.builderCheck()" style="flex:1; background: #3b82f6; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #2563eb;"><span data-i18n="builder_check_eq">🔍 Check Equation</span></button>
+            <button class="interactive" id="builder-save-btn" onclick="window.builderSaveAndPlay()" style="flex:1; display:none; background: #10b981; color:white; border:none; padding:20px; font-size:24px; font-weight:900; border-radius:16px; cursor:pointer; box-shadow:0 6px 0 #059669; animation: pulse 1s infinite;"><span data-i18n="builder_save_play">✅ Save & Play!</span></button>
         </div>
         
         <div id="builder-feedback" style="font-size:22px; font-weight:900; text-align:center; padding:15px; border-radius:16px; display:none;"></div>
@@ -501,8 +502,8 @@ window.addEventListener('load', () => {
             <div style="display:flex; align-items:center; gap:10px;">
                 <span style="font-size:28px;">🧪</span>
                 <div>
-                    <h3 style="margin:0; font-size:22px; color:#4c1d95; font-weight:900; line-height:1.1;">Chemistry Keyboard & Equation Builder</h3>
-                    <p style="margin:2px 0 0 0; font-size:12px; color:#6b21a8; font-weight:700;">Tap elements on the periodic table or type with your physical keyboard.</p>
+                    <h3 style="margin:0; font-size:22px; color:#4c1d95; font-weight:900; line-height:1.1;" data-i18n="vk_header_title">Chemistry Keyboard & Equation Builder</h3>
+                    <p style="margin:2px 0 0 0; font-size:12px; color:#6b21a8; font-weight:700;" data-i18n="vk_header_subtitle">Tap elements on the periodic table or type with your physical keyboard.</p>
                 </div>
             </div>
         </div>
@@ -528,7 +529,7 @@ window.addEventListener('load', () => {
                         <line x1="18" y1="9" x2="12" y2="15"/>
                         <line x1="12" y1="9" x2="18" y2="15"/>
                     </svg>
-                    <span>Back</span>
+                    <span data-i18n="back">Back</span>
                 </button>
             </div>
             
@@ -551,7 +552,7 @@ window.addEventListener('load', () => {
                             <span style="font-size:18px;">🔥</span>
                             <span style="font-size:14px; font-weight:900; color:#1e1b4b;">Prof. Bunsen</span>
                         </div>
-                        <span style="background:#ede9fe; color:#6d28d9; border:1.5px solid #c4b5fd; font-size:10px; font-weight:900; padding:2px 7px; border-radius:6px;">AI Chemist</span>
+                        <span style="background:#ede9fe; color:#6d28d9; border:1.5px solid #c4b5fd; font-size:10px; font-weight:900; padding:2px 7px; border-radius:6px;" data-i18n="vk_bunsen_role">AI Chemist</span>
                     </div>
                     <p style="margin:0 0 10px 0; font-size:13px; font-weight:700; color:#475569; line-height:1.45;">
                         Prof. Bunsen is an advanced AI chemist that can help you turn your ideas into an equation.
@@ -560,7 +561,7 @@ window.addEventListener('load', () => {
                         <span style="font-size:12px; font-weight:900; color:#7c3aed; display:inline-flex; align-items:center; gap:4px;">
                             <span>Click to talk!</span> <span>💬</span>
                         </span>
-                        <span style="font-size:11px; font-weight:800; color:#94a3b8; background:#f8fafc; border:1px solid #cbd5e1; border-radius:5px; padding:1px 6px;">Prompt Assistant</span>
+                        <span style="font-size:11px; font-weight:800; color:#94a3b8; background:#f8fafc; border:1px solid #cbd5e1; border-radius:5px; padding:1px 6px;" data-i18n="vk_tab_prompt">Prompt Assistant</span>
                     </div>
                 </div>
             </div>
@@ -582,9 +583,9 @@ window.addEventListener('load', () => {
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #e2e8f0; padding-bottom:4px;">
                         <div style="display:flex; align-items:center; gap:7px;">
                             <span style="font-size:18px;">🧪</span>
-                            <span style="font-size:13.5px; font-weight:900; color:#0f172a; text-transform:uppercase; letter-spacing:0.8px;">Lab Keypad</span>
+                            <span style="font-size:13.5px; font-weight:900; color:#0f172a; text-transform:uppercase; letter-spacing:0.8px;" data-i18n="vk_tab_keypad">Lab Keypad</span>
                         </div>
-                        <span style="font-size:11px; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 8px; border-radius:6px; border:1px solid #cbd5e1;">Tools</span>
+                        <span style="font-size:11px; font-weight:800; color:#64748b; background:#f1f5f9; padding:2px 8px; border-radius:6px; border:1px solid #cbd5e1;" data-i18n="vk_tab_tools">Tools</span>
                     </div>
 
                     <!-- Enlarged Quick Tutorial on How to Build an Equation -->
@@ -597,31 +598,31 @@ window.addEventListener('load', () => {
                                     <line x1="12" y1="8" x2="12.01" y2="8"/>
                                 </svg>
                             </div>
-                            <span>How to Build an Equation</span>
+                            <span data-i18n="vk_guide_title">How to Build an Equation</span>
                         </div>
                         <div style="display:flex; flex-direction:column; gap:5px;">
                             <div style="display:flex; align-items:flex-start; gap:7px; line-height:1.35;">
                                 <span style="background:#ede9fe; color:#6d28d9; border:2px solid #1e293b; font-weight:900; font-size:11px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</span>
                                 <div style="font-size:12px; font-weight:700; color:#1e293b;">
-                                    <span style="color:#6d28d9; font-weight:900;">Pick Elements:</span> Tap the <b style="color:#4f46e5;">Periodic Table</b> or click <b style="color:#7c3aed;">Prof. Bunsen</b> above.
+                                    <span style="color:#6d28d9; font-weight:900;" data-i18n="vk_step1_label">Pick Elements:</span> Tap the <b style="color:#4f46e5;">Periodic Table</b> or click <b style="color:#7c3aed;">Prof. Bunsen</b> above.
                                 </div>
                             </div>
                             <div style="display:flex; align-items:flex-start; gap:7px; line-height:1.35;">
                                 <span style="background:#dbeafe; color:#1d4ed8; border:2px solid #1e293b; font-weight:900; font-size:11px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</span>
                                 <div style="font-size:12px; font-weight:700; color:#1e293b;">
-                                    <span style="color:#1d4ed8; font-weight:900;">Add Operators:</span> Use <b style="background:#dbeafe; color:#1d4ed8; padding:1px 5px; border-radius:5px; border:1.5px solid #93c5fd;">+</b> and <b style="background:#d1fae5; color:#047857; padding:1px 5px; border-radius:5px; border:1.5px solid #6ee7b7;">→</b> to split reactants & products.
+                                    <span style="color:#1d4ed8; font-weight:900;" data-i18n="vk_step2_label">Add Operators:</span> Use <b style="background:#dbeafe; color:#1d4ed8; padding:1px 5px; border-radius:5px; border:1.5px solid #93c5fd;">+</b> and <b style="background:#d1fae5; color:#047857; padding:1px 5px; border-radius:5px; border:1.5px solid #6ee7b7;">→</b> to split reactants & products.
                                 </div>
                             </div>
                             <div style="display:flex; align-items:flex-start; gap:7px; line-height:1.35;">
                                 <span style="background:#fef3c7; color:#b45309; border:2px solid #1e293b; font-weight:900; font-size:11px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">3</span>
                                 <div style="font-size:12px; font-weight:700; color:#1e293b;">
-                                    <span style="color:#b45309; font-weight:900;">Check & Solve:</span> Tap <b style="color:#d97706;">Check Equation</b> to balance or auto-complete.
+                                    <span style="color:#b45309; font-weight:900;" data-i18n="vk_step3_label">Check & Solve:</span> Tap <b style="color:#d97706;">Check Equation</b> to balance or auto-complete.
                                 </div>
                             </div>
                             <div style="display:flex; align-items:flex-start; gap:7px; line-height:1.35;">
                                 <span style="background:#d1fae5; color:#047857; border:2px solid #1e293b; font-weight:900; font-size:11px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">4</span>
                                 <div style="font-size:12px; font-weight:700; color:#1e293b;">
-                                    <span style="color:#047857; font-weight:900;">Save to Play:</span> Tap <b style="color:#059669;">Save This Level</b> to store into your collection!
+                                    <span style="color:#047857; font-weight:900;" data-i18n="vk_step4_label">Save to Play:</span> Tap <b style="color:#059669;">Save This Level</b> to store into your collection!
                                 </div>
                             </div>
                         </div>
@@ -650,11 +651,11 @@ window.addEventListener('load', () => {
                     <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px;">
                         <button type="button" class="interactive vk-op-btn vk-op-plus" onclick="window.vkType('+')" title="Add Plus Operator" style="min-height:40px; border:2.5px solid #1e293b; border-radius:12px; box-shadow:0 3px 0 #1e293b;">
                             <span style="font-size:16px; line-height:1; font-weight:900;">+</span>
-                            <span style="font-size:12px; font-weight:900;">Plus</span>
+                            <span style="font-size:12px; font-weight:900;" data-i18n="vk_btn_plus">Plus</span>
                         </button>
                         <button type="button" class="interactive vk-op-btn vk-op-arrow" id="vk-arrow-btn" onclick="window.vkType('->')" title="Add Reaction Yields Arrow" style="min-height:40px; border:2.5px solid #1e293b; border-radius:12px; box-shadow:0 3px 0 #1e293b;">
                             <span style="font-size:18px; line-height:1; font-weight:900;">→</span>
-                            <span style="font-size:12px; font-weight:900;">Yields</span>
+                            <span style="font-size:12px; font-weight:900;" data-i18n="vk_btn_yields">Yields</span>
                         </button>
                         <button type="button" class="interactive vk-op-btn" onclick="window.vkClear()" 
                             style="min-height:40px; padding:0 6px; background:#fee2e2; border:2.5px solid #1e293b; color:#dc2626; border-radius:12px; box-shadow:0 3px 0 #991b1b; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; font-weight:900; transition:all 0.1s;" 
@@ -680,7 +681,7 @@ window.addEventListener('load', () => {
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                             <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
-                        <span id="vk-check-btn-text">Check Equation</span>
+                        <span id="vk-check-btn-text" data-i18n="vk_btn_check">Check Equation</span>
                     </button>
                 </div>
             </div>
@@ -1390,7 +1391,7 @@ window.addEventListener('load', () => {
         
         <!-- RIGHT PANEL: The Grid -->
         <div class="good-block pt-grid-panel">
-            <h3 style="margin:0 0 15px 0; font-size:clamp(20px, 2.5vw, 36px); color:#1e293b; font-weight:900; text-align:center;">Interactive Periodic Table</h3>
+            <h3 style="margin:0 0 15px 0; font-size:clamp(20px, 2.5vw, 36px); color:#1e293b; font-weight:900; text-align:center;" data-i18n="pt_modal_title">Interactive Periodic Table</h3>
             <div id="picker-grid"></div>
         </div>
         
@@ -1398,8 +1399,8 @@ window.addEventListener('load', () => {
         <div class="good-block pt-details-panel">
             <div id="element-details-empty" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#94a3b8; text-align:center;">
                 <div style="font-size:70px; margin-bottom:15px;">🔬</div>
-                <h2 style="font-size:22px; font-weight:900; margin:0;">Awaiting Input</h2>
-                <p style="font-size:16px; font-weight:700;">Hover over any element on the periodic table to analyze its atomic structure.</p>
+                <h2 style="font-size:22px; font-weight:900; margin:0;" data-i18n="pt_awaiting_title">Awaiting Input</h2>
+                <p style="font-size:16px; font-weight:700;" data-i18n="pt_awaiting_desc">Hover over any element on the periodic table to analyze its atomic structure.</p>
             </div>
             
             <div id="element-details-content" style="display:none; flex-direction:column; gap:15px;">
@@ -1435,15 +1436,15 @@ window.addEventListener('load', () => {
                 <!-- 3. Primary Info: Group, Period, Type -->
                 <div style="display:grid; grid-template-columns:1fr 1fr 1.5fr; gap:8px;">
                     <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center;">
-                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Group</div>
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;" data-i18n="pt_label_group">Group</div>
                         <div id="ed-group-num" style="font-size:18px; font-weight:900; color:#1e3a8a; margin-top:2px;">1</div>
                     </div>
                     <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center;">
-                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Period</div>
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;" data-i18n="pt_label_period">Period</div>
                         <div id="ed-period-num" style="font-size:18px; font-weight:900; color:#1e3a8a; margin-top:2px;">2</div>
                     </div>
                     <div style="background:#eff6ff; border:3px solid #bfdbfe; border-radius:12px; padding:8px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;">Type</div>
+                        <div style="font-size:10px; font-weight:900; color:#2563eb; text-transform:uppercase;" data-i18n="pt_label_type">Type</div>
                         <div id="ed-group-badge" style="display:inline-block; padding:3px 6px; border-radius:6px; font-size:11px; font-weight:900; color:white; text-transform:uppercase; letter-spacing:0.5px; line-height:1.2; margin-top:3px;">Alkali Metal</div>
                     </div>
                 </div>
@@ -1454,20 +1455,20 @@ window.addEventListener('load', () => {
                 <!-- 5. Physical Stats -->
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                     <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:12px; padding:10px;">
-                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;">Atomic Mass</div>
+                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;" data-i18n="pt_label_mass">Atomic Mass</div>
                         <div id="ed-mass" style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;">6.941 u</div>
                     </div>
                     <div style="background:#f8fafc; border:3px solid #e2e8f0; border-radius:12px; padding:10px;">
-                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;">Density</div>
+                        <div style="font-size:11px; font-weight:900; color:#64748b; text-transform:uppercase;" data-i18n="pt_label_density">Density</div>
                         <div id="ed-density" style="font-size:16px; font-weight:900; color:#0f172a; margin-top:2px;">0.512 g/cm³</div>
                     </div>
                     <div style="background:#fef2f2; border:3px solid #fecaca; border-radius:12px; padding:10px;">
-                        <div style="font-size:11px; font-weight:900; color:#dc2626; text-transform:uppercase;">Melting Point</div>
+                        <div style="font-size:11px; font-weight:900; color:#dc2626; text-transform:uppercase;" data-i18n="pt_label_melt">Melting Point</div>
                         <div id="ed-melt" style="font-size:16px; font-weight:900; color:#991b1b; margin-top:2px;">180.54 °C</div>
                     </div>
                     <div style="background:#fff7ed; border:3px solid #fed7aa; border-radius:12px; padding:10px;">
-                        <div style="font-size:11px; font-weight:900; color:#ea580c; text-transform:uppercase;">Boiling Point</div>
-                        <div id="ed-boil" style="font-size:16px; font-weight:900; color:#9a3412; margin-top:2px;">1342 &deg;C</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;">Discovered By</div><div id="ed-discoverer" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;">Discovery Year</div><div id="ed-year" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div></div>
+                        <div style="font-size:11px; font-weight:900; color:#ea580c; text-transform:uppercase;" data-i18n="pt_label_boil">Boiling Point</div>
+                        <div id="ed-boil" style="font-size:16px; font-weight:900; color:#9a3412; margin-top:2px;">1342 &deg;C</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;" data-i18n="pt_label_discoverer">Discovered By</div><div id="ed-discoverer" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div><div style="background:#f0fdf4; border:3px solid #bbf7d0; border-radius:12px; padding:10px; grid-column: 1 / -1;"><div style="font-size:11px; font-weight:900; color:#16a34a; text-transform:uppercase;" data-i18n="pt_label_year">Discovery Year</div><div id="ed-year" style="font-size:16px; font-weight:900; color:#166534; margin-top:2px;">Unknown</div></div></div>
 
                 </div>
         </div>
@@ -1490,14 +1491,14 @@ window.addEventListener('load', () => {
             </svg>
         </div>
         <div>
-            <span class="stats-header-kicker">CAREER ARCHIVE</span>
-            <h2 class="stats-header-title">Player Records</h2>
+            <span class="stats-header-kicker" data-i18n="stats_archive_badge">CAREER ARCHIVE</span>
+            <h2 class="stats-header-title" data-i18n="stats_title">Player Records</h2>
         </div>
     </div>
     
     <div class="stats-header-right">
         <div class="stats-player-badge">
-            <span class="player-badge-label">Chemist</span>
+            <span class="player-badge-label" data-i18n="stats_role_chemist">Chemist</span>
             <span class="player-badge-name" id="stats-profile-name">Student</span>
         </div>
         <button class="neo-close-btn interactive" onclick="closeStatsModal()" aria-label="Close stats modal">
@@ -1515,7 +1516,7 @@ window.addEventListener('load', () => {
             <svg class="tab-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
             </svg>
-            <span>Match History</span>
+            <span data-i18n="stats_tab_history">Match History</span>
             <span class="tab-count-pill" id="history-count-pill">0</span>
         </button>
         <button id="tab-btn-badges" class="stats-tab-btn interactive" onclick="switchStatsTab('badges')">
@@ -1523,17 +1524,17 @@ window.addEventListener('load', () => {
                 <circle cx="12" cy="8" r="6"/>
                 <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
             </svg>
-            <span>Badges & Trophies</span>
+            <span data-i18n="stats_tab_badges">Badges & Trophies</span>
             <span class="tab-count-pill" id="badges-count-text">0/10</span>
         </button>
     </div>
     
     <div class="stats-filter-group" id="stats-filter-controls">
-        <span class="stats-filter-label">FILTER:</span>
-        <button class="stats-filter-btn active interactive" id="filter-btn-all" onclick="setMatchHistoryFilter('all')">All</button>
-        <button class="stats-filter-btn interactive" id="filter-btn-easy" onclick="setMatchHistoryFilter('easy')">Easy</button>
-        <button class="stats-filter-btn interactive" id="filter-btn-medium" onclick="setMatchHistoryFilter('medium')">Medium</button>
-        <button class="stats-filter-btn interactive" id="filter-btn-hard" onclick="setMatchHistoryFilter('hard')">Hard</button>
+        <span class="stats-filter-label" data-i18n="stats_filter_label">FILTER:</span>
+        <button class="stats-filter-btn active interactive" id="filter-btn-all" onclick="setMatchHistoryFilter('all')" data-i18n="stats_filter_all">All</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-easy" onclick="setMatchHistoryFilter('easy')" data-i18n="easy">Easy</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-medium" onclick="setMatchHistoryFilter('medium')" data-i18n="medium">Medium</button>
+        <button class="stats-filter-btn interactive" id="filter-btn-hard" onclick="setMatchHistoryFilter('hard')" data-i18n="hard">Hard</button>
     </div>
 </div>
 
@@ -1561,33 +1562,33 @@ window.addEventListener('load', () => {
             <div class="typing-bar-header">
                 <div class="typing-bar-title-wrap">
                     <span class="typing-bar-icon">✏️</span>
-                    <span class="typing-bar-title">Enter Player Name</span>
+                    <span class="typing-bar-title" data-i18n="top_typing_title">Enter Player Name</span>
                 </div>
                 <button type="button" class="typing-bar-close interactive" onclick="window.closeTopTypingBar()" aria-label="Close">&times;</button>
             </div>
             
             <div class="typing-bar-input-row">
-                <input type="text" id="top-typing-input" class="typing-bar-input" placeholder="Type your name..." autocomplete="off" maxlength="24">
+                <input type="text" id="top-typing-input" class="typing-bar-input" placeholder="Type your name..." data-i18n-placeholder="player_name_placeholder" autocomplete="off" maxlength="24">
                 <button type="button" id="top-typing-dice-btn" class="typing-bar-dice interactive" onclick="window.randomizeTopTypingName()" title="Random Fun Chemistry Name" aria-label="Random Chemistry Name">🎲</button>
                 <button type="button" id="top-typing-done-btn" class="typing-bar-done interactive" onclick="window.confirmTopTypingName()">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
                         <polyline points="20 6 9 17 4 12"/>
                     </svg>
-                    <span>Done</span>
+                    <span data-i18n="top_typing_done">Done</span>
                 </button>
             </div>
 
             <div class="typing-bar-chips" id="top-typing-chips">
-                <span class="typing-chip-label">Quick Picks:</span>
+                <span class="typing-chip-label" data-i18n="top_typing_quick">Quick Picks:</span>
             </div>
         </div>
     </div>
 
     <!-- Persistent Fullscreen Toggle Button -->
     <!-- Fullscreen Enticing Info Card -->
-    <div id="fullscreen-nudge-bubble" class="fullscreen-nudge interactive" onclick="window.toggleFullscreen()" title="Click to go Fullscreen!">
+    <div id="fullscreen-nudge-bubble" class="fullscreen-nudge interactive" onclick="window.toggleFullscreen()" title="Click to go Fullscreen!" data-i18n-title="fs_nudge_title">
         <div class="fs-nudge-content pop-in">
-            <span id="fs-nudge-text">✨ Hey, click me!</span>
+            <span id="fs-nudge-text" data-i18n="fs_nudge_text">✨ Hey, click me!</span>
         </div>
         <div class="fs-nudge-tail"></div>
     </div>
@@ -1609,7 +1610,10 @@ window.addEventListener('load', () => {
         if (!toggle) return;
         const current = toggle.getAttribute('data-lang') || localStorage.getItem('stoich_lang') || 'en';
         const target = pref ? pref.toLowerCase() : (current === 'en' ? 'bm' : 'en');
-
+        if (typeof window.setLanguage === 'function') {
+            window.setLanguage(target);
+            return;
+        }
         toggle.setAttribute('data-lang', target);
         try {
             localStorage.setItem('stoich_lang', target);
@@ -1748,8 +1752,8 @@ window.addEventListener('load', () => {
                 <div style="display:flex; align-items:center; gap:14px;">
                     <div style="width:48px; height:48px; border-radius:16px; background:#facc15; border:3px solid #1e293b; display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-shadow:0 3.5px 0 #1e293b;">📖</div>
                     <div>
-                        <h2 style="margin:0; font-size:1.55rem; font-weight:900; color:#0f172a; line-height:1.2;">Lab Guide & Teaching Notes</h2>
-                        <span style="font-size:0.8rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:1px;">SPM CHEMISTRY • FORM 4 & FORM 5</span>
+                        <h2 style="margin:0; font-size:1.55rem; font-weight:900; color:#0f172a; line-height:1.2;" data-i18n="guide_title">Lab Guide & Teaching Notes</h2>
+                        <span style="font-size:0.8rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:1px;" data-i18n="guide_syllabus_badge">SPM CHEMISTRY • FORM 4 & FORM 5</span>
                     </div>
                 </div>
                 <button onclick="closeHelpGuideModal()" class="btn-close-modal" style="width:42px; height:42px; border-radius:14px; background:#fee2e2; color:#ef4444; border:3px solid #1e293b; font-weight:900; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 #1e293b;">✕</button>
@@ -1757,10 +1761,10 @@ window.addEventListener('load', () => {
 
             <!-- Segmented Tactile Tabs -->
             <div style="display:flex; background:#f1f5f9; border-bottom:3.5px solid #1e293b; padding:12px 28px; gap:12px; flex-shrink:0;">
-                <button id="guide-tab-btn-teacher" onclick="switchGuideTab('teacher')" class="guide-tab-btn" style="flex:1; padding:12px 20px; border-radius:16px; font-weight:900; font-size:1.02rem; cursor:pointer; border:3px solid #1e293b; background:#3b82f6; color:#ffffff; box-shadow:0 4px 0 #1e3a8a;">
+                <button id="guide-tab-btn-teacher" onclick="switchGuideTab('teacher')" data-i18n="guide_tab_teacher" class="guide-tab-btn" style="flex:1; padding:12px 20px; border-radius:16px; font-weight:900; font-size:1.02rem; cursor:pointer; border:3px solid #1e293b; background:#3b82f6; color:#ffffff; box-shadow:0 4px 0 #1e3a8a;">
                     👨‍🏫 Teacher's Classroom Guide
                 </button>
-                <button id="guide-tab-btn-student" onclick="switchGuideTab('student')" class="guide-tab-btn" style="flex:1; padding:12px 20px; border-radius:16px; font-weight:900; font-size:1.02rem; cursor:pointer; border:3px solid #cbd5e1; background:#ffffff; color:#475569; box-shadow:0 4px 0 #cbd5e1;">
+                <button id="guide-tab-btn-student" onclick="switchGuideTab('student')" data-i18n="guide_tab_student" class="guide-tab-btn" style="flex:1; padding:12px 20px; border-radius:16px; font-weight:900; font-size:1.02rem; cursor:pointer; border:3px solid #cbd5e1; background:#ffffff; color:#475569; box-shadow:0 4px 0 #cbd5e1;">
                     🎒 Student's How to Balance
                 </button>
             </div>
@@ -1773,15 +1777,15 @@ window.addEventListener('load', () => {
                     <div>
                         <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                             <span style="font-size:1.2rem;">✨</span>
-                            <h4 style="margin:0; font-size:1.15rem; font-weight:900; color:#065f46;">Prefer learning by doing?</h4>
+                            <h4 style="margin:0; font-size:1.15rem; font-weight:900; color:#065f46;" data-i18n="guide_tut_hero_title">Prefer learning by doing?</h4>
                         </div>
-                        <p style="margin:0; font-size:0.9rem; color:#047857; font-weight:700; line-height:1.45;">
+                        <p style="margin:0; font-size:0.9rem; color:#047857; font-weight:700; line-height:1.45;" data-i18n="guide_tut_hero_desc">
                             Play our interactive tutorial level with a live dimmed spotlight guiding you through each tool!
                         </p>
                     </div>
                     <button onclick="closeHelpGuideModal(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=TUT0');" class="btn-play-tutorial" style="background:#10b981; color:#ffffff; border:3.5px solid #1e293b; box-shadow:0 5px 0 #065f46; border-radius:16px; padding:13px 22px; font-weight:900; font-size:0.96rem; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:8px;">
                         <span style="font-size:1.2rem;">🎓</span>
-                        <span>Play Tutorial (TUT0)</span>
+                        <span data-i18n="guide_tut_hero_btn">Play Tutorial (TUT0)</span>
                         <span class="btn-arrow-slide" style="font-size:1.1rem; line-height:1;">➔</span>
                     </button>
                 </div>
@@ -1790,9 +1794,9 @@ window.addEventListener('load', () => {
                 <div id="guide-content-teacher" style="display:flex; flex-direction:column; gap:16px;">
                     <div style="background:#eff6ff; border:2.5px solid #3b82f6; border-radius:18px; padding:18px 22px; box-shadow:0 3px 0 #bfdbfe;">
                         <h3 style="margin:0 0 8px 0; font-size:1.15rem; font-weight:900; color:#1d4ed8; display:flex; align-items:center; gap:8px;">
-                            <span>📺</span> Smartboard & Projector Display
+                            <span>📺</span> <span data-i18n="guide_smartboard_title">Smartboard & Projector Display</span>
                         </h3>
-                        <p style="margin:0; font-size:0.92rem; line-height:1.55; color:#1e3a8a; font-weight:700;">
+                        <p style="margin:0; font-size:0.92rem; line-height:1.55; color:#1e3a8a; font-weight:700;" data-i18n="guide_smartboard_desc">
                             Project the live simulation directly in the classroom. The centered 3-column layout scales element tokens, seesaws, and discrete bar counts so every student in the lecture hall can easily follow along.
                         </p>
                     </div>
@@ -1800,17 +1804,17 @@ window.addEventListener('load', () => {
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                         <div style="background:#f8fafc; border:2.5px solid #cbd5e1; border-radius:18px; padding:18px; box-shadow:0 3px 0 #e2e8f0;">
                             <h4 style="margin:0 0 8px 0; font-size:1.05rem; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                                <span>📘</span> Curriculum Alignment
+                                <span>📘</span> <span data-i18n="guide_curriculum_title">Curriculum Alignment</span>
                             </h4>
-                            <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#475569; font-weight:700;">
+                            <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#475569; font-weight:700;" data-i18n="guide_curriculum_desc">
                                 Structured around <b>KSSM Kimia Tingkatan 4 Bab 3</b> (Chemical Formulae & Equations). Covers diatomic synthesis, acid-metal reactions, precipitation, and thermal decomposition.
                             </p>
                         </div>
                         <div style="background:#f8fafc; border:2.5px solid #cbd5e1; border-radius:18px; padding:18px; box-shadow:0 3px 0 #e2e8f0;">
                             <h4 style="margin:0 0 8px 0; font-size:1.05rem; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                                <span>⚖️</span> Dual Visual Models
+                                <span>⚖️</span> <span data-i18n="guide_dual_models_title">Dual Visual Models</span>
                             </h4>
-                            <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#475569; font-weight:700;">
+                            <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#475569; font-weight:700;" data-i18n="guide_dual_models_desc">
                                 Use the left sidebar to toggle between the <b>3D Seesaw</b> (mass-balance intuition) and <b>Bar Graphs</b> (discrete stoichiometric atomic counts).
                             </p>
                         </div>
@@ -1818,9 +1822,9 @@ window.addEventListener('load', () => {
 
                     <div style="background:#fefce8; border:2.5px solid #facc15; border-radius:18px; padding:18px; box-shadow:0 3px 0 #fde68a;">
                         <h4 style="margin:0 0 6px 0; font-size:1.05rem; font-weight:900; color:#854d0e; display:flex; align-items:center; gap:8px;">
-                            <span>💡</span> Classroom Pedagogical Tip: Starting with 1
+                            <span>💡</span> <span data-i18n="guide_tip_start1_title">Classroom Pedagogical Tip: Starting with 1</span>
                         </h4>
-                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#713f12; font-weight:700;">
+                        <p style="margin:0; font-size:0.88rem; line-height:1.5; color:#713f12; font-weight:700;" data-i18n="guide_tip_start1_desc">
                             Equations always default to 1 of each molecule. Emphasize to students that coefficients of zero do not exist in real chemical reactions: we adjust counts from 1 until both sides reach equilibrium.
                         </p>
                     </div>
@@ -1830,9 +1834,9 @@ window.addEventListener('load', () => {
                 <div id="guide-content-student" style="display:none; flex-direction:column; gap:16px;">
                     <div style="background:#f0fdf4; border:2.5px solid #22c55e; border-radius:18px; padding:18px 22px; box-shadow:0 3px 0 #bbf7d0;">
                         <h3 style="margin:0 0 8px 0; font-size:1.15rem; font-weight:900; color:#15803d; display:flex; align-items:center; gap:8px;">
-                            <span>🌿</span> The Golden Law of Conservation of Mass
+                            <span>🌿</span> <span data-i18n="guide_law_title">The Golden Law of Conservation of Mass</span>
                         </h3>
-                        <p style="margin:0; font-size:0.92rem; line-height:1.55; color:#14532d; font-weight:700;">
+                        <p style="margin:0; font-size:0.92rem; line-height:1.55; color:#14532d; font-weight:700;" data-i18n="guide_law_desc">
                             Atoms can never disappear, and new atoms cannot appear from nowhere. Whatever atoms enter as reactants must leave as products. When both sides match, the seesaw balances!
                         </p>
                     </div>
@@ -1840,20 +1844,20 @@ window.addEventListener('load', () => {
                     <!-- MINOH Framework Cards -->
                     <div style="background:#f8fafc; border:2.5px solid #cbd5e1; border-radius:18px; padding:18px; box-shadow:0 3px 0 #e2e8f0;">
                         <h4 style="margin:0 0 12px 0; font-size:1.05rem; font-weight:900; color:#0f172a; display:flex; align-items:center; gap:8px;">
-                            <span>🧭</span> The 3-Step MINOH Strategy
+                            <span>🧭</span> <span data-i18n="guide_minoh_framework_title">The 3-Step MINOH Strategy</span>
                         </h4>
                         <div style="display:flex; flex-direction:column; gap:10px;">
                             <div style="display:flex; align-items:center; gap:14px; background:#ffffff; border:2px solid #93c5fd; border-radius:14px; padding:10px 14px;">
                                 <span style="width:30px; height:30px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.95rem; flex-shrink:0;">1</span>
-                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;"><b>M & I:</b> Balance Metals (Na, Mg, Fe) and Polyatomic Ions (NO₃, SO₄, CO₃ as intact groups) first.</span>
+                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;" data-i18n="guide_minoh_step1"><b>M & I:</b> Balance Metals (Na, Mg, Fe) and Polyatomic Ions (NO₃, SO₄, CO₃ as intact groups) first.</span>
                             </div>
                             <div style="display:flex; align-items:center; gap:14px; background:#ffffff; border:2px solid #fde047; border-radius:14px; padding:10px 14px;">
                                 <span style="width:30px; height:30px; border-radius:50%; background:#eab308; color:white; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.95rem; flex-shrink:0;">2</span>
-                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;"><b>N:</b> Balance Non-metals (Cl, C, S) next.</span>
+                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;" data-i18n="guide_minoh_step2"><b>N:</b> Balance Non-metals (Cl, C, S) next.</span>
                             </div>
                             <div style="display:flex; align-items:center; gap:14px; background:#ffffff; border:2px solid #86efac; border-radius:14px; padding:10px 14px;">
                                 <span style="width:30px; height:30px; border-radius:50%; background:#22c55e; color:white; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:0.95rem; flex-shrink:0;">3</span>
-                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;"><b>O & H:</b> Balance Oxygen and Hydrogen last—they usually fall into place naturally!</span>
+                                <span style="font-size:0.88rem; color:#1e293b; font-weight:800;" data-i18n="guide_minoh_step3"><b>O & H:</b> Balance Oxygen and Hydrogen last—they usually fall into place naturally!</span>
                             </div>
                         </div>
                     </div>
@@ -1861,17 +1865,17 @@ window.addEventListener('load', () => {
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <div style="display:flex; align-items:center; gap:14px; background:#f8fafc; border:2.5px solid #cbd5e1; border-radius:16px; padding:12px 18px; box-shadow:0 3px 0 #e2e8f0;">
                             <span style="font-size:1.3rem;">🎮</span>
-                            <span style="font-size:0.9rem; color:#1e293b; font-weight:800; line-height:1.45;">Tap <b>+</b> on molecule badges to drop compounds into beakers. You can only add complete molecules, never split atoms apart!</span>
+                            <span style="font-size:0.9rem; color:#1e293b; font-weight:800; line-height:1.45;" data-i18n="guide_student_instruction1">Tap <b>+</b> on molecule badges to drop compounds into beakers. You can only add complete molecules, never split atoms apart!</span>
                         </div>
                         <div style="display:flex; align-items:center; gap:14px; background:#f8fafc; border:2.5px solid #cbd5e1; border-radius:16px; padding:12px 18px; box-shadow:0 3px 0 #e2e8f0;">
                             <span style="font-size:1.3rem;">🏆</span>
-                            <span style="font-size:0.9rem; color:#1e293b; font-weight:800; line-height:1.45;">When every element indicator turns green and equilibrium is reached, the reaction is balanced!</span>
+                            <span style="font-size:0.9rem; color:#1e293b; font-weight:800; line-height:1.45;" data-i18n="guide_student_instruction2">When every element indicator turns green and equilibrium is reached, the reaction is balanced!</span>
                         </div>
                     </div>
 
                     <div style="display:flex; justify-content:center; margin-top:8px;">
                         <button onclick="closeHelpGuideModal(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=F4L1');" class="btn-try-level1" style="padding:14px 30px; border-radius:18px; background:#10b981; color:white; font-weight:900; font-size:1.02rem; border:3.5px solid #1e293b; box-shadow:0 6px 0 #065f46; cursor:pointer; display:inline-flex; align-items:center; gap:10px;">
-                            <span>Try Level 1 (Haber Process) Now</span>
+                            <span data-i18n="guide_try_level1">Try Level 1 (Haber Process) Now</span>
                             <span style="font-size:1.25rem; line-height:1;">➔</span>
                         </button>
                     </div>
@@ -1943,7 +1947,7 @@ window.addEventListener('load', () => {
         <div id="home-tour-card" style="position:fixed; background:#ffffff; border:4px solid #2563eb; border-radius:20px; box-shadow:0 16px 36px rgba(0,0,0,0.35); max-width:400px; width:90vw; padding:18px 20px; box-sizing:border-box; z-index:99995; pointer-events:auto; transition:all 0.22s ease;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                 <span id="ht-badge" style="background:#dbeafe; color:#1e40af; border:1.5px solid #93c5fd; font-size:0.75rem; font-weight:900; padding:2px 8px; border-radius:999px;">1/7 Profile</span>
-                <div style="display:flex; align-items:center; gap:6px;"><button onclick="closeHomeTour(); openHelpGuideModal();" style="background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; padding:3px 9px; font-size:0.75rem; font-weight:900; color:#1d4ed8; cursor:pointer; box-shadow:0 2px 0 #93c5fd;" title="Open Teaching Notes & Guide">📖 Notes</button><button onclick="closeHomeTour()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; border-radius:50%; width:28px; height:28px; font-weight:900; color:#475569; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Close tour">✕</button></div>
+                <div style="display:flex; align-items:center; gap:6px;"><button id="ht-header-notes" onclick="closeHomeTour(); openHelpGuideModal();" style="background:#eff6ff; border:1.5px solid #93c5fd; border-radius:8px; padding:3px 9px; font-size:0.75rem; font-weight:900; color:#1d4ed8; cursor:pointer; box-shadow:0 2px 0 #93c5fd;" title="Open Teaching Notes & Guide">📖 Notes</button><button onclick="closeHomeTour()" style="background:#f1f5f9; border:1.5px solid #cbd5e1; border-radius:50%; width:28px; height:28px; font-weight:900; color:#475569; cursor:pointer; display:flex; align-items:center; justify-content:center;" title="Close tour">✕</button></div>
             </div>
             <h3 id="ht-title" style="margin:0 0 6px 0; font-size:1.15rem; font-weight:900; color:#0f172a; line-height:1.2;">Title</h3>
             <p id="ht-desc" style="margin:0 0 10px 0; font-size:0.9rem; font-weight:600; line-height:1.4; color:#334155;">Description</p>
@@ -1986,27 +1990,39 @@ window.addEventListener('load', () => {
             {
                 selector: ".player-input-wrapper",
                 badge: "1/8 Profile",
+                badge_bm: "1/8 Profil",
                 title: "Your Player Profile",
+                title_bm: "Profil Pemain Anda",
                 desc: "Enter your name here to save your stars, scores, and progress on this device.",
+                desc_bm: "Masukkan nama anda di sini untuk menyimpan bintang, skor, dan kemajuan anda pada peranti ini.",
                 tip: "💡 Everything saves automatically.",
+                tip_bm: "💡 Semua kemajuan disimpan secara automatik.",
                 mode: "class",
                 closePeriodic: true
             },
             {
                 selector: "#challenge-stats-btn",
                 badge: "2/8 Records",
+                badge_bm: "2/8 Rekod",
                 title: "Career Records & Medals",
+                title_bm: "Rekod Kerjaya & Pingat",
                 desc: "Click the trophy to check your match history, best times, and earned badges.",
+                desc_bm: "Klik ikon trofi untuk menyemak sejarah perlawanan, masa terpantas, dan lencana yang diperoleh.",
                 tip: "🏆 Track your personal records anytime.",
+                tip_bm: "🏆 Pantau rekod peribadi anda pada bila-bila masa.",
                 mode: "class",
                 closePeriodic: true
             },
             {
                 selector: "#btn-periodic-widget",
                 badge: "3/8 Periodic Table",
+                badge_bm: "3/8 Jadual Berkala",
                 title: "Interactive Periodic Table Button",
+                title_bm: "Butang Jadual Berkala Interaktif",
                 desc: "Click this green beaker on the top right anytime to open the full interactive periodic table!",
+                desc_bm: "Klik bikar hijau di sudut kanan atas pada bila-bila masa untuk membuka jadual berkala interaktif yang lengkap!",
                 tip: "🧪 Click Open Table (or tap the beaker) to explore all 118 elements.",
+                tip_bm: "🧪 Klik Buka Jadual (atau ketik bikar) untuk menerokai kesemua 118 unsur.",
                 mode: "class",
                 closePeriodic: true,
                 openPeriodicNext: true
@@ -2014,52 +2030,76 @@ window.addEventListener('load', () => {
             {
                 selector: "#periodic-picker-modal .good-block.pt-grid-panel",
                 badge: "4/8 Explore Elements",
+                badge_bm: "4/8 Terokai Unsur",
                 title: "118 Chemical Elements",
+                title_bm: "118 Unsur Kimia",
                 desc: "Here are all 118 chemical elements! Hover or tap any tile to inspect atomic numbers, mass, and Bohr electron configurations.",
+                desc_bm: "Inilah kesemua 118 unsur kimia! Layangkan kursor atau ketik mana-mana petak untuk melihat nombor atom, jisim, dan konfigurasi elektron Bohr.",
                 tip: "🔬 Explore freely! Click Next when you are ready to continue.",
+                tip_bm: "🔬 Terokai secara bebas! Klik Seterusnya apabila anda sedia menyambung.",
                 openPeriodic: true
             },
             {
                 selector: "#btn-close-periodic",
                 badge: "4/8 Close Table",
+                badge_bm: "4/8 Tutup Jadual",
                 title: "Close Periodic Table",
+                title_bm: "Tutup Jadual Berkala",
                 desc: "Click the red ✕ button (or tap Next) to close the table and explore the game modes!",
+                desc_bm: "Klik butang merah ✕ (atau ketik Seterusnya) untuk menutup jadual dan menerokai mod permainan!",
                 tip: "👉 Up next: Class, Challenge, and Sandbox modes.",
+                tip_bm: "👉 Seterusnya: Mod Kelas, Cabaran, dan Eksperimen.",
                 promptClosePeriodic: true
             },
             {
                 selector: "#mode-class",
                 badge: "5/8 Syllabus",
+                badge_bm: "5/8 Sukatan Pelajaran",
                 title: "Class Mode: Form 4 & Form 5",
+                title_bm: "Mod Kelas: Tingkatan 4 & Tingkatan 5",
                 desc: "Practice balancing official SPM chemistry textbook reactions chapter by chapter.",
+                desc_bm: "Latih diri mengimbangi tindak balas kimia buku teks SPM rasmi mengikut bab.",
                 tip: "📘 Select Form 4 or Form 5 to view curriculum levels.",
+                tip_bm: "📘 Pilih Tingkatan 4 atau Tingkatan 5 untuk melihat tahap kurikulum.",
                 mode: "class",
                 closePeriodic: true
             },
             {
                 selector: "#mode-challenge",
                 badge: "6/8 Challenge",
+                badge_bm: "6/8 Cabaran",
                 title: "Challenge Mode & Modifiers",
+                title_bm: "Mod Cabaran & Pengubah Suai",
                 desc: "Race the clock! Select Easy, Medium, or Hard difficulty, and enable modifiers like No Scale or 90s Rush for up to 2.5x score multipliers.",
+                desc_bm: "Berlumba dengan masa! Pilih kesukaran Mudah, Sederhana, atau Sukar, dan aktifkan pengubah suai seperti Tanpa Neraca atau Pecutan 90s untuk pengganda markah hingga 2.5x.",
                 tip: "⚡ Modifiers give you extra points on the leaderboard.",
+                tip_bm: "⚡ Pengubah suai memberikan markah bonus tambahan di papan pendahulu.",
                 mode: "challenge",
                 closePeriodic: true
             },
             {
                 selector: "#mode-sandbox",
                 badge: "7/8 Sandbox",
+                badge_bm: "7/8 Eksperimen",
                 title: "Custom Equation Builder",
+                title_bm: "Pembina Persamaan Sendiri",
                 desc: "Build custom reactions! Use Create to build your own equations with the full periodic table keyboard, or explore community Levels.",
+                desc_bm: "Bina tindak balas tersuai! Gunakan Bina untuk membina persamaan menggunakan papan kekunci jadual berkala penuh, atau terokai koleksi Tahap.",
                 tip: "🧪 Great for testing custom exam questions.",
+                tip_bm: "🧪 Sangat sesuai untuk mencuba soalan peperiksaan sendiri.",
                 mode: "sandbox",
                 closePeriodic: true
             },
             {
                 selector: "#main-play-btn",
                 badge: "8/8 Tutorial",
+                badge_bm: "8/8 Tutorial",
                 title: "First Time Playing?",
+                title_bm: "Kali Pertama Bermain?",
                 desc: "Play our interactive tutorial level with a live dimmed spotlight guiding you through each balancing tool step by step!",
+                desc_bm: "Main tahap tutorial interaktif kami dengan sorotan lampu memandu anda memahami setiap alatan mengimbang langkah demi langkah!",
                 tip: "🚀 Tap Play Tutorial to get started!",
+                tip_bm: "🚀 Ketik Main Tutorial untuk memulakan!",
                 mode: "class",
                 closePeriodic: true,
                 isFinal: true
@@ -2168,40 +2208,53 @@ window.addEventListener('load', () => {
             }
 
             // 3. Render Card Text
-            document.getElementById('ht-badge').innerText = step.badge;
-            document.getElementById('ht-title').innerText = step.title;
-            document.getElementById('ht-desc').innerHTML = step.desc;
-            document.getElementById('ht-tip').innerHTML = step.tip;
+            const isBm = ((typeof getCurrentLanguage === 'function' ? getCurrentLanguage() : (window.stoich_lang || (typeof localStorage !== 'undefined' && localStorage.getItem('stoich_lang')))) === 'bm');
+            document.getElementById('ht-badge').innerText = (isBm && step.badge_bm) ? step.badge_bm : step.badge;
+            document.getElementById('ht-title').innerText = (isBm && step.title_bm) ? step.title_bm : step.title;
+            document.getElementById('ht-desc').innerHTML = (isBm && step.desc_bm) ? step.desc_bm : step.desc;
+            document.getElementById('ht-tip').innerHTML = (isBm && step.tip_bm) ? step.tip_bm : step.tip;
+
+            const headerNotes = document.getElementById('ht-header-notes');
+            if (headerNotes) {
+                headerNotes.innerText = isBm ? '📖 Nota' : '📖 Notes';
+                headerNotes.title = isBm ? 'Buka Panduan & Nota Guru' : 'Open Teaching Notes & Guide';
+            }
 
             const actions = document.getElementById('ht-actions');
+            const lblBack = isBm ? 'Kembali' : 'Back';
+            const lblNext = isBm ? 'Seterusnya →' : 'Next →';
+            const lblOpenTable = isBm ? 'Buka Jadual ➔' : 'Open Table ➔';
+            const lblCloseCont = isBm ? 'Tutup & Teruskan →' : 'Close & Continue →';
+            const lblNotes = isBm ? '📖 Nota' : '📖 Notes';
+            const lblTutorial = isBm ? '🎓 Main Tutorial' : '🎓 Play Tutorial';
 
             if (step.isFinal) {
                 actions.innerHTML = `
-                    <button onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 12px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
+                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 12px; font-weight:800; color:#475569; cursor:pointer;">${lblBack}</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="closeHomeTour(); openHelpGuideModal();" style="background:#3b82f6; border:2px solid #1d4ed8; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">📖 Notes</button>
-                        <button onclick="closeHomeTour(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=TUT0');" style="background:#10b981; border:2px solid #047857; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #047857;">🎓 Play Tutorial</button>
+                        <button onclick="closeHomeTour(); openHelpGuideModal();" style="background:#3b82f6; border:2px solid #1d4ed8; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">${lblNotes}</button>
+                        <button onclick="closeHomeTour(); if(typeof window.transitionTo==='function') window.transitionTo('game.html?level=TUT0');" style="background:#10b981; border:2px solid #047857; border-radius:10px; padding:6px 14px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #047857;">${lblTutorial}</button>
                     </div>
                 `;
             } else if (step.openPeriodicNext) {
                 actions.innerHTML = `
-                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
+                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer;">${lblBack}</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="nextHomeTourStep()" style="background:#059669; border:2px solid #047857; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #064e3b;">Open Table ➔</button>
+                        <button onclick="nextHomeTourStep()" style="background:#059669; border:2px solid #047857; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #064e3b;">${lblOpenTable}</button>
                     </div>
                 `;
             } else if (step.promptClosePeriodic) {
                 actions.innerHTML = `
-                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer;">Back</button>
+                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer;">${lblBack}</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="nextHomeTourStep()" style="background:#ef4444; border:2px solid #b91c1c; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #991b1b;">Close & Continue →</button>
+                        <button onclick="nextHomeTourStep()" style="background:#ef4444; border:2px solid #b91c1c; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #991b1b;">${lblCloseCont}</button>
                     </div>
                 `;
             } else {
                 actions.innerHTML = `
-                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer; opacity:${currentHomeStep === 0 ? '0.4' : '1'}; pointer-events:${currentHomeStep === 0 ? 'none' : 'auto'};">Back</button>
+                    <button id="ht-btn-back" onclick="prevHomeTourStep()" style="background:#f1f5f9; border:2px solid #cbd5e1; border-radius:10px; padding:6px 14px; font-weight:800; color:#475569; cursor:pointer; opacity:${currentHomeStep === 0 ? '0.4' : '1'}; pointer-events:${currentHomeStep === 0 ? 'none' : 'auto'};">${lblBack}</button>
                     <div style="display:flex; gap:8px;">
-                        <button onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">Next →</button>
+                        <button onclick="nextHomeTourStep()" style="background:#2563eb; border:2px solid #1d4ed8; border-radius:10px; padding:6px 16px; font-weight:900; color:#ffffff; cursor:pointer; box-shadow:0 3px 0 #1e40af;">${lblNext}</button>
                     </div>
                 `;
             }
@@ -2303,7 +2356,17 @@ window.addEventListener('load', () => {
             }
         }
     })();
-    </script>
+    
+        // Bilingual UI Live Update Listener for index.html
+        window.addEventListener('stoich_lang_changed', function(e) {
+            const tour = document.getElementById('home-spotlight-tour');
+            if (tour && window.getComputedStyle(tour).display !== 'none') {
+                if (typeof renderHomeStep === 'function') renderHomeStep(currentHomeStep);
+            }
+            if (typeof updatePlayButton === 'function') updatePlayButton();
+            if (typeof updateHomeMultiplier === 'function') updateHomeMultiplier();
+        });
+</script>
 
 
 <!-- Prof. Bunsen AI Conversational Chat Modal (Neubrutalist Pop UI) -->
@@ -2325,12 +2388,12 @@ window.addEventListener('load', () => {
             <div style="display:flex; align-items:center; gap:12px;">
                 <button type="button" id="toggle-saved-btn" onclick="window.openSavedSidebar()" class="bunsen-neubrutal-btn" 
                     style="background:#fde047; border-radius:14px; padding:9px 18px; font-weight:900; font-size:14px; color:#1a1a1a; gap:6px;">
-                    <span>📁 Saved (<span id="ai-saved-count">0</span>)</span>
+                    <span><span data-i18n="bunsen_saved_btn">📁 Saved</span> (<span id="ai-saved-count">0</span>)</span>
                 </button>
                 <button type="button" class="bunsen-neubrutal-btn" onclick="window.restartBunsenChat()" title="Start New Conversation"
                     style="background:#ffffff; border-radius:14px; padding:9px 18px; font-weight:900; font-size:14px; color:#1a1a1a; gap:6px;">
                     <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    <span>New Chat</span>
+                    <span data-i18n="bunsen_new_chat">New Chat</span>
                 </button>
                 <button type="button" class="bunsen-neubrutal-btn" onclick="window.closeAiLevelModal()" title="Close"
                     style="background:#ff6b6b; border-radius:14px; width:44px; height:44px; color:#ffffff; font-size:20px; font-weight:900;">
@@ -2351,36 +2414,36 @@ window.addEventListener('load', () => {
             <div style="display:flex; align-items:center; gap:12px; overflow:hidden;">
                 <span style="white-space:nowrap; flex-shrink:0; font-size:12px; font-weight:900; color:#6b7280; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:6px;">
                     <svg style="width:14px; height:14px;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
-                    Ask Bunsen:
+                    <span data-i18n="bunsen_ask_label">Ask Bunsen:</span>
                 </span>
                 <div style="flex:1; display:flex; gap:10px; overflow-x:auto; padding:4px 2px 8px 2px;">
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Can you suggest a friendly starter reaction for a beginner to practice?')">
-                        🧪 Friendly Starter
+                        <span data-i18n="bunsen_chip_starter">🧪 Friendly Starter</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Can you recommend an exciting fiery combustion reaction to balance?')">
-                        🔥 Fiery Combustion
+                        <span data-i18n="bunsen_chip_combustion">🔥 Fiery Combustion</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Can you recommend a colourful precipitate reaction and explain what happens?')">
-                        🌧️ Precipitate Reaction
+                        <span data-i18n="bunsen_chip_precipitate">🌧️ Precipitate Reaction</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Test my skills with a tricky Form 5 SPM chemistry exam reaction!')">
-                        🎯 Tough SPM Challenge
+                        <span data-i18n="bunsen_chip_spm">🎯 Tough SPM Challenge</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Can you explain the MINOH rule and how to balance equations step by step?')">
-                        💡 Explain MINOH Rule
+                        <span data-i18n="bunsen_chip_minoh">💡 Explain MINOH Rule</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('What happens when alkali metals react with water? Give me an equation to balance!')">
-                        ⚡ Alkali Metal & Water
+                        <span data-i18n="bunsen_chip_alkali">⚡ Alkali Metal & Water</span>
                     </button>
                     <button type="button" class="bunsen-chip-neubrutal" onclick="window.sendBunsenPrompt('Give me a powerful rocket fuel chemical reaction to balance!')">
-                        🚀 Rocket Fuel
+                        <span data-i18n="bunsen_chip_rocket">🚀 Rocket Fuel</span>
                     </button>
                 </div>
             </div>
 
             <!-- Input Area -->
             <div style="display:flex; gap:12px; align-items:center;">
-                <input type="text" id="bunsen-chat-input" placeholder="Ask Prof. Bunsen for reaction ideas, formulas, or recommendations in any language..." 
+                <input type="text" id="bunsen-chat-input" placeholder="Ask Prof. Bunsen for reaction ideas, formulas, or recommendations in any language..." data-i18n-placeholder="ask_bunsen_placeholder" 
                     style="flex:1; height:52px; background:#f4f5f0; border:2.5px solid #1a1a1a; border-radius:18px; padding:0 20px; font-weight:800; font-size:16px; color:#1a1a1a; box-shadow:3.5px 3.5px 0px #1a1a1a; outline:none; font-family:inherit; transition:background 0.15s, box-shadow 0.15s;"
                     onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.sendBunsenMessage(); }">
                 <button type="button" id="bunsen-send-btn" class="bunsen-neubrutal-btn" onclick="window.sendBunsenMessage()" title="Send Message"
@@ -2401,7 +2464,7 @@ window.addEventListener('load', () => {
             <!-- Sidebar Header -->
             <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:4px solid #1a1a1a; background:#fde047; flex-shrink:0;">
                 <h2 style="margin:0; font-size:20px; font-weight:900; color:#1a1a1a; display:flex; align-items:center; gap:8px;">
-                    📁 Saved Reactions
+                    <span data-i18n="bunsen_sidebar_title">📁 Saved Reactions</span>
                 </h2>
                 <button type="button" id="close-sidebar-btn" onclick="window.closeSavedSidebar()" class="bunsen-neubrutal-btn" 
                     style="background:#ff6b6b; border-radius:12px; width:38px; height:38px; font-weight:900; color:#ffffff; font-size:18px;">
