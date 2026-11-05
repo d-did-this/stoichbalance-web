@@ -33,7 +33,7 @@
 
             // Scale floating corner widgets proportionally
             const widgetScale = Math.min(Math.max(scale, 0.72), 1.0);
-            document.querySelectorAll('.fun-widget, .btn-fullscreen-toggle').forEach(w => {
+            document.querySelectorAll('.fun-widget, .btn-fullscreen-toggle, #fullscreen-nudge-bubble, .btn-lang-toggle').forEach(w => {
                 w.style.zoom = widgetScale;
             });
         }
@@ -61,10 +61,10 @@
                 levelsContainer.style.maxHeight = '';
             }
 
-            const fsBtn = document.querySelector('.btn-fullscreen-toggle');
-            if (fsBtn) {
-                fsBtn.style.zoom = Math.min(Math.max(scale, 0.72), 1.0);
-            }
+            const cornerBtns = document.querySelectorAll('.btn-fullscreen-toggle, .btn-lang-toggle');
+            cornerBtns.forEach(btn => {
+                btn.style.zoom = Math.min(Math.max(scale, 0.72), 1.0);
+            });
         }
 
         // Auto-scale Game Dashboard stage for tablets and compact landscape screens
