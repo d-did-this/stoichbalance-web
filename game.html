@@ -2565,6 +2565,7 @@
 
     </style>
 
+    <script src="js/translations.js"></script>
     <script src="js/levels.js?v=1792976306"></script>
     <script src="js/game.js?v=1793787661"></script>
 
@@ -3605,7 +3606,7 @@ window.addEventListener('load', () => {
         </div>
 
         <!-- Red How to Play Button -->
-        <button id="btn-how-to-play" class="legacy-btn has-chem-info" data-info="settings-help" onclick="if(typeof playSound==='function') playSound('click'); window.openTutorial();" style="width: 52px; height: 52px; border-radius: 50%; background: #ef4444; color: #ffffff; border: 4px solid #b91c1c; box-shadow: 0 4px 0 #b91c1c; font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;" onmouseover="this.style.transform='scale(1.06) translateY(-2px)'" onmouseout="this.style.transform='scale(1) translateY(0)'" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='0 1px 0 #b91c1c';" onmouseup="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 4px 0 #b91c1c';" title="How to Play?">?</button>
+        <button id="btn-how-to-play" class="legacy-btn has-chem-info" data-info="settings-help" onclick="if(typeof playSound==='function') playSound('click'); window.openTutorial();" style="width: 52px; height: 52px; border-radius: 50%; background: #ef4444; color: #ffffff; border: 4px solid #b91c1c; box-shadow: 0 4px 0 #b91c1c; font-size: 1.5rem; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s;" onmouseover="this.style.transform='scale(1.06) translateY(-2px)'" onmouseout="this.style.transform='scale(1) translateY(0)'" onmousedown="this.style.transform='translateY(3px)'; this.style.boxShadow='0 1px 0 #b91c1c';" onmouseup="this.style.transform='scale(1) translateY(0)'; this.style.boxShadow='0 4px 0 #b91c1c';" data-i18n-title="game_how_to_play" title="How to Play?">?</button>
     </div>
 
     
@@ -3614,13 +3615,13 @@ window.addEventListener('load', () => {
         <button id="btn-side-scale" class="side-tab-btn active-tab has-chem-info" data-info="mode-scale" onclick="window.switchViewMode('scale')" data-tooltip="Scale View">
             <div style="display:flex; flex-direction:column; align-items:center;">
                 <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">SCALE</span>
+                <span data-i18n="game_scale" style="font-size: 10px; font-weight: 900; margin-top: 2px;">SCALE</span>
             </div>
         </button>
         <button id="btn-side-bar" class="side-tab-btn has-chem-info" data-info="mode-bar" onclick="window.switchViewMode('bar')" data-tooltip="Bar View">
             <div style="display:flex; flex-direction:column; align-items:center;">
                 <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span style="font-size: 10px; font-weight: 900; margin-top: 2px;">BAR</span>
+                <span data-i18n="game_bar" style="font-size: 10px; font-weight: 900; margin-top: 2px;">BAR</span>
             </div>
         </button>
         </div>
@@ -3629,12 +3630,12 @@ window.addEventListener('load', () => {
         <!-- Block 1: Top Bar -->
         <div class="good-block block-top" style="display: flex; justify-content: center; align-items: center; min-height: 80px; position: relative;">
             <button class="btn-back interactive" onclick="window.handleGameBackClick()" style="position: absolute; left: 20px;">
-                <span class="back-icon">◀</span> Back
+                <span class="back-icon">◀</span> <span data-i18n="game_back">Back</span>
             </button>
             <div id="challenge-hud-pills" style="display:none; position:absolute; right:20px; align-items:center; gap:12px;">
                 <button id="challenge-test-timeout-btn" class="interactive has-chem-info" data-info="btn-test-timeout" onclick="window.handleChallengeTimeout()" title="Developer Quick Test: Trigger Timeout" style="height:38px; padding:0 14px; background:#fef2f2; color:#dc2626; border:2.5px solid #ef4444; border-radius:14px; font-weight:900; font-size:0.85rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 3px 0 #b91c1c; box-sizing:border-box; transition:transform 0.1s, box-shadow 0.1s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 0 #b91c1c';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 0 #b91c1c';" onmousedown="this.style.transform='translateY(2px)'; this.style.boxShadow='0 1px 0 #b91c1c';">
                     <span>⏰</span>
-                    <span>Test Timeout</span>
+                    <span data-i18n="game_test_timeout">Test Timeout</span>
                 </button>
                 <div id="challenge-diff-pill" class="lvl-diff diff-easy has-chem-info" data-info="challenge-diff">Easy</div>
                 <div id="challenge-timer-badge" class="timer-pill-tactile has-chem-info" data-info="challenge-timer">
@@ -3658,7 +3659,7 @@ window.addEventListener('load', () => {
                 <button class="rect-btn has-chem-info" data-info="btn-tray" onclick="toggleBlock('left')">
                     <span class="btn-text-full" style="display:flex; align-items:center; justify-content:center; white-space:nowrap; gap:8px;">
                         <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        Element Trays
+                        <span data-i18n="game_element_trays">Element Trays</span>
                     </span>
                     <span class="btn-text-short">
                         <svg style="width:32px;height:32px;margin:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -3707,19 +3708,19 @@ window.addEventListener('load', () => {
     <div id="section-bar-graph" class="grid-section" style="display: none; align-items: center; justify-content: space-between; position: relative; background: #ffffff; border: 4px solid #1e293b; border-radius: 20px; box-shadow: 0 6px 0 #1e293b; padding: 14px 24px; box-sizing: border-box; height: 220px; margin: 0; margin-bottom: 12px; z-index: 5; flex-shrink: 0; width: 100%;">
         <!-- Reactants Column Group -->
         <div style="display: flex; flex-direction: column; align-items: center; height: 100%; flex: 1; min-width: 0;">
-            <span style="font-size: 0.72rem; font-weight: 900; text-transform: uppercase; color: #2563eb; letter-spacing: 1px; margin-bottom: 2px;">Reactants</span>
+            <span data-i18n="reactants" style="font-size: 0.72rem; font-weight: 900; text-transform: uppercase; color: #2563eb; letter-spacing: 1px; margin-bottom: 2px;">Reactants</span>
             <div id="bar-graph-reactants" style="display: flex; gap: 24px; align-items: flex-end; justify-content: center; height: calc(100% - 18px); width: 100%;"></div>
         </div>
 
         <!-- Center Equator Divider & Equality Status -->
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 16px; border-left: 2.5px dashed #cbd5e1; border-right: 2.5px dashed #cbd5e1; height: 80%;">
             <div id="bar-graph-symbol" style="font-size: 2.6rem; font-weight: 900; line-height: 1; color: #1e3a8a; font-family: 'Fredoka', system-ui, sans-serif; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);">&#8800;</div>
-            <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px; margin-top: 4px;">EQUILIBRIUM</span>
+            <span data-i18n="game_equilibrium" style="font-size: 10px; font-weight: 900; text-transform: uppercase; color: #64748b; letter-spacing: 0.8px; margin-top: 4px;">EQUILIBRIUM</span>
         </div>
 
         <!-- Products Column Group -->
         <div style="display: flex; flex-direction: column; align-items: center; height: 100%; flex: 1; min-width: 0;">
-            <span style="font-size: 0.72rem; font-weight: 900; text-transform: uppercase; color: #ea580c; letter-spacing: 1px; margin-bottom: 2px;">Products</span>
+            <span data-i18n="products" style="font-size: 0.72rem; font-weight: 900; text-transform: uppercase; color: #ea580c; letter-spacing: 1px; margin-bottom: 2px;">Products</span>
             <div id="bar-graph-products" style="display: flex; gap: 24px; align-items: flex-end; justify-content: center; height: calc(100% - 18px); width: 100%;"></div>
         </div>
     </div>
@@ -3747,7 +3748,7 @@ window.addEventListener('load', () => {
             <div class="panel-card" style="border: 4px solid #000000; border-radius: 16px; background: #ffffff; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0;">
                 
                 <!-- FULL WIDTH HEADER -->
-                <div class="header-react" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">REACTANTS</div>
+                <div class="header-react" data-i18n="reactants" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">REACTANTS</div>
                 
                 <!-- GRID 1: Molecule Buttons -->
                 <div id="react-btn-container" style="padding: 10px 8px; display: flex; justify-content: center; gap: 8px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
@@ -3756,7 +3757,7 @@ window.addEventListener('load', () => {
 </div>
                 
                 <!-- GRID 2: Blocks Drop Zone -->
-                <div id="react-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='react') window.addMolecule('react', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-react">Drop Reactants Here</div></div>
+                <div id="react-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='react') window.addMolecule('react', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-react" data-i18n="drop_reactants">Drop Reactants Here</div></div>
                 
                 <!-- Footer Counters with 2D Marbles -->
                 <div id="footer-react" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
@@ -3768,7 +3769,7 @@ window.addEventListener('load', () => {
             <div class="panel-card" style="border: 4px solid #000000; border-radius: 16px; background: #ffffff; display: flex; flex-direction: column; flex: 1; overflow: hidden; min-height: 0;">
                 
                 <!-- FULL WIDTH HEADER -->
-                <div class="header-prod" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">PRODUCTS</div>
+                <div class="header-prod" data-i18n="products" style="font-size: 1.2rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; color: white;">PRODUCTS</div>
                 
                 <!-- GRID 1: Molecule Buttons -->
                 <div id="prod-btn-container" style="padding: 10px 8px; display: flex; justify-content: center; gap: 8px; background: #f8fafc; border-bottom: 4px solid #e2e8f0;">
@@ -3777,7 +3778,7 @@ window.addEventListener('load', () => {
 </div>
                 
                 <!-- GRID 2: Blocks Drop Zone -->
-                <div id="prod-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='prod') window.addMolecule('prod', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-prod">Drop Products Here</div></div>
+                <div id="prod-drop-container" ondragover="event.preventDefault()" ondrop="event.preventDefault(); let data=event.dataTransfer.getData('text/plain').split(','); if(data[0]==='prod') window.addMolecule('prod', data[1]);" style="padding: 15px; display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; overflow-x: hidden; background: #ffffff;"> <div class="drop-placeholder" id="placeholder-prod" data-i18n="drop_products">Drop Products Here</div></div>
                 
                 <!-- Footer Counters with 2D Marbles -->
                 <div id="footer-prod" class="panel-footer" style="height: 40px; border-top: 4px solid #000000; display: flex;"></div>
@@ -3813,11 +3814,11 @@ window.addEventListener('load', () => {
                         <!-- Pinned Chat Conversation Bottom Bar -->
                         <div class="chat-conversation-footer-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: #ffffff; border-top: 2px solid #e2e8f0; flex-shrink: 0;">
                             <span style="font-size: 0.72rem; color: #64748b; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
-                                <svg style="width: 14px; height: 14px; flex-shrink: 0; color: #d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> <span>AI makes mistakes too</span>
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0; color: #d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> <span data-i18n="game_ai_mistakes">AI makes mistakes too</span>
                             </span>
                             <button id="btn-open-study-room" onclick="if(typeof playSound==='function') playSound('click'); window.openStudyRoomModal();" title="Expand Study Room" class="study-room-pill-btn has-chem-info" data-info="btn-study-room">
                                 <svg style="width: 13px; height: 13px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                                <span>Study Room</span>
+                                <span data-i18n="game_study_room">Study Room</span>
                             </button>
                         </div>
                     </div>
@@ -3832,22 +3833,22 @@ window.addEventListener('load', () => {
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                     </svg>
                                 </span>
-                                <span id="clue-btn-dynamic-text" class="clue-btn-label" style="font-size: 0.92rem; font-weight: 800; letter-spacing: 0.3px; text-align: center; flex: initial !important; margin: 0 !important;">I am Stuck! Help!</span>
+                                <span id="clue-btn-dynamic-text" class="clue-btn-label" data-i18n="game_stuck_help" style="font-size: 0.92rem; font-weight: 800; letter-spacing: 0.3px; text-align: center; flex: initial !important; margin: 0 !important;">I am Stuck! Help!</span>
                             </button>
-                            <button class="btn-trash has-chem-info" data-info="settings-clear-chat" onclick="clearChat(true)" title="Clear Chat" style="width: 35px !important; min-width: 35px !important; height: 35px !important; border-radius: 12px !important; border: 2.5px solid #1e293b !important; box-shadow: 0 3px 0 #1e293b !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0;">
+                            <button class="btn-trash has-chem-info" data-info="settings-clear-chat" onclick="clearChat(true)" data-i18n-title="game_clear_chat" title="Clear Chat" style="width: 35px !important; min-width: 35px !important; height: 35px !important; border-radius: 12px !important; border: 2.5px solid #1e293b !important; box-shadow: 0 3px 0 #1e293b !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0;">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px !important; height: 18px !important;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
 
                         <!-- 2. Full-Width Textarea with Integrated Inside Send Button -->
                         <div style="position: relative; width: 100%;">
-                            <textarea id="beaker-chat-input" placeholder="Ask Prof. Beaker in any language about chemistry!" rows="2" maxlength="250"
+                            <textarea id="beaker-chat-input" data-i18n-placeholder="game_ask_beaker_placeholder" placeholder="Ask Prof. Beaker in any language about chemistry!" rows="2" maxlength="250"
                                 style="width: 100%; height: 68px; min-height: 68px; resize: none; border-radius: 14px; border: 2.5px solid #cbd5e1; padding: 10px 46px 10px 12px; font-size: 0.92rem; font-weight: 700; color: #1e293b; background: #ffffff; outline: none; font-family: inherit; line-height: 1.4; transition: all 0.2s; box-sizing: border-box; display: block;"
                                 onfocus="this.style.borderColor='#3b82f6'; this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.15)';"
                                 onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';"
                                 onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitBeakerInput(); }"
                             ></textarea>
-                            <button id="btn-beaker-send" class="has-chem-info" data-info="btn-ask-beaker" onclick="window.submitBeakerInput()" title="Send question" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 10px; background: #3b82f6; color: white; border: 2px solid #1d4ed8; box-shadow: 0 2px 0 #1d4ed8; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.1s, box-shadow 0.1s;">
+                            <button id="btn-beaker-send" class="has-chem-info" data-info="btn-ask-beaker" onclick="window.submitBeakerInput()" data-i18n-title="game_send_question" title="Send question" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 10px; background: #3b82f6; color: white; border: 2px solid #1d4ed8; box-shadow: 0 2px 0 #1d4ed8; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.1s, box-shadow 0.1s;">
                                 <svg style="width: 16px; height: 16px; color: #ffffff; display: block;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
                                 </svg>
@@ -3897,6 +3898,7 @@ window.addEventListener('load', () => {
 
 
 
+    <script src="js/translations.js"></script>
     <script src="js/element_data.js"></script>
     <script src="js/info_cards.js?v=1793787661"></script>
     <script src="js/tutorial.js?v=1793787661"></script>
@@ -3912,7 +3914,7 @@ window.addEventListener('load', () => {
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 40px; height: 40px; border-radius: 12px; background: #facc15; color: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; box-shadow: 0 3px 0 #ca8a04;">🧪</div>
                 <div>
-                    <h2 style="margin: 0; font-size: 1.25rem; font-weight: 900; letter-spacing: 0.5px;">Prof. Beaker's Chemistry Study Room</h2>
+                    <h2 data-i18n="game_study_room_title" style="margin: 0; font-size: 1.25rem; font-weight: 900; letter-spacing: 0.5px;">Prof. Beaker's Chemistry Study Room</h2>
                     <div id="study-room-level-name" style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">Level 1 : Haber Process</div>
                 </div>
             </div>
@@ -3925,54 +3927,54 @@ window.addEventListener('load', () => {
             <!-- Left Column: Pedagogical Visual Breakdown -->
             <div style="width: 48%; border-right: 3px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; background: #ffffff;">
                 <div style="background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px; padding: 12px 16px;">
-                    <div style="font-size: 0.75rem; font-weight: 900; color: #16a34a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Reaction Under Study</div>
+                    <div data-i18n="game_reaction_under_study" style="font-size: 0.75rem; font-weight: 900; color: #16a34a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">Reaction Under Study</div>
                     <div id="study-room-equation" style="font-size: 1.15rem; font-weight: 900; color: #0f172a; font-family: 'Nunito', sans-serif;"></div>
                 </div>
 
                 <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 12px 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <div style="font-size: 0.75rem; font-weight: 900; color: #2563eb; text-transform: uppercase; letter-spacing: 0.8px;">Conservation of Mass • Visual Atom Scales</div>
-                        <span style="font-size: 0.72rem; color: #64748b; font-weight: 800;">LHS vs RHS</span>
+                        <div data-i18n="game_conservation_of_mass" style="font-size: 0.75rem; font-weight: 900; color: #2563eb; text-transform: uppercase; letter-spacing: 0.8px;">Conservation of Mass • Visual Atom Scales</div>
+                        <span data-i18n="game_lhs_vs_rhs" style="font-size: 0.72rem; color: #64748b; font-weight: 800;">LHS vs RHS</span>
                     </div>
                     <div id="study-room-mass-table" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
 
                 <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.75rem; font-weight: 900; color: #b45309; text-transform: uppercase; letter-spacing: 0.8px;">SPM Strategy • The MINOH Method</span>
-                        <span style="font-size: 0.7rem; font-weight: 800; background: #fef3c7; color: #92400e; padding: 1px 6px; border-radius: 6px;">Recommended Order</span>
+                        <span data-i18n="game_spm_strategy_minoh" style="font-size: 0.75rem; font-weight: 900; color: #b45309; text-transform: uppercase; letter-spacing: 0.8px;">SPM Strategy • The MINOH Method</span>
+                        <span data-i18n="game_recommended_order" style="font-size: 0.7rem; font-weight: 800; background: #fef3c7; color: #92400e; padding: 1px 6px; border-radius: 6px;">Recommended Order</span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr; gap: 5px; font-size: 0.82rem; font-weight: 700; color: #78350f;">
                         <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 8px;">
                             <span style="background: #ef4444; color: white; font-weight: 900; border-radius: 6px; padding: 1px 6px; font-size: 0.72rem;">M</span>
-                            <span style="font-weight: 800; color: #1e293b; min-width: 90px;">Metals First</span>
+                            <span data-i18n="game_minoh_m" style="font-weight: 800; color: #1e293b; min-width: 90px;">Metals First</span>
                             <span style="color: #64748b; font-size: 0.78rem;">Na, Mg, Fe, Zn, Ca, Cu</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 8px;">
                             <span style="background: #8b5cf6; color: white; font-weight: 900; border-radius: 6px; padding: 1px 6px; font-size: 0.72rem;">I</span>
-                            <span style="font-weight: 800; color: #1e293b; min-width: 90px;">Polyatomic Ions</span>
-                            <span style="color: #64748b; font-size: 0.78rem;">SO₄, NO₃, CO₃ (if intact)</span>
+                            <span data-i18n="game_minoh_i" style="font-weight: 800; color: #1e293b; min-width: 90px;">Polyatomic Ions</span>
+                            <span data-i18n="game_minoh_i_sub" style="color: #64748b; font-size: 0.78rem;">SO₄, NO₃, CO₃ (if intact)</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 8px;">
                             <span style="background: #3b82f6; color: white; font-weight: 900; border-radius: 6px; padding: 1px 6px; font-size: 0.72rem;">N</span>
-                            <span style="font-weight: 800; color: #1e293b; min-width: 90px;">Non-Metals</span>
+                            <span data-i18n="game_minoh_n" style="font-weight: 800; color: #1e293b; min-width: 90px;">Non-Metals</span>
                             <span style="color: #64748b; font-size: 0.78rem;">C, Cl, N, S, P</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 8px;">
                             <span style="background: #0ea5e9; color: white; font-weight: 900; border-radius: 6px; padding: 1px 6px; font-size: 0.72rem;">O</span>
-                            <span style="font-weight: 800; color: #1e293b; min-width: 90px;">Oxygen</span>
-                            <span style="color: #64748b; font-size: 0.78rem;">Leave for the end</span>
+                            <span data-i18n="game_minoh_o" style="font-weight: 800; color: #1e293b; min-width: 90px;">Oxygen</span>
+                            <span data-i18n="game_minoh_o_sub" style="color: #64748b; font-size: 0.78rem;">Leave for the end</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 8px;">
                             <span style="background: #10b981; color: white; font-weight: 900; border-radius: 6px; padding: 1px 6px; font-size: 0.72rem;">H</span>
-                            <span style="font-weight: 800; color: #1e293b; min-width: 90px;">Hydrogen</span>
-                            <span style="color: #64748b; font-size: 0.78rem;">Balances out last!</span>
+                            <span data-i18n="game_minoh_h" style="font-weight: 800; color: #1e293b; min-width: 90px;">Hydrogen</span>
+                            <span data-i18n="game_minoh_h_sub" style="color: #64748b; font-size: 0.78rem;">Balances out last!</span>
                         </div>
                     </div>
 
                     <div style="font-size: 0.76rem; color: #92400e; font-weight: 800; border-top: 1px dashed #fde68a; padding-top: 6px; display: flex; align-items: center; gap: 4px;">
-                        <span>💡</span> <span>Rule: Change big molecule coefficients only, never small subscripts!</span>
+                        <span>💡</span> <span data-i18n="game_minoh_rule_banner">Rule: Change big molecule coefficients only, never small subscripts!</span>
                     </div>
                 </div>
             </div>
@@ -3984,20 +3986,20 @@ window.addEventListener('load', () => {
 
                 <!-- Suggested Chips -->
                 <div style="display: flex; gap: 8px; margin: 10px 0; overflow-x: auto; padding-bottom: 4px;">
-                    <button class="beaker-chip" onclick="window.sendStudyRoomPrompt('How do I balance this step by step?')">📝 Step-by-step balance</button>
-                    <button class="beaker-chip" onclick="window.sendStudyRoomPrompt('Why do we change coefficients instead of subscripts?')">🔬 Why not subscripts?</button>
-                    <button class="beaker-chip" onclick="window.sendStudyRoomPrompt('What does this reaction do in real life?')">🌍 Real-world application</button>
+                    <button class="beaker-chip" data-i18n="game_chip_step_by_step" onclick="window.sendStudyRoomPrompt('How do I balance this step by step?')">📝 Step-by-step balance</button>
+                    <button class="beaker-chip" data-i18n="game_chip_why_not_subscripts" onclick="window.sendStudyRoomPrompt('Why do we change coefficients instead of subscripts?')">🔬 Why not subscripts?</button>
+                    <button class="beaker-chip" data-i18n="game_chip_real_world" onclick="window.sendStudyRoomPrompt('What does this reaction do in real life?')">🌍 Real-world application</button>
                 </div>
 
                 <!-- Input Row -->
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <input type="text" id="study-room-input" placeholder="Ask Prof. Beaker any chemistry question..." 
+                    <input type="text" id="study-room-input" data-i18n-placeholder="game_study_room_input_ph" placeholder="Ask Prof. Beaker any chemistry question..." 
                         style="flex: 1; height: 46px; border-radius: 14px; border: 2.5px solid #cbd5e1; padding: 0 16px; font-size: 0.95rem; font-weight: 700; color: #1e293b; background: #ffffff; outline: none;"
                         onkeydown="if(event.key==='Enter') window.submitStudyRoomInput();"
                     />
                     <button id="btn-study-room-send" onclick="window.submitStudyRoomInput()" 
                         style="height: 46px; padding: 0 20px; border-radius: 14px; background: #3b82f6; color: white; border: 2.5px solid #1d4ed8; box-shadow: 0 3px 0 #1d4ed8; font-weight: 900; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                        <span>Send</span>
+                        <span data-i18n="game_send">Send</span>
                         <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                     </button>
                 </div>
