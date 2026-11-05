@@ -191,3 +191,19 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
   - `.level7-scaled` CSS class streamlines token footprint: `.sci-coeff` (0.85rem, 1px 5px padding, 22px min-width), `.sci-formula` (0.92rem), `.state-label` (0.72rem), and 3px molecule gaps.
   - `autoFitEquation()` dynamically computes inward proportional scaling (`transform-origin: left center` on reactants, `transform-origin: right center` on products) with an 8px safety buffer.
   - Guarantees $+20.22\text{px}$ clearance between the centered arrow and $\text{NaCl}$ on desktop and $+13.52\text{px}$ on laptops, maintaining single horizontal row elegance and zero regressions on other levels.
+
+## 11. Bilingual Translation Engine & KSSM SPM Nomenclature (`js/translations.js`)
+* **Dual-Language Dictionary Architecture**:
+  - Centralized module (`js/translations.js`) providing official Malaysian Ministry of Education (MOE) KSSM SPM Chemistry terms in English (`en`) and Bahasa Melayu (`bm`).
+  - Contains 299 comprehensive translation keys covering static DOM, 7 modal dialogs, spotlight tour engine, periodic table element metadata, career badge archives, level select grids, and all in-game HUD/dialogue components.
+  - Contextual localization: translated according to educational and scientific context (e.g. "Mod Eksperimen" / "Tahap Eksperimen" for Sandbox Mode, "Tingkatan 4" / "Tingkatan 5" for curriculum tiers, "Tanpa Neraca" for No Scale modifier, "Hukum Keabadian Jisim" for Law of Conservation of Mass).
+  - Authentic KSSM SPM Element Nomenclature (`KSSM_ELEMENT_NAMES`): Natrium (Na), Kalium (K), Plumbum (Pb), Ferum (Fe), Kuprum (Cu), Argentum (Ag), Zink (Zn), Kalsium (Ca), Magnesium (Mg), etc.
+  - Physical States of Matter Mapping (`STATE_MAP_BM`): `(s)` -> `(p)` [pepejal], `(l)` -> `(ce)` [cecair], `(g)` -> `(g)` [gas], and `(aq)` -> `(ak)` [akueus]. Stored losslessly in DOM attributes via `data-state`.
+  - Persistent state saved to `localStorage.getItem('stoich_lang') || 'en'`.
+* **Zero-Reload Dynamic Re-Rendering**:
+  - `window.applyTranslations()` processes `[data-i18n]`, `[data-i18n-placeholder]`, and `[data-i18n-title]` attributes.
+  - Fires the `stoich_lang_changed` CustomEvent, allowing open game arenas, level select grids, active tours, play buttons, and menus to re-render text dynamically without triggering page refreshes.
+  - Spotlight Tour engine dynamically selects `badge_bm`, `title_bm`, `desc_bm`, `tip_bm`, and localized navigation buttons (`Kembali`, `Seterusnya →`, `Buka Jadual ➔`, `Tutup & Teruskan →`, `📖 Nota`, `🎓 Main Tutorial`).
+  - Level Selection Viewport (`levels.html`): `window.renderCurrentView()` dynamically dispatches to `renderSyllabusLevelsScreen()`, `renderSandboxLevelsScreen()`, or `renderChallengeScreen()`, translating level names (`Proses Haber`, `Pengoksidaan Magnesium`), difficulty chips (`Mudah`, `Sederhana`, `Sukar`), action banners (`MAIN`, `ULANGKAJI`), pagination controls (`◀ Sebelum`, `Seterusnya ▶`), and Sandbox empty/custom states (`Belum Ada Tahap Eksperimen!`, `Ciptaan`, `Bina Tahap Baru`).
+  - In-Game Gameplay Engine (`game.html` & `js/game.js`): Re-renders level title prefixes ("Tahap X : ...", "Eksperimen : ..."), drop zone headers (`BAHAN TINDAK BALAS` / `HASIL TINDAK BALAS`), Element Tray cards, scale headers (`BAHAN` / `HASIL`), Socratic Clue button dynamic text ("Saya Buntu! Tolong!" / "Beri saya jawapan!"), Prof. Beaker pedagogical responses, Study Room modal breakdown, Victory celebration popups (`SEIMBANG SEMPURNA!`, `ULANGKAJI`, `TAHAP SETERUSNYA ▶`), and Challenge Mode timeout / round celebration modals.
+  - Centralized tactile yellow language toggle button (`#btn-lang-toggle`) resides exclusively on `index.html`, persisting the user's selected language via `localStorage` to govern all child pages (`levels.html`, `game.html`).
