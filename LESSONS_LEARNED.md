@@ -388,3 +388,78 @@
   2. Applied `.level7-scaled` CSS class specifically to Level 7 to streamline UI tokens: `.sci-coeff` (0.85rem, 1px 5px padding, 22px min-width), `.sci-formula` (0.92rem), `.state-label` (0.72rem), and compact molecule gaps (3px).
   3. Integrated Level 7 into `window.autoFitEquation()` with inward dynamic scaling (`transform-origin: left center` on reactants, `transform-origin: right center` on products) and an 8px safe buffer. This delivers $+20.22\text{px}$ clearance on desktop and $+13.52\text{px}$ on laptops with zero overlap.
   4. Preserved 100% isolation across all other 19 levels.
+
+
+### 7. Dual-Language Architecture & Event-Driven DOM Localization (11/05/2026)
+- **Problem**: Adding bilingual support (Bahasa Melayu / English) without introducing layout breaks, text overflow, or requiring full page reloads.
+- **Root Cause**: Hardcoded strings across multiple view templates (`index.html`, `levels.html`, `game.html`) and decoupled level metadata in `levels.js`.
+- **Solution**:
+  1. Built `js/translations.js` containing complete KSSM SPM Chemistry dictionaries and level title mappings.
+  2. Implemented `stoich_lang_changed` CustomEvent to trigger instant localized re-renders across the top bar, status indicators, and drop zone containers without resetting game state or reloading the page.
+  3. Ensured `levelId` lookup references `currentLevelData.id` or URL parameters safely inside event listeners to prevent scope reference errors.
+
+
+### 8. Contextual Bahasa Melayu Translation & UI Invariant Assertions for index.html (11/05/2026)
+- **Problem**:
+  1. Direct literal translations produce unnatural and nonsensical Malay phrases in a laboratory setting (e.g. translating "Sandbox Mode" to "Mod Kotak Pasir" instead of educational "Mod Eksperimen").
+  2. Modals and dynamically rendered components (Spotlight Tour, Interactive Periodic Table element inspector, Career Archive Badges, Prof. Bunsen AI chat chips) bypassed initial static translation passes.
+  3. Automated browser tests failed unexpectedly on elements with CSS `text-transform: uppercase` because Puppeteer `.innerText` returns rendered uppercase strings while raw DOM strings remain title/sentence case.
+- **Root Cause**:
+  1. Lack of domain-specific pedagogical dictionaries for SPM chemistry.
+  2. Tour steps and periodic table metadata were injected programmatically via JavaScript string literals rather than declarative HTML `data-i18n` tags.
+  3. `window.stoich_lang` was not synchronously maintained on the `window` object when toggling, leading inline helper functions to check only `localStorage`.
+- **Solution**:
+  1. Built comprehensive 219-key contextual SPM dictionary in `js/translations.js`, mapping terms to authentic Malaysian chemistry curriculum (e.g. "Mod Eksperimen", "Tanpa Neraca", "Jisim Atom Relatif", "Hukum Keabadian Jisim", "Strategi 3 Langkah MINOH").
+  2. Tagged over 106 DOM elements in `index.html` with `data-i18n`, `data-i18n-placeholder`, and `data-i18n-title`.
+  3. Updated `HOME_STEPS` in `index.html` with bilingual keys (`badge_bm`, `title_bm`, `desc_bm`, `tip_bm`) and enhanced `renderHomeStep()` to select language dynamically.
+  4. Localized dynamic helper functions in `js/app.js`: `updateHomeMultiplier()`, `updatePlayButton()`, `openElements()`, `updateElementDetails()`, and `renderBadges()`.
+  5. Harmonized test assertions using `.toUpperCase()` for CSS-transformed containers and verified 100% reversion to English when switching back.
+
+
+### 9. Dynamic Viewport Dispatching & Bilingual Invariants for levels.html (11/05/2026)
+- **Problem**:
+  1. `levels.html` serves multiple distinct viewports depending on query parameters (`form=Form%204`, `form=Form%205`, `mode=sandbox`, and `mode=challenge`). Initially, language selection was evaluated once during page load inside inline procedural scripts.
+  2. In Sandbox mode, both empty states and populated user reaction cards lacked contextual Malay phrasing ("Tahap Eksperimen", "Belum Ada Tahap Eksperimen!", "Ciptaan", "Bina Tahap Baru").
+  3. When toggling languages with `#btn-lang-toggle`, dynamically injected level grids and pagination controls did not refresh without a full page reload.
+- **Root Cause**:
+  1. Syllabus cards and sandbox cards were rendered directly inside `DOMContentLoaded` instead of a reusable, parameterized view function.
+  2. Language state was decoupled from the card template engines.
+- **Solution**:
+  1. Encapsulated rendering into `renderSyllabusLevelsScreen()`, `renderSandboxLevelsScreen()`, and `renderChallengeScreen()`, coordinated by a unified dispatcher `window.renderCurrentView()`.
+  2. Bound `window.renderCurrentView()` to the `stoich_lang_changed` CustomEvent, guaranteeing instantaneous bilingual updates across all level titles, difficulty chips, action banners, and pagination without reloading or resetting active pages.
+  3. Localized all 22 official SPM level titles (Form 4 Haber Process to Decomposition, Form 5 Magnesium Oxidation to Contact Process) and Sandbox cards into authentic Malaysian chemistry terminology.
+  4. Verified 100% invariant preservation across all 4 modes with adversarial Puppeteer browser tests.
+
+
+### 10. Complete In-Game Bilingual Architecture & State Preservation for game.html (11/05/2026)
+- **Problem**:
+  1. In-game chemical equations contain physical states of matter (`(s)`, `(l)`, `(g)`, `(aq)`) that require Malaysian SPM standard nomenclature: `(p)` [pepejal], `(ce)` [cecair], `(g)` [gas], and `(ak)` [akueus].
+  2. Socratic multi-stage clue button ("Saya Buntu! Tolong!" -> "Beri saya jawapan!") and Prof. Beaker's chat guidance had hardcoded English tokens and variable reference bugs (TDZ on `isBm`).
+  3. Prof. Beaker Study Room modal, Victory celebration popups, review mode, and Challenge Mode timeout modals bypassed static translation passes.
+  4. Elements styled with CSS `text-transform: uppercase` caused false test failures in Puppeteer when checking exact-cased localized strings with `.innerText`.
+  5. In `initEngine()`, `isBm` was declared inside a conditional block (`if (titleEl && currentLevelData)`), causing asynchronous callbacks (`setTimeout` for the welcome message) to throw an `Uncaught ReferenceError: isBm is not defined`.
+- **Root Cause**:
+  1. Equation rendering in `renderBoard()` destroyed original chemical state strings during HTML generation unless preserved in a dedicated DOM attribute.
+  2. Nested scopes and early exits in `revealGuidedSolvingHint()`, `handleChallengeTimeout()`, and `initEngine()` referenced `isBm` before or outside its block scope.
+  3. Modal contents were dynamically constructed inside JS templates rather than declarative HTML.
+- **Solution**:
+  1. Tagged `.state-label` tokens with `data-state` (`s`, `l`, `g`, `aq`) to enable seamless, lossless toggling between `(s)/(l)/(g)/(aq)` and `(p)/(ce)/(g)/(ak)` without altering chemical formulas.
+  2. Added authentic KSSM SPM element names in `js/translations.js` (Natrium, Kalium, Plumbum, Ferum, Kuprum, Argentum, Zink, etc.) and integrated `getLocalizedElementName()` across Element Tray cards, scale headers, and clue cards.
+  3. Hoisted `const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm'` to the root of all gameplay functions (`initEngine`, `revealGuidedSolvingHint`, `handleChallengeTimeout`, `handleChallengeRoundComplete`, `showWinPopup`, `enterReviewMode`).
+  4. Bound all in-game dynamic elements to `stoich_lang_changed` listener, refreshing HUD, level titles, trays, clue button dynamic text, and study room live without state loss.
+  5. Evaluated `isBm` directly within the welcome message `setTimeout` callback and provided a default fallback in `getLocalizedElementName()`, validating zero console errors across all level entrypoints.
+  6. Validated 100% test coverage with 8 adversarial Puppeteer test suites.
+
+
+### 11. Centralized Single-Point Language Switcher & Event Loop Re-Entrancy Defense (11/05/2026)
+- **Problem**:
+  1. Having duplicate language toggle buttons scattered across sub-pages created visual clutter and conflicting UI expectations.
+  2. In `levels.html`, an event listener for `stoich_lang_changed` invoked `applyTranslations()`, which in turn dispatched `stoich_lang_changed`, causing an infinite recursive call stack explosion (`RangeError: Maximum call stack size exceeded`).
+- **Root Cause**:
+  1. The language toggle component was duplicated in `levels.html` and `game.html` DOM trees instead of being centralized on `index.html`.
+  2. Calling `applyTranslations()` inside a `stoich_lang_changed` subscriber created an unbuffered event loop recursion.
+- **Solution**:
+  1. Removed `#btn-lang-toggle` markup from `levels.html` and `game.html`. The interactive language button now resides exclusively on `index.html`.
+  2. Language selection persists globally in `localStorage.getItem('stoich_lang')`. Child pages (`levels.html`, `game.html`) automatically read this value on load via `js/translations.js` and render in the user's preferred language without showing redundant buttons.
+  3. Removed the circular `applyTranslations()` call from `levels.html`'s `stoich_lang_changed` listener and added re-entrancy protection (`isApplyingTranslations` lock) to `applyTranslations()` in `js/translations.js`.
+  4. Verified with automated browser tests that `#btn-lang-toggle` exists only on `index.html` and that child pages inherit language settings accurately.
