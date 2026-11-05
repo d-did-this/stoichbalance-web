@@ -264,25 +264,26 @@ function updateHomeMultiplier() {
     if (window.homeModifiers.hints) { mult += 0.5; count++; }
     if (window.homeModifiers.rush) { mult += 0.5; count++; }
     
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     const tagEl = document.getElementById('home-multiplier-tag');
     if (tagEl) {
         if (mult >= 2.5) {
-            tagEl.innerText = '2.5x LEGENDARY';
+            tagEl.innerText = isBm ? '2.5x LEGENDA' : '2.5x LEGENDARY';
             tagEl.style.background = '#fef3c7';
             tagEl.style.color = '#d97706';
             tagEl.style.borderColor = '#d97706';
         } else if (mult >= 2.0) {
-            tagEl.innerText = '2.0x EXPERT';
+            tagEl.innerText = isBm ? '2.0x PAKAR' : '2.0x EXPERT';
             tagEl.style.background = '#f3e8ff';
             tagEl.style.color = '#7e22ce';
             tagEl.style.borderColor = '#7e22ce';
         } else if (mult >= 1.5) {
-            tagEl.innerText = '1.5x VETERAN';
+            tagEl.innerText = isBm ? '1.5x VETERAN' : '1.5x VETERAN';
             tagEl.style.background = '#dbeafe';
             tagEl.style.color = '#2563eb';
             tagEl.style.borderColor = '#2563eb';
         } else {
-            tagEl.innerText = '1.0x STANDARD';
+            tagEl.innerText = isBm ? '1.0x STANDARD' : '1.0x STANDARD';
             tagEl.style.background = 'rgba(255, 255, 255, 0.2)';
             tagEl.style.color = 'white';
             tagEl.style.borderColor = 'rgba(255, 255, 255, 0.4)';
@@ -296,8 +297,11 @@ function updatePlayButton() {
     const playBtnText = document.getElementById('play-btn-text');
     const statsBtn = document.getElementById('challenge-stats-btn');
     if (statsBtn) statsBtn.style.display = 'inline-flex';
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    
     if (currentMode === 'class') {
-        playBtnText.innerText = `Start ${currentSubOption}`;
+        const subLabel = currentSubOption === 'Form 4' ? (isBm ? 'Tingkatan 4' : 'Form 4') : (isBm ? 'Tingkatan 5' : 'Form 5');
+        playBtnText.innerText = isBm ? `Mula ${subLabel}` : `Start ${currentSubOption}`;
     } 
     else if (currentMode === 'challenge') {
         let mult = 1.0;
@@ -307,11 +311,17 @@ function updatePlayButton() {
             if (window.homeModifiers.rush) mult += 0.5;
         }
         let multStr = mult > 1.0 ? ` (${mult.toFixed(1)}x)` : '';
-        playBtnText.innerText = `Start ${currentSubOption} Challenge${multStr}`;
+        const diffMap = { Easy: isBm ? 'Mudah' : 'Easy', Medium: isBm ? 'Sederhana' : 'Medium', Hard: isBm ? 'Sukar' : 'Hard' };
+        const diffLabel = diffMap[currentSubOption] || currentSubOption;
+        playBtnText.innerText = isBm ? `Mula Cabaran ${diffLabel}${multStr}` : `Start ${currentSubOption} Challenge${multStr}`;
     } 
     else if (currentMode === 'sandbox') {
         const isLevels = (currentSubOption === 'Select Levels' || currentSubOption === 'Levels');
-        playBtnText.innerText = isLevels ? 'Select Levels' : 'Create Level';
+        if (isBm) {
+            playBtnText.innerText = isLevels ? 'Pilih Tahap' : 'Bina Tahap';
+        } else {
+            playBtnText.innerText = isLevels ? 'Select Levels' : 'Create Level';
+        }
     }
 }
 
@@ -561,10 +571,13 @@ function openElements() {
             </button>`;
         });
         
-        // Add the legend keys
+        // Add the legend keys (Bilingual EN / BM)
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
         let legendHtml = `<div style="grid-column:1 / -1; margin-top: 10px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; padding:10px; background: #f8fafc; border-radius: 16px; border: 3px solid #e2e8f0;">`;
         Object.keys(PT_GROUPS).forEach(g => {
-            let name = g.charAt(0).toUpperCase() + g.slice(1);
+            let name = (typeof window.getGroupNameTranslation === 'function')
+                ? window.getGroupNameTranslation(g, isBm ? 'bm' : 'en')
+                : (g.charAt(0).toUpperCase() + g.slice(1));
             legendHtml += `<div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:900; color:#334155;"><div style="width:16px; height:16px; border-radius:6px; border: 2px solid rgba(0,0,0,0.1); background:${PT_GROUPS[g]}; box-shadow: 0 2px 0 rgba(0,0,0,0.2);"></div>${name}</div>`;
         });
         legendHtml += `</div>`;
@@ -632,7 +645,11 @@ window.updateElementDetails = function(symbol) {
     
     let badge = document.getElementById('ed-group-badge');
     if(badge) {
-        badge.innerText = data.groupName;
+        const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+        const grpToTranslate = data.groupKey || data.groupName || '';
+        badge.innerText = (typeof window.getGroupNameTranslation === 'function')
+            ? window.getGroupNameTranslation(grpToTranslate, isBm ? 'bm' : 'en')
+            : data.groupName;
         badge.style.background = data.color;
     }
     
@@ -683,15 +700,15 @@ window.updateElementDetails = function(symbol) {
         structText.innerHTML = `
             <div style="display:flex; gap:10px; margin-bottom:12px; width:100%;">
                 <div style="flex:1; background:${cBg}; border:2px solid ${cBorder}; border-radius:12px; padding:10px; text-align:center;">
-                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">Protons</div>
+                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Proton' : 'Protons'}</div>
                     <div style="font-size:22px; font-weight:900; color:${cText}; line-height:1; margin-top:4px;">${data.protons}</div>
                 </div>
                 <div style="flex:1; background:${cBg}; border:2px solid ${cBorder}; border-radius:12px; padding:10px; text-align:center;">
-                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">Neutrons</div>
+                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Neutron' : 'Neutrons'}</div>
                     <div style="font-size:22px; font-weight:900; color:${cText}; line-height:1; margin-top:4px;">${data.neutrons}</div>
                 </div>
                 <div style="flex:1; background:${cBg}; border:2px solid ${cBorder}; border-radius:12px; padding:10px; text-align:center;">
-                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">Electrons</div>
+                    <div style="font-size:10px; font-weight:900; color:${cText}; text-transform:uppercase;">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Elektron' : 'Electrons'}</div>
                     <div style="font-size:22px; font-weight:900; color:${cText}; line-height:1; margin-top:4px;">${data.electrons}</div>
                 </div>
             </div>
@@ -1090,7 +1107,7 @@ window.setVkBtnToCheckMode = function() {
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
         </svg>
-        <span id="vk-check-btn-text">Check Equation</span>
+        <span id="vk-check-btn-text">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Semak Persamaan' : 'Check Equation'}</span>
     `;
 };
 
@@ -1111,7 +1128,7 @@ window.setVkBtnToSaveMode = function() {
             <polyline points="17 21 17 13 7 13 7 21"/>
             <polyline points="7 3 7 8 15 8"/>
         </svg>
-        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">Save This Level</span>
+        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Simpan Tahap Ini' : 'Save This Level'}</span>
     `;
 };
 
@@ -1130,7 +1147,7 @@ window.setVkBtnToSavedMode = function() {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"/>
         </svg>
-        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">Saved to Collection! ✓</span>
+        <span id="vk-check-btn-text" style="letter-spacing:0.3px;">${(localStorage.getItem('stoich_lang') || 'en') === 'bm' ? 'Tersimpan dalam Koleksi! ✓' : 'Saved to Collection! ✓'}</span>
     `;
 };
 
@@ -1980,10 +1997,14 @@ window.renderBadges = function(player) {
     
     let pct = allBadges.length > 0 ? Math.round((unlocked.length / allBadges.length) * 100) : 0;
     
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    const achTitle = isBm ? 'Pencapaian Dibuka:' : 'Achievements Unlocked:';
+    const ofWord = isBm ? 'daripada' : 'of';
+
     let bannerHtml = `
         <div class="badges-progress-banner">
             <div class="badges-banner-row">
-                <span>Achievements Unlocked: <b>${unlocked.length} of ${allBadges.length}</b></span>
+                <span>${achTitle} <b>${unlocked.length} ${ofWord} ${allBadges.length}</b></span>
                 <span><b>${pct}%</b></span>
             </div>
             <div class="badges-bar-track">
@@ -2002,6 +2023,10 @@ window.renderBadges = function(player) {
             ? `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>` 
             : `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#94a3b8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
         
+        const bTrans = (typeof window.getBadgeTranslation === 'function') ? window.getBadgeTranslation(b.id, isBm ? 'bm' : 'en') : null;
+        const bName = (bTrans && bTrans.name) ? (bTrans.name[isBm ? 'bm' : 'en'] || bTrans.name) : b.name;
+        const bDesc = (bTrans && bTrans.desc) ? (bTrans.desc[isBm ? 'bm' : 'en'] || bTrans.desc) : b.desc;
+
         gridHtml += `
             <div class="${cardClass}">
                 <div class="badge-trophy-icon-box" style="background:${iconBg}; border-color:${iconBorder};">
@@ -2009,10 +2034,10 @@ window.renderBadges = function(player) {
                 </div>
                 <div class="badge-trophy-content">
                     <div class="badge-trophy-header">
-                        <span class="badge-trophy-title">${b.name}</span>
+                        <span class="badge-trophy-title">${bName}</span>
                         ${statusIndicator}
                     </div>
-                    <div class="badge-trophy-desc">${b.desc}</div>
+                    <div class="badge-trophy-desc">${bDesc}</div>
                 </div>
             </div>
         `;
@@ -2489,9 +2514,13 @@ function escapeHtml(str) {
 window.initBunsenChat = function() {
     let stream = document.getElementById('bunsen-chat-stream');
     if (!stream || stream.children.length > 0) return;
+    const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
+    const greeting = isBm
+        ? "Salam sejahtera, ahli kimia muda! Saya Profesor Bunsen. 🧪 Apakah tindak balas kimia yang ingin anda bina atau terokai hari ini? Tanya saya sebarang soalan kimia, atau pilih salah satu cadangan topik di bawah untuk bermula!"
+        : "Greetings, young chemist! I am Professor Bunsen. 🧪 What chemical reaction would you like to build or explore today? Ask me any chemistry question, or pick one of the prompts below to get started!";
     window.appendBunsenMessage({
         role: 'assistant',
-        content: "Greetings, young chemist! I am Professor Bunsen. 🧪 What chemical reaction would you like to build or explore today? Ask me any chemistry question, or pick one of the prompts below to get started!"
+        content: greeting
     }, false);
 };
 
