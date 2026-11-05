@@ -2459,8 +2459,58 @@ window.vkAiAutoComplete = function() {
     }
 };
 
-// Open AI Reaction & Level Generator Modal
+// ==========================================
+// PROF. BUNSEN AI CONVERSATIONAL CHAT ENGINE
+// ==========================================
+window.bunsenChatHistory = [];
 let currentGeneratedAiLevel = null;
+
+function formatBunsenSubscripts(str) {
+    if (!str) return '';
+    const subMap = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+    return str
+        .replace(/->/g, ' ➔ ')
+        .replace(/→/g, ' ➔ ')
+        .replace(/([A-Za-z\)])(\d+)/g, (m, letter, num) => {
+            return letter + num.split('').map(d => subMap[d] || d).join('');
+        });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+window.initBunsenChat = function() {
+    let stream = document.getElementById('bunsen-chat-stream');
+    if (!stream || stream.children.length > 0) return;
+    window.appendBunsenMessage({
+        role: 'assistant',
+        content: "Greetings, young chemist! I am Professor Bunsen. 🧪 What chemical reaction would you like to build or explore today? Ask me any chemistry question, or pick one of the prompts below to get started!"
+    }, false);
+};
+
+window.openSavedSidebar = function() {
+    if (typeof playSound === 'function') playSound('pop');
+    let sidebar = document.getElementById('bunsen-saved-sidebar');
+    let overlay = document.getElementById('bunsen-sidebar-overlay');
+    if (sidebar) sidebar.classList.add('active');
+    if (overlay) overlay.classList.add('active');
+    window.renderSavedAiLevels();
+};
+
+window.closeSavedSidebar = function() {
+    if (typeof playSound === 'function') playSound('click');
+    let sidebar = document.getElementById('bunsen-saved-sidebar');
+    let overlay = document.getElementById('bunsen-sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+};
 
 window.openAiLevelModal = function() {
     if (typeof playSound === 'function') playSound('pop');
@@ -2469,7 +2519,13 @@ window.openAiLevelModal = function() {
         modal.style.display = 'flex';
         let choiceModal = document.getElementById('sandbox-choice-modal');
         if (choiceModal) choiceModal.style.display = 'none';
+        window.closeSavedSidebar();
+        window.initBunsenChat();
         window.renderSavedAiLevels();
+        setTimeout(() => {
+            let input = document.getElementById('bunsen-chat-input');
+            if (input) input.focus();
+        }, 150);
     }
 };
 
@@ -2477,111 +2533,326 @@ window.closeAiLevelModal = function() {
     if (typeof playSound === 'function') playSound('click');
     let modal = document.getElementById('sandbox-ai-modal');
     if (modal) modal.style.display = 'none';
+    window.closeSavedSidebar();
+    if (typeof window.updateFullscreenNudgeState === 'function') {
+        window.updateFullscreenNudgeState();
+    }
 };
 
-window.setAiPrompt = function(promptText) {
-    let inp = document.getElementById('ai-level-input');
+window.restartBunsenChat = function() {
+    if (typeof playSound === 'function') playSound('click');
+    window.bunsenChatHistory = [];
+    let stream = document.getElementById('bunsen-chat-stream');
+    if (stream) stream.innerHTML = '';
+    window.initBunsenChat();
+};
+
+window.sendBunsenPrompt = function(promptText) {
+    let inp = document.getElementById('bunsen-chat-input');
     if (inp) {
         inp.value = promptText;
-        window.generateAiLevel();
+        window.sendBunsenMessage();
     }
 };
 
-window.generateAiLevel = function() {
+window.sendBunsenMessage = function() {
+    let input = document.getElementById('bunsen-chat-input');
+    let text = input ? input.value.trim() : '';
+    if (!text) return;
+
     if (typeof playSound === 'function') playSound('click');
-    let inp = document.getElementById('ai-level-input');
-    let promptText = inp ? inp.value.trim() : '';
-    let preview = document.getElementById('ai-level-preview') || document.getElementById('ai-preview-card');
-    let statusBox = document.getElementById('ai-status-box');
 
-    if (!promptText) {
-        if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.style.background = '#fef2f2';
-            statusBox.style.color = '#991b1b';
-            statusBox.style.border = '2px solid #ef4444';
-            statusBox.innerHTML = '⚠️ Please enter a chemical reaction or topic!';
+    // Append user message to stream and history
+    window.appendBunsenMessage({ role: 'user', content: text }, true);
+    input.value = '';
+
+    // Show animated typing indicator
+    window.showBunsenTyping();
+
+    // Call DeepSeek API on local server
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: text,
+            history: window.bunsenChatHistory,
+            persona: 'bunsen'
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        window.hideBunsenTyping();
+        if (data && data.reply) {
+            window.appendBunsenMessage({ role: 'assistant', content: data.reply }, true);
+        } else if (data && data.error) {
+            window.appendBunsenMessage({
+                role: 'assistant',
+                content: "⚠️ " + data.error + " Feel free to pick one of the recommended topics below in the meantime!"
+            }, false);
+        } else {
+            throw new Error('No reply received');
         }
-        return;
-    }
-
-    let reaction = window.resolveReactionFromPrompt(promptText);
-
-    if (!reaction) {
-        if (statusBox) {
-            statusBox.style.display = 'block';
-            statusBox.style.background = '#fef2f2';
-            statusBox.style.color = '#991b1b';
-            statusBox.style.border = '2px solid #ef4444';
-            statusBox.innerHTML = '❌ <b>Could not recognize reaction.</b> Try writing formulas (e.g. <code>CH4 + O2</code> or <code>Fe + O2 -> Fe2O3</code>) or choose one of the suggestion chips!';
-        }
-        if (preview) preview.style.display = 'none';
-        return;
-    }
-
-    if (statusBox) statusBox.style.display = 'none';
-    currentGeneratedAiLevel = reaction;
-
-    if (preview) {
-        preview.style.display = 'flex';
-        let titleEl = document.getElementById('ai-preview-title');
-        let diffEl = document.getElementById('ai-preview-difficulty');
-        let eqEl = document.getElementById('ai-preview-equation');
+    })
+    .catch(err => {
+        console.warn('Bunsen API fallback:', err.message);
+        window.hideBunsenTyping();
         
-        if (titleEl) titleEl.innerText = reaction.title;
-        if (diffEl) diffEl.innerText = reaction.difficulty;
-        if (eqEl) eqEl.innerHTML = `${reaction.equation} &nbsp;➔&nbsp; <span style="color:#059669;">${reaction.balancedString}</span>`;
-        
-        let saveBtn = document.getElementById('ai-save-btn');
-        if (saveBtn) {
-            saveBtn.innerText = "💾 Save Level";
-            saveBtn.disabled = false;
+        // Local intelligent fallback matching
+        let localMatch = (typeof window.resolveReactionFromPrompt === 'function') ? window.resolveReactionFromPrompt(text) : null;
+        if (localMatch) {
+            let replyText = `Here is a fantastic reaction matching your topic from my laboratory archives: **${localMatch.title}**!\n\n[REACTION: ${localMatch.equation} | ${localMatch.balancedString} | ${localMatch.title} | ${localMatch.difficulty || 'Intermediate'}]`;
+            window.appendBunsenMessage({ role: 'assistant', content: replyText }, true);
+        } else {
+            window.appendBunsenMessage({
+                role: 'assistant',
+                content: "I could not reach the cloud laboratory right now, but feel free to choose one of our verified reaction topics below or type formulas like CH4 + O2!"
+            }, false);
         }
+    });
+};
+
+window.showBunsenTyping = function() {
+    let stream = document.getElementById('bunsen-chat-stream');
+    if (!stream) return;
+    window.hideBunsenTyping();
+
+    let ind = document.createElement('div');
+    ind.id = 'bunsen-typing-indicator';
+    ind.className = 'bunsen-bubble-assistant-pop';
+    ind.innerHTML = `
+        <div class="bunsen-avatar-pop">🔥</div>
+        <div class="bunsen-bubble-card-pop" style="width:fit-content; flex:none; padding:12px 18px; flex-direction:row; align-items:center; gap:8px;">
+            <span class="bunsen-dot" style="width:8px; height:8px; background:#7c3aed; border-radius:50%; display:inline-block; animation:bunsenBounce 1.4s infinite ease-in-out;"></span>
+            <span class="bunsen-dot" style="width:8px; height:8px; background:#7c3aed; border-radius:50%; display:inline-block; animation:bunsenBounce 1.4s infinite ease-in-out 0.2s;"></span>
+            <span class="bunsen-dot" style="width:8px; height:8px; background:#7c3aed; border-radius:50%; display:inline-block; animation:bunsenBounce 1.4s infinite ease-in-out 0.4s;"></span>
+            <span style="font-size:13px; font-weight:800; color:#6d28d9; margin-left:4px;">Prof. Bunsen is thinking...</span>
+        </div>
+    `;
+    stream.appendChild(ind);
+    stream.scrollTop = stream.scrollHeight;
+};
+
+window.hideBunsenTyping = function() {
+    let ind = document.getElementById('bunsen-typing-indicator');
+    if (ind && ind.parentNode) {
+        ind.parentNode.removeChild(ind);
     }
 };
 
-window.saveCurrentAiLevel = function() {
-    if (!currentGeneratedAiLevel) return;
-    if (typeof playSound === 'function') playSound('start');
+window.appendBunsenMessage = function(msg, saveToHistory = true) {
+    let stream = document.getElementById('bunsen-chat-stream');
+    if (!stream) return;
 
-    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
-    let exists = saved.some(l => l.equation === currentGeneratedAiLevel.equation);
-    if (!exists) {
-        saved.unshift({
-            title: currentGeneratedAiLevel.title,
-            equation: currentGeneratedAiLevel.equation,
-            balancedString: currentGeneratedAiLevel.balancedString,
-            difficulty: currentGeneratedAiLevel.difficulty,
-            createdAt: new Date().toISOString()
+    if (saveToHistory) {
+        window.bunsenChatHistory.push({ role: msg.role, content: msg.content });
+        // Keep last 12 entries to maintain manageable prompt payload
+        if (window.bunsenChatHistory.length > 12) {
+            window.bunsenChatHistory = window.bunsenChatHistory.slice(-12);
+        }
+    }
+
+    if (msg.role === 'user') {
+        let bubble = document.createElement('div');
+        bubble.className = 'bunsen-bubble-user-pop';
+        bubble.innerText = msg.content;
+        stream.appendChild(bubble);
+    } else {
+        // Assistant message: extract all [REACTION: ...] tags
+        let rawContent = msg.content || '';
+        let reactions = [];
+
+        const tagRegex = /\[REACTION:\s*([^|\]]+)\|\s*([^|\]]+)\|\s*([^|\]]+)\|\s*([^|\]]+)\]/gi;
+        const matches = [...rawContent.matchAll(tagRegex)];
+        if (matches && matches.length > 0) {
+            reactions = matches.map(m => ({
+                equation: m[1].trim(),
+                balancedString: m[2].trim(),
+                title: m[3].trim(),
+                difficulty: m[4].trim()
+            }));
+            // Thoroughly strip all [REACTION: ...] tags from message text
+            rawContent = rawContent.replace(/\[REACTION:.*?\]/gis, '').trim();
+        } else {
+            // Check if full content is or contains an equation
+            if (typeof window.resolveReactionFromPrompt === 'function') {
+                let directMatch = window.resolveReactionFromPrompt(rawContent);
+                if (directMatch && directMatch.equation) {
+                    reactions.push(directMatch);
+                }
+            }
+        }
+
+        if (reactions.length > 0) {
+            currentGeneratedAiLevel = reactions[0];
+        }
+
+        // Format message paragraphs and bold text
+        let formattedHtml = escapeHtml(rawContent)
+            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+            .replace(/\n\n/g, '<br><br>')
+            .replace(/\n/g, '<br>');
+
+        // Format any chemical formulas in text with Unicode subscripts
+        formattedHtml = formattedHtml.replace(/\b([A-Z][a-z]?)(\d+)\b/g, (m, el, n) => {
+            const subMap = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+            return el + n.split('').map(d => subMap[d] || d).join('');
         });
-        localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(saved));
+
+        let container = document.createElement('div');
+        container.className = 'bunsen-bubble-assistant-pop';
+
+        // Render card for each detected reaction (Pop Neubrutalist Style)
+        let allCardsHtml = reactions.map(r => {
+            let eqDisplay = formatBunsenSubscripts(r.equation);
+            let balancedDisplay = formatBunsenSubscripts(r.balancedString || r.equation);
+            let safeTitle = escapeHtml(r.title || 'Chemical Reaction');
+            let safeDiff = escapeHtml(r.difficulty || 'Intermediate');
+            let safeEqAttr = escapeHtml(r.equation);
+            let safeBalancedAttr = escapeHtml(r.balancedString || r.equation);
+
+            return `
+                <div class="bunsen-reaction-card-pop">
+                    <!-- Card Body -->
+                    <div class="bunsen-rc-body">
+                        <!-- Difficulty Badge -->
+                        <span class="bunsen-rc-badge">${safeDiff}</span>
+                        
+                        <!-- Icon & Title -->
+                        <div style="font-size:36px; margin:4px 0 2px 0;">⚡</div>
+                        <h3 style="font-weight:900; color:#1e293b; font-size:22px; margin:0 0 14px 0; text-align:center;">${safeTitle}</h3>
+                        
+                        <!-- Equation Box -->
+                        <div class="bunsen-rc-eq-box">
+                            <div style="font-size:21px; font-weight:900; color:#1e293b; letter-spacing:0.5px; text-align:center;">
+                                ${eqDisplay}
+                            </div>
+                        </div>
+
+                        <!-- Goal -->
+                        <div class="bunsen-rc-goal-pill">
+                            Goal: ${balancedDisplay}
+                        </div>
+                        
+                        <!-- Secondary Actions -->
+                        <div style="display:flex; gap:12px; width:100%; justify-content:center;">
+                            <button type="button" class="bunsen-neubrutal-btn" onclick="window.loadBunsenToKeypad('${safeEqAttr}')"
+                                style="flex:1; max-width:150px; background:#ffffff; border-radius:12px; padding:10px 14px; font-weight:800; font-size:14px; color:#4c1d95; gap:6px;">
+                                ✎ Edit
+                            </button>
+                            <button type="button" class="bunsen-neubrutal-btn" onclick="window.saveBunsenReaction('${safeTitle}', '${safeEqAttr}', '${safeBalancedAttr}', '${safeDiff}', this)"
+                                style="flex:1; max-width:150px; background:#ffffff; border-radius:12px; padding:10px 14px; font-weight:800; font-size:14px; color:#1a1a1a; gap:6px;">
+                                💾 Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Primary Action (Full Width Bottom) -->
+                    <button type="button" class="bunsen-rc-play-btn" onclick="window.playBunsenReaction('${safeEqAttr}')">
+                        ▶ Play in Sandbox
+                    </button>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="bunsen-avatar-pop">🔥</div>
+            <div class="bunsen-bubble-card-pop">
+                <div style="font-size:16.5px; line-height:1.6;">${formattedHtml}</div>
+                ${allCardsHtml}
+            </div>
+        `;
+        stream.appendChild(container);
     }
 
-    let saveBtn = document.getElementById('ai-save-btn');
-    if (saveBtn) {
-        saveBtn.innerText = "✅ Saved to Collection!";
-        saveBtn.disabled = true;
-    }
-    window.renderSavedAiLevels();
+    stream.scrollTop = stream.scrollHeight;
+    if (typeof playSound === 'function') playSound('pop');
 };
 
-window.playCurrentAiLevel = function() {
-    if (!currentGeneratedAiLevel) return;
+window.playBunsenReaction = function(eq) {
     if (typeof playSound === 'function') playSound('start');
     let nameParam = encodeURIComponent(document.getElementById('player-name').value.trim() || 'Student');
-    let eqParam = encodeURIComponent(currentGeneratedAiLevel.equation);
+    let eqParam = encodeURIComponent(eq);
     window.transitionTo(`game.html?level=sandbox&name=${nameParam}&eq=${eqParam}`);
 };
 
-window.editInVirtualKeyboard = function() {
-    if (!currentGeneratedAiLevel) return;
+window.loadBunsenToKeypad = function(eq) {
+    if (typeof playSound === 'function') playSound('click');
     window.closeAiLevelModal();
     window.openVirtualKeyboardModal();
     let disp = document.getElementById('vk-display');
     if (disp) {
-        disp.innerText = currentGeneratedAiLevel.equation;
-        window.vkCheck();
+        disp.innerText = eq;
+        if (typeof window.vkCheck === 'function') {
+            window.vkCheck();
+        }
     }
+};
+
+window.saveBunsenReaction = function(title, eq, balancedString, difficulty, btnEl) {
+    if (typeof playSound === 'function') playSound('start');
+    let saved = JSON.parse(localStorage.getItem('stoich_saved_custom_levels') || '[]');
+    let exists = saved.some(l => l.equation.replace(/\s+/g, '') === eq.replace(/\s+/g, ''));
+    if (!exists) {
+        saved.unshift({
+            title: title || 'Custom Reaction',
+            equation: eq,
+            balancedString: balancedString || eq,
+            difficulty: difficulty || 'Custom Level',
+            createdAt: new Date().toISOString()
+        });
+        localStorage.setItem('stoich_saved_custom_levels', JSON.stringify(saved));
+    }
+    if (btnEl) {
+        btnEl.innerHTML = '✅ Saved!';
+        btnEl.disabled = true;
+        btnEl.style.background = '#10b981';
+        btnEl.style.color = '#ffffff';
+    }
+    window.renderSavedAiLevels();
+};
+
+window.toggleSavedLevelsDrawer = function() {
+    let container = document.getElementById('ai-saved-levels-container');
+    let arrow = document.getElementById('ai-saved-toggle-arrow');
+    if (!container) return;
+
+    if (container.style.display === 'none' || !container.style.display) {
+        container.style.display = 'flex';
+        if (arrow) arrow.innerText = '▲';
+    } else {
+        container.style.display = 'none';
+        if (arrow) arrow.innerText = '▼';
+    }
+};
+
+// Backward-compatibility bridges
+window.setAiPrompt = function(promptText) {
+    window.sendBunsenPrompt(promptText);
+};
+
+window.generateAiLevel = function() {
+    window.sendBunsenMessage();
+};
+
+window.saveCurrentAiLevel = function() {
+    if (!currentGeneratedAiLevel) return;
+    window.saveBunsenReaction(
+        currentGeneratedAiLevel.title,
+        currentGeneratedAiLevel.equation,
+        currentGeneratedAiLevel.balancedString,
+        currentGeneratedAiLevel.difficulty,
+        null
+    );
+};
+
+window.playCurrentAiLevel = function() {
+    if (!currentGeneratedAiLevel) return;
+    window.playBunsenReaction(currentGeneratedAiLevel.equation);
+};
+
+window.editInVirtualKeyboard = function() {
+    if (!currentGeneratedAiLevel) return;
+    window.loadBunsenToKeypad(currentGeneratedAiLevel.equation);
 };
 
 window.saveSandboxKeypadLevel = function() {
@@ -2650,39 +2921,25 @@ window.renderSavedAiLevels = function() {
                 }
             }
 
+            let safeDiff = escapeHtml(lvl.difficulty || 'Custom');
             return `
-                <div style="background:#ffffff; border:2.5px solid #1e293b; border-radius:14px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 3px 0 #1e293b; width:100%; box-sizing:border-box;">
-                    <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-                        <div style="width:36px; height:36px; border-radius:10px; background:#ede9fe; color:#6d28d9; border:2px solid #1e293b; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 2px 0 #1e293b;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M10 2v7.31L4.1 19.33A2 2 0 0 0 5.82 22h12.36a2 2 0 0 0 1.72-2.67L14 9.31V2"/>
-                                <line x1="8" y1="2" x2="16" y2="2"/>
-                                <line x1="6.5" y1="16" x2="17.5" y2="16"/>
-                            </svg>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:3px; min-width:0;">
-                            <span style="font-size:13.5px; font-weight:900; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${displayTitle}</span>
-                            <span style="font-size:12px; font-weight:800; color:#6d28d9; font-family:monospace; background:#f5f3ff; border:1px solid #ddd6fe; border-radius:6px; padding:2px 8px; width:fit-content; letter-spacing:0.3px;">${eq}</span>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center; flex-shrink:0;">
-                        <button type="button" class="interactive ai-saved-play-btn" onclick="window.playSavedLevel('${encodeURIComponent(lvl.equation)}')" 
-                            style="background:#10b981; border:2.5px solid #1e293b; color:#ffffff; font-size:12.5px; font-weight:900; border-radius:10px; padding:6px 14px; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 0 #047857;" 
-                            title="Play Level Now">
-                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                                <polygon points="5 3 19 12 5 21 5 3"/>
-                            </svg>
-                            <span>Play</span>
-                        </button>
-                        <button type="button" class="interactive ai-saved-del-btn" onclick="window.deleteSavedLevel(${idx})" 
-                            style="background:#fee2e2; border:2.5px solid #1e293b; color:#dc2626; border-radius:10px; padding:6px 10px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 0 #991b1b;" 
-                            title="Delete Level">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
+                <div style="background:#ffffff; border:2.5px solid #1a1a1a; border-radius:16px; padding:16px; box-shadow:4px 4px 0px #1a1a1a; display:flex; flex-direction:column; gap:8px;" class="bunsen-saved-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:11px; font-weight:900; color:#4338ca; background:#e0e7ff; border:1.5px solid #1a1a1a; border-radius:9999px; padding:2px 8px; letter-spacing:0.5px; text-transform:uppercase;">
+                            ${safeDiff}
+                        </span>
+                        <button type="button" onclick="window.deleteSavedLevel(${idx})" title="Delete reaction" 
+                            style="background:none; border:none; color:#9ca3af; cursor:pointer; padding:2px; transition:color 0.15s;" 
+                            onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
+                            <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
+                    <h3 style="font-weight:900; color:#1a1a1a; margin:0; font-size:17px; word-break:break-word;">${displayTitle}</h3>
+                    <p style="font-size:14px; font-weight:800; color:#4b5563; margin:0 0 6px 0; font-family:monospace; word-break:break-word;">${eq}</p>
+                    <button type="button" onclick="window.playSavedLevel('${encodeURIComponent(lvl.equation)}')" class="bunsen-neubrutal-btn" 
+                        style="width:100%; background:#10b981; color:#ffffff; font-weight:900; font-size:13px; border-radius:10px; padding:9px 12px; gap:6px;">
+                        ▶ Play
+                    </button>
                 </div>
             `;
         }).join('');
