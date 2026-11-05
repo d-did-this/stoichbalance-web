@@ -463,3 +463,22 @@
   2. Language selection persists globally in `localStorage.getItem('stoich_lang')`. Child pages (`levels.html`, `game.html`) automatically read this value on load via `js/translations.js` and render in the user's preferred language without showing redundant buttons.
   3. Removed the circular `applyTranslations()` call from `levels.html`'s `stoich_lang_changed` listener and added re-entrancy protection (`isApplyingTranslations` lock) to `applyTranslations()` in `js/translations.js`.
   4. Verified with automated browser tests that `#btn-lang-toggle` exists only on `index.html` and that child pages inherit language settings accurately.
+
+
+### 12. Chemistry Virtual Keyboard Numpad Viewport Containment, Fluid Sizing, and Scrollable Tutorial Architecture (11/05/2026)
+- **Problem**:
+  1. On screens with vertical heights <= 768px (e.g. 1024x650, 1024x600, 1024x500), the numpad in `#sandbox-virtual-modal` (`+ Tambah (+)`, `→ Hasil (→)`, `Clear`) flowed out past the bottom border of the white card into the dark backdrop.
+  2. The tutorial guide card ("Cara Membina Persamaan") occupied a fixed vertical block of ~220px, while keypad buttons had rigid CSS rules (`min-height: 44px` and `min-height: 42px`) that prevented flexbox from shrinking them.
+  3. When an equation was typed, the dynamic `#vk-check-btn` ("Semak Persamaan" / "Simpan Tahap Ini") pushed the operator row even further down into the backdrop.
+- **Root Cause**:
+  1. The modal card `.card` lacked `overflow: hidden;` and used rigid vertical padding.
+  2. The right column container had `display: flex; flex-direction: column; justify-content: space-between;` without `min-height: 0;` or `overflow: hidden;`, which prevented child elements from yielding space.
+  3. Duplicate CSS blocks in `index.html` repeatedly overrode button sizing with static `min-height: 44px;`.
+  4. The tutorial guide card lacked `flex-shrink: 1` and internal scroll capability.
+- **Solution**:
+  1. Enforced hard containment on `.vk-modal-card` with `overflow: hidden;` and responsive vertical padding (`clamp(10px, 1.8vh, 20px)`).
+  2. Configured the right column `.vk-right-panel` with `min-height: 0; overflow: hidden;` and wrapped the tutorial guide into `.vk-guide-container` with `flex: 1 1 auto; min-height: 0;` containing `.vk-guide-card` with `overflow-y: auto;` and a sleek thin scrollbar.
+  3. Set `flex-shrink: 0;` on `.vk-keypad-container` and `.vk-action-wrapper` to guarantee the numpad is never crushed or hidden.
+  4. Replaced rigid `min-height: 44px` with fluid responsive formulas: `.vk-num-btn` (`height: clamp(28px, 4.4vh, 40px)`) and `.vk-op-btn` (`height: clamp(30px, 4.6vh, 40px)`).
+  5. Added `@media (max-height: 780px)` and `@media (max-height: 620px)` breakpoints for compact step text, badges, and button heights down to 500px viewports.
+  6. Incorporated 32-suite adversarial browser tests in `gatekeeper_deploy.js` verifying 100% containment across 1080p, 900p, 768p, 700p, 650p, 600p, 550p, and 500p heights in both empty and active equation states.
