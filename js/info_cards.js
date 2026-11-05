@@ -381,15 +381,15 @@
     }
 
     
-    function getMinohElementClassification(sym) {
+    function getMinohElementClassification(sym, isBm = false) {
         const METALS = new Set(['Na', 'K', 'Ca', 'Mg', 'Al', 'Zn', 'Fe', 'Pb', 'Cu', 'Ag', 'Ba', 'Li', 'Sn', 'Ni', 'Mn', 'Cr']);
         if (METALS.has(sym)) {
             return {
                 letter: 'M',
-                category: 'Metal',
-                priorityText: 'Priority 1 • Balance first!',
-                priorityShort: 'Priority 1 (First)',
-                tip: 'Metals are always balanced first in the MINOH order.',
+                category: isBm ? 'Logam' : 'Metal',
+                priorityText: isBm ? 'Keutamaan 1 • Imbang dahulu!' : 'Priority 1 • Balance first!',
+                priorityShort: isBm ? 'Keutamaan 1 (Dahulu)' : 'Priority 1 (First)',
+                tip: isBm ? 'Logam sentiasa diimbangkan dahulu dalam turutan MINOH.' : 'Metals are always balanced first in the MINOH order.',
                 bg: '#eff6ff',
                 color: '#1d4ed8',
                 border: '#bfdbfe'
@@ -398,10 +398,10 @@
         if (sym === 'O') {
             return {
                 letter: 'O',
-                category: 'Oxygen',
-                priorityText: 'Priority 4 • Leave for the end',
-                priorityShort: 'Priority 4 (Near End)',
-                tip: 'Oxygen is balanced near the end before Hydrogen.',
+                category: isBm ? 'Oksigen' : 'Oxygen',
+                priorityText: isBm ? 'Keutamaan 4 • Simpan ke hujung' : 'Priority 4 • Leave for the end',
+                priorityShort: isBm ? 'Keutamaan 4 (Hampir Hujung)' : 'Priority 4 (Near End)',
+                tip: isBm ? 'Oksigen diimbangkan hampir ke hujung sebelum Hidrogen.' : 'Oxygen is balanced near the end before Hydrogen.',
                 bg: '#fef2f2',
                 color: '#b91c1c',
                 border: '#fca5a5'
@@ -410,10 +410,10 @@
         if (sym === 'H') {
             return {
                 letter: 'H',
-                category: 'Hydrogen',
-                priorityText: 'Priority 5 • Always balance last',
-                priorityShort: 'Priority 5 (Last)',
-                tip: 'Hydrogen is always balanced last in the MINOH order.',
+                category: isBm ? 'Hidrogen' : 'Hydrogen',
+                priorityText: isBm ? 'Keutamaan 5 • Sentiasa imbang terakhir' : 'Priority 5 • Always balance last',
+                priorityShort: isBm ? 'Keutamaan 5 (Terakhir)' : 'Priority 5 (Last)',
+                tip: isBm ? 'Hidrogen sentiasa diimbangkan terakhir dalam turutan MINOH.' : 'Hydrogen is always balanced last in the MINOH order.',
                 bg: '#ecfdf5',
                 color: '#047857',
                 border: '#6ee7b7'
@@ -421,17 +421,53 @@
         }
         return {
             letter: 'N',
-            category: 'Non-Metal',
-            priorityText: 'Priority 3 • Balance after metals',
-            priorityShort: 'Priority 3 (After Metals)',
-            tip: 'Non-metals are balanced after metals and polyatomic ions.',
+            category: isBm ? 'Bukan Logam' : 'Non-Metal',
+            priorityText: isBm ? 'Keutamaan 3 • Imbang selepas logam' : 'Priority 3 • Balance after metals',
+            priorityShort: isBm ? 'Keutamaan 3 (Selepas Logam)' : 'Priority 3 (After Metals)',
+            tip: isBm ? 'Bukan logam diimbangkan selepas logam dan ion poliatom.' : 'Non-metals are balanced after metals and polyatomic ions.',
             bg: '#f0f9ff',
             color: '#0369a1',
             border: '#bae6fd'
         };
     }
 
+    function renderMinohPipelineTrack(activeLetter, isBm = false) {
+        const letters = [
+            { key: 'M', full: isBm ? 'Logam' : 'Metal', color: '#1d4ed8' },
+            { key: 'I', full: isBm ? 'Ion Poliatom' : 'Polyatomic Ions', color: '#6d28d9' },
+            { key: 'N', full: isBm ? 'Bukan Logam' : 'Non-Metal', color: '#0284c7' },
+            { key: 'O', full: isBm ? 'Oksigen' : 'Oxygen', color: '#b91c1c' },
+            { key: 'H', full: isBm ? 'Hidrogen' : 'Hydrogen', color: '#047857' }
+        ];
+
+        const stepIndex = letters.findIndex(l => l.key === activeLetter);
+        const activeObj = letters[stepIndex] || letters[0];
+        const stepNumber = stepIndex >= 0 ? (stepIndex + 1) : 1;
+
+        const trackNodes = letters.map(l => {
+            const isActive = (l.key === activeLetter);
+            if (isActive) {
+                return `<div style="flex:1; height:24px; border-radius:6px; background:${l.color}; color:#ffffff; font-weight:900; font-size:0.75rem; display:flex; align-items:center; justify-content:center; border:1.5px solid #0f172a; box-shadow:0 1.5px 0 #0f172a;">${l.key}</div>`;
+            } else {
+                return `<div style="flex:1; height:24px; border-radius:6px; background:#f1f5f9; color:#94a3b8; font-weight:800; font-size:0.72rem; display:flex; align-items:center; justify-content:center; border:1px solid #e2e8f0;">${l.key}</div>`;
+            }
+        }).join('<span style="color:#cbd5e1; font-size:0.65rem; font-weight:900; padding:0 1px;">➔</span>');
+
+        return `
+            <div style="display:flex; flex-direction:column; gap:4px; width:100%;">
+                <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.68rem; font-weight:900; text-transform:uppercase; color:#64748b;">
+                    <span>${isBm ? 'Langkah MINOH' : 'MINOH Step'}</span>
+                    <span style="color:${activeObj.color}; font-weight:900;">[${activeObj.key}] ${activeObj.full} (${isBm ? 'Langkah ' + stepNumber + '/5' : 'Step ' + stepNumber + ' of 5'})</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:2px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:4px 6px;">
+                    ${trackNodes}
+                </div>
+            </div>
+        `;
+    }
+
     function buildCardData(type, target, e) {
+        const isBm = ((typeof localStorage !== 'undefined' && localStorage.getItem('stoich_lang')) || 'en') === 'bm';
         const text = target.innerText.trim();
 
         switch (type) {
@@ -597,31 +633,29 @@
                 };
             }
 
-            // 4. Element Symbol: Shows Periodic Table Group instead of atomic mass
+            // 4. Element Symbol: Shows Periodic Table Group and MINOH Pipeline Stepper
             case 'element': {
                 const sym = target.getAttribute('data-element') || text;
                 const meta = getElementMeta(sym);
-                const grp = ELEMENT_GROUPS[sym] || "Periodic Table Element";
-                const minoh = getMinohElementClassification(sym);
+                const localizedName = (typeof window.getLocalizedElementName === 'function' ? window.getLocalizedElementName(sym, isBm) : meta.name);
+                const grp = ELEMENT_GROUPS[sym] || (isBm ? "Unsur Jadual Berkala" : "Periodic Table Element");
+                const minoh = getMinohElementClassification(sym, isBm);
 
                 return {
                     badgeClass: 'sic-badge-element',
-                    badgeText: 'Periodic Element',
-                    title: `${meta.name} (${sym})`,
+                    badgeText: isBm ? 'Unsur Berkala' : 'Periodic Element',
+                    title: `${localizedName} (${sym})`,
                     visualHtml: `
-                        <div class="sic-visual-graphic" style="gap:10px;">
+                        <div class="sic-visual-graphic" style="gap:10px; margin-bottom:6px;">
                             ${renderAtomCircle(sym, 32)}
                             <div style="font-size:0.82rem; font-weight:800; color:#0f172a; text-align:left;">
                                 <div style="color:#0284c7; font-weight:900;">${grp}</div>
                                 <div style="color:#64748b; font-size:0.75rem;">${meta.type}</div>
                             </div>
                         </div>
-                        <div style="margin-top:6px; padding:4px 8px; border-radius:6px; background:${minoh.bg}; border:1.5px solid ${minoh.border}; display:flex; align-items:center; justify-content:space-between; gap:6px;">
-                            <span style="font-size:0.76rem; font-weight:900; color:${minoh.color};">🏷️ MINOH: [${minoh.letter}] ${minoh.category}</span>
-                            <span style="font-size:0.72rem; font-weight:800; color:${minoh.color};">${minoh.priorityShort}</span>
-                        </div>
+                        ${renderMinohPipelineTrack(minoh.letter, isBm)}
                     `,
-                    callout: `${minoh.tip} Every ${sym} atom entering on the left must exit on the right.`
+                    callout: `${minoh.tip} ${isBm ? 'Setiap atom yang bertindak balas mestilah seimbang di kedua-dua belah pihak.' : `Every ${sym} atom entering on the left must exit on the right.`}`
                 };
             }
 
@@ -791,11 +825,12 @@
                 };
             }
 
-            // 10. Element Tray Tracker Card: Direct and non-wordy
+            // 10. Element Tray Tracker Card: Pipeline Stepper (Option 1)
             case 'tracker-card': {
                 const elSym = target.getAttribute('data-element') || 'H';
                 const elMeta = getElementMeta(elSym);
-                const minoh = getMinohElementClassification(elSym);
+                const localizedName = (typeof window.getLocalizedElementName === 'function' ? window.getLocalizedElementName(elSym, isBm) : elMeta.name);
+                const minoh = getMinohElementClassification(elSym, isBm);
 
                 let rCount = 0;
                 let pCount = 0;
@@ -812,26 +847,32 @@
 
                 let statusDesc = '';
                 if (isEmpty) {
-                    statusDesc = 'No atoms added yet.';
+                    statusDesc = isBm ? 'Belum ada atom ditambah.' : 'No atoms added yet.';
                 } else if (isBalanced) {
-                    statusDesc = 'Left and right atom counts match.';
+                    statusDesc = isBm ? `Atom seimbang (${rCount} = ${pCount}).` : `Atoms are balanced (${rCount} = ${pCount}).`;
                 } else if (rCount < pCount) {
-                    statusDesc = `The Reactants' ${elMeta.name} is low.`;
+                    statusDesc = isBm ? `Perlu +${pCount - rCount} di sebelah Bahan Tindak Balas.` : `Needs +${pCount - rCount} on Reactants side.`;
                 } else {
-                    statusDesc = `The Products' ${elMeta.name} is low.`;
+                    statusDesc = isBm ? `Perlu +${rCount - pCount} di sebelah Hasil.` : `Needs +${rCount - pCount} on Products side.`;
                 }
+
+                const atomCountBadge = `
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#ffffff; border:1.5px solid #e2e8f0; border-radius:8px; padding:5px 8px; font-size:0.75rem; font-weight:800; color:#475569; margin-bottom:6px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
+                        <span>${isBm ? 'Bahan Tindak Balas' : 'Reactants'}: <b style="color:#0f172a; font-size:0.85rem;">${rCount}</b></span>
+                        <span style="font-size:0.85rem;">⚖️</span>
+                        <span>${isBm ? 'Hasil' : 'Products'}: <b style="color:#0f172a; font-size:0.85rem;">${pCount}</b></span>
+                    </div>
+                `;
 
                 return {
                     badgeClass: isBalanced ? 'sic-badge-balanced' : (isEmpty ? 'sic-badge-control' : 'sic-badge-unbalanced'),
-                    badgeText: isBalanced ? 'Balanced' : (isEmpty ? 'Empty' : 'Unbalanced'),
+                    badgeText: isBalanced ? (isBm ? 'Seimbang' : 'Balanced') : (isEmpty ? (isBm ? 'Kosong' : 'Empty') : (isBm ? 'Tidak Seimbang' : 'Unbalanced')),
                     accentColor: isBalanced ? '#10b981' : (isEmpty ? '#64748b' : '#ef4444'),
-                    title: `${elMeta.name} (${elSym})`,
+                    title: `${localizedName} (${elSym})`,
                     desc: statusDesc,
                     visualHtml: `
-                        <div style="margin-top:4px; padding:4px 8px; border-radius:6px; background:${minoh.bg}; border:1.5px solid ${minoh.border}; display:flex; align-items:center; justify-content:space-between; gap:6px;">
-                            <span style="font-size:0.76rem; font-weight:900; color:${minoh.color};">🏷️ MINOH: [${minoh.letter}] ${minoh.category}</span>
-                            <span style="font-size:0.72rem; font-weight:800; color:${minoh.color};">${minoh.priorityShort}</span>
-                        </div>
+                        ${atomCountBadge}
+                        ${renderMinohPipelineTrack(minoh.letter, isBm)}
                     `,
                     callout: minoh.tip
                 };
