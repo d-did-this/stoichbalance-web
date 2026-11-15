@@ -2598,8 +2598,9 @@ window.sendBunsenMessage = function() {
     // Show animated typing indicator
     window.showBunsenTyping();
 
-    // Call DeepSeek API on local server
-    fetch('/api/chat', {
+    // Call DeepSeek API on local server or production endpoint
+    const chatApiUrl = window.location.hostname.includes('github.io') ? 'https://stoichbalance-edu.vercel.app/api/chat' : '/api/chat';
+    fetch(chatApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

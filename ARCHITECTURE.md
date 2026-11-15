@@ -227,3 +227,25 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
 - **Chat MINOH Strategy (`window.buildLevelMinohPlanCard`)**:
   - Module: [js/game.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/js/game.js)
   - Display: Option 3 (Lab Checklist) featuring mission briefing checklist items, item count badge, and advice footer without redundant duplicate sequence boxes.
+
+
+## 24. Defensive AI Proxy & Chat Security Architecture (`api/chat.js` & `server.js`)
+* **Secret Isolation (CWE-798 Defense)**:
+  - Zero hardcoded API keys in source control or public GitHub commits.
+  - In local development, [server.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/server.js) safely loads keys from [.env](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/.env), which is strictly gitignored.
+  - In cloud deployment, [api/chat.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/api/chat.js) reads `process.env.DEEPSEEK_API_KEY` configured in the hosting dashboard. If the environment variable is missing, the endpoint rejects the request with HTTP 500 and an explicit configuration error message.
+* **Origin & CORS Restriction (CWE-770 Defense)**:
+  - Direct rejection of wildcard cross-origin requests.
+  - Explicit allowlist `ALLOWED_ORIGINS` restricts access to approved deployment domains (`https://stoichbalance-edu.vercel.app`, `https://d-did-this.github.io`, and `http://localhost:3000`).
+* **Resource Exhaustion & Rate Limiting (CWE-770 / CWE-400 Defense)**:
+  - Sliding-window IP rate limiter restricts client calls to a maximum of 25 requests per minute per IP, with a minimum 1.2s delay between consecutive calls.
+  - Automatic timestamp pruning prevents in-memory leaks during extended daemon uptimes.
+  - Hard payload limit of 12 KB rejects oversized payloads with HTTP 413.
+* **Strict Role & Input Sanitization (CWE-20 Defense)**:
+  - Client message is trimmed and clamped to 500 characters, returning HTTP 400 if empty.
+  - Level context is trimmed and clamped to 800 characters.
+  - Client history roles are clamped strictly to `'assistant'` or `'user'` turns, preventing attackers from injecting arbitrary `'system'` prompts via historical context.
+* **Dual Persona Support**:
+  - Persona routing automatically selects Professor Beaker for curriculum balancing levels and Professor Bunsen for the Sandbox chemical experiment lab.
+* **Output Normalization**:
+  - Automatically replaces em dashes with hyphens and semicolons with commas before returning responses to the browser.

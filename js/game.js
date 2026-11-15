@@ -1473,9 +1473,10 @@ Current Reactant Atom Totals: ${JSON.stringify(rCounts)}
 Current Product Atom Totals: ${JSON.stringify(pCounts)}`;
     }
 
-    // 4. Fetch DeepSeek from local proxy
+    // 4. Fetch DeepSeek from local proxy or production endpoint
     try {
-        const response = await fetch('/api/chat', {
+        const chatApiUrl = window.location.hostname.includes('github.io') ? 'https://stoichbalance-edu.vercel.app/api/chat' : '/api/chat';
+        const response = await fetch(chatApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

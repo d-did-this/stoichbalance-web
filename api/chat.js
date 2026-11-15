@@ -1,5 +1,25 @@
 // Vercel Serverless Function: /api/chat
+// Hardened with Antigravity Defensive Security Standards
 const https = require('https');
+const fs = require('fs');
+const path = require('path');
+
+// Safe local fallback from .env (ignored by version control)
+if (!process.env.DEEPSEEK_API_KEY) {
+    try {
+        const envPath = path.join(process.cwd(), '.env');
+        if (fs.existsSync(envPath)) {
+            const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed && !trimmed.startsWith('#') && trimmed.startsWith('DEEPSEEK_API_KEY=')) {
+                    process.env.DEEPSEEK_API_KEY = trimmed.split('=')[1].trim();
+                    break;
+                }
+            }
+        }
+    } catch (e) {}
+}
 
 const PROF_BEAKER_SYSTEM_PROMPT = `You are Professor Beaker, an enthusiastic, friendly chemistry mentor in the Stoichbalance learning tool. You guide students (SPM Chemistry Form 4/5, Chapter 3: Chemical Formulae and Equations) to discover and understand chemical balancing.
 
@@ -44,12 +64,70 @@ TEACHING PRINCIPLES:
    - Zero semicolons (;).
    - Zero AI buzzwords (delve, crucial, vital, tapestry, intricate, showcase, highlight, underscore, testament, navigate, pivotal).`;
 
+const PROF_BUNSEN_SYSTEM_PROMPT = `You are Professor Bunsen, the passionate AI Chemical Architect in Stoichbalance. You are chatting directly with students in the Sandbox reaction lab.
+
+YOUR MISSION:
+1. TALK TO THE STUDENT: Speak warmly, enthusiastically, and conversationally. Ask what kind of reactions or chemistry topics they want to explore (e.g. combustion, rocket propellant, fireworks, rusting, acid-base, precipitation, synthesis).
+2. GIVE SPECIFIC RECOMMENDATIONS: Whenever the student asks for an idea, recommendation, or topic, give 1-2 exciting real-world reactions, explain why they are fascinating or tricky to balance, and ask what they think!
+3. REACTION TAG SPECIFICATION:
+   Whenever you recommend, propose, or discuss a chemical reaction for the student to balance, ALWAYS append a tag on its own line at the end of your response in this exact format:
+   [REACTION: Reactants -> Products | BalancedEquation | Title | Difficulty]
+   
+   Examples:
+   - [REACTION: CH4 + O2 -> CO2 + H2O | CH4 + 2O2 -> CO2 + 2H2O | Combustion of Methane | Intermediate]
+   - [REACTION: NH3 + O2 -> NO + H2O | 4NH3 + 5O2 -> 4NO + 6H2O | Oxidation of Ammonia | Advanced]
+   - [REACTION: Fe + O2 -> Fe2O3 | 4Fe + 3O2 -> 2Fe2O3 | Rusting of Iron | Intermediate]
+   - [REACTION: HCl + NaOH -> NaCl + H2O | HCl + NaOH -> NaCl + H2O | Neutralisation | Easy]
+   - [REACTION: N2 + H2 -> NH3 | N2 + 3H2 -> 2NH3 | Haber Process | Easy]
+   - [REACTION: Al + Fe2O3 -> Al2O3 + Fe | 2Al + Fe2O3 -> Al2O3 + 2Fe | Thermite Reaction | Advanced]
+   - [REACTION: Na + H2O -> NaOH + H2 | 2Na + 2H2O -> 2NaOH + H2 | Sodium & Water Reaction | Intermediate]
+
+4. STRICT INVARIANTS:
+   - Zero em dashes (—). Use hyphens, commas, or colons instead.
+   - Zero semicolons (;).
+   - Zero AI buzzwords (delve, crucial, vital, tapestry, intricate, showcase, highlight, underscore, testament, navigate, pivotal).
+   - Keep messages lively, engaging, and concise (2-4 sentences max per response) so the chat stays fast and responsive!`;
+
+// Allowed CORS Origins allowlist (CWE-770 defense)
+const ALLOWED_ORIGINS = new Set([
+    'https://stoichbalance-edu.vercel.app',
+    'https://d-did-this.github.io',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+]);
+
+// In-Memory Rate Limiting per serverless instance (CWE-770 defense)
+const ipRequests = new Map();
+function checkServerlessRateLimit(ip) {
+    const now = Date.now();
+    const timestamps = (ipRequests.get(ip) || []).filter(t => now - t < 60000);
+    if (timestamps.length >= 25) {
+        return false; // Max 25 requests per minute per IP
+    }
+    if (timestamps.length > 0 && (now - timestamps[timestamps.length - 1]) < 1200) {
+        return false; // Minimum 1.2s delay between requests
+    }
+    timestamps.push(now);
+    ipRequests.set(ip, timestamps);
+    if (ipRequests.size > 1000) {
+        const threshold = now - 60000;
+        for (const [k, v] of ipRequests.entries()) {
+            if (v.length === 0 || v[v.length - 1] < threshold) {
+                ipRequests.delete(k);
+            }
+        }
+    }
+    return true;
+}
+
 module.exports = async function handler(req, res) {
-    // CORS headers
+    // 1. Strict CORS Allowlist Enforcement
+    const clientOrigin = req.headers.origin || '';
+    const originToSet = ALLOWED_ORIGINS.has(clientOrigin) ? clientOrigin : 'https://stoichbalance-edu.vercel.app';
+    res.setHeader('Access-Control-Allow-Origin', originToSet);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(200);
@@ -63,7 +141,15 @@ module.exports = async function handler(req, res) {
         return;
     }
 
-    // Parse body if needed (Vercel provides req.body, but handle raw stream as fallback)
+    // 2. Rate Limiting Check
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
+    if (!checkServerlessRateLimit(ip)) {
+        res.writeHead(429, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Rate limit exceeded. Please wait a moment before sending another message.' }));
+        return;
+    }
+
+    // 3. Body Parsing with Payload Size Guard (Max 12KB)
     let body = req.body;
     if (!body || typeof body !== 'object') {
         try {
@@ -71,7 +157,14 @@ module.exports = async function handler(req, res) {
                 body = JSON.parse(body);
             } else {
                 let raw = '';
-                for await (const chunk of req) { raw += chunk; }
+                for await (const chunk of req) {
+                    raw += chunk;
+                    if (raw.length > 12288) {
+                        res.writeHead(413, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ error: 'Payload too large.' }));
+                        return;
+                    }
+                }
                 body = JSON.parse(raw || '{}');
             }
         } catch (e) {
@@ -79,24 +172,44 @@ module.exports = async function handler(req, res) {
         }
     }
 
-    const userMessage = body.message || '';
-    const history = Array.isArray(body.history) ? body.history : [];
-    const levelContext = body.levelContext || '';
-
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
-        res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: "Server configuration error: DEEPSEEK_API_KEY is missing." }));
+    // 4. Input Sanitization & Clamping (CWE-20 defense)
+    const rawMessage = typeof body.message === 'string' ? body.message : '';
+    const userMessage = rawMessage.trim().slice(0, 500);
+    if (!userMessage) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Message cannot be empty.' }));
         return;
     }
 
+    const levelContext = (typeof body.levelContext === 'string') ? body.levelContext.trim().slice(0, 800) : '';
+
+    // 5. Secret Retrieval: Zero Hardcoded Keys in Source Control (CWE-798 defense)
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ 
+            error: 'DeepSeek API key is not configured in Vercel Environment Variables. Please set DEEPSEEK_API_KEY in the Vercel project dashboard.' 
+        }));
+        return;
+    }
+
+    // 6. Persona Selection (Supports both Prof. Bunsen in Sandbox and Prof. Beaker in Game)
+    const persona = (body.persona === 'bunsen' || body.agent === 'bunsen') ? 'bunsen' : 'beaker';
+    const systemPrompt = (persona === 'bunsen') ? PROF_BUNSEN_SYSTEM_PROMPT : PROF_BEAKER_SYSTEM_PROMPT;
+
     const messages = [
-        { role: 'system', content: PROF_BEAKER_SYSTEM_PROMPT + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }
+        { role: 'system', content: systemPrompt + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }
     ];
 
+    // 7. Provenance & Role Sanitization (Clamp strictly to user/assistant turns)
+    const history = Array.isArray(body.history) ? body.history : [];
     history.slice(-4).forEach(h => {
-        if (h.role && h.content) {
-            messages.push({ role: h.role, content: h.content });
+        if (h && typeof h.content === 'string') {
+            const safeRole = (h.role === 'assistant') ? 'assistant' : 'user';
+            const safeContent = h.content.trim().slice(0, 500);
+            if (safeContent) {
+                messages.push({ role: safeRole, content: safeContent });
+            }
         }
     });
 
@@ -127,6 +240,7 @@ module.exports = async function handler(req, res) {
                     try {
                         const parsed = JSON.parse(dsData);
                         let reply = parsed.choices?.[0]?.message?.content || 'Keep experimenting with the molecules to balance the atoms!';
+                        // Output sanitization: normalize forbidden punctuation
                         reply = reply.replace(/\u2014/g, ' - ').replace(/;/g, ',');
                         res.writeHead(200, { 'Content-Type': 'application/json' });
                         res.end(JSON.stringify({ reply: reply }));

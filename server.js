@@ -129,7 +129,7 @@ YOUR MISSION:
    - Keep messages lively, engaging, and concise (2-4 sentences max per response) so the chat stays fast and responsive!`;
 
 function handleDeepSeekChat(req, res) {
-    const ip = req.socket.remoteAddress || 'unknown';
+    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim();
     const rateStatus = checkRateLimit(ip);
     if (!rateStatus.allowed) {
         res.writeHead(429, { 'Content-Type': 'application/json' });
@@ -137,33 +137,54 @@ function handleDeepSeekChat(req, res) {
     }
 
     let body = '';
-    req.on('data', chunk => { body += chunk; });
+    let isTooLarge = false;
+    req.on('data', chunk => {
+        body += chunk;
+        if (body.length > 12288) {
+            isTooLarge = true;
+        }
+    });
     req.on('end', () => {
+        if (isTooLarge) {
+            res.writeHead(413, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ error: 'Payload too large.' }));
+        }
+
         try {
             const data = JSON.parse(body || '{}');
-            const userMessage = data.message || '';
-            const history = Array.isArray(data.history) ? data.history : [];
-            const levelContext = data.levelContext || '';
+            const rawMessage = typeof data.message === 'string' ? data.message : '';
+            const userMessage = rawMessage.trim().slice(0, 500);
+            if (!userMessage) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ error: 'Message cannot be empty.' }));
+            }
+
+            const levelContext = (typeof data.levelContext === 'string') ? data.levelContext.trim().slice(0, 800) : '';
 
             const apiKey = process.env.DEEPSEEK_API_KEY;
             if (!apiKey) {
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 return res.end(JSON.stringify({ 
-                    error: 'DeepSeek API key is not configured on the local server.' 
+                    error: 'DeepSeek API key is not configured on the local server. Set DEEPSEEK_API_KEY in .env file.' 
                 }));
             }
 
             // Build conversation payload
-            const persona = data.persona || (data.agent === 'bunsen' ? 'bunsen' : 'beaker');
+            const persona = (data.persona === 'bunsen' || data.agent === 'bunsen') ? 'bunsen' : 'beaker';
             const systemPrompt = (persona === 'bunsen') ? PROF_BUNSEN_SYSTEM_PROMPT : PROF_BEAKER_SYSTEM_PROMPT;
             const messages = [
                 { role: 'system', content: systemPrompt + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }
             ];
 
-            // Append last 4 messages for conversational context
+            // Append last 4 messages with role and content clamping (CWE-20 defense)
+            const history = Array.isArray(data.history) ? data.history : [];
             history.slice(-4).forEach(h => {
-                if (h.role && h.content) {
-                    messages.push({ role: h.role, content: h.content });
+                if (h && typeof h.content === 'string') {
+                    const safeRole = (h.role === 'assistant') ? 'assistant' : 'user';
+                    const safeContent = h.content.trim().slice(0, 500);
+                    if (safeContent) {
+                        messages.push({ role: safeRole, content: safeContent });
+                    }
                 }
             });
 
@@ -182,7 +203,7 @@ function handleDeepSeekChat(req, res) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`,
+                    'Authorization': Bearer ,
                     'Content-Length': Buffer.byteLength(payload)
                 }
             }, dsRes => {

@@ -514,3 +514,24 @@
   1. **Strict Mock-First Testing**: Automated verification scripts must mock `/api/chat` with offline deterministic response fixtures (`mockReply: '...'`).
   2. **Zero-Token Test Environments**: Tests must run against dummy API keys (`mock-testing-key-zero-cost`) so accidental un-mocked requests fail immediately with zero cost.
   3. **No Automated Live API Loops**: Live paid API calls are strictly restricted to deliberate, single-turn manual user testing. Automated batch testing against paid endpoints is prohibited.
+
+
+---
+
+### 40. Defensive Chat Security Hardening & Zero-Exposure Invariants
+
+- **Symptom**:
+  1. A preliminary security audit identified four key risks in the AI chat proxy implementation:
+     - Hardcoded fallback API keys in source files created a risk of credential leakage if pushed to a public repository (CWE-798).
+     - Permissive CORS headers (`*`) allowed arbitrary third-party web origins to issue requests to the serverless proxy.
+     - Unbounded payload acceptance and lack of per-IP rate limiting left the endpoint open to resource exhaustion (CWE-770).
+     - Unchecked client-supplied conversation history allowed arbitrary `role` parameters, opening an avenue for role confusion or system prompt tampering (CWE-20).
+- **Root Cause**:
+  1. Early iteration serverless handlers prioritized speed of development by inlining test secrets directly in the source file.
+  2. Missing input validation guards allowed client payloads to dictate parameters without sanitization or rate boundaries.
+- **Enforced Solution & Project Invariants**:
+  1. **Strict Zero Hardcoded Secrets**: All API keys must be loaded exclusively through `process.env.DEEPSEEK_API_KEY` (in cloud production) or a gitignored `.env` file (in local development). Committing any raw key string to version control is strictly forbidden.
+  2. **Explicit CORS Allowlist**: Access to `/api/chat` is restricted exclusively to authorized domains (`https://stoichbalance-edu.vercel.app`, `https://d-did-this.github.io`, and `http://localhost:3000`).
+  3. **Sliding-Window Rate Limiting**: An in-memory rate limiter caps requests at 25 calls per minute per IP, with a mandatory 1.2s delay between consecutive calls. Payloads exceeding 12 KB are rejected immediately with HTTP 413.
+  4. **Strict Role Clamping**: All historical turns supplied by the client are strictly mapped to either `'user'` or `'assistant'`. Any attempt to inject `'system'` roles or malformed structures is stripped before forwarding to the upstream AI service.
+  5. **Persona Parity**: Both Professor Beaker (curriculum levels) and Professor Bunsen (Sandbox experiment lab) system prompts are consolidated within the proxy, ensuring consistent pedagogical behavior across environments.
