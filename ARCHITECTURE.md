@@ -249,3 +249,18 @@ To eliminate element collisions, text squeezing, and beaker clipping on tablet s
   - Persona routing automatically selects Professor Beaker for curriculum balancing levels and Professor Bunsen for the Sandbox chemical experiment lab.
 * **Output Normalization**:
   - Automatically replaces em dashes with hyphens and semicolons with commas before returning responses to the browser.
+
+
+## 25. Custom Level Subscript & Sandbox Navigation Lifecycle (`levels.html` & `js/game.js`)
+* **Subscript Normalization**:
+  - Centralized `formatEquationSubscripts(str)` converts raw ASCII chemical formulas into standard Unicode subscripts (`₀` to `₉`) for numbers following element symbols or closing brackets.
+  - Standardizes ASCII arrows (`->` and `➔`) to Unicode right arrows (`→`).
+  - Applied uniformly across [levels.html](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/levels.html) custom reaction cards and the top title in [game.html](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/game.html).
+* **URL Parameter Precedence over Local Storage**:
+  - In [js/game.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/js/game.js), `params.get('eq')` takes absolute precedence over `stoich_custom_sandbox` cached in localStorage.
+  - When an explicit `eq` parameter is provided in the URL query string, the engine solves and builds that exact chemical level and updates local storage.
+  - Local storage is only read as a fallback when no equation parameter is specified.
+* **Sandbox Navigation State Invariant**:
+  - In [levels.html](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/levels.html), clicking play passes `&mode=sandbox` alongside `level=sandbox`.
+  - In [js/game.js](file:///C:/Workspace/04_Tech_and_Projects/2_Web_Development/3_Stoichbalance_V2/js/game.js), `window.handleGameBackClick()` checks whether `level === 'sandbox'` or `mode === 'sandbox'`, redirecting back to `levels.html?mode=sandbox` to preserve the user's custom laboratory view.
+  - The victory celebration modal "Main Menu" button returns the player to `levels.html?mode=sandbox`.

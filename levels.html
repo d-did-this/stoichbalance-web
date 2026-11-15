@@ -354,6 +354,19 @@ window.addEventListener('load', () => {
 
   
 <script>
+function formatEquationSubscripts(str) {
+    if (!str) return '';
+    const subMap = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+    return str
+        .replace(/\s*->\s*/g, ' → ')
+        .replace(/\s*➔\s*/g, ' → ')
+        .replace(/\s*→\s*/g, ' → ')
+        .replace(/([A-Za-z\)])(\d+)/g, (m, letter, num) => {
+            return letter + num.split('').map(d => subMap[d] || d).join('');
+        });
+}
+window.formatEquationSubscripts = formatEquationSubscripts;
+
 let myCurrentPage = 1;
 const ITEMS_PER_PAGE = 6;
 let myTotalPages = 1;
@@ -1090,7 +1103,7 @@ window.renderSandboxLevelsScreen = function(params) {
                         e.currentTarget.style.transform = 'translateY(6px)';
                         e.currentTarget.style.setProperty('box-shadow', 'none', 'important');
                         if (typeof window.playSound === 'function') window.playSound('retro-select');
-                        window.transitionTo(`game.html?level=sandbox&name=${encodeURIComponent(nameParam)}&eq=${encodeURIComponent(lvl.equation)}`);
+                        window.transitionTo(`game.html?level=sandbox&mode=sandbox&name=${encodeURIComponent(nameParam)}&eq=${encodeURIComponent(lvl.equation)}`);
                     };
 
                     const eqText = lvl.equation || (isBmList ? 'Tindak Balas Ciptaan' : 'Custom Reaction');
@@ -1116,7 +1129,7 @@ window.renderSandboxLevelsScreen = function(params) {
                         <div class="card-body">
                             <div class="card-icon">${iconText}</div>
                             <h3 class="lvl-name">${displayTitle}</h3>
-                            <p class="lvl-equation">${eqText}</p>
+                            <p class="lvl-equation">${formatEquationSubscripts(eqText)}</p>
                         </div>
                         <div class="status-banner banner-blue">${isBmList ? 'MAIN' : 'PLAY'}</div>
                     `;

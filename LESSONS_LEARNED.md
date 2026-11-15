@@ -535,3 +535,21 @@
   3. **Sliding-Window Rate Limiting**: An in-memory rate limiter caps requests at 25 calls per minute per IP, with a mandatory 1.2s delay between consecutive calls. Payloads exceeding 12 KB are rejected immediately with HTTP 413.
   4. **Strict Role Clamping**: All historical turns supplied by the client are strictly mapped to either `'user'` or `'assistant'`. Any attempt to inject `'system'` roles or malformed structures is stripped before forwarding to the upstream AI service.
   5. **Persona Parity**: Both Professor Beaker (curriculum levels) and Professor Bunsen (Sandbox experiment lab) system prompts are consolidated within the proxy, ensuring consistent pedagogical behavior across environments.
+
+
+---
+
+### 41. Sandbox Custom Level Caching vs. Query Parameter Precedence
+
+- **Symptom**:
+  1. Custom levels created via Professor Bunsen or the Sandbox builder showed raw ASCII characters and unformatted numbers (e.g. `Pb(NO3)2 + KI -> PbI2 + KNO3`) on the level cards in `levels.html`.
+  2. Clicking "PLAY" on a custom reaction card loaded a stale previous reaction (`I → I`) instead of the chosen equation.
+  3. Clicking the top-left `< Back` button during a sandbox level dumped the user onto the Form 4 syllabus level grid instead of the Sandbox Levels screen.
+- **Root Cause**:
+  1. `levels.html` lacked a subscript formatter in the custom level card renderer, directly interpolating raw equation strings into the DOM.
+  2. `game.js` checked `localStorage.getItem('stoich_custom_sandbox')` before inspecting `params.get('eq')`. Any existing session in local storage masked newly clicked equations.
+  3. `window.handleGameBackClick()` evaluated level IDs with `startsWith('F5')`, falling back to `'Form 4'` when the ID was `'sandbox'`.
+- **Enforced Solution & Project Invariants**:
+  1. **Subscript Standardizer**: Enforced `formatEquationSubscripts(str)` across both `levels.html` and `game.js`, ensuring all displayed equations render with proper Unicode subscripts and clean arrows.
+  2. **Query Parameter Precedence**: In `js/game.js`, URL query parameters always override local storage cache. If `params.get('eq')` is present, it is validated and built first.
+  3. **Mode-Aware Back Navigation**: In `js/game.js`, sandbox sessions explicitly return to `levels.html?mode=sandbox` on both back button click and victory modal return.

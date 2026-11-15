@@ -1,3 +1,16 @@
+function formatEquationSubscripts(str) {
+    if (!str) return '';
+    const subMap = {'0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉'};
+    return str
+        .replace(/\s*->\s*/g, ' → ')
+        .replace(/\s*➔\s*/g, ' → ')
+        .replace(/\s*→\s*/g, ' → ')
+        .replace(/([A-Za-z\)])(\d+)/g, (m, letter, num) => {
+            return letter + num.split('').map(d => subMap[d] || d).join('');
+        });
+}
+window.formatEquationSubscripts = formatEquationSubscripts;
+
 window.buildLevelMinohPlanCard = function(levelData) {
     const isBm = (localStorage.getItem('stoich_lang') || 'en') === 'bm';
     if (!levelData || !levelData.elements) return '';
@@ -187,8 +200,12 @@ window.handleGameBackClick = function() {
     } else {
         const params = new URLSearchParams(window.location.search);
         const lvl = params.get('level') || '';
-        const form = params.get('form') || (lvl.toUpperCase().startsWith('F5') ? 'Form 5' : 'Form 4');
         const name = params.get('name') || localStorage.getItem('currentPlayer') || 'Player';
+        if (lvl === 'sandbox' || params.get('mode') === 'sandbox') {
+            window.transitionTo(`levels.html?mode=sandbox&name=${encodeURIComponent(name)}`);
+            return;
+        }
+        const form = params.get('form') || (lvl.toUpperCase().startsWith('F5') ? 'Form 5' : 'Form 4');
         window.transitionTo(`levels.html?form=${encodeURIComponent(form)}&mode=class&name=${encodeURIComponent(name)}`);
     }
 };
@@ -350,21 +367,33 @@ function initEngine() {
     levelId = levelId.replace(/['"]/g, '');
     
     if (levelId === 'sandbox') {
-        let stored = localStorage.getItem('stoich_custom_sandbox');
+        let eqParam = params.get('eq');
         let customData = null;
-        if (stored) {
-            try { customData = JSON.parse(stored); } catch (_) {}
+        if (eqParam) {
+            customData = (typeof window.buildSandboxLevelData === 'function') ? window.buildSandboxLevelData(eqParam) : null;
+            if (customData && customData.valid) {
+                try { localStorage.setItem('stoich_custom_sandbox', JSON.stringify(customData)); } catch (_) {}
+            }
         }
         if (!customData || !customData.reactants || customData.reactants.length === 0) {
-            let eqParam = params.get('eq') || localStorage.getItem('stoich_sandbox_level') || 'H2 + O2 -> H2O';
-            customData = (typeof window.buildSandboxLevelData === 'function') ? window.buildSandboxLevelData(eqParam) : null;
+            let stored = localStorage.getItem('stoich_custom_sandbox');
+            if (stored) {
+                try { customData = JSON.parse(stored); } catch (_) {}
+            }
+        }
+        if (!customData || !customData.reactants || customData.reactants.length === 0) {
+            let fallbackEq = localStorage.getItem('stoich_sandbox_level') || 'H2 + O2 -> H2O';
+            customData = (typeof window.buildSandboxLevelData === 'function') ? window.buildSandboxLevelData(fallbackEq) : null;
         }
         if (customData) {
+            let formattedEq = (typeof formatEquationSubscripts === 'function')
+                ? formatEquationSubscripts(customData.equation || 'Custom Reaction')
+                : (customData.equation || 'Custom Reaction');
             currentLevelData = {
                 id: 'sandbox',
-                title: 'Sandbox : ' + (customData.equation || 'Custom Reaction'),
+                title: 'Sandbox : ' + formattedEq,
                 form: 'Sandbox',
-                equation: customData.equation || 'Custom Reaction',
+                equation: formattedEq,
                 reactants: customData.reactants,
                 products: customData.products,
                 elements: customData.elements,
@@ -392,7 +421,7 @@ function initEngine() {
     let titleEl = document.getElementById("level-title");
     if (titleEl && currentLevelData) {
         if (levelId === 'sandbox') {
-            titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + (currentLevelData.equation || 'Custom Reaction');
+            titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + formatEquationSubscripts(currentLevelData.equation || 'Custom Reaction');
         } else if (levelId === 'TUT0' || levelId === 'tutorial') {
             titleEl.innerText = isBm ? "Tutorial : Sintesis Air" : "Tutorial : Water Synthesis";
         } else {
@@ -2218,7 +2247,10 @@ window.showWinPopup = function(isPerfect) {
         buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.slideTransitionTo('game.html?level=${nextLevel}')" style=" background: #3b82f6; color: white; border: 4px solid #1d4ed8; box-shadow: 0 8px 0 #1e3a8a;">${nextBtnLabel}</button>`;
     }
     
-    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('levels.html')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">${isBm ? 'MENU UTAMA' : 'MAIN MENU'}</button>`;
+    let returnTarget = (levelId === 'sandbox')
+        ? `levels.html?mode=sandbox&name=${encodeURIComponent(new URLSearchParams(window.location.search).get('name') || localStorage.getItem('currentPlayer') || 'Player')}`
+        : 'levels.html';
+    buttonsHtml += `<button class="win-btn interactive" onclick="if(typeof playSound==='function') playSound('click'); window.transitionTo('${returnTarget}')" style=" background: #ec4899; color: white; border: 4px solid #be185d; box-shadow: 0 8px 0 #9d174d;">${isBm ? 'MENU UTAMA' : 'MAIN MENU'}</button>`;
     buttonsHtml += `</div>`;
 
     let modal = document.createElement("div");
@@ -2861,7 +2893,7 @@ window.addEventListener('stoich_lang_changed', () => {
             const lvlId = currentLevelData.id || (new URLSearchParams(window.location.search).get('level') || 'F4L1');
             let transTitle = (typeof window.getLevelTitle === 'function') ? window.getLevelTitle(lvlId, currentLevelData.title) : currentLevelData.title;
             if (lvlId === 'sandbox') {
-                titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + (currentLevelData.equation || 'Custom Reaction');
+                titleEl.innerText = (isBm ? "Eksperimen : " : "Sandbox : ") + formatEquationSubscripts(currentLevelData.equation || 'Custom Reaction');
             } else if (lvlId === 'TUT0' || lvlId === 'tutorial') {
                 titleEl.innerText = isBm ? "Tutorial : Sintesis Air" : "Tutorial : Water Synthesis";
             } else {
