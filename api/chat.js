@@ -83,7 +83,7 @@ module.exports = async function handler(req, res) {
     const history = Array.isArray(body.history) ? body.history : [];
     const levelContext = body.levelContext || '';
 
-    const apiKey = process.env.DEEPSEEK_API_KEY || 'sk-edcebe67d9ae4d5685211339dd2bb040';
+    const apiKey = process.env.DEEPSEEK_API_KEY || 'sk-67d64c0e446e4c4392a2b9dd5877c835';
 
     const messages = [
         { role: 'system', content: PROF_BEAKER_SYSTEM_PROMPT + (levelContext ? `\n\nCurrent Level Context:\n${levelContext}` : '') }

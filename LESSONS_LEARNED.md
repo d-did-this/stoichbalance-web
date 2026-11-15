@@ -498,3 +498,19 @@
   2. Implemented structured mission briefing checklist rows with clear checkbox status badges (`[✓] Step X: Element / [Category] Guidance`).
   3. Integrated a step counter badge (`2 Steps` / `2 Langkah`) and clean footer reminder (`💡 Follow the MINOH order to avoid cyclic re-balancing!`).
   4. Fully localized across Form 4 and Form 5 equations in both English and Bahasa Melayu.
+
+---
+
+### 39. Zero Live Token Consumption Invariant (API Quota Protection Law)
+
+- **Symptom**:
+  1. During active test development between Nov 4 and Nov 9, automated test suites (Puppeteer browser verification runners and script loops) made live requests to `/api/chat`.
+  2. Live requests were sent directly to `api.deepseek.com`, burning through 518 calls and 77.9 million cumulative tokens.
+  3. Overdraft paused the live API key at -$0.18 USD.
+- **Root Cause**:
+  1. Test runners did not intercept `/api/chat` network requests or use local canned mock fixtures.
+  2. Conversation arrays accumulated state across test runs without automated session clearing.
+- **Enforced Solution & Project Invariant**:
+  1. **Strict Mock-First Testing**: Automated verification scripts must mock `/api/chat` with offline deterministic response fixtures (`mockReply: '...'`).
+  2. **Zero-Token Test Environments**: Tests must run against dummy API keys (`mock-testing-key-zero-cost`) so accidental un-mocked requests fail immediately with zero cost.
+  3. **No Automated Live API Loops**: Live paid API calls are strictly restricted to deliberate, single-turn manual user testing. Automated batch testing against paid endpoints is prohibited.
